@@ -1,38 +1,58 @@
 {
   "name": "rogue-lineage-tycoon",
+  "globIgnorePaths": [
+	"**/package.json",
+	"**/tsconfig.json"
+	],
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
-      "$ignoreUnknownInstances": true,
-      "$path": "src/ReplicatedStorage",
       "Packages": {
         "$path": "Packages"
-      }
+      },
+			"rbxts_include": {
+				"$path": "include",
+				"node_modules": {
+					"$className": "Folder",
+					"@rbxts": {
+						"$path": "node_modules/@rbxts"
+					}
+				}
+			},
+			"Modules": {
+				"$path": "out/shared/modules"
+			},
+			"PlayerModules": {
+				"$path": "out/client/modules"
+			}
     },
     "ServerScriptService": {
       "$className": "ServerScriptService",
-      "$ignoreUnknownInstances": true,
-      "$path": "src/ServerScriptService"
+      "Source": {
+				"$path": "out/server/scripts"
+			}
     },
     "ServerStorage": {
       "$className": "ServerStorage",
-      "$ignoreUnknownInstances": true,
-      "$path": "src/ServerStorage"
+			"Source": {
+				"$path": "out/server/modules"	
+			}
     },
     "StarterPlayer": {
       "$className": "StarterPlayer",
       "StarterCharacterScripts": {
         "$className": "StarterCharacterScripts",
-        "$ignoreUnknownInstances": true,
-        "$path": "src/StarterPlayer/StarterCharacterScripts"
+				"Source": {
+					"$path": "out/client/scripts/character"
+				}
       },
       "StarterPlayerScripts": {
         "$className": "StarterPlayerScripts",
-        "$ignoreUnknownInstances": true,
-        "$path": "src/StarterPlayer/StarterPlayerScripts"
-      },
-      "$ignoreUnknownInstances": true
+        "Source": {
+					"$path": "out/client/scripts/player"
+				}
+      }
     }
   }
 }

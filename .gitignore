@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 Packages/
 node_modules/
 
 *.rbxl
+=======
+/node_modules
+/out
+/include
+*.tsbuildinfo
+>>>>>>> 254eefc12a6e3d21336ab613992fca9cbe8840c5
