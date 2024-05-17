@@ -1,23 +1,20 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local ServerScriptService = game:GetService("ServerScriptService")
-local ServerStorage = game:GetService("ServerStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Signal = require(Knit.Util.Signal)
-local Trove = require(Knit.Util.Trove)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 
-local DataService, RagdollService
+local RagdollService, HealthService
 
 -- responsible for things that pose a danger to the player and their effects
 --		- fall damage
 
 local DangerService = Knit.CreateService {
 	Name = "DangerService";
-	
+
 	SessionData = {};
-	
+
 	Client = {};
 }
 
@@ -28,19 +25,19 @@ local CastVisualizer = require(ReplicatedStorage.Utility.CastVisualizer)
 local function snipe(character: Model)
 	local player = Players:GetPlayerFromCharacter(character)
 	local particleAtt = character.Head.ParticleAttachment
-	
+
 	local critted = script.Critted:Clone()
 	local sniped = script.Sniped:Clone()
 	local crit = script.Crit:Clone()
-	
+
 	critted.Parent = particleAtt
 	sniped.Parent = particleAtt
 	crit.Parent = particleAtt
-	
+
 	critted:Play()
 	sniped:Play()
 	crit:Emit(1)
-	
+
 	HealthService.Kill(player)
 end
 
@@ -54,7 +51,7 @@ function DangerService.Update(deltaTime: number)
 			if not humanoid then return end
 			local hrp: Part = character:FindFirstChild("HumanoidRootPart")
 			if not hrp then return end
-			
+
 			local sessionData = DangerService.SessionData[player.UserId]
 			local falling = hrp.AssemblyLinearVelocity.Y < 0
 			if false and falling then
@@ -73,14 +70,14 @@ function DangerService.Update(deltaTime: number)
 						print(string.format("fell %d studs (%d -> %d)", MATH.Truncate(deltaHeight, 2), sessionData.StartHeight, nowHeight))
 						print(string.format("in %s seconds", MATH.Truncate(sessionData.AirTime, 2)))
 					end
-					
+
 					humanoid:TakeDamage(damage)
 					if damage > humanoid.MaxHealth*.75 then
 						RagdollService.Pop(character)
 						HealthService.Kill(player)
 					end
 				end
-				
+
 				sessionData.AirTime = 0
 				sessionData.StartHeight = nowHeight
 			end
@@ -93,7 +90,7 @@ end
 function DangerService.OnCharacterAdded(character: Model)
 	local player = Players:GetPlayerFromCharacter(character)
 	if not player then error("???") end
-	
+
 	DangerService.SessionData[player.UserId] = {
 		AirTime = 0;
 		StartHeight = 0;
@@ -109,13 +106,11 @@ function DangerService:KnitInit()
 end
 
 function DangerService:KnitStart()
-	-- initialize knit services
-	DataService = Knit.GetService("DataService")
 	HealthService = Knit.GetService("HealthService")
 	RagdollService = Knit.GetService("RagdollService")
 
 	self._trove:Connect(RunService.Heartbeat, self.Update)
-	
+
 	game:BindToClose(function()
 		self._trove:Destroy()
 	end)
