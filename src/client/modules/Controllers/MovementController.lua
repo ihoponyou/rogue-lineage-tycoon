@@ -1,13 +1,3 @@
-local PRINT_DIAGNOSES = false
-local PRINT_STARTS = false
-local PRINT_STOPS = false
-local VISUALIZE = false
-
-local BASE_CLIMB_SPEED = 10
-local BASE_WALK_SPEED = 20
-local DASH_DURATION = 0.4
-local MAX_CLIMB_BONUS = 10 -- bonus for max climb training
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -25,6 +15,16 @@ local CastVisualizer = require(ReplicatedStorage.Source.Modules.CastVisualizer)
 local MovementController = Knit.CreateController {
 	Name = "MovementController"
 }
+
+local PRINT_DIAGNOSES = false
+local PRINT_STARTS = false
+local PRINT_STOPS = false
+local VISUALIZE = false
+
+local BASE_CLIMB_SPEED = 10
+local BASE_WALK_SPEED = 20
+local DASH_DURATION = 0.4
+local MAX_CLIMB_BONUS = 10 -- bonus for max climb training
 
 local VFX = ReplicatedStorage.Effects.Visuals
 local SFX = ReplicatedStorage.Effects.Sounds
@@ -63,21 +63,29 @@ function MovementController:ClimbStart(ray : RaycastResult)
 
 	local character = self.Character
 
-	self.ClimbForce = self._climbTrove:Clone(script.ClimbForce)
+	self.ClimbForce = self._climbTrove:Construct(Instance, "LinearVelocity") :: LinearVelocity
 	self.ClimbForce.Parent = character
 	self.ClimbForce.Attachment0 = character.HumanoidRootPart.RootAttachment
 	self.ClimbForce.MaxForce = math.huge
 
-	self.GoalPart = self._climbTrove:Clone(script.GoalPart)
+	self.GoalPart = self._climbTrove:Construct(Instance, "Part") :: Part
 	self.GoalPart.Parent = character.HumanoidRootPart
+	self.GoalPart.Size = Vector3.new(4, 1.2, 2)
+	self.GoalPart.CanCollide = false
+	self.GoalPart.CanQuery = false
+	self.GoalPart.CanTouch = false
+	self.GoalPart.Anchored = true
+	self.GoalPart.Transparency = 1
 
-	self.GoalAttachment = self._climbTrove:Add(Instance.new("Attachment"))
+	self.GoalAttachment = self._climbTrove:Construct(Instance, "Attachment") :: Attachment
 	self.GoalAttachment.Parent = self.GoalPart
 
-	self.ClimbConstraint = self._climbTrove:Clone(script.ClimbConstraint)
+	self.ClimbConstraint = self._climbTrove:Construct(Instance, "AlignOrientation") :: AlignOrientation
 	self.ClimbConstraint.Parent = character
 	self.ClimbConstraint.Attachment0 = character.HumanoidRootPart.RootAttachment
 	self.ClimbConstraint.Attachment1 = self.GoalAttachment
+	self.ClimbConstraint.AlignType = Enum.AlignType.Parallel
+	self.ClimbConstraint.MaxTorque = 10^6
 
 	local humanoid = character:FindFirstChild("Humanoid")
 	humanoid.AutoRotate = false
