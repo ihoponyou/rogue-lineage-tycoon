@@ -5,6 +5,7 @@ local PRINT_SETS = true
 
 local BASE_WALK_SPEED = 20
 local BASE_MAX_HP = 100
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -39,7 +40,7 @@ local DataService = Knit.CreateService {
 	};
 }
 
-
+local PLAYER_DATA_TEMPLATE = ReplicatedFirst.Data
 
 local function error404(player: Player): string
 	return string.format("Profile not found for \"%s\"", player.Name)
@@ -114,15 +115,15 @@ function DataService.AddStatChange(player: Player, stat: string, value: number)
 end
 
 function DataService.ResetStatChanges(player: Player)
-	local sessionData = player:FindFirstChild("Data")
-	if not sessionData then error("Session data not found for "..player.Name) end
-	local statChanges = sessionData:FindFirstChild("StatChanges")
+	local playerData = player:FindFirstChild("Data")
+	if not playerData then error("Session data not found for "..player.Name) end
+	local statChanges = playerData:FindFirstChild("StatChanges")
 	if not statChanges then error("Stat changes folder not found for "..player.Name) end
 
 	statChanges:Destroy()
 
-	local new = script.Data.StatChanges:Clone()
-	new.Parent = sessionData
+	local new = PLAYER_DATA_TEMPLATE.StatChanges:Clone()
+	new.Parent = playerData
 end
 
 
@@ -152,7 +153,7 @@ local function giveLeaderStats(player: Player)
 end
 
 local function giveDataFolder(player: Player)
-	local folder = script.Data:Clone()
+	local folder = PLAYER_DATA_TEMPLATE:Clone()
 	folder.Parent = player
 end
 

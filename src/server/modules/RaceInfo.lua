@@ -13,8 +13,8 @@ type Race = {
 
 	Actives: {string};
 	Passives: {string};
-	StatChanges: {number};
-	Phenotypes: {Phenotype};
+	StatChanges: {[string]: number};
+	Phenotypes: {[string]: Phenotype};
 
 	IsBald: boolean;
 	HasCustomHead: boolean;
@@ -672,14 +672,6 @@ RaceInfo.Rollables = TableFunctions.Filter(RaceInfo.Glossary, function(race: Rac
 	return race.Category == "Rollable"
 end)
 
-function RaceInfo.GetRandomPhenotype(raceName: string): string
-	local race = RaceInfo.Glossary[raceName]
-	local phenotypes = TableFunctions.ArrayFromKeys(race.Phenotypes)
-	if #phenotypes < 2 then return "Default" end
-
-	return phenotypes[math.random(1, #phenotypes)]
-end
-
 local function getTotalAbundance(t: {[string]: Race})
 	local total = 0
 	for _, data in t do
@@ -687,15 +679,22 @@ local function getTotalAbundance(t: {[string]: Race})
 	end
 	return total
 end
+RaceInfo._totalAbundance = getTotalAbundance(RaceInfo.Rollables)
+
+function RaceInfo.GetRandomPhenotype(raceName: string): string
+	local race = RaceInfo.Glossary[raceName]
+	local phenotypes = TableFunctions.GetKeys(race.Phenotypes)
+	if #phenotypes < 2 then return "Default" end
+
+	return phenotypes[math.random(1, #phenotypes)]
+end
 
 function RaceInfo.GetRandomRollable(): string
-	local rand = Random.new()
-
-	local totalAbundance = getTotalAbundance(RaceInfo.Rollables)
 	local calculatedWeights = TableFunctions.Map(RaceInfo.Rollables, function(race: Race)
-		return race.Abundance / totalAbundance
+		return race.Abundance / RaceInfo._totalAbundance
 	end)
 
+	local rand = Random.new()
 	local roll = rand:NextNumber()
 	for race, weight in calculatedWeights do
 		if roll < weight then

@@ -90,25 +90,25 @@ end
 
 function IdentityService.CleanAppearance(player: Player): HumanoidDescription
 	local appearance = IdentityService.PlayerAppearances[player.UserId]
-	
-	appearance.Shirt = ""
-	appearance.Pants = ""
-	appearance.GraphicTShirt = ""
-	appearance.Face = ""
-	appearance.Head = ""
-	appearance.LeftArm = ""
-	appearance.LeftLeg = ""
-	appearance.RightArm = ""
-	appearance.RightLeg = ""
-	appearance.Torso = ""
 
-	appearance.BackAccessory = ""
-	appearance.FrontAccessory = ""
-	appearance.HatAccessory = ""
-	appearance.NeckAccessory = ""
-	appearance.ShouldersAccessory = ""
-	appearance.WaistAccessory = ""
-	appearance.FaceAccessory = ""
+	appearance.Shirt = 0
+	appearance.Pants = 0
+	appearance.GraphicTShirt = 0
+	appearance.Face = 0
+	appearance.Head = 0
+	appearance.LeftArm = 0
+	appearance.LeftLeg = 0
+	appearance.RightArm = 0
+	appearance.RightLeg = 0
+	appearance.Torso = 0
+
+	appearance.BackAccessory = 0
+	appearance.FrontAccessory = 0
+	appearance.HatAccessory = 0
+	appearance.NeckAccessory = 0
+	appearance.ShouldersAccessory = 0
+	appearance.WaistAccessory = 0
+	appearance.FaceAccessory = 0
 
 	if PRINT_CLEANS then print("Cleaned saved appearance for", player.Name) end
 	return appearance
