@@ -5,7 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Component = require(ReplicatedStorage.Packages.Component)
-local Logger = require(ReplicatedStorage.Extensions.Logger)
+local Logger = require(ReplicatedStorage.Source.Modules.Extensions.Logger)
 
 local RagdollService
 

@@ -1,24 +1,18 @@
-local PRINT_STARTS = false
-
-local BASE_WALK_SPEED = 20
-
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
 
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
-local Signal = require(Knit.Util.Signal)
-local Timer = require(Knit.Util.Timer)
-local Trove = require(Knit.Util.Trove)
-local DataService, ManaService
-local GuiController, MovementController
+local Trove = require(ReplicatedStorage.Packages.Trove)
+local ManaService
+local MovementController
 
 local MagicController = Knit.CreateController {
 	Name = "MagicController";
 
 	Loaded = false;
 }
+
+local PRINT_STARTS = false
+local BASE_WALK_SPEED = 20
 
 function MagicController:ChargeMana(bool: boolean)
 	if not self.ManaObtained then print("mana not obtained") return end
@@ -93,17 +87,14 @@ function MagicController:KnitInit()
 end
 
 function MagicController:KnitStart()
-	DataService = Knit.GetService("DataService")
 	ManaService = Knit.GetService("ManaService")
 
 	MovementController = Knit.GetController("MovementController")
 
 	if Knit.Player.Character then self:OnCharacterAdded() end
 	self._trove:Connect(Knit.Player.CharacterAdded, function(...) self:OnCharacterAdded(...) end)
-	self._trove:Connect(Players.PlayerRemoving, function(...) self:OnPlayerRemoving(...) end)
 	self._trove:BindToRenderStep("magic_update", Enum.RenderPriority.First.Value, function(...) self:Update(...) end)
 
-	self._trove:Connect(DataService.ProfileLoaded, self.OnProfileLoaded)
 	self._trove:Connect(ManaService.ManaObtained, function(...) self:OnManaObtained(...) end)
 	self._trove:Connect(ManaService.ManaFilled, function(...) self:OnManaFilled(...) end)
 

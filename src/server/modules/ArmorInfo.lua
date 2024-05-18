@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local TableFunctions = require(ReplicatedStorage.Utility.TableFunctions)
+local TableFunctions = require(ReplicatedStorage.Source.Modules.TableFunctions)
 
 local OUTFITS = ReplicatedStorage.Appearance.Outfits
 

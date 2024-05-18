@@ -11,12 +11,12 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
-local Signal = require(Knit.Util.Signal)
-local Trove = require(Knit.Util.Trove)
+local Signal = require(ReplicatedStorage.Packages.Signal)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local DataService, ManaService
 
-local TableFunctions = require(ReplicatedStorage.Utility.TableFunctions)
+local TableFunctions = require(ReplicatedStorage.Source.Modules.TableFunctions)
 
 local IdentityService = Knit.CreateService {
 	Name = "IdentityService";
@@ -35,12 +35,12 @@ local IdentityService = Knit.CreateService {
 	};
 }
 
-local ARMOR_INFO = require(ServerStorage.ArmorInfo)
+local ARMOR_INFO = require(ServerStorage.Source.ArmorInfo)
 local CUSTOM_HEADS = ReplicatedStorage.Appearance.CustomHeads
 local CUSTOM_ACCESSORIES = ReplicatedStorage.Appearance.CustomAccessories
 local FACES = ReplicatedStorage.Appearance.Faces
-local NAME_GEN = require(ServerStorage.NameGenerator)
-local RACE_INFO = require(ServerStorage.RaceInfo)
+local NAME_GEN = require(ServerStorage.Source.NameGenerator)
+local RACE_INFO = require(ServerStorage.Source.RaceInfo)
 
 local function loadedMessage(thingLoaded, player: Player): string
 	local message = string.format("%s: %s loaded", player.Name, tostring(thingLoaded))

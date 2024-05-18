@@ -1,4 +1,4 @@
-local TableFunctions = require(game.ReplicatedStorage.Utility.TableFunctions)
+local TableFunctions = require(game.ReplicatedStorage.Source.Modules.TableFunctions)
 
 local RaceInfo = {}
 

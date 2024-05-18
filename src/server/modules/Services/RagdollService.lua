@@ -4,17 +4,13 @@ local MAX_INTERACT_DISTANCE = 7
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Signal = require(Knit.Util.Signal)
-local Trove = require(Knit.Util.Trove)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 
-local HealthService
-local Carriable = require(ServerScriptService.Knit.Components.Carriable)
-local Grippable = require(ServerScriptService.Knit.Components.Grippable)
+local Carriable = require(ServerStorage.Source.ServerComponents.Carriable)
+local Grippable = require(ServerStorage.Source.ServerComponents.Grippable)
 
 local RagdollService = Knit.CreateService {
 	Name = "RagdollService";

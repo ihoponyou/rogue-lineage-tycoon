@@ -207,7 +207,6 @@ function GuiController:KnitStart()
 
 	MagicController = Knit.GetController("MagicController")
 
-	self._trove:Connect(Players.PlayerRemoving, function(...) self:OnPlayerRemoving(...) end)
 	self._trove:Connect(Knit.Player.CharacterAdded, function(...) self:OnCharacterAdded(...) end)
 	self._trove:Connect(Knit.Player.CharacterRemoving, function(...) self:OnCharacterRemoving(...) end)
 

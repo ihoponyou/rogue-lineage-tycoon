@@ -18,8 +18,8 @@ local DangerService = Knit.CreateService {
 	Client = {};
 }
 
-local MATH = require(ReplicatedStorage.Utility.MathFunctions)
-local CastVisualizer = require(ReplicatedStorage.Utility.CastVisualizer)
+local MATH = require(ReplicatedStorage.Source.Modules.MathFunctions)
+local CastVisualizer = require(ReplicatedStorage.Source.Modules.CastVisualizer)
 
 
 local function snipe(character: Model)

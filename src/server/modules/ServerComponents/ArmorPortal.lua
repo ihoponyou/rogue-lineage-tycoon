@@ -3,10 +3,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Signal = require(Knit.Util.Signal)
-local Trove = require(Knit.Util.Trove)
-local Component = require(Knit.Util.Component)
-local Logger = require(script.Parent.Extensions.Logger)
+local Signal = require(ReplicatedStorage.Packages.Signal)
+local Trove = require(ReplicatedStorage.Packages.Trove)
+local Component = require(ReplicatedStorage.Packages.Component)
+local Logger = require(ReplicatedStorage.Source.Modules.Extensions.Logger)
 
 local IdentityService
 
@@ -17,7 +17,7 @@ local ArmorPortal = Component.new {
 	};
 }
 
-local ARMOR_INFO = require(ServerStorage.ArmorInfo)
+local ARMOR_INFO = require(ServerStorage.Source.ArmorInfo)
 
 function ArmorPortal:Construct()
 	self._trove = Trove.new()

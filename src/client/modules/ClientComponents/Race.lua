@@ -1,20 +1,16 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Component = require(Knit.Util.Component)
-local Signal = require(Knit.Util.Signal)
-local Trove = require(Knit.Util.Trove)
+local Component = require(ReplicatedStorage.Packages.Component)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local IdentityService = Knit.GetService("IdentityService")
-local ManaService = Knit.GetService("ManaService")
-local Logger = require(Knit.Player.PlayerScripts.Knit.Components.Extensions.Logger)
-local RacialProgression = require(script.RacialProgression)
+local Logger = require(ReplicatedStorage.Source.Modules.Extensions.Logger)
 
 local Race = Component.new {
 	Tag = "Race";
 	Extensions = {
 		Logger,
-		RacialProgression,
 	};
 }
 

@@ -49,7 +49,6 @@ end
 function EffectController:KnitStart()
 	if Knit.Player.Character then self:OnCharacterAdded() end
 	self._trove:Connect(Knit.Player.CharacterAdded, function(...) self:OnCharacterAdded(...) end)
-	self._trove:Connect(Players.PlayerRemoving, function(...) self:OnPlayerRemoving(...) end)
 
 	if PRINT_STARTS then print("EffectController started") end
 end

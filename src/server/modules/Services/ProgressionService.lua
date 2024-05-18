@@ -9,9 +9,9 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Signal = require(Knit.Util.Signal)
-local Timer = require(Knit.Util.Timer)
-local Trove = require(Knit.Util.Trove)
+local Signal = require(ReplicatedStorage.Packages.Signal)
+local Timer = require(ReplicatedStorage.Packages.Timer)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local DataService
 

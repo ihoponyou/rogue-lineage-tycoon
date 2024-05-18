@@ -20,7 +20,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local ActionService, IdentityService, ManaService
 local AnimationController, InputController, MagicController
 
-local CastVisualizer = require(ReplicatedStorage.Utility.CastVisualizer)
+local CastVisualizer = require(ReplicatedStorage.Source.Modules.CastVisualizer)
 
 local MovementController = Knit.CreateController {
 	Name = "MovementController"

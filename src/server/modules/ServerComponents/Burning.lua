@@ -10,11 +10,11 @@ local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Signal = require(Knit.Util.Signal)
-local Timer = require(Knit.Util.Timer)
-local Trove = require(Knit.Util.Trove)
-local Component = require(Knit.Util.Component)
-local Logger = require(script.Parent.Extensions.Logger)
+local Signal = require(ReplicatedStorage.Packages.Signal)
+local Timer = require(ReplicatedStorage.Packages.Timer)
+local Trove = require(ReplicatedStorage.Packages.Trove)
+local Component = require(ReplicatedStorage.Packages.Component)
+local Logger = require(ReplicatedStorage.Source.Modules.Extensions.Logger)
 
 local HealthService, RagdollService, SurvivalService
 
