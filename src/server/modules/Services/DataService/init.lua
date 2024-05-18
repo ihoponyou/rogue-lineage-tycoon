@@ -20,7 +20,7 @@ local Timer = require(Knit.Util.Timer)
 local ManaService
 
 local PROFILE_TEMPLATE = require(script.ProfileTemplate)
-local ProfileService = require(ServerScriptService.Libs.ProfileService)
+local ProfileService = require(ReplicatedStorage.libs.ProfileService)
 local ProfileStore = ProfileService.GetProfileStore("Production", PROFILE_TEMPLATE)
 
 -- responsible for handling session-specific/"dependent" data and saved data using ProfileService 

@@ -1,16 +1,13 @@
 {
-  "name": "rogue-lineage-tycoon",
-  "globIgnorePaths": [
-	"**/package.json",
-	"**/tsconfig.json"
-	],
-  "tree": {
-    "$className": "DataModel",
-    "ReplicatedStorage": {
-      "$className": "ReplicatedStorage",
-      "Packages": {
-        "$path": "Packages"
-      },
+	"name": "rogue-lineage-tycoon",
+	"globIgnorePaths": ["**/package.json", "**/tsconfig.json"],
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"Packages": {
+				"$path": "Packages"
+			},
 			"rbxts_include": {
 				"$path": "include",
 				"node_modules": {
@@ -20,39 +17,45 @@
 					}
 				}
 			},
-			"Modules": {
-				"$path": "out/shared/modules"
+			"libs": {
+				"$path": "out/shared/libs"
 			},
-			"PlayerModules": {
-				"$path": "out/client/modules"
+			"Source": {
+				"$className": "Folder",
+				"Modules": {
+					"$path": "out/shared/modules"
+				},
+				"ClientModules": {
+					"$path": "out/client/modules"
+				}
 			}
-    },
-    "ServerScriptService": {
-      "$className": "ServerScriptService",
-      "Source": {
+		},
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"Source": {
 				"$path": "out/server/scripts"
 			}
-    },
-    "ServerStorage": {
-      "$className": "ServerStorage",
+		},
+		"ServerStorage": {
+			"$className": "ServerStorage",
 			"Source": {
-				"$path": "out/server/modules"	
+				"$path": "out/server/modules"
 			}
-    },
-    "StarterPlayer": {
-      "$className": "StarterPlayer",
-      "StarterCharacterScripts": {
-        "$className": "StarterCharacterScripts",
+		},
+		"StarterPlayer": {
+			"$className": "StarterPlayer",
+			"StarterCharacterScripts": {
+				"$className": "StarterCharacterScripts",
 				"Source": {
 					"$path": "out/client/scripts/character"
 				}
-      },
-      "StarterPlayerScripts": {
-        "$className": "StarterPlayerScripts",
-        "Source": {
+			},
+			"StarterPlayerScripts": {
+				"$className": "StarterPlayerScripts",
+				"Source": {
 					"$path": "out/client/scripts/player"
 				}
-      }
-    }
-  }
+			}
+		}
+	}
 }
