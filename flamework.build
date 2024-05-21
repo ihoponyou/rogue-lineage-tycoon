@@ -1,0 +1,10 @@
+{
+	"version": 1,
+	"flameworkVersion": "1.2.2",
+	"identifiers": {
+		"rogue-lineage-tycoon:out/server/modules/Services/test-service@TestService": "server/modules/Services/test-service@TestService",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/test-service@TestService": "server/modules/Services/flamework/test-service@TestService",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/identity-service@IdentityService": "server/modules/Services/flamework/identity-service@IdentityService"
+	},
+	"metadata": {}
+}
