@@ -1,9 +1,4 @@
-local PRINT_STARTS = false
-local PRINT_LOADS = false
-
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
 local Trove = require(game:GetService("ReplicatedStorage").Packages.Trove)
@@ -14,6 +9,9 @@ local AnimationController = Knit.CreateController {
 	Name = "AnimationController";
 	Tracks = {}
 }
+
+local PRINT_STARTS = false
+local PRINT_LOADS = false
 
 local ANIMATIONS = ReplicatedStorage.Animations
 
@@ -51,38 +49,41 @@ function AnimationController:HandleClimbAnims(inputObj: InputObject, gpe: boolea
 	local key = inputObj.KeyCode
 	local keybinds = InputController.Keybinds
 
-	if key == keybinds.Forward or key == keybinds.Backward or key == keybinds.Left or key == keybinds.Right then
-		if inputObj.UserInputState == Enum.UserInputState.Begin then
-			self.Tracks.ClimbIdle:Stop()
-			if key == keybinds.Forward then
-				self:Play("ClimbUp")
-			elseif key == keybinds.Backward then
-				self:Play("ClimbDown")
-			elseif key == keybinds.Left then
-				self:Play("ClimbLeft")
-			elseif key == keybinds.Right then
-				self:Play("ClimbRight")
-			end
-		elseif inputObj.UserInputState == Enum.UserInputState.End then
-			if key == keybinds.Forward then
-				self:Stop("ClimbUp")
-			elseif key == keybinds.Backward then
-				self:Stop("ClimbDown")
-			elseif key == keybinds.Left then
-				self:Stop("ClimbLeft")
-			elseif key == keybinds.Right then
-				self:Stop("ClimbRight")
+	local map = {
+		Forward = "ClimbUp",
+		Backward = "ClimbDown",
+		Left = "ClimbLeft",
+		Right = "ClimbRight"
+	}
+
+	if not (key == keybinds.Forward or key == keybinds.Backward or key == keybinds.Left or key == keybinds.Right) then
+		return
+	end
+
+	if inputObj.UserInputState == Enum.UserInputState.Begin then
+		self:Stop("ClimbIdle")
+		for direction, animName in map do
+			if key == keybinds[direction] then
+				self:Play(animName)
+				break
 			end
 		end
-
-		if not InputController:IsWasdDown() then self:Play("ClimbIdle") end
+	elseif inputObj.UserInputState == Enum.UserInputState.End then
+		for direction, animName in map do
+			if key == keybinds[direction] then
+				self:Stop(animName)
+				break
+			end
+		end
 	end
+
+	if not InputController:IsMovementKeyDown() then self:Play("ClimbIdle") end
 end
 
 function AnimationController:OnCharacterAdded(character: Model)
 	self.Character = character
 	local humanoid: Humanoid = self.Character:WaitForChild("Humanoid")
-	self.Animator = humanoid:WaitForChild("Animator")
+	self.Animator = humanoid:WaitForChild("Animator") :: Animator
 
 	self:LoadAnimations(false)
 	self.Tracks.ClimbUp.Priority = Enum.AnimationPriority.Action2

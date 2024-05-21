@@ -1,17 +1,7 @@
-local PRINT_STARTS = false
-local PRINT_LOADS = false
-
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
-
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
 local Trove = require(game:GetService("ReplicatedStorage").Packages.Trove)
 
-local InputController
-
--- this only works for client sided effects
-
+-- only for client sided effects
 local EffectController = Knit.CreateController {
 	Name = "EffectController";
 
@@ -19,6 +9,9 @@ local EffectController = Knit.CreateController {
 	Trails = {};
 	Sounds = {};
 }
+
+local PRINT_STARTS = false
+local PRINT_LOADS = false
 
 function EffectController:LoadEffect<E>(effect: E, log: boolean)
 	local isValidType = effect:IsA("ParticleEmitter") or effect:IsA("Trail") or effect:IsA("Sound")
@@ -51,10 +44,6 @@ function EffectController:KnitStart()
 	self._trove:Connect(Knit.Player.CharacterAdded, function(...) self:OnCharacterAdded(...) end)
 
 	if PRINT_STARTS then print("EffectController started") end
-end
-
-function EffectController:Destroy()
-	self._trove:Destroy()
 end
 
 return EffectController

@@ -1,7 +1,3 @@
-local PRINT_STARTS = false
-local PRINT_INPUTS = false
-local RUN_INTERVAL = 0.2
-
 local ContextActionService = game:GetService("ContextActionService")
 local UserInputService = game:GetService("UserInputService")
 
@@ -10,32 +6,40 @@ local Trove = require(game:GetService("ReplicatedStorage").Packages.Trove)
 
 local InteractionController, MagicController, MovementController
 
-local DEFAULT_KEYBINDS = require(script.DefaultKeybinds)
-
 -- "bridges the gap" between controllers by linking functionality to inputs
 local InputController = Knit.CreateController {
 	Name = "InputController";
 	Keybinds = {};
 }
 
-function InputController.GetAxis(axis : string)
+local PRINT_STARTS = false
+local PRINT_INPUTS = false
+local RUN_INTERVAL = 0.2
+
+local DEFAULT_KEYBINDS = require(script.DefaultKeybinds)
+
+function InputController:GetAxis(axis : string)
+	local isRightDown = UserInputService:IsKeyDown(self.Keybinds.Right)
+	local isLeftDown = UserInputService:IsKeyDown(self.Keybinds.Left)
+	local isForwardDown = UserInputService:IsKeyDown(self.Keybinds.Forward)
+	local isBackwardDown = UserInputService:IsKeyDown(self.Keybinds.Backward)
 	if axis == "horizontal" then
-		if UserInputService:IsKeyDown(Enum.KeyCode.D) and UserInputService:IsKeyDown(Enum.KeyCode.A) then
+		if isRightDown and isLeftDown then
 			return 0
-		elseif UserInputService:IsKeyDown(Enum.KeyCode.A) then
-			return -1
-		elseif UserInputService:IsKeyDown(Enum.KeyCode.D) then
+		elseif isRightDown then
 			return 1
+		elseif isLeftDown then
+			return -1
 		else
 			return 0
 		end
 	elseif axis == "vertical" then
-		if UserInputService:IsKeyDown(Enum.KeyCode.W) and UserInputService:IsKeyDown(Enum.KeyCode.S) then
+		if isForwardDown and isBackwardDown then
 			return 0
-		elseif UserInputService:IsKeyDown(Enum.KeyCode.S) then
-			return -1
-		elseif UserInputService:IsKeyDown(Enum.KeyCode.W) then
+		elseif isForwardDown then
 			return 1
+		elseif isBackwardDown then
+			return -1
 		else
 			return 0
 		end
@@ -44,8 +48,11 @@ function InputController.GetAxis(axis : string)
 	end
 end
 
-function InputController.IsWasdDown(): boolean
-	return UserInputService:IsKeyDown(Enum.KeyCode.W) or UserInputService:IsKeyDown(Enum.KeyCode.A) or UserInputService:IsKeyDown(Enum.KeyCode.S) or UserInputService:IsKeyDown(Enum.KeyCode.D)
+function InputController:IsMovementKeyDown(): boolean
+	return UserInputService:IsKeyDown(self.Keybinds.Forward)
+		or UserInputService:IsKeyDown(self.Keybinds.Backward)
+		or UserInputService:IsKeyDown(self.Keybinds.Left)
+		or UserInputService:IsKeyDown(self.Keybinds.Right)
 end
 
 function InputController:_Forward(actionName: string, userInputState: Enum.UserInputState, inputObject: InputObject)
@@ -196,14 +203,6 @@ function InputController:ChangeKeybind(action: string, keyToChange: Enum.KeyCode
 	self:LoadKeybind(action, newKey)
 end
 
-function InputController:OnCharacterAdded(character: Model)
-	self.Character = character
-
-	--self._trove:Connect(self.Character:WaitForChild("Humanoid").Died, function()
-	--	print("char died")
-	--end)
-end
-
 function InputController:KnitInit()
 	self._trove = Trove.new()
 
@@ -231,14 +230,7 @@ function InputController:KnitStart()
 		Enum.KeyCode.BackSlash
 	)
 
-	if Knit.Player.Character then self:OnCharacterAdded() end
-	self._trove:Connect(Knit.Player.CharacterAdded, function(...) self:OnCharacterAdded(...) end)
-
 	if PRINT_STARTS then print("InputController started") end
-end
-
-function InputController:Destroy()
-	self._trove:Destroy()
 end
 
 return InputController

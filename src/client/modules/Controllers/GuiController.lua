@@ -1,6 +1,3 @@
-local PRINT_EVENTS = false
-local PRINT_STARTS = false
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -8,6 +5,7 @@ local TweenService = game:GetService("TweenService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+
 local DataService, IdentityService
 local MagicController
 
@@ -15,6 +13,8 @@ local GuiController = Knit.CreateController {
 	Name = "GuiController";
 }
 
+local PRINT_EVENTS = false
+local PRINT_STARTS = false
 local UI = ReplicatedStorage.UI
 local WHITE_STOMACH = {
 	"Gaian",
@@ -92,13 +92,13 @@ end
 
 local function doRollerEffect(label: TextLabel, text)
 	local tween = TweenService:Create(label, TweenInfo.new(0.15), {LineHeight = 3})
-	tween:Play()
-	tween.Completed:Connect(function()
+	tween.Completed:Once(function()
 		task.wait(0.1)
 		label.Text = text
 		label.LineHeight = 0
 		TweenService:Create(label, TweenInfo.new(0.15), {LineHeight = 1}):Play()
 	end)
+	tween:Play()
 end
 
 function GuiController:OnDaysChanged(dayCount: number)
@@ -175,7 +175,7 @@ function GuiController:OnCharacterAdded(character: Model)
 	self._charTrove:Connect(IdentityService.ManaColorChanged, function(color) self:OnManaColorChanged(color) end)
 	self._charTrove:Connect(IdentityService.FirstNameChanged, function(name) self:OnFirstNameChanged(name) end)
 
-	while not MagicController.Loaded do RunService.Heartbeat:Wait() end
+	while not MagicController.Loaded do task.wait() end
 	self:ToggleManaBar(MagicController.ManaObtained)
 
 	while not Knit.Player:GetAttribute("IdentityLoaded") do Knit.Player.AttributeChanged:Wait() end
@@ -185,7 +185,7 @@ function GuiController:OnCharacterAdded(character: Model)
 		end
 	end)
 
-	while not (self.StatGui or self.ManaGui or self.SilverGui) do RunService.Heartbeat:Wait() end
+	while not (self.StatGui or self.ManaGui or self.SilverGui) do task.wait() end
 	self.StatGui.Enabled = true
 	self.ManaGui.Enabled = true
 	self.SilverGui.Enabled = true
@@ -211,10 +211,6 @@ function GuiController:KnitStart()
 	self._trove:Connect(Knit.Player.CharacterRemoving, function(...) self:OnCharacterRemoving(...) end)
 
 	if PRINT_STARTS then print("GuiController started") end
-end
-
-function GuiController:Destroy()
-	self._trove:Destroy()
 end
 
 return GuiController
