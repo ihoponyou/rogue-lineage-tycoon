@@ -5,5 +5,7 @@
 /include
 /not-code
 
+flamework.build
+
 *.rbxl
 *.tsbuildinfo
