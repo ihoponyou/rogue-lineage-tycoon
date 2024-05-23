@@ -1,14 +1,14 @@
 import Object from "@rbxts/object-utils";
 
-export type Phenotype = {
+export interface Phenotype {
 	EyeColor: Color3;
 	HairColor: Color3;
 	SkinColor: Color3;
-};
+}
 
 export type RaceCategory = "Rollable" | "Obtainable" | "Exclusive";
 
-export type Race = {
+export interface Race {
 	Category: RaceCategory;
 	Actives: string[];
 	Passives: string[];
@@ -19,12 +19,14 @@ export type Race = {
 	HasCustomFace: boolean;
 	HasCustomAccessory: boolean;
 	Abundance: number;
-};
+}
 
-export type Glossary = { [name: string]: Race };
+export interface RaceGlossary {
+	[raceName: string]: Race;
+}
 
 export class RaceInfo {
-	static readonly GLOSSARY: Glossary = {
+	static readonly GLOSSARY: RaceGlossary = {
 		Ashiin: {
 			Category: "Rollable",
 			Actives: ["Shoulder Throw", "Agility"],
@@ -620,21 +622,21 @@ export class RaceInfo {
 			Abundance: 2,
 		},
 	};
-	static readonly ROLLABLES: Glossary = Object.fromEntries(
+	static readonly ROLLABLES: RaceGlossary = Object.fromEntries(
 		Object.entries(this.GLOSSARY).filter((entry) => entry[1].Category === "Rollable"),
 	);
 	static totalAbundance = 0;
 
-	static getRandomRollable(): Race {
+	static getRandomRollable(): keyof RaceGlossary {
 		const rand = new Random();
 
 		if (this.totalAbundance === 0) {
 			Object.values(this.ROLLABLES).forEach((race) => (this.totalAbundance += race.Abundance));
 		}
 
-		const weightedRaces = new Map<Race, number>();
+		const weightedRaces = new Map<keyof RaceGlossary, number>();
 		Object.entries(this.ROLLABLES).forEach((entry) => {
-			weightedRaces.set(entry[1], entry[1].Abundance / this.totalAbundance);
+			weightedRaces.set(entry[0], entry[1].Abundance / this.totalAbundance);
 		});
 
 		let roll = math.random();
@@ -644,10 +646,10 @@ export class RaceInfo {
 		}
 
 		// ts compiler wants an ending return statement
-		return this.GLOSSARY["Seraph"];
+		return "Seraph";
 	}
 
-	static getRandomPhenotype(raceName: keyof Glossary): Phenotype {
+	static getRandomPhenotype(raceName: keyof RaceGlossary): Phenotype {
 		const race = this.GLOSSARY[raceName];
 		const phenotypeNames = Object.keys(race.Phenotypes);
 		if (phenotypeNames.size() < 2) return race.Phenotypes["Default"];

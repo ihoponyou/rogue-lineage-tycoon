@@ -2,13 +2,13 @@ import { Service, OnInit, OnStart, Modding } from "@flamework/core";
 import { Players, ReplicatedStorage, Workspace } from "@rbxts/services";
 import { Logger } from "@rbxts/log";
 import { OnPlayerAdded } from "./setup-service";
-import { RaceInfo } from "server/modules/race-info";
+import { Phenotype, Race, RaceGlossary, RaceInfo } from "server/modules/race-info";
 
 export type Personality = "";
 export type Sex = "Male" | "Female";
 
 @Service()
-export class IdentityService implements OnInit, OnStart, OnPlayerAdded {
+export class IdentityService implements OnInit, OnPlayerAdded {
 	private playerDescriptions: { [playerId: number]: HumanoidDescription } = {};
 	private defaultDescription = new Instance("HumanoidDescription");
 
@@ -28,19 +28,77 @@ export class IdentityService implements OnInit, OnStart, OnPlayerAdded {
 		this.defaultDescription.Shirt = 6168685211;
 	}
 
-	onStart() {
-		this.logger.Info("hello");
-	}
-
 	onPlayerAdded(player: Player) {
-		this.logger.Debug("{Player} was added", player);
 		this.playerDescriptions[player.UserId] = this.getPlayerAvatarDescription(player.UserId);
+		this.cleanPlayerDescription(this.playerDescriptions[player.UserId]);
 		player.CharacterAdded.Connect((character) => this.onCharacterAdded(character));
 		player.LoadCharacter();
 	}
 
 	onCharacterAdded(character: Model) {
-		this.cleanCharacterFace(character);
+		// if PRINT_EVENTS then print("CharacterAdded fired", character.Name) end
+		// local player: Player = Players:GetPlayerFromCharacter(character)
+		// if PRINT_LOADS then print(loadedMessage("Character", player)) end
+		// IdentityService.RefreshPlayerAppearance(player)
+		// local humanoid: Humanoid = character.Humanoid
+		// local raceName = DataService.GetData(player, "Race")
+		// if isEmptyString(raceName) then
+		// 	raceName = IdentityService.RollRace(player)
+		// 	DataService.SetData(player, "Race", raceName)
+		// end
+		// player:SetAttribute("Race", raceName)
+		// local race = RACE_INFO.Glossary[raceName]
+		// IdentityService.CleanFace(player)
+		// if not race.HasCustomHead then
+		// 	local personality = DataService.GetData(player, "Personality")
+		// 	if isEmptyString(personality) then
+		// 		personality = IdentityService.RollPersonality(raceName)
+		// 		DataService.SetData(player, "Personality", personality)
+		// 	end
+		// 	IdentityService.SetFace(player, personality)
+		// end
+		// local phenotypeName = DataService.GetData(player, "Phenotype")
+		// if isEmptyString(phenotypeName) then
+		// 	phenotypeName = RACE_INFO.GetRandomPhenotype(raceName)
+		// 	DataService.SetData(player, "Phenotype", phenotypeName)
+		// end
+		// local phenotype = race.Phenotypes[phenotypeName]
+		// IdentityService.SetPhenotype(player, raceName, phenotypeName)
+		// local gender = DataService.GetData(player, "Gender")
+		// if isEmptyString(gender) then
+		// 	gender = IdentityService.RollGender()
+		// 	DataService.SetData(player, "Gender", gender)
+		// end
+		// IdentityService.SetGender(player, gender)
+		// local firstName = DataService.GetData(player, "FirstName")
+		// if isEmptyString(firstName) then
+		// 	firstName = IdentityService.RollName(raceName, gender)
+		// end
+		// IdentityService.SetFirstName(player, firstName)
+		// local armorName = DataService.GetData(player, "Armor")
+		// if isEmptyString(armorName) then
+		// 	if raceName == "Gaian" then
+		// 		armorName = "GaianDefault"
+		// 	elseif raceName == "Scroom" or race == "Metascroom" then
+		// 		armorName = "ScroomDefault"
+		// 	else
+		// 		armorName = ARMOR_INFO.GetRandomStarter()
+		// 	end
+		// 	DataService.SetData(player, "Armor", armorName)
+		// end
+		// IdentityService.SetArmor(player, armorName)
+		// local manaColor = DataService.GetData(player, "ManaColor") -- saved color data is always a dictionary
+		// local color
+		// if manaColor.R == 0 and manaColor.G == 0 and manaColor.B == 0 then
+		// 	color = IdentityService.RollManaColor()
+		// else
+		// 	color = Color3.fromRGB(manaColor.R*255, manaColor.G*255, manaColor.B*255)
+		// end
+		// IdentityService.SetManaColor(player, color)
+		// while not character:IsDescendantOf(workspace) do character.AncestryChanged:Wait() end
+		// humanoid:ApplyDescription(IdentityService.PlayerAppearances[player.UserId])
+		// player:SetAttribute("IdentityLoaded", true)
+		// IdentityService.Client.IdentityLoaded:Fire(player)
 	}
 
 	getPlayerAvatarDescription(playerId: number): HumanoidDescription {
@@ -51,7 +109,7 @@ export class IdentityService implements OnInit, OnStart, OnPlayerAdded {
 		return success ? playerDescription : this.defaultDescription;
 	}
 
-	getPlayerDescription(player: Player): HumanoidDescription {
+	getSavedPlayerDescription(player: Player): HumanoidDescription {
 		return this.playerDescriptions[player.UserId];
 	}
 
@@ -136,6 +194,13 @@ export class IdentityService implements OnInit, OnStart, OnPlayerAdded {
 		}
 	}
 
+	setEyeColor(character: Model, color: Color3) {
+		const head = this.getHead(character);
+		const face = head?.FindFirstChild("face") as Decal;
+		if (face) face.Color3 = color;
+		this.logger.Info("Set {Attribute} of {Character} ([old] -> {new})", "Eye Color", character, color);
+	}
+
 	// TODO: uses dataservice race and personality and gets appropriate face
 	setFace(player: Player, personality: Personality) {}
 
@@ -199,12 +264,11 @@ export class IdentityService implements OnInit, OnStart, OnPlayerAdded {
 		// IdentityService.Client.FirstNameChanged:Fire(player, name)
 	}
 
-	setCustomHead(character: Model, raceName: string, phenotypeName: string) {
+	addCustomHead(character: Model, raceName: keyof RaceGlossary, phenotypeName: string) {
 		const head = this.getHead(character);
+		if (head) head.Size = new Vector3(0.8, 1.4, 0.8);
 		const mesh = head?.FindFirstChild("Mesh");
 		if (mesh) mesh.Destroy();
-
-		if (head) head.Size = new Vector3(0.8, 1.4, 0.8);
 
 		let customHead = ReplicatedStorage.Appearance.CustomHeads.FindFirstChild(raceName);
 		if (!customHead) {
@@ -227,5 +291,70 @@ export class IdentityService implements OnInit, OnStart, OnPlayerAdded {
 		if (!humanoid) error(`Failed to find Humanoid in ${character}`);
 
 		humanoid.AddAccessory(customHead?.Clone() as Accessory);
+	}
+
+	addCustomAccessory(character: Model, raceName: keyof RaceGlossary) {
+		const customAccessory = ReplicatedStorage.Appearance.CustomAccessories.FindFirstChild(raceName);
+
+		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
+		if (!humanoid) error(`Failed to find Humanoid in ${character}`);
+
+		humanoid.AddAccessory(customAccessory?.Clone() as Accessory);
+	}
+
+	setPhenotype(character: Model, raceName: keyof RaceGlossary, phenotypeName: string) {
+		const race = RaceInfo.GLOSSARY[raceName];
+		const phenotype = race.Phenotypes[phenotypeName];
+
+		this.setCharacterSkinColor(character, phenotype.SkinColor);
+
+		if (race.IsBald) {
+			this.removeHair(character);
+		} else {
+			this.setHairColor(character, phenotype.HairColor);
+		}
+
+		if (race.HasCustomHead) {
+			this.addCustomHead(character, raceName, phenotypeName);
+		} else {
+			this.setEyeColor(character, phenotype.EyeColor);
+		}
+
+		if (race.HasCustomAccessory) this.addCustomAccessory(character, raceName);
+	}
+
+	getRandomSex(): Sex {
+		return math.random() > 0.5 ? "Male" : "Female";
+	}
+
+	getRandomManaColor(): Color3 {
+		return Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255));
+	}
+
+	getRandomNewRace(oldRace: keyof RaceGlossary): keyof RaceGlossary {
+		let newRace = "";
+		do {
+			newRace = RaceInfo.getRandomRollable() as string;
+		} while (newRace === oldRace);
+		return newRace;
+	}
+
+	getRandomPersonality(raceName: keyof RaceGlossary): string {
+		if (raceName === "Fischeran") {
+			raceName = "Rigan";
+		} else if (!ReplicatedStorage.Appearance.Faces.FindFirstChild(raceName)) {
+			raceName = "Other";
+		}
+
+		let personality = "Default";
+		if (ReplicatedStorage.Appearance.Faces.FindFirstChild(raceName)?.FindFirstChild("Emotions")) {
+			const emotions = ReplicatedStorage.Appearance.Faces?.FindFirstChild(raceName)
+				?.FindFirstChild("Emotions")
+				?.GetChildren();
+			if (!emotions) return personality;
+			personality = emotions[math.random(emotions.size())].Name;
+		}
+
+		return personality;
 	}
 }
