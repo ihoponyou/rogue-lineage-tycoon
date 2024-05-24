@@ -1,5 +1,4 @@
 import { BaseComponent, Component } from "@flamework/components";
-
 import { OnStart } from "@flamework/core";
 
 interface Attributes {
@@ -24,7 +23,9 @@ export class Character
 		this.instance.AddTag("FallDamage");
 	}
 
-	kill(): void {}
+	kill(): void {
+		this.attributes.isAlive = false;
+	}
 
 	snipe(): void {
 		const particleAttachment = this.instance.Head.ParticleAttachment;
