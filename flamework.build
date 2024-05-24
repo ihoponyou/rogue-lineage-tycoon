@@ -9,7 +9,10 @@
 		"rogue-lineage-tycoon:out/server/modules/race-info@RaceInfo": "server/modules/race-info@RaceInfo",
 		"rogue-lineage-tycoon:out/server/modules/Services/flamework/data-service@DataService": "server/modules/Services/flamework/data-service@DataService",
 		"rogue-lineage-tycoon:out/server/modules/Services/flamework/setup-service@OnPlayerAdded": "server/modules/Services/flamework/setup-service@OnPlayerAdded",
-		"rogue-lineage-tycoon:out/server/modules/Services/flamework/reset-service@ResetService": "server/modules/Services/flamework/reset-service@ResetService"
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/reset-service@ResetService": "server/modules/Services/flamework/reset-service@ResetService",
+		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/fall-damage@FallDamage": "server/modules/ServerComponents/flamework/fall-damage@FallDamage",
+		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/character@Character": "server/modules/ServerComponents/flamework/character@Character",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/setup-service@LifecycleService": "server/modules/Services/flamework/setup-service@LifecycleService"
 	},
 	"metadata": {}
 }
