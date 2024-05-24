@@ -4,7 +4,12 @@
 	"identifiers": {
 		"rogue-lineage-tycoon:out/server/modules/Services/test-service@TestService": "server/modules/Services/test-service@TestService",
 		"rogue-lineage-tycoon:out/server/modules/Services/flamework/test-service@TestService": "server/modules/Services/flamework/test-service@TestService",
-		"rogue-lineage-tycoon:out/server/modules/Services/flamework/identity-service@IdentityService": "server/modules/Services/flamework/identity-service@IdentityService"
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/identity-service@IdentityService": "server/modules/Services/flamework/identity-service@IdentityService",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/setup-service@SetupService": "server/modules/Services/flamework/setup-service@SetupService",
+		"rogue-lineage-tycoon:out/server/modules/race-info@RaceInfo": "server/modules/race-info@RaceInfo",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/data-service@DataService": "server/modules/Services/flamework/data-service@DataService",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/setup-service@OnPlayerAdded": "server/modules/Services/flamework/setup-service@OnPlayerAdded",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/reset-service@ResetService": "server/modules/Services/flamework/reset-service@ResetService"
 	},
 	"metadata": {}
 }

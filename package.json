@@ -30,6 +30,7 @@
     "@flamework/networking": "^1.2.2",
     "@rbxts/log": "^0.6.3",
     "@rbxts/object-utils": "^1.0.4",
+    "@rbxts/profileservice": "^1.4.2",
     "@rbxts/services": "^1.5.4"
   }
 }

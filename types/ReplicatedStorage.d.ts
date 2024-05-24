@@ -1933,6 +1933,9 @@ interface ReplicatedStorage extends Instance {
 					types: Folder;
 				};
 				["object-utils"]: ModuleScript;
+				profileservice: Folder & {
+					src: ModuleScript;
+				};
 				["message-templates"]: Folder & {
 					out: ModuleScript & {
 						MessageTemplateRenderer: ModuleScript;

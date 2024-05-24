@@ -903,10 +903,8 @@ export const NAMES: { [category: string]: string[] } = {
 };
 
 export function getRandomFirstName(raceName: keyof RaceGlossary, sex: Sex): string {
-	let names: string[];
-	try {
-		names = NAMES[raceName];
-	} catch (e) {
+	let names: string[] = NAMES[raceName];
+	if (!names) {
 		switch (raceName) {
 			case "Metascroom":
 				names = NAMES.Scroom;

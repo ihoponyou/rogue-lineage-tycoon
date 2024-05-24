@@ -1,10 +1,13 @@
-import { Service, OnInit, OnStart, Modding } from "@flamework/core";
+import { Service, OnInit } from "@flamework/core";
 import { Players, ReplicatedStorage, Workspace } from "@rbxts/services";
 import { Logger } from "@rbxts/log";
-import { OnPlayerAdded } from "./setup-service";
-import { Phenotype, Race, RaceGlossary, RaceInfo } from "server/modules/race-info";
+import { RACES, RaceGlossary, getRandomPhenotype, getRandomRollable } from "server/modules/race-info";
+import { OnPlayerAdded } from "../../../../../types/lifecycles";
+import { DataService } from "./data-service";
+import { getRandomFirstName } from "server/modules/name-generator";
+import { ARMORS, getRandomStarterArmor } from "server/modules/armor-info";
+import Object from "@rbxts/object-utils";
 
-export type Personality = "";
 export type Sex = "Male" | "Female";
 
 @Service()
@@ -12,7 +15,10 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 	private playerDescriptions: { [playerId: number]: HumanoidDescription } = {};
 	private defaultDescription = new Instance("HumanoidDescription");
 
-	public constructor(private readonly logger: Logger) {}
+	public constructor(
+		private readonly logger: Logger,
+		private dataService: DataService,
+	) {}
 
 	onInit() {
 		this.defaultDescription.HatAccessory = "48474313";
@@ -24,7 +30,6 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 		this.defaultDescription.RightArmColor = BLACK;
 		this.defaultDescription.RightLegColor = BLACK;
 		this.defaultDescription.TorsoColor = BLACK;
-
 		this.defaultDescription.Shirt = 6168685211;
 	}
 
@@ -32,71 +37,82 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 		this.playerDescriptions[player.UserId] = this.getPlayerAvatarDescription(player.UserId);
 		this.cleanPlayerDescription(this.playerDescriptions[player.UserId]);
 		player.CharacterAdded.Connect((character) => this.onCharacterAdded(character));
-		player.LoadCharacter();
 	}
 
 	onCharacterAdded(character: Model) {
-		// if PRINT_EVENTS then print("CharacterAdded fired", character.Name) end
-		// local player: Player = Players:GetPlayerFromCharacter(character)
-		// if PRINT_LOADS then print(loadedMessage("Character", player)) end
-		// IdentityService.RefreshPlayerAppearance(player)
-		// local humanoid: Humanoid = character.Humanoid
-		// local raceName = DataService.GetData(player, "Race")
-		// if isEmptyString(raceName) then
-		// 	raceName = IdentityService.RollRace(player)
-		// 	DataService.SetData(player, "Race", raceName)
-		// end
-		// player:SetAttribute("Race", raceName)
-		// local race = RACE_INFO.Glossary[raceName]
-		// IdentityService.CleanFace(player)
-		// if not race.HasCustomHead then
-		// 	local personality = DataService.GetData(player, "Personality")
-		// 	if isEmptyString(personality) then
-		// 		personality = IdentityService.RollPersonality(raceName)
-		// 		DataService.SetData(player, "Personality", personality)
-		// 	end
-		// 	IdentityService.SetFace(player, personality)
-		// end
-		// local phenotypeName = DataService.GetData(player, "Phenotype")
-		// if isEmptyString(phenotypeName) then
-		// 	phenotypeName = RACE_INFO.GetRandomPhenotype(raceName)
-		// 	DataService.SetData(player, "Phenotype", phenotypeName)
-		// end
-		// local phenotype = race.Phenotypes[phenotypeName]
-		// IdentityService.SetPhenotype(player, raceName, phenotypeName)
-		// local gender = DataService.GetData(player, "Gender")
-		// if isEmptyString(gender) then
-		// 	gender = IdentityService.RollGender()
-		// 	DataService.SetData(player, "Gender", gender)
-		// end
-		// IdentityService.SetGender(player, gender)
-		// local firstName = DataService.GetData(player, "FirstName")
-		// if isEmptyString(firstName) then
-		// 	firstName = IdentityService.RollName(raceName, gender)
-		// end
-		// IdentityService.SetFirstName(player, firstName)
-		// local armorName = DataService.GetData(player, "Armor")
-		// if isEmptyString(armorName) then
-		// 	if raceName == "Gaian" then
-		// 		armorName = "GaianDefault"
-		// 	elseif raceName == "Scroom" or race == "Metascroom" then
-		// 		armorName = "ScroomDefault"
-		// 	else
-		// 		armorName = ARMOR_INFO.GetRandomStarter()
-		// 	end
-		// 	DataService.SetData(player, "Armor", armorName)
-		// end
-		// IdentityService.SetArmor(player, armorName)
-		// local manaColor = DataService.GetData(player, "ManaColor") -- saved color data is always a dictionary
-		// local color
-		// if manaColor.R == 0 and manaColor.G == 0 and manaColor.B == 0 then
-		// 	color = IdentityService.RollManaColor()
-		// else
-		// 	color = Color3.fromRGB(manaColor.R*255, manaColor.G*255, manaColor.B*255)
-		// end
-		// IdentityService.SetManaColor(player, color)
-		// while not character:IsDescendantOf(workspace) do character.AncestryChanged:Wait() end
-		// humanoid:ApplyDescription(IdentityService.PlayerAppearances[player.UserId])
+		const player = Players.GetPlayerFromCharacter(character);
+		if (!player) error(`Player not found for ${character.Name}`);
+
+		this.playerDescriptions[player.UserId] = this.getPlayerAvatarDescription(player.UserId);
+		this.cleanPlayerDescription(this.playerDescriptions[player.UserId]);
+
+		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
+		if (!humanoid) error(`Humanoid not found in ${character.Name}`);
+
+		const profile = this.dataService.getProfile(player);
+
+		let raceName = profile.Data.RaceName;
+		if (raceName === "") {
+			raceName = getRandomRollable();
+			profile.Data.RaceName = raceName;
+		}
+		const race = RACES[raceName];
+
+		this.cleanCharacterFace(character);
+		if (!race.HasCustomHead) {
+			let personality = profile.Data.Personality;
+			if (personality === "") {
+				personality = this.getRandomPersonality(raceName);
+				profile.Data.Personality = personality;
+			}
+			this.setFace(character, raceName, personality);
+		}
+
+		let phenotypeName = profile.Data.PhenotypeName;
+		if (phenotypeName === "") {
+			phenotypeName = getRandomPhenotype(raceName);
+			profile.Data.PhenotypeName = phenotypeName;
+		}
+		this.setPhenotype(character, raceName, phenotypeName);
+
+		let sex = profile.Data.Sex;
+		if (sex === "") {
+			sex = this.getRandomSex();
+			profile.Data.Sex = sex;
+		}
+		this.setSex(player, sex);
+
+		let firstName = profile.Data.FirstName;
+		if (firstName === "") {
+			firstName = getRandomFirstName(raceName, sex);
+		}
+		this.setFirstName(player, firstName);
+
+		let armorName = profile.Data.ArmorName;
+		if (armorName === "") {
+			// not sure why this needs a type cast
+			switch (armorName as string) {
+				case "Gaian":
+					armorName = "GaianDefault";
+					break;
+				case "Scroom":
+				case "Metascroom":
+					armorName = "ScroomDefault";
+					break;
+				default:
+					armorName = getRandomStarterArmor();
+			}
+			profile.Data.ArmorName = armorName;
+		}
+		this.setArmor(character, armorName);
+
+		let manaColor = profile.Data.ManaColor;
+		if (manaColor.R === 0 && manaColor.G === 0 && manaColor.B === 0) manaColor = this.getRandomManaColor();
+		else manaColor = { R: math.random(0, 255), G: math.random(0, 255), B: math.random(0, 255) };
+		this.setManaColor(player, Color3.fromRGB(manaColor.R, manaColor.G, manaColor.B));
+
+		while (!character.IsDescendantOf(Workspace)) character.AncestryChanged.Wait();
+		humanoid.ApplyDescription(this.playerDescriptions[player.UserId]);
 		// player:SetAttribute("IdentityLoaded", true)
 		// IdentityService.Client.IdentityLoaded:Fire(player)
 	}
@@ -177,7 +193,7 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 	}
 
 	setHairColor(character: Model, color: Color3) {
-		const humanoid = character.FindFirstAncestorWhichIsA("Humanoid");
+		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
 		if (!humanoid) error(`Failed to find Humanoid in ${character}`);
 
 		for (const accessory of humanoid.GetAccessories()) {
@@ -201,8 +217,32 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 		this.logger.Info("Set {Attribute} of {Character} ([old] -> {new})", "Eye Color", character, color);
 	}
 
-	// TODO: uses dataservice race and personality and gets appropriate face
-	setFace(player: Player, personality: Personality) {}
+	setFace(character: Model, raceName: string, personality: string) {
+		this.cleanCharacterFace(character);
+
+		const race = RACES[raceName];
+		if (raceName === "Fischeran") {
+			raceName = "Rigan";
+		} else if (!race.HasCustomFace) {
+			raceName = "Other";
+		}
+
+		const FACES = ReplicatedStorage.Appearance.Faces;
+		const faceFolder = FACES.FindFirstChild(raceName);
+		if (!faceFolder) error(`Faces not found for ${raceName}`);
+
+		let face = faceFolder.FindFirstChild("Default");
+		if (!face) error(`Default face not found for ${raceName}`);
+		const emotions = faceFolder.FindFirstChild("Emotions");
+		if (emotions) {
+			face = emotions.FindFirstChild(personality);
+			if (!face) error(`${personality} face not found for ${raceName}`);
+		}
+
+		const clone = face.Clone();
+		clone.Parent = this.getHead(character);
+		clone.Name = "face";
+	}
 
 	addEyelashes(character: Model) {
 		const head = character.FindFirstChild("Head") as BasePart;
@@ -213,44 +253,37 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 		lashes.Parent = head;
 	}
 
-	// TODO: save sex using dataservice
 	setSex(player: Player, sex: Sex) {
 		if (sex === "Female" && player.Character) this.addEyelashes(player.Character);
 		this.logger.Info("Set {Attribute} of {Player} ([old] -> {new}", "Sex", player, sex);
 	}
 
-	// TODO
-	setArmor(player: Player, armorName: string) {
-		// local character = player.Character
-		// local gender = DataService.GetData(player, "Gender")
-		// if not gender then error(string.format("Gender not set.")) end
-		// local armor = ARMOR_INFO.Glossary[armorName]
-		// if not armor then error(err404("Armor", armorName, player)) end
-		// local variation = ARMOR_INFO.Glossary[armorName].Variations[gender]
-		// if not variation then variation = armor.Variations.Male end
-		// local oldArmorName = DataService.GetData(player, "Armor")
-		// if not isEmptyString(oldArmorName) then
-		// 	for _,child in character:GetChildren() do
-		// 		if child:IsA("Clothing") then
-		// 			child:Destroy()
-		// 		end
-		// 	end
-		// 	for stat, value in ARMOR_INFO.Glossary[oldArmorName].StatChanges do
-		// 		DataService.AddStatChange(player, stat, -value)
-		// 	end
-		// end
-		// for stat, value in armor.StatChanges do
-		// 	DataService.AddStatChange(player, stat, value)
-		// end
-		// variation.Shirt:Clone().Parent = character
-		// variation.Pants:Clone().Parent = character
-		// player:SetAttribute("Armor", armorName)
-		// DataService.SetData(player, "Armor", armorName)
-		// if PRINT_SETS then print(setMessage("Armor", armorName, player)) end
+	setArmor(character: Model, armorName: string) {
+		const profile = this.dataService.getProfile(Players.GetPlayerFromCharacter(character) as Player);
+		const armor = ARMORS[armorName];
+		let variation = armor.Variations[profile.Data.Sex];
+		if (!variation) variation = armor.Variations.Male;
+
+		const oldArmorName = profile.Data.ArmorName;
+		if (oldArmorName !== "") {
+			for (const instance of character.GetChildren()) {
+				if (instance.IsA("Clothing")) instance.Destroy();
+			}
+			Object.entries(ARMORS[oldArmorName].StatChanges).forEach((entry) => {
+				// TODO: subtract old armor's stats
+			});
+		}
+		Object.entries(ARMORS[oldArmorName].StatChanges).forEach((entry) => {
+			// TODO: add new armor's stats
+		});
+
+		variation.Shirt.Clone().Parent = character;
+		variation.Pants.Clone().Parent = character;
+
+		profile.Data.ArmorName = armorName;
 	}
 
 	setManaColor(player: Player, color: Color3) {
-		// DataService.SetData(player, "ManaColor", {R = color.R, G = color.G, B = color.B})
 		// IdentityService.Client.ManaColorChanged:Fire(player, color)
 	}
 
@@ -259,7 +292,6 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 			const humanoid = player.Character.FindFirstChildWhichIsA("Humanoid");
 			if (humanoid) humanoid.DisplayName = name;
 		}
-		// 	DataService.SetData(player, "FirstName", name)
 
 		// IdentityService.Client.FirstNameChanged:Fire(player, name)
 	}
@@ -277,7 +309,7 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 		}
 
 		if (raceName === "Scroom") {
-			const hairColor = RaceInfo.GLOSSARY[raceName].Phenotypes[phenotypeName].HairColor;
+			const hairColor = RACES[raceName].Phenotypes[phenotypeName].HairColor;
 			if (phenotypeName !== "Glowscroom") {
 				for (const instance of customHead.GetDescendants()) {
 					if (instance.IsA("BasePart") && instance.Name === "Mush") instance.Color = hairColor;
@@ -302,11 +334,15 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 		humanoid.AddAccessory(customAccessory?.Clone() as Accessory);
 	}
 
-	setPhenotype(character: Model, raceName: keyof RaceGlossary, phenotypeName: string) {
-		const race = RaceInfo.GLOSSARY[raceName];
+	setPhenotype(character: Model, raceName: string, phenotypeName: string) {
+		const race = RACES[raceName];
 		const phenotype = race.Phenotypes[phenotypeName];
 
 		this.setCharacterSkinColor(character, phenotype.SkinColor);
+		this.setDescriptionSkinColor(
+			this.playerDescriptions[(Players.GetPlayerFromCharacter(character) as Player).UserId],
+			phenotype.SkinColor,
+		);
 
 		if (race.IsBald) {
 			this.removeHair(character);
@@ -331,10 +367,10 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 		return Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255));
 	}
 
-	getRandomNewRace(oldRace: keyof RaceGlossary): keyof RaceGlossary {
+	getRandomNewRace(oldRace: keyof RaceGlossary): string {
 		let newRace = "";
 		do {
-			newRace = RaceInfo.getRandomRollable() as string;
+			newRace = getRandomRollable() as string;
 		} while (newRace === oldRace);
 		return newRace;
 	}
