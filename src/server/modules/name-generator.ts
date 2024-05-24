@@ -295,7 +295,18 @@ export const NAMES: { [category: string]: string[] } = {
 		"Zoe",
 		"Zoey",
 	],
-	GreaterNavaran: ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"],
+	GreaterNavaran: [
+		"One",
+		"Two",
+		"Three",
+		"Four",
+		"Five",
+		"Six",
+		"Seven",
+		"Eight",
+		"Nine",
+		"Ten",
+	],
 	Kasparan: [
 		"Aelgr",
 		"Aslaugr",
@@ -902,7 +913,10 @@ export const NAMES: { [category: string]: string[] } = {
 	],
 };
 
-export function getRandomFirstName(raceName: keyof RaceGlossary, sex: Sex): string {
+export function getRandomFirstName(
+	raceName: keyof RaceGlossary,
+	sex: Sex,
+): string {
 	let names: string[] = NAMES[raceName];
 	if (!names) {
 		switch (raceName) {
@@ -919,5 +933,5 @@ export function getRandomFirstName(raceName: keyof RaceGlossary, sex: Sex): stri
 				names = sex === "Male" ? NAMES.Masculine : NAMES.Feminine;
 		}
 	}
-	return names[math.random(0, names.size())];
+	return names[math.random(0, names.size() - 1)];
 }

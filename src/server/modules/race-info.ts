@@ -231,7 +231,13 @@ export const RACES: RaceGlossary = {
 	Fischeran: {
 		Category: "Obtainable",
 		Actives: ["Dissolve"],
-		Passives: ["Wind Shield", "Wind Affinity", "Skybound", "Mana Lineage", "Unnatural Blood"],
+		Passives: [
+			"Wind Shield",
+			"Wind Affinity",
+			"Skybound",
+			"Mana Lineage",
+			"Unnatural Blood",
+		],
 		StatChanges: {},
 		Phenotypes: {
 			Default: {
@@ -275,7 +281,13 @@ export const RACES: RaceGlossary = {
 	Gaian: {
 		Category: "Rollable",
 		Actives: ["Repair"],
-		Passives: ["Overheating", "Unnatural Blood", "Robotic Anatomy", "Iron Body", "Robot Mind"],
+		Passives: [
+			"Overheating",
+			"Unnatural Blood",
+			"Robotic Anatomy",
+			"Iron Body",
+			"Robot Mind",
+		],
 		StatChanges: {
 			StomachDecay: 0,
 			SlashResist: 0.25,
@@ -338,7 +350,12 @@ export const RACES: RaceGlossary = {
 	Kasparan: {
 		Category: "Rollable",
 		Actives: ["Respirare"],
-		Passives: ["Dragon Age", "Fire Affinity", "Dragonborn", "Dragon Scales"],
+		Passives: [
+			"Dragon Age",
+			"Fire Affinity",
+			"Dragonborn",
+			"Dragon Scales",
+		],
 		StatChanges: {},
 		Phenotypes: {
 			Default: {
@@ -404,7 +421,14 @@ export const RACES: RaceGlossary = {
 	Lich: {
 		Category: "Exclusive",
 		Actives: ["Vagrant Soul"],
-		Passives: ["Tomeless", "Iron Mind", "Iron Body", "Poison Immunity", "Temperature Immunity", "Skeletal"],
+		Passives: [
+			"Tomeless",
+			"Iron Mind",
+			"Iron Body",
+			"Poison Immunity",
+			"Temperature Immunity",
+			"Skeletal",
+		],
 		StatChanges: {
 			HungerRate: 0.0,
 			ToxicResist: 7.0,
@@ -603,7 +627,14 @@ export const RACES: RaceGlossary = {
 	Vind: {
 		Category: "Rollable",
 		Actives: ["Tempest Soul"],
-		Passives: ["Skybound", "Calm Mind", "Perfect Face", "Unnatural Blood", "Mana Lineage", "Wind Affinity"],
+		Passives: [
+			"Skybound",
+			"Calm Mind",
+			"Perfect Face",
+			"Unnatural Blood",
+			"Mana Lineage",
+			"Wind Affinity",
+		],
 		StatChanges: {
 			HealthRegen: 1.1,
 		},
@@ -630,12 +661,17 @@ let totalAbundance = 0;
 
 export function getRandomRollable(): string {
 	if (totalAbundance === 0) {
-		Object.values(ROLLABLE_RACES).forEach((race) => (totalAbundance += race.Abundance));
+		Object.values(ROLLABLE_RACES).forEach(
+			(race) => (totalAbundance += race.Abundance),
+		);
 	}
 
 	const weightedRaces = new Map<string, number>();
 	Object.entries(ROLLABLE_RACES).forEach((entry) => {
-		weightedRaces.set(entry[0] as string, entry[1].Abundance / totalAbundance);
+		weightedRaces.set(
+			entry[0] as string,
+			entry[1].Abundance / totalAbundance,
+		);
 	});
 
 	let roll = math.random();
@@ -652,5 +688,5 @@ export function getRandomPhenotype(raceName: string): string {
 	const race = RACES[raceName];
 	const phenotypeNames = Object.keys(race.Phenotypes);
 	if (phenotypeNames.size() < 2) return "Default";
-	return phenotypeNames[math.random(0, phenotypeNames.size())] as string;
+	return phenotypeNames[math.random(0, phenotypeNames.size() - 1)] as string;
 }
