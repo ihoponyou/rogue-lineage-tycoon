@@ -174,7 +174,6 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 	public constructor(private readonly logger: Logger) {}
 
 	onPlayerAdded(player: Player): void {
-		print("a");
 		const key = `Player${player.UserId}`;
 
 		this.profileStore.WipeProfileAsync(key);

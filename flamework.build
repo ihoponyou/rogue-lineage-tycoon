@@ -19,7 +19,8 @@
 		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/burn-scar@Frostbite": "server/modules/ServerComponents/flamework/burn-scar@Frostbite",
 		"rogue-lineage-tycoon:out/server/modules/Services/flamework/daylight-service@DaylightService": "server/modules/Services/flamework/daylight-service@DaylightService",
 		"rogue-lineage-tycoon:out/server/modules/Services/flamework/lifecycle-service@LifecycleService": "server/modules/Services/flamework/lifecycle-service@LifecycleService",
-		"rogue-lineage-tycoon:out/server/modules/Services/flamework/lifecycle-service@LifecycleService.newLifecycleEvent.E": "server/modules/Services/flamework/lifecycle-service@LifecycleService.newLifecycleEvent.E"
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/lifecycle-service@LifecycleService.newLifecycleEvent.E": "server/modules/Services/flamework/lifecycle-service@LifecycleService.newLifecycleEvent.E",
+		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/ragdoll@Ragdoll": "server/modules/ServerComponents/flamework/ragdoll@Ragdoll"
 	},
 	"metadata": {}
 }

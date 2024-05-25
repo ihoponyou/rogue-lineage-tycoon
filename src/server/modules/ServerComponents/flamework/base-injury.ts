@@ -7,7 +7,11 @@ interface Attributes {
 	playEffects: boolean;
 }
 
-@Component()
+@Component({
+	defaults: {
+		playEffects: false,
+	},
+})
 export abstract class BaseInjury
 	extends BaseComponent<Attributes, StarterCharacter>
 	implements OnStart

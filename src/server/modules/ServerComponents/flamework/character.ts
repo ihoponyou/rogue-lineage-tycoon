@@ -3,10 +3,7 @@ import { OnStart, OnTick } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { Trove } from "@rbxts/trove";
-import {
-	DataService,
-	PlayerProfile,
-} from "server/modules/Services/flamework/data-service";
+import { DataService } from "server/modules/Services/flamework/data-service";
 
 interface Attributes {
 	isKnocked: boolean;
@@ -41,8 +38,6 @@ export class Character
 		this.instance.AddTag("FallDamage");
 
 		const humanoid = this.instance.Humanoid;
-		humanoid.SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
-		humanoid.SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
 
 		const profile = this.dataService.getProfile(this.getPlayer());

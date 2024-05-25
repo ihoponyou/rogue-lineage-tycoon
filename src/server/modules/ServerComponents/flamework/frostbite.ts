@@ -6,9 +6,6 @@ import { DataService } from "server/modules/Services/flamework/data-service";
 
 @Component({
 	tag: "Frostbite",
-	defaults: {
-		playEffects: false,
-	},
 })
 export class Frostbite extends BaseInjury {
 	readonly name = "Frostbite";
