@@ -1,4 +1,4 @@
-import { Service, OnInit } from "@flamework/core";
+import { Service, OnInit, Dependency } from "@flamework/core";
 import { Players, ReplicatedStorage, Workspace } from "@rbxts/services";
 import { Logger } from "@rbxts/log";
 import {
@@ -12,6 +12,8 @@ import { DataService } from "./data-service";
 import { getRandomFirstName } from "server/modules/name-generator";
 import { ARMORS, getRandomStarterArmor } from "server/modules/armor-info";
 import Object from "@rbxts/object-utils";
+import { Components } from "@flamework/components";
+import { Character } from "server/modules/ServerComponents/flamework/character";
 
 export type Sex = "Male" | "Female";
 const SET_MESSAGE_TEMPLATE = "Set {Attribute} of {Player} ({Old} -> {New})";
@@ -138,6 +140,10 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 		humanoid.ApplyDescription(this.playerDescriptions[player.UserId]);
 		// player:SetAttribute("IdentityLoaded", true)
 		// IdentityService.Client.IdentityLoaded:Fire(player)
+		const components = Dependency<Components>();
+		components.waitForComponent<Character>(character).then((component) => {
+			component.giveForceField();
+		});
 	}
 
 	getPlayerAvatarDescription(playerId: number): HumanoidDescription {
@@ -194,6 +200,7 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 			if (!part.IsA("BasePart")) continue;
 			part.Color = color;
 		}
+		character.SetAttribute("SkinColor", color);
 	}
 
 	setDescriptionSkinColor(description: HumanoidDescription, color: Color3) {

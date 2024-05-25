@@ -2,11 +2,12 @@ import { OnStart, Service } from "@flamework/core";
 import { GetProfileStore } from "@rbxts/profileservice";
 import { Profile } from "@rbxts/profileservice/globals";
 import { Players, RunService } from "@rbxts/services";
-import { OnPlayerAdded, OnPlayerRemoving } from "../../../../../types/lifecycles";
+import {
+	OnPlayerAdded,
+	OnPlayerRemoving,
+} from "../../../../../types/lifecycles";
 import { Sex } from "./identity-service";
 import { Logger } from "@rbxts/log";
-import { valueof } from "../../../../../types/valueof";
-import Object from "@rbxts/object-utils";
 
 interface Vector {
 	X: number | 0;
@@ -39,7 +40,7 @@ export type PlayerData = {
 	Position: Vector;
 	Direction: Vector;
 
-	ResGrip: boolean;
+	HasResGrip: boolean;
 	HasMadeHouse: boolean;
 	IsVampire: boolean;
 	IsLord: boolean;
@@ -98,16 +99,32 @@ export type PlayerData = {
 export type PlayerProfile = Profile<PlayerData>;
 
 export const PROFILE_TEMPLATE: PlayerData = {
-	Conditions: [],
-	Health: 100,
-	Stomach: 100,
-	Toxicity: 0,
-	Temperature: 50,
-
-	Position: { X: 0, Y: 0, Z: 0 },
-	Direction: { X: 0, Y: 0, Z: 0 },
-	ResGrip: false,
-
+	// player
+	IsBanned: false,
+	Rebirths: 0,
+	// lineage
+	RaceName: "",
+	Edict: "",
+	HouseName: "",
+	BankedArtifact: "",
+	UnlockIds: [],
+	// character
+	Days: 0,
+	Seconds: 0,
+	Runes: 0,
+	Lives: 3,
+	Alignment: 0,
+	SnapSlots: 0,
+	ManaProgression: 0,
+	PDDay: 0,
+	GachaDay: 0,
+	HasMadeHouse: false,
+	IsVampire: false,
+	IsHybrid: false,
+	CanHybrid: false,
+	SigilObtained: false,
+	ManaObtained: false,
+	IsLord: false,
 	FirstName: "",
 	PhenotypeName: "",
 	Sex: "",
@@ -115,14 +132,6 @@ export const PROFILE_TEMPLATE: PlayerData = {
 	ArmorName: "",
 	Artifact: "",
 	EmulatedSkill: "",
-	HasMadeHouse: false,
-	Dye: { R: 0, G: 0, B: 0 },
-	IsVampire: false,
-	Days: 0,
-	Seconds: 0,
-	Runes: 0,
-	Lives: 3,
-
 	Class: "",
 	SubClass: "",
 	BaseClass: "",
@@ -130,36 +139,24 @@ export const PROFILE_TEMPLATE: PlayerData = {
 	HybridClass: "",
 	UltraClass: "",
 	LastSkill: "",
+	HomeTown: "",
 	Skills: [],
-	IsHybrid: false,
-	CanHybrid: false,
-	SigilObtained: false,
-	Alignment: 0,
-
 	Spells: [],
 	Snaps: [],
+	Dye: { R: 0, G: 0, B: 0 },
 	ManaColor: { R: 0, G: 0, B: 0 },
-	ManaObtained: false,
-	SnapSlots: 0,
-	ManaProgression: 0,
-
-	HomeTown: "",
-	IsBanned: false,
-	PDDay: 0,
-	GachaDay: 0,
-
 	Silver: DEFAULT_CURRENCY,
 	Valu: DEFAULT_CURRENCY,
 	Insight: DEFAULT_CURRENCY,
-
-	RaceName: "",
-	Edict: "",
-	HouseName: "",
-	BankedArtifact: "",
-	IsLord: false,
-
-	UnlockIds: [],
-	Rebirths: 0,
+	// life
+	Health: 100,
+	Stomach: 100,
+	Toxicity: 0,
+	Temperature: 50,
+	HasResGrip: false,
+	Conditions: [],
+	Position: { X: 0, Y: 0, Z: 0 },
+	Direction: { X: 0, Y: 0, Z: 0 },
 };
 
 const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Production" : "Testing";
@@ -167,7 +164,10 @@ const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Production" : "Testing";
 @Service()
 export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 	private profiles = new Map<number, PlayerProfile>();
-	private profileStore = GetProfileStore(PROFILE_STORE_INDEX, PROFILE_TEMPLATE);
+	private profileStore = GetProfileStore(
+		PROFILE_STORE_INDEX,
+		PROFILE_TEMPLATE,
+	);
 
 	public constructor(private readonly logger: Logger) {}
 
@@ -233,5 +233,71 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 		const profile = this.profiles.get(player.UserId);
 		if (!profile) error(`could not fetch profile for ${player.Name}`);
 		return profile;
+	}
+
+	resetLifeValues(data: PlayerData) {
+		data.Health = PROFILE_TEMPLATE.Health;
+		data.Stomach = PROFILE_TEMPLATE.Stomach;
+		data.Toxicity = PROFILE_TEMPLATE.Toxicity;
+		data.Temperature = PROFILE_TEMPLATE.Temperature;
+		data.HasResGrip = PROFILE_TEMPLATE.HasResGrip;
+		data.Conditions.clear();
+		data.Position = PROFILE_TEMPLATE.Position;
+		data.Direction = PROFILE_TEMPLATE.Direction;
+	}
+
+	resetCharacterValues(data: PlayerData) {
+		this.resetLifeValues(data);
+
+		data.Days = PROFILE_TEMPLATE.Days;
+		data.Seconds = PROFILE_TEMPLATE.Seconds;
+		data.Runes = PROFILE_TEMPLATE.Runes;
+		data.Lives = PROFILE_TEMPLATE.Lives;
+		data.Alignment = PROFILE_TEMPLATE.Alignment;
+		data.SnapSlots = PROFILE_TEMPLATE.SnapSlots;
+		data.ManaProgression = PROFILE_TEMPLATE.ManaProgression;
+		data.PDDay = PROFILE_TEMPLATE.PDDay;
+		data.GachaDay = PROFILE_TEMPLATE.GachaDay;
+		data.HasMadeHouse = PROFILE_TEMPLATE.HasMadeHouse;
+		data.IsVampire = PROFILE_TEMPLATE.IsVampire;
+		data.IsHybrid = PROFILE_TEMPLATE.IsHybrid;
+		data.CanHybrid = PROFILE_TEMPLATE.CanHybrid;
+		data.SigilObtained = PROFILE_TEMPLATE.SigilObtained;
+		data.ManaObtained = PROFILE_TEMPLATE.ManaObtained;
+		data.IsLord = PROFILE_TEMPLATE.IsLord;
+		data.FirstName = PROFILE_TEMPLATE.FirstName;
+		data.PhenotypeName = PROFILE_TEMPLATE.PhenotypeName;
+		data.Sex = PROFILE_TEMPLATE.Sex;
+		data.Personality = PROFILE_TEMPLATE.Personality;
+		data.ArmorName = PROFILE_TEMPLATE.ArmorName;
+		data.Artifact = PROFILE_TEMPLATE.Artifact;
+		data.EmulatedSkill = PROFILE_TEMPLATE.EmulatedSkill;
+		data.Class = PROFILE_TEMPLATE.Class;
+		data.SubClass = PROFILE_TEMPLATE.SubClass;
+		data.BaseClass = PROFILE_TEMPLATE.BaseClass;
+		data.SuperClass = PROFILE_TEMPLATE.SuperClass;
+		data.HybridClass = PROFILE_TEMPLATE.HybridClass;
+		data.UltraClass = PROFILE_TEMPLATE.UltraClass;
+		data.LastSkill = PROFILE_TEMPLATE.LastSkill;
+		data.HomeTown = PROFILE_TEMPLATE.HomeTown;
+		data.Skills.clear();
+		data.Spells.clear();
+		data.Snaps.clear();
+		data.Dye = PROFILE_TEMPLATE.Dye;
+		data.ManaColor = PROFILE_TEMPLATE.ManaColor;
+		data.Silver = PROFILE_TEMPLATE.Silver;
+		data.Valu = PROFILE_TEMPLATE.Valu;
+		data.Insight = PROFILE_TEMPLATE.Insight;
+	}
+
+	resetLineageValues(data: PlayerData) {
+		this.resetLifeValues(data);
+		this.resetCharacterValues(data);
+
+		data.RaceName = PROFILE_TEMPLATE.RaceName;
+		data.Edict = PROFILE_TEMPLATE.Edict;
+		data.HouseName = PROFILE_TEMPLATE.HouseName;
+		data.BankedArtifact = PROFILE_TEMPLATE.BankedArtifact;
+		data.UnlockIds.clear();
 	}
 }

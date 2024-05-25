@@ -12,7 +12,11 @@
 		"rogue-lineage-tycoon:out/server/modules/Services/flamework/reset-service@ResetService": "server/modules/Services/flamework/reset-service@ResetService",
 		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/fall-damage@FallDamage": "server/modules/ServerComponents/flamework/fall-damage@FallDamage",
 		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/character@Character": "server/modules/ServerComponents/flamework/character@Character",
-		"rogue-lineage-tycoon:out/server/modules/Services/flamework/setup-service@LifecycleService": "server/modules/Services/flamework/setup-service@LifecycleService"
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/setup-service@LifecycleService": "server/modules/Services/flamework/setup-service@LifecycleService",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/injury-service@InjuryService": "server/modules/Services/flamework/injury-service@InjuryService",
+		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/base-injury@BaseInjury": "server/modules/ServerComponents/flamework/base-injury@BaseInjury",
+		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/frostbite@Frostbite": "server/modules/ServerComponents/flamework/frostbite@Frostbite",
+		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/burn-scar@Frostbite": "server/modules/ServerComponents/flamework/burn-scar@Frostbite"
 	},
 	"metadata": {}
 }
