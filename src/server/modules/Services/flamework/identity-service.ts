@@ -7,7 +7,10 @@ import {
 	getRandomPhenotype,
 	getRandomRollable,
 } from "server/modules/race-info";
-import { OnPlayerAdded } from "../../../../../types/lifecycles";
+import {
+	OnCharacterAdded,
+	OnPlayerAdded,
+} from "../../../../../types/lifecycles";
 import { DataService } from "./data-service";
 import { getRandomFirstName } from "server/modules/name-generator";
 import { ARMORS, getRandomStarterArmor } from "server/modules/armor-info";
@@ -20,7 +23,9 @@ const SET_MESSAGE_TEMPLATE = "Set {Attribute} of {Player} ({Old} -> {New})";
 const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
 
 @Service()
-export class IdentityService implements OnInit, OnPlayerAdded {
+export class IdentityService
+	implements OnInit, OnPlayerAdded, OnCharacterAdded
+{
 	private playerDescriptions: { [playerId: number]: HumanoidDescription } =
 		{};
 	private defaultDescription = new Instance("HumanoidDescription");
@@ -47,9 +52,6 @@ export class IdentityService implements OnInit, OnPlayerAdded {
 		this.playerDescriptions[player.UserId] =
 			this.getPlayerAvatarDescription(player.UserId);
 		this.cleanPlayerDescription(this.playerDescriptions[player.UserId]);
-		player.CharacterAdded.Connect((character) =>
-			this.onCharacterAdded(character),
-		);
 	}
 
 	onCharacterAdded(character: Model) {

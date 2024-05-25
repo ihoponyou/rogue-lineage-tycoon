@@ -45,7 +45,7 @@ export class Character
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
 
-		const profile = this.profile();
+		const profile = this.dataService.getProfile(this.getPlayer());
 		let savedHealth = profile.Data.Health;
 		if (savedHealth < 1) savedHealth = 100;
 		humanoid.Health = savedHealth;
@@ -64,15 +64,11 @@ export class Character
 		humanoid.TakeDamage(dt * -regenRate);
 	}
 
-	player(): Player {
+	getPlayer(): Player {
 		const player = Players.GetPlayerFromCharacter(this.instance);
 		if (!player)
 			error(`Player not found from character ${this.instance.Name}`);
 		return player;
-	}
-
-	profile(): PlayerProfile {
-		return this.dataService.getProfile(this.player());
 	}
 
 	knock(): void {
@@ -94,7 +90,7 @@ export class Character
 			}
 		});
 
-		const profile = this.profile();
+		const profile = this.dataService.getProfile(this.getPlayer());
 		profile.Data.Lives -= 1;
 		if (profile.Data.Lives > 0) {
 			this.dataService.resetLifeValues(profile.Data);
@@ -102,7 +98,7 @@ export class Character
 			this.dataService.resetCharacterValues(profile.Data);
 		}
 
-		task.delay(Players.RespawnTime, () => this.player().LoadCharacter());
+		task.delay(Players.RespawnTime, () => this.getPlayer().LoadCharacter());
 	}
 
 	snipe(): void {

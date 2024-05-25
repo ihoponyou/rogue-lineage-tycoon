@@ -16,7 +16,10 @@
 		"rogue-lineage-tycoon:out/server/modules/Services/flamework/injury-service@InjuryService": "server/modules/Services/flamework/injury-service@InjuryService",
 		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/base-injury@BaseInjury": "server/modules/ServerComponents/flamework/base-injury@BaseInjury",
 		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/frostbite@Frostbite": "server/modules/ServerComponents/flamework/frostbite@Frostbite",
-		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/burn-scar@Frostbite": "server/modules/ServerComponents/flamework/burn-scar@Frostbite"
+		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/burn-scar@Frostbite": "server/modules/ServerComponents/flamework/burn-scar@Frostbite",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/daylight-service@DaylightService": "server/modules/Services/flamework/daylight-service@DaylightService",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/lifecycle-service@LifecycleService": "server/modules/Services/flamework/lifecycle-service@LifecycleService",
+		"rogue-lineage-tycoon:out/server/modules/Services/flamework/lifecycle-service@LifecycleService.newLifecycleEvent.E": "server/modules/Services/flamework/lifecycle-service@LifecycleService.newLifecycleEvent.E"
 	},
 	"metadata": {}
 }

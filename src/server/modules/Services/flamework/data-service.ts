@@ -8,6 +8,7 @@ import {
 } from "../../../../../types/lifecycles";
 import { Sex } from "./identity-service";
 import { Logger } from "@rbxts/log";
+import { SECONDS_PER_DAY } from "./daylight-service";
 
 interface Vector {
 	X: number | 0;
@@ -168,10 +169,12 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 		PROFILE_STORE_INDEX,
 		PROFILE_TEMPLATE,
 	);
+	private joinTicks = new Map<Player, number>();
 
 	public constructor(private readonly logger: Logger) {}
 
 	onPlayerAdded(player: Player): void {
+		print("a");
 		const key = `Player${player.UserId}`;
 
 		this.profileStore.WipeProfileAsync(key);
@@ -195,6 +198,7 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 		}
 
 		this.profiles.set(player.UserId, profile);
+		this.joinTicks.set(player, math.round(tick()));
 
 		this.giveLeaderStatsFolder(player);
 
@@ -203,7 +207,23 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 
 	onPlayerRemoving(player: Player): void {
 		const profile = this.profiles.get(player.UserId);
-		if (profile) profile.Release();
+		if (!profile) return;
+
+		this.updateLifeLength(player);
+
+		profile.Release();
+	}
+
+	private updateLifeLength(player: Player): void {
+		const joinTick = this.joinTicks.get(player);
+		if (joinTick === undefined) error("wtf 2");
+
+		const profile = this.getProfile(player);
+		profile.Data.Seconds += math.round(tick()) - joinTick;
+		while (profile.Data.Seconds >= SECONDS_PER_DAY) {
+			profile.Data.Days++;
+			profile.Data.Seconds -= SECONDS_PER_DAY;
+		}
 	}
 
 	private giveLeaderStatsFolder(player: Player) {

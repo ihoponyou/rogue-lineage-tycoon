@@ -2,6 +2,7 @@ import { Component } from "@flamework/components";
 import { BaseInjury } from "./base-injury";
 import { Character } from "./character";
 import { ReplicatedStorage } from "@rbxts/services";
+import { DataService } from "server/modules/Services/flamework/data-service";
 
 @Component({
 	tag: "Frostbite",
@@ -12,14 +13,20 @@ import { ReplicatedStorage } from "@rbxts/services";
 export class Frostbite extends BaseInjury {
 	readonly name = "Frostbite";
 
-	constructor(protected character: Character) {
-		super(character);
+	constructor(
+		protected character: Character,
+		protected dataService: DataService,
+	) {
+		super(character, dataService);
 	}
 
 	override onStart(): void {
 		this.inflict();
 
-		const data = this.character.profile().Data;
+		const data = this.dataService.getProfile(
+			this.character.getPlayer(),
+		).Data;
+
 		if (data.Temperature === 100) {
 			data.Temperature = 70;
 		}

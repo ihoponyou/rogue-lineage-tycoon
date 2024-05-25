@@ -1,6 +1,7 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { Character } from "./character";
 import { OnStart } from "@flamework/core";
+import { DataService } from "server/modules/Services/flamework/data-service";
 
 interface Attributes {
 	playEffects: boolean;
@@ -13,22 +14,29 @@ export abstract class BaseInjury
 {
 	abstract readonly name: string;
 
-	constructor(protected character: Character) {
+	constructor(
+		protected character: Character,
+		protected dataService: DataService,
+	) {
 		super();
 	}
 
 	abstract onStart(): void;
 
 	inflict(): void {
-		const profile = this.character.profile();
-		if (profile.Data.Conditions.includes(this.name)) return;
-		profile.Data.Conditions.push(this.name);
+		const data = this.dataService.getProfile(
+			this.character.getPlayer(),
+		).Data;
+		if (data.Conditions.includes(this.name)) return;
+		data.Conditions.push(this.name);
 
 		if (this.attributes.playEffects) this.playInjuryEffects();
 	}
 
 	heal(): void {
-		const data = this.character.profile().Data;
+		const data = this.dataService.getProfile(
+			this.character.getPlayer(),
+		).Data;
 		const conditions = data.Conditions;
 		conditions.remove(conditions.findIndex((value) => value === this.name));
 
