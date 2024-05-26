@@ -1,0 +1,13 @@
+{
+	"Disabled Instance metadata": {
+		"scope": "json",
+		"prefix": "disabled",
+		"body": [
+			"{",
+			"\t\"properties\": {",
+			"\t\t\"Enabled\": false",
+			"\t}",
+			"}"
+		]
+	}
+}
