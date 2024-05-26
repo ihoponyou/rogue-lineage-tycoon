@@ -1,0 +1,22 @@
+{
+  "autorun": true,
+  "autokill": true,
+  "terminals": [
+    {
+      "name": "compiler",
+      "description": "compiles source code into lua with rbxtsc",
+      "focus": true,
+      "command": "npm run watch"
+    },
+    {
+      "name": "io-serve",
+      "description": "necessary for rbxts-object-to-tree",
+      "command": "npx io-serve"
+    },
+    {
+      "name": "rojo",
+      "description": "you know",
+      "command": "rojo serve"
+    }
+  ]
+}
