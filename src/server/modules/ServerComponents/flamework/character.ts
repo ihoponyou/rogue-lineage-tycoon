@@ -104,13 +104,12 @@ export class Character
 			MAXIMUM_TEMPERATURE,
 		);
 		profile.Data.Temperature = newTemperature;
+		this.attributes.temperature = newTemperature;
 
 		if (newTemperature === MINIMUM_TEMPERATURE)
 			this.instance.AddTag("Frostbite");
 		else if (newTemperature === MAXIMUM_TEMPERATURE)
 			this.instance.AddTag("BurnScar");
-
-		print(newTemperature);
 	}
 
 	knock(): void {
