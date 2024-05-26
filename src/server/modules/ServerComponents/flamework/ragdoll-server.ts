@@ -1,30 +1,29 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Character } from "./character";
+import { Ragdoll } from "shared/modules/components/ragdoll";
 import Trove from "../../../../../Packages/_Index/sleitnick_trove@1.3.0/trove";
+
+type SocketType = "Hip" | "Shoulder" | "Neck";
+
+type SocketAngles = {
+	UpperAngle: number;
+	TwistAngle: number;
+};
 
 type RagdollJoint = {
 	motor: Motor6D;
 	socket: BallSocketConstraint;
 };
 
-interface Attributes {
-	isActive: boolean;
-}
-
-type SocketAngle = {
-	UpperAngle: number;
-	TwistAngle: number;
-};
-
-@Component()
-export class Ragdoll
-	extends BaseComponent<Attributes, StarterCharacter>
-	implements OnStart
-{
-	readonly SOCKET_ANGLES: {
-		[socketType: string]: SocketAngle;
-	} = {
+@Component({
+	tag: "Ragdoll",
+	defaults: {
+		isRagdolled: false,
+	},
+})
+export class RagdollServer extends Ragdoll implements OnStart {
+	private readonly SOCKET_ANGLES: { [key: string]: SocketAngles } = {
 		Hip: {
 			UpperAngle: 30,
 			TwistAngle: 135,
@@ -40,10 +39,6 @@ export class Ragdoll
 	};
 	private trove = new Trove();
 	private joints = new Map<string, RagdollJoint>();
-
-	constructor(private character: Character) {
-		super();
-	}
 
 	private createJoint(
 		motor: Motor6D,
@@ -96,11 +91,10 @@ export class Ragdoll
 		return { motor: motor, socket: socket };
 	}
 
+	private createSocket(jointName: string, socketType: SocketType) {}
+
 	onStart(): void {
-		const humanoid = this.character.instance.Humanoid;
-		humanoid.BreakJointsOnDeath = false;
-		humanoid.SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
-		humanoid.SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
+		this.configureHumanoid();
 
 		for (const motor of this.instance.GetDescendants()) {
 			if (!motor.IsA("Motor6D")) continue;
@@ -131,15 +125,21 @@ export class Ragdoll
 				this.joints.delete(jointName);
 			});
 		}
+
+		this.onAttributeChanged("isRagdolled", (newValue) =>
+			this.changeHumanoidState(newValue),
+		);
 	}
 
 	toggle(on: boolean): void {
-		const humanoid = this.character.instance.Humanoid;
-		humanoid.ChangeState(
-			on
-				? Enum.HumanoidStateType.Physics
-				: Enum.HumanoidStateType.GettingUp,
-		);
-		humanoid.AutoRotate = false;
+		this.attributes.isRagdolled = on;
+
+		this.humanoid.AutoRotate = !on;
+		this.changeHumanoidState(on);
+
+		for (const [name, joint] of this.joints) {
+			joint.motor.Enabled = !on;
+			if (joint.motor.Part1) joint.motor.Part1.CanCollide = on;
+		}
 	}
 }

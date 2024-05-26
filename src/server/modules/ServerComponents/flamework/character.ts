@@ -4,14 +4,11 @@ import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { Trove } from "@rbxts/trove";
 import { DataService } from "server/modules/Services/flamework/data-service";
+import { RagdollServer } from "./ragdoll-server";
 
 interface Attributes {
 	isKnocked: boolean;
 	isAlive: boolean;
-}
-
-interface CharacterInstance extends StarterCharacter {
-	Humanoid: Humanoid;
 }
 
 @Component({
@@ -30,13 +27,14 @@ export class Character
 	private PROTECTED_DISTANCE = 5;
 	private BASE_REGEN_RATE = 0.5;
 
-	constructor(private dataService: DataService) {
+	constructor(
+		private dataService: DataService,
+		private ragdoll: RagdollServer,
+	) {
 		super();
 	}
 
 	onStart(): void {
-		this.instance.AddTag("FallDamage");
-
 		const humanoid = this.instance.Humanoid;
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
 
@@ -69,10 +67,11 @@ export class Character
 	knock(): void {
 		if (this.attributes.isKnocked) return;
 		this.attributes.isKnocked = true;
-		// TODO: ragdoll
+		this.ragdoll.toggle(true);
 	}
 
 	kill(): void {
+		if (!this.attributes.isAlive) return;
 		this.attributes.isAlive = false;
 
 		this.instance.Humanoid.Health = 0;

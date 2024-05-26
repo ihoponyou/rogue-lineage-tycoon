@@ -20,7 +20,10 @@
 		"rogue-lineage-tycoon:out/server/modules/Services/flamework/daylight-service@DaylightService": "server/modules/Services/flamework/daylight-service@DaylightService",
 		"rogue-lineage-tycoon:out/server/modules/Services/flamework/lifecycle-service@LifecycleService": "server/modules/Services/flamework/lifecycle-service@LifecycleService",
 		"rogue-lineage-tycoon:out/server/modules/Services/flamework/lifecycle-service@LifecycleService.newLifecycleEvent.E": "server/modules/Services/flamework/lifecycle-service@LifecycleService.newLifecycleEvent.E",
-		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/ragdoll@Ragdoll": "server/modules/ServerComponents/flamework/ragdoll@Ragdoll"
+		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/ragdoll@Ragdoll": "server/modules/ServerComponents/flamework/ragdoll@Ragdoll",
+		"rogue-lineage-tycoon:out/shared/modules/components/ragdoll@Ragdoll": "shared/modules/components/ragdoll@Ragdoll",
+		"rogue-lineage-tycoon:out/client/modules/components/ragdoll-client@RagdollClient": "client/modules/components/ragdoll-client@RagdollClient",
+		"rogue-lineage-tycoon:out/server/modules/ServerComponents/flamework/ragdoll-server@RagdollServer": "server/modules/ServerComponents/flamework/ragdoll-server@RagdollServer"
 	},
 	"metadata": {}
 }
