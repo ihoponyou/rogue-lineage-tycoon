@@ -29,6 +29,6 @@ export class Frostbite extends BaseInjury {
 		}
 
 		ReplicatedStorage.Appearance.FacialExtras.Scars.BurnScar.Clone().Parent =
-			this.character.instance.Head;
+			this.character.getHead();
 	}
 }

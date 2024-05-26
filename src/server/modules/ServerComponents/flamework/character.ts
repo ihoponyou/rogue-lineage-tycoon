@@ -11,6 +11,10 @@ interface Attributes {
 	isAlive: boolean;
 }
 
+const FF_DURATION = 15;
+const PROTECTED_DISTANCE = 5;
+const BASE_REGEN_RATE = 0.5;
+
 @Component({
 	tag: "Character",
 	defaults: {
@@ -19,13 +23,10 @@ interface Attributes {
 	},
 })
 export class Character
-	extends BaseComponent<Attributes, CharacterInstance>
+	extends BaseComponent<Attributes, Model>
 	implements OnStart, OnTick
 {
 	private trove: Trove = new Trove();
-	private FF_DURATION = 15;
-	private PROTECTED_DISTANCE = 5;
-	private BASE_REGEN_RATE = 0.5;
 
 	constructor(
 		private dataService: DataService,
@@ -35,7 +36,7 @@ export class Character
 	}
 
 	onStart(): void {
-		const humanoid = this.instance.Humanoid;
+		const humanoid = this.getHumanoid();
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
 
 		const profile = this.dataService.getProfile(this.getPlayer());
@@ -46,15 +47,26 @@ export class Character
 		for (const condition of profile.Data.Conditions) {
 			this.instance.AddTag(condition);
 		}
+
+		this.instance.AddTag("FallDamage");
 	}
 
 	onTick(dt: number): void {
-		const humanoid = this.instance.Humanoid;
+		const humanoid = this.getHumanoid();
 		if (humanoid.Health >= humanoid.MaxHealth) return;
 
 		const boost = 0; // TODO: health regen multiplier
-		const regenRate = this.BASE_REGEN_RATE * (1 + boost);
+		const regenRate = BASE_REGEN_RATE * (1 + boost);
 		humanoid.TakeDamage(dt * -regenRate);
+	}
+
+	getHumanoid(): Humanoid {
+		const humanoid = this.instance.FindFirstChild("Humanoid") as
+			| Humanoid
+			| undefined;
+		if (!humanoid)
+			error(`Humanoid not found in character ${this.instance.Name}`);
+		return humanoid;
 	}
 
 	getPlayer(): Player {
@@ -62,6 +74,13 @@ export class Character
 		if (!player)
 			error(`Player not found from character ${this.instance.Name}`);
 		return player;
+	}
+
+	getHead(): Head {
+		const head = this.instance.FindFirstChild("Head") as Head | undefined;
+		if (head === undefined)
+			error(`Head not found in character ${this.instance.Name}`);
+		return head;
 	}
 
 	knock(): void {
@@ -74,7 +93,7 @@ export class Character
 		if (!this.attributes.isAlive) return;
 		this.attributes.isAlive = false;
 
-		this.instance.Humanoid.Health = 0;
+		this.getHumanoid().Health = 0;
 		this.instance.GetChildren().forEach((value) => {
 			if (
 				value.IsA("BallSocketConstraint") ||
@@ -100,7 +119,8 @@ export class Character
 	}
 
 	snipe(): void {
-		const particleAttachment = this.instance.Head.ParticleAttachment;
+		const particleAttachment = this.getHead().ParticleAttachment;
+		if (particleAttachment === undefined) return;
 
 		particleAttachment.Critted.Play();
 		particleAttachment.Sniped.Play();
@@ -109,18 +129,20 @@ export class Character
 
 	giveForceField(): void {
 		const ffTrove = this.trove.extend();
-		const startPos = this.instance.HumanoidRootPart.Position;
+		const startPos = (this.instance as StarterCharacter).HumanoidRootPart
+			.Position;
 		const startTick = tick();
 		const ff = ffTrove.add(new Instance("ForceField"));
 		ff.Parent = this.instance;
 
 		ffTrove.add(
 			setInterval(() => {
-				const timeExpired = tick() - startTick > this.FF_DURATION;
+				const timeExpired = tick() - startTick > FF_DURATION;
 
-				const currentPos = this.instance.HumanoidRootPart.Position;
+				const currentPos = (this.instance as StarterCharacter)
+					.HumanoidRootPart.Position;
 				const distanceFromStart = currentPos.sub(startPos).Magnitude;
-				const leftSpawn = distanceFromStart > this.PROTECTED_DISTANCE;
+				const leftSpawn = distanceFromStart > PROTECTED_DISTANCE;
 
 				if (timeExpired || leftSpawn) ffTrove.destroy();
 			}, 0.5),

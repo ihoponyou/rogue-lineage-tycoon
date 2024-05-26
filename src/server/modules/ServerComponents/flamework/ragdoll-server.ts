@@ -16,6 +16,21 @@ type RagdollJoint = {
 	socket: BallSocketConstraint;
 };
 
+const SOCKET_ANGLES: { [key: string]: SocketAngles } = {
+	Hip: {
+		UpperAngle: 30,
+		TwistAngle: 135,
+	},
+	Shoulder: {
+		UpperAngle: 100,
+		TwistAngle: 45,
+	},
+	Neck: {
+		UpperAngle: 10,
+		TwistAngle: 30,
+	},
+};
+
 @Component({
 	tag: "Ragdoll",
 	defaults: {
@@ -23,20 +38,6 @@ type RagdollJoint = {
 	},
 })
 export class RagdollServer extends Ragdoll implements OnStart {
-	private readonly SOCKET_ANGLES: { [key: string]: SocketAngles } = {
-		Hip: {
-			UpperAngle: 30,
-			TwistAngle: 135,
-		},
-		Shoulder: {
-			UpperAngle: 100,
-			TwistAngle: 45,
-		},
-		Neck: {
-			UpperAngle: 10,
-			TwistAngle: 30,
-		},
-	};
 	private trove = new Trove();
 	private joints = new Map<string, RagdollJoint>();
 
@@ -80,10 +81,10 @@ export class RagdollServer extends Ragdoll implements OnStart {
 		socket.LimitsEnabled = true;
 		socket.MaxFrictionTorque = 100;
 		socket.Restitution = 0.25;
-		socket.UpperAngle = this.SOCKET_ANGLES[socketType].UpperAngle;
+		socket.UpperAngle = SOCKET_ANGLES[socketType].UpperAngle;
 		socket.TwistLimitsEnabled = socketType !== "Shoulder";
 		if (socket.TwistLimitsEnabled) {
-			const twistAngle = this.SOCKET_ANGLES[socketType].TwistAngle;
+			const twistAngle = SOCKET_ANGLES[socketType].TwistAngle;
 			socket.TwistUpperAngle = twistAngle;
 			socket.TwistLowerAngle = -twistAngle;
 		}

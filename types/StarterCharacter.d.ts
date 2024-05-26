@@ -1,7 +1,3 @@
-type CharacterInstance = StarterCharacter & {
-	Humanoid: Humanoid;
-};
-
 type StarterCharacter = Model & {
 	["Left Leg"]: Part & {
 		RagdollAttachment: Attachment;

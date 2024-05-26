@@ -5,10 +5,6 @@ import { RagdollServer } from "./ragdoll-server";
 
 @Component({
 	tag: "FallDamage",
-	defaults: {
-		airTime: 0,
-		startHeight: 0,
-	},
 })
 export class FallDamage extends BaseComponent<{}, Model> implements OnTick {
 	airTime = 0;
@@ -26,7 +22,8 @@ export class FallDamage extends BaseComponent<{}, Model> implements OnTick {
 	}
 
 	onTick(dt: number): void {
-		const humanoidRootPart = this.character.instance.HumanoidRootPart;
+		const humanoidRootPart = (this.character.instance as StarterCharacter)
+			.HumanoidRootPart;
 		const falling = humanoidRootPart.AssemblyLinearVelocity.Y < -1;
 
 		if (falling) {
@@ -40,7 +37,7 @@ export class FallDamage extends BaseComponent<{}, Model> implements OnTick {
 			if (distanceFallen < 15) return;
 
 			const damage = this.calculateDamage(distanceFallen);
-			const humanoid = this.character.instance.Humanoid;
+			const humanoid = this.character.getHumanoid();
 
 			humanoid.TakeDamage(damage);
 			if (damage > humanoid.MaxHealth * 0.75) {
