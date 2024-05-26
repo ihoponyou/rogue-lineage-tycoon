@@ -9,17 +9,21 @@ import { RagdollServer } from "./ragdoll-server";
 interface Attributes {
 	isKnocked: boolean;
 	isAlive: boolean;
+	temperature: number;
 }
 
 const FF_DURATION = 15;
 const PROTECTED_DISTANCE = 5;
 const BASE_REGEN_RATE = 0.5;
+const MINIMUM_TEMPERATURE = 0;
+const MAXIMUM_TEMPERATURE = 100;
 
 @Component({
 	tag: "Character",
 	defaults: {
 		isKnocked: false,
 		isAlive: true,
+		temperature: 50,
 	},
 })
 export class Character
@@ -83,17 +87,39 @@ export class Character
 		return head;
 	}
 
+	getTorso(): Torso {
+		const torso = this.instance.FindFirstChild("Torso") as
+			| Torso
+			| undefined;
+		if (torso === undefined)
+			error(`Torso not found in character ${this.instance.Name}`);
+		return torso;
+	}
+
+	adjustTemperature(amount: number) {
+		const profile = this.dataService.getProfile(this.getPlayer());
+		const newTemperature = math.clamp(
+			profile.Data.Temperature + amount,
+			MINIMUM_TEMPERATURE,
+			MAXIMUM_TEMPERATURE,
+		);
+		profile.Data.Temperature = newTemperature;
+
+		if (newTemperature === MINIMUM_TEMPERATURE)
+			this.instance.AddTag("Frostbite");
+		else if (newTemperature === MAXIMUM_TEMPERATURE)
+			this.instance.AddTag("BurnScar");
+
+		print(newTemperature);
+	}
+
 	knock(): void {
 		if (this.attributes.isKnocked) return;
 		this.attributes.isKnocked = true;
 		this.ragdoll.toggle(true);
 	}
 
-	kill(): void {
-		if (!this.attributes.isAlive) return;
-		this.attributes.isAlive = false;
-
-		this.getHumanoid().Health = 0;
+	breakJoints(): void {
 		this.instance.GetChildren().forEach((value) => {
 			if (
 				value.IsA("BallSocketConstraint") ||
@@ -102,6 +128,14 @@ export class Character
 				value.Destroy();
 			}
 		});
+	}
+
+	kill(): void {
+		if (!this.attributes.isAlive) return;
+		this.attributes.isAlive = false;
+
+		this.getHumanoid().Health = 0;
+		this.breakJoints();
 
 		const profile = this.dataService.getProfile(this.getPlayer());
 		profile.Data.Lives -= 1;

@@ -3,17 +3,9 @@ import { Character } from "./character";
 import { OnStart } from "@flamework/core";
 import { DataService } from "server/modules/Services/flamework/data-service";
 
-interface Attributes {
-	playEffects: boolean;
-}
-
-@Component({
-	defaults: {
-		playEffects: false,
-	},
-})
+@Component()
 export abstract class BaseInjury
-	extends BaseComponent<Attributes, StarterCharacter>
+	extends BaseComponent<{}, Model>
 	implements OnStart
 {
 	abstract readonly name: string;
@@ -34,7 +26,7 @@ export abstract class BaseInjury
 		if (data.Conditions.includes(this.name)) return;
 		data.Conditions.push(this.name);
 
-		if (this.attributes.playEffects) this.playInjuryEffects();
+		this.playInjuryEffects();
 	}
 
 	heal(): void {
@@ -48,7 +40,8 @@ export abstract class BaseInjury
 	}
 
 	playInjuryEffects(): void {
-		this.instance.Torso.Injure.Emit(1);
-		this.instance.Torso.Injured.Play();
+		const torso = this.character.getTorso();
+		torso.Injure.Emit(1);
+		torso.Injured.Play();
 	}
 }
