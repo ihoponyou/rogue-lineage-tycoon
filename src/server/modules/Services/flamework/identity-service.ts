@@ -97,7 +97,7 @@ export class IdentityService
 			sex = this.getRandomSex();
 			profile.Data.Sex = sex;
 		}
-		this.setSex(player, sex);
+		this.setSex(character, sex);
 
 		let firstName = profile.Data.FirstName;
 		if (firstName === "") {
@@ -107,7 +107,6 @@ export class IdentityService
 
 		let armorName = profile.Data.ArmorName;
 		if (armorName === "") {
-			// not sure why this needs a type cast
 			switch (raceName) {
 				case "Gaian":
 					armorName = "GaianDefault";
@@ -295,11 +294,14 @@ export class IdentityService
 		lashes.Parent = head;
 	}
 
-	setSex(player: Player, sex: Sex) {
-		if (sex === "Female" && player.Character)
-			this.addEyelashes(player.Character);
-		const oldSex = this.dataService.getProfile(player).Data.Sex;
-		this.logger.Info(SET_MESSAGE_TEMPLATE, "Sex", player.Name, oldSex, sex);
+	setSex(character: Model, sex: Sex) {
+		if (sex === "Female") {
+			this.addEyelashes(character);
+		} else {
+			const head = character.FindFirstChild("Head") as BasePart;
+			const lashes = head.FindFirstChild("Lashes");
+			if (lashes) lashes.Destroy();
+		}
 	}
 
 	setArmor(character: Model, armorName: string) {
