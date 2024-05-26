@@ -9,7 +9,7 @@ import { Workspace } from "@rbxts/services";
 
 const UPPER_TEMPERATURE_THRESHOLD = 5;
 const DEATH_MESSAGE_TEMPLATE = "{Character} froze to death innit";
-const ICE_COLOR = new Color3(152, 194, 219);
+const ICE_COLOR = Color3.fromRGB(152, 194, 219);
 
 @Component({
 	tag: "Frostbite",
