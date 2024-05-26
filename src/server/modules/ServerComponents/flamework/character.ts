@@ -15,7 +15,7 @@ interface Attributes {
 	tag: "Character",
 	defaults: {
 		isKnocked: false,
-		isAlive: false,
+		isAlive: true,
 	},
 })
 export class Character
@@ -92,7 +92,11 @@ export class Character
 			this.dataService.resetCharacterValues(profile.Data);
 		}
 
-		task.delay(Players.RespawnTime, () => this.getPlayer().LoadCharacter());
+		this.trove.add(
+			task.delay(Players.RespawnTime, () =>
+				this.getPlayer().LoadCharacter(),
+			),
+		);
 	}
 
 	snipe(): void {
