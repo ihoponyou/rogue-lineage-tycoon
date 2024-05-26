@@ -1,11 +1,13 @@
-import { Modding, OnStart, Service } from "@flamework/core";
+import { Dependency, Modding, OnStart, Service } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import {
 	OnCharacterAdded,
 	OnCharacterRemoving,
 	OnPlayerAdded,
 	OnPlayerRemoving,
+	OnRemoved,
 } from "../../../../../types/lifecycles";
+import { Components } from "@flamework/components";
 
 @Service()
 export class LifecycleService implements OnStart {
@@ -94,6 +96,12 @@ export class LifecycleService implements OnStart {
 			for (const listener of playerRemovingListeners) {
 				task.spawn(() => listener.onPlayerRemoving(player));
 			}
+		});
+
+		const components = Dependency<Components>();
+
+		components.onComponentRemoved<OnRemoved>((value) => {
+			value.onRemoved();
 		});
 	}
 }

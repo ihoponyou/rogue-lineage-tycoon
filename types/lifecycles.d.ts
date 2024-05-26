@@ -13,3 +13,7 @@ export interface OnCharacterAdded {
 export interface OnCharacterRemoving {
 	onCharacterRemoving(character: StarterCharacter): void;
 }
+
+export interface OnRemoved {
+	onRemoved(): void;
+}

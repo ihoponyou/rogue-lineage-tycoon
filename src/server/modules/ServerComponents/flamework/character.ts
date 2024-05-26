@@ -5,6 +5,7 @@ import { setInterval } from "@rbxts/set-timeout";
 import { Trove } from "@rbxts/trove";
 import { DataService } from "server/modules/Services/flamework/data-service";
 import { RagdollServer } from "./ragdoll-server";
+import { OnRemoved } from "../../../../../types/lifecycles";
 
 interface Attributes {
 	isKnocked: boolean;
@@ -17,6 +18,7 @@ const PROTECTED_DISTANCE = 5;
 const BASE_REGEN_RATE = 0.5;
 const MINIMUM_TEMPERATURE = 0;
 const MAXIMUM_TEMPERATURE = 100;
+const KNOCK_PERCENT_THRESHOLD = 0.15;
 
 @Component({
 	tag: "Character",
@@ -28,7 +30,7 @@ const MAXIMUM_TEMPERATURE = 100;
 })
 export class Character
 	extends BaseComponent<Attributes, Model>
-	implements OnStart, OnTick
+	implements OnStart, OnTick, OnRemoved
 {
 	private trove: Trove = new Trove();
 
@@ -53,6 +55,10 @@ export class Character
 		}
 
 		this.instance.AddTag("FallDamage");
+
+		this.trove.connect(humanoid.HealthChanged, (health) =>
+			this.onHealthChanged(health, humanoid),
+		);
 	}
 
 	onTick(dt: number): void {
@@ -62,6 +68,25 @@ export class Character
 		const boost = 0; // TODO: health regen multiplier
 		const regenRate = BASE_REGEN_RATE * (1 + boost);
 		humanoid.TakeDamage(dt * -regenRate);
+	}
+
+	onRemoved(): void {
+		this.trove.destroy();
+	}
+
+	onHealthChanged(health: number, humanoid: Humanoid): void {
+		const percentHealth = health / humanoid.MaxHealth;
+		if (this.attributes.isKnocked) {
+			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
+				this.attributes.isKnocked = false;
+				this.ragdoll.toggle(false);
+			}
+			return;
+		}
+
+		if (health > 0) return;
+
+		this.knock();
 	}
 
 	getHumanoid(): Humanoid {
@@ -144,11 +169,7 @@ export class Character
 			this.dataService.resetCharacterValues(profile.Data);
 		}
 
-		this.trove.add(
-			task.delay(Players.RespawnTime, () =>
-				this.getPlayer().LoadCharacter(),
-			),
-		);
+		task.delay(Players.RespawnTime, () => this.getPlayer().LoadCharacter());
 	}
 
 	snipe(): void {
