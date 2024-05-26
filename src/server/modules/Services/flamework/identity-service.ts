@@ -69,8 +69,7 @@ export class IdentityService
 
 		let raceName = profile.Data.RaceName;
 		if (raceName === "") {
-			// raceName = getRandomRollable();
-			raceName = "Scroom";
+			raceName = getRandomRollable();
 			profile.Data.RaceName = raceName;
 		}
 		const race = RACES[raceName];
