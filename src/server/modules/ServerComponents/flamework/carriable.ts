@@ -4,7 +4,7 @@ import { Character } from "./character";
 import { Dependency, OnStart } from "@flamework/core";
 import { RagdollServer } from "./ragdoll-server";
 import { Players, Workspace } from "@rbxts/services";
-import { Interactable } from "./interactable";
+import { KeyInteractable } from "./interactable/key-interactable";
 
 interface Attributes {
 	isCarried: boolean;
@@ -17,32 +17,30 @@ interface Attributes {
 	},
 })
 export class Carriable
-	extends DisposableComponent<Attributes, Model>
+	extends KeyInteractable<Attributes, Model>
 	implements OnStart
 {
 	private carryTrove = this.trove.extend();
 
 	constructor(
 		private character: Character,
-		private interactable: Interactable,
 		private ragdoll: RagdollServer,
 	) {
 		super();
 	}
 
-	onStart(): void {
+	override onStart(): void {
+		super.onStart();
 		// hide the proximity prompt for local player
-		this.interactable.setEnabled(false);
+		this.inputInstance.Enabled = false;
 		this.trove.add(
 			this.ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
-				this.interactable.setEnabled(newValue);
+				this.inputInstance.Enabled = newValue;
 			}),
 		);
-		this.interactable.onTriggered((player) => this.onPrompted(player));
 	}
 
-	onPrompted(player: Player): void {
-		print("triggered");
+	override onInteract(player: Player): void {
 		if (!player.Character) return;
 		const components = Dependency<Components>();
 		const characterComponent = components.getComponent<Character>(
@@ -56,7 +54,6 @@ export class Carriable
 	}
 
 	pickUp(carrier: Character): void {
-		print("picking up");
 		this.attributes.isCarried = true;
 
 		const components = Dependency<Components>();
@@ -99,7 +96,6 @@ export class Carriable
 	}
 
 	drop(carrier: Character): void {
-		print("dropping");
 		this.attributes.isCarried = false;
 
 		this.carryTrove.clean();

@@ -101,6 +101,15 @@ export class Character
 		return humanoid;
 	}
 
+	getAnimator(): Animator {
+		const animator = this.getHumanoid().FindFirstChild("Animator") as
+			| Animator
+			| undefined;
+		if (!animator)
+			error(`Animator not found in character ${this.instance.Name}`);
+		return animator;
+	}
+
 	getPlayer(): Player {
 		const player = Players.GetPlayerFromCharacter(this.instance);
 		if (!player)
