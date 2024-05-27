@@ -4,7 +4,7 @@ import { setInterval } from "@rbxts/set-timeout";
 import { Character } from "./character";
 import { Players, TweenService } from "@rbxts/services";
 import { OnRemoved } from "../../../../../types/lifecycles";
-import Trove from "../../../../../Packages/_Index/sleitnick_trove@1.3.0/trove";
+import { Trove } from "@rbxts/trove";
 
 const HEAT_AMOUNT = 1.5;
 const BURN_DAMAGE = 6;
@@ -36,7 +36,7 @@ export class Burning extends BaseComponent implements OnStart, OnRemoved {
 
 	onRemoved(): void {
 		this.cleanupBurnInterval();
-		this.trove.Destroy();
+		this.trove.destroy();
 	}
 
 	burn(): void {
