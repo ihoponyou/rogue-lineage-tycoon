@@ -144,7 +144,7 @@ export class Character
 	}
 
 	breakJoints(): void {
-		this.instance.GetChildren().forEach((value) => {
+		this.instance.GetDescendants().forEach((value) => {
 			if (
 				value.IsA("BallSocketConstraint") ||
 				value.IsA("JointInstance")

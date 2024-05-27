@@ -246,7 +246,6 @@ export class IdentityService
 		const face = head?.FindFirstChild("face") as Decal;
 		if (!face) error(`Face not find in character ${character}`);
 
-		const oldColor = face.Color3;
 		face.Color3 = color;
 	}
 

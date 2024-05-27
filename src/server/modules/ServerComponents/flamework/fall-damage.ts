@@ -22,6 +22,8 @@ export class FallDamage extends BaseComponent<{}, Model> implements OnTick {
 	}
 
 	onTick(dt: number): void {
+		if (!this.character.attributes.isAlive) return;
+
 		const humanoidRootPart = (this.character.instance as StarterCharacter)
 			.HumanoidRootPart;
 		const falling = humanoidRootPart.AssemblyLinearVelocity.Y < -1;

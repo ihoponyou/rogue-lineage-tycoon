@@ -126,10 +126,6 @@ export class RagdollServer extends Ragdoll implements OnStart {
 				this.joints.delete(jointName);
 			});
 		}
-
-		this.onAttributeChanged("isRagdolled", (newValue) =>
-			this.changeHumanoidState(newValue),
-		);
 	}
 
 	toggle(on: boolean): void {
