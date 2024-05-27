@@ -3,7 +3,7 @@ import { OnStart } from "@flamework/core";
 import { setInterval } from "@rbxts/set-timeout";
 import { Character } from "./character";
 import { Players, TweenService } from "@rbxts/services";
-import { OnRemoved } from "../../../../../types/lifecycles";
+import { OnRemoved } from "../../../../types/lifecycles";
 import { DisposableComponent } from "shared/modules/components/disposable-component";
 
 const HEAT_AMOUNT = 1.5;

@@ -5,7 +5,7 @@ import { setInterval } from "@rbxts/set-timeout";
 import { Trove } from "@rbxts/trove";
 import { DataService } from "server/modules/Services/flamework/data-service";
 import { RagdollServer } from "./ragdoll-server";
-import { OnRemoved } from "../../../../../types/lifecycles";
+import { OnRemoved } from "../../../../types/lifecycles";
 
 interface Attributes {
 	isKnocked: boolean;

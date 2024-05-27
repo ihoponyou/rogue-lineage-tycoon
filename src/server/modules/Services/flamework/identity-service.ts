@@ -16,7 +16,7 @@ import { getRandomFirstName } from "server/modules/name-generator";
 import { ARMORS, getRandomStarterArmor } from "server/modules/armor-info";
 import Object from "@rbxts/object-utils";
 import { Components } from "@flamework/components";
-import { Character } from "server/modules/ServerComponents/flamework/character";
+import { Character } from "server/modules/components/character";
 
 export type Sex = "Male" | "Female";
 const SET_MESSAGE_TEMPLATE = "Set {Attribute} of {Player} ({Old} -> {New})";

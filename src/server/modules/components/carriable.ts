@@ -33,6 +33,7 @@ export class Carriable
 		super.onStart();
 		// hide the proximity prompt for local player
 		this.inputInstance.Enabled = false;
+		this.inputInstance.KeyboardKeyCode = Enum.KeyCode.V;
 		this.trove.add(
 			this.ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
 				this.inputInstance.Enabled = newValue;

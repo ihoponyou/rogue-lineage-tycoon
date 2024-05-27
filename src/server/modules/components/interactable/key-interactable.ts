@@ -11,6 +11,7 @@ export abstract class KeyInteractable<
 		super.onStart();
 
 		this.inputInstance.ClickablePrompt = false;
+		this.inputInstance.Style = Enum.ProximityPromptStyle.Custom;
 
 		this.trove.connect(this.inputInstance.Triggered, (player) =>
 			this.onPromptTriggered(player),

@@ -2,7 +2,7 @@ import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Character } from "./character";
 import { Ragdoll } from "shared/modules/components/ragdoll";
-import Trove from "../../../../../Packages/_Index/sleitnick_trove@1.3.0/trove";
+import Trove from "../../../../Packages/_Index/sleitnick_trove@1.3.0/trove";
 
 type SocketType = "Hip" | "Shoulder" | "Neck";
 

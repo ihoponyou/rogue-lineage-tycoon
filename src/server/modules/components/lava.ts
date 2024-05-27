@@ -1,6 +1,6 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { OnRemoved } from "../../../../../types/lifecycles";
+import { OnRemoved } from "../../../../types/lifecycles";
 import { Trove } from "@rbxts/trove";
 
 @Component({

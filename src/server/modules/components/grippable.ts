@@ -1,9 +1,9 @@
 import { Component, Components } from "@flamework/components";
-import { DisposableComponent } from "shared/modules/components/disposable-component";
 import { Character } from "./character";
-import { Dependency } from "@flamework/core";
+import { Dependency, OnStart } from "@flamework/core";
 import { RagdollServer } from "./ragdoll-server";
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
+import { KeyInteractable } from "./interactable/key-interactable";
 
 interface Attributes {
 	gettingGripped: boolean;
@@ -18,11 +18,42 @@ const GRIPPING_ANIMATION = ReplicatedStorage.Animations.Combat.Gripping;
 		gettingGripped: false,
 	},
 })
-export class Grippable extends DisposableComponent<Attributes, Model> {
+export class Grippable
+	extends KeyInteractable<Attributes, Model>
+	implements OnStart
+{
 	private gripTrove = this.trove.extend();
 
-	constructor(private character: Character) {
+	constructor(
+		private character: Character,
+		private ragdoll: RagdollServer,
+	) {
 		super();
+	}
+
+	override onStart(): void {
+		super.onStart();
+		// hide the proximity prompt for local player
+		this.inputInstance.Enabled = false;
+		this.inputInstance.KeyboardKeyCode = Enum.KeyCode.B;
+		this.trove.add(
+			this.ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
+				this.inputInstance.Enabled = newValue;
+			}),
+		);
+	}
+
+	override onInteract(player: Player): void {
+		if (!player.Character) return;
+		const components = Dependency<Components>();
+		const characterComponent = components.getComponent<Character>(
+			player.Character,
+		);
+		if (!characterComponent) return;
+		print(this.attributes.gettingGripped);
+		this.attributes.gettingGripped
+			? this.release(characterComponent)
+			: this.grip(characterComponent);
 	}
 
 	grip(gripper: Character): void {
@@ -144,6 +175,8 @@ export class Grippable extends DisposableComponent<Attributes, Model> {
 	}
 
 	release(gripper: Character): void {
+		this.attributes.gettingGripped = false;
+
 		this.gripTrove.clean();
 
 		gripper.getHumanoid().AutoRotate = true;

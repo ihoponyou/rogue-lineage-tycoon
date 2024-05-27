@@ -1,6 +1,6 @@
 import { Components } from "@flamework/components";
 import { Dependency, OnStart, Service } from "@flamework/core";
-import { Character } from "server/modules/ServerComponents/flamework/character";
+import { Character } from "server/modules/components/character";
 import { Events } from "server/modules/networking";
 
 @Service()

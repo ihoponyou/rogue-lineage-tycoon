@@ -11,6 +11,7 @@ export abstract class Interactable<A extends {}, I extends BasePart | Model>
 
 	onStart(): void {
 		this.inputInstance.Parent = this.instance;
+		this.trove.add(this.inputInstance);
 	}
 
 	abstract onInteract(player: Player): void;
