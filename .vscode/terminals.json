@@ -20,7 +20,10 @@
     {
       "name": "rojo",
       "description": "you know",
-      "command": "rojo serve"
+      "commands": [
+        "Start-Sleep -Seconds 10",
+        "rojo serve"
+      ]
     }
   ]
 }

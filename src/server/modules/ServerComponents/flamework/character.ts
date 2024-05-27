@@ -123,6 +123,15 @@ export class Character
 		return torso;
 	}
 
+	getHumanoidRootPart(): HumanoidRootPart {
+		const humanoidRootPart = this.instance.FindFirstChild(
+			"HumanoidRootPart",
+		) as HumanoidRootPart | undefined;
+		if (humanoidRootPart === undefined)
+			error(`HRP not found in character ${this.instance.Name}`);
+		return humanoidRootPart;
+	}
+
 	adjustTemperature(amount: number) {
 		const profile = this.dataService.getProfile(this.getPlayer());
 		const newTemperature = math.clamp(

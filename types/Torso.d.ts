@@ -19,11 +19,12 @@ type Torso = Part & {
 	RightLegSocket: BallSocketConstraint;
 	LeftLegSocket: BallSocketConstraint;
 	BlockParticle: ParticleEmitter;
+	LeftPelvis: Attachment;
 	["Left Shoulder"]: Motor6D;
 	LeftArmSocket: BallSocketConstraint;
 	Fire: ParticleEmitter;
 	NeckSocket: BallSocketConstraint;
-	LeftPelvis: Attachment;
+	CarryCollision: NoCollisionConstraint;
 	LeftCollarAttachment: Attachment;
 	Injure: ParticleEmitter;
 	Neck: Motor6D;

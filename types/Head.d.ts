@@ -1,14 +1,15 @@
 type Head = Part & {
-	RagdollAttachment: Attachment;
 	HatAttachment: Attachment;
+	FaceFrontAttachment: Attachment;
+	face: Decal;
 	ParticleAttachment: Attachment & {
 		Sniped: Sound;
 		Crit: ParticleEmitter;
 		Critted: Sound;
 	};
-	FaceFrontAttachment: Attachment;
+	CarryCollision: NoCollisionConstraint;
 	HairAttachment: Attachment;
-	face: Decal;
+	RagdollAttachment: Attachment;
 	Mesh: SpecialMesh;
 	FaceCenterAttachment: Attachment;
-};
+}

@@ -296,15 +296,14 @@ export class IdentityService
 	}
 
 	setArmor(character: Model, armorName: string) {
-		const profile = this.dataService.getProfile(
+		const data = this.dataService.getProfile(
 			Players.GetPlayerFromCharacter(character) as Player,
-		);
+		).Data;
 		const armor = ARMORS[armorName];
-		print(armorName);
-		let variation = armor.Variations[profile.Data.Sex];
+		let variation = armor.Variations[data.Sex];
 		if (!variation) variation = armor.Variations.Male;
 
-		const oldArmorName = profile.Data.ArmorName;
+		const oldArmorName = data.ArmorName;
 		if (oldArmorName !== "") {
 			for (const instance of character.GetChildren()) {
 				if (instance.IsA("Clothing")) instance.Destroy();
@@ -324,7 +323,7 @@ export class IdentityService
 		variation.Shirt.Clone().Parent = character;
 		variation.Pants.Clone().Parent = character;
 
-		profile.Data.ArmorName = armorName;
+		data.ArmorName = armorName;
 	}
 
 	setManaColor(player: Player, color: Color3) {
