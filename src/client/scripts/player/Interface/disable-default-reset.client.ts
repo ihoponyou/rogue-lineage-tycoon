@@ -3,7 +3,7 @@ import { Events } from "client/modules/networking";
 
 const resetBindable = new Instance("BindableEvent");
 resetBindable.Event.Connect(() => {
-	Events.reset();
+	Events.resetEvents.reset();
 });
 
 let success = false;

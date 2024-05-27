@@ -1,6 +1,11 @@
-import { OnTick, Service } from "@flamework/core";
-import { OnPlayerRemoving } from "../../../../../types/lifecycles";
+import { OnStart, OnTick, Service } from "@flamework/core";
+import {
+	OnCharacterAdded,
+	OnPlayerRemoving,
+} from "../../../../../types/lifecycles";
 import { DataService } from "./data-service";
+import { Events } from "server/modules/networking";
+import { Players } from "@rbxts/services";
 
 const BASE_MANA_CHARGE_RATE = 100 / 3.5;
 const BASE_MANA_DECAY_RATE = 100 / 2.5;
@@ -13,17 +18,36 @@ interface PlayerData {
 }
 
 @Service()
-export class ManaService implements OnTick, OnPlayerRemoving {
+export class ManaService
+	implements OnStart, OnTick, OnPlayerRemoving, OnCharacterAdded
+{
+	private events = Events.manaEvents;
 	private sessionData = new Map<Player, PlayerData>();
 
 	constructor(private dataService: DataService) {}
 
+	onStart(): void {
+		this.events.charge.connect((player: Player, bool: boolean) => {
+			const data = this.sessionData.get(player);
+			if (!data) return;
+			data.ChargingMana = bool;
+		});
+	}
+
 	onTick(dt: number): void {
 		this.sessionData.forEach((value, key) => {
+			print(value, key);
 			value.ChargingMana
 				? this.chargeMana(key, dt)
 				: this.decayMana(key, dt);
 		});
+	}
+
+	onCharacterAdded(character: StarterCharacter): void {
+		const player = Players.GetPlayerFromCharacter(character) as Player;
+		const data = this.dataService.getProfile(player).Data;
+		data.ManaObtained = true;
+		if (data.ManaObtained) this.onManaObtained(player);
 	}
 
 	onPlayerRemoving(player: Player): void {
@@ -46,13 +70,13 @@ export class ManaService implements OnTick, OnPlayerRemoving {
 			DecayRate: BASE_MANA_DECAY_RATE,
 		});
 
-		// tell client
+		this.events.manaObtained(player);
 	}
 
 	onManaDisabled(player: Player): void {
 		this.sessionData.delete(player);
 
-		// tell client
+		this.events.manaDisabled(player);
 	}
 
 	toggleManaObtained(player: Player, bool: boolean): void {
@@ -72,7 +96,7 @@ export class ManaService implements OnTick, OnPlayerRemoving {
 
 		data.Mana -= math.min(data.Mana, decayRate * deltaTime);
 		if (data.Mana === 0) {
-			// tell client
+			this.events.manaEmptied(player);
 		}
 	}
 
@@ -84,7 +108,7 @@ export class ManaService implements OnTick, OnPlayerRemoving {
 
 		if (data.Mana === 100) {
 			data.ChargingMana = false;
-			// tell client
+			this.events.manaFilled(player);
 		}
 	}
 }

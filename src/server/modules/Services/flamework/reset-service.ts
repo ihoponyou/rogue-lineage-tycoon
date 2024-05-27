@@ -6,8 +6,10 @@ import { Events } from "server/modules/networking";
 @Service()
 export class ResetService implements OnStart {
 	private components = Dependency<Components>();
+	private events = Events.resetEvents;
+
 	onStart(): void {
-		Events.reset.connect((player) => {
+		this.events.reset.connect((player) => {
 			if (!player.Character) return;
 
 			const character = this.components.getComponent<Character>(
