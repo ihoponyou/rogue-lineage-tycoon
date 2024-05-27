@@ -3,7 +3,10 @@ import { OnStart, OnTick } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { Trove } from "@rbxts/trove";
-import { DataService } from "server/modules/Services/flamework/data-service";
+import {
+	DataService,
+	PlayerProfile,
+} from "server/modules/Services/flamework/data-service";
 import { RagdollServer } from "./ragdoll-server";
 import { OnRemoved } from "../../../../types/lifecycles";
 
@@ -21,6 +24,9 @@ const MINIMUM_TEMPERATURE = 0;
 const MAXIMUM_TEMPERATURE = 100;
 const KNOCK_PERCENT_THRESHOLD = 0.15;
 
+const BASE_STOMACH_DECAY_PER_SECOND = 0.1;
+const BASE_TOXICITY_DECAY_PER_SECOND = 0.05;
+
 @Component({
 	tag: "Character",
 	defaults: {
@@ -35,12 +41,18 @@ export class Character
 	implements OnStart, OnTick, OnRemoved
 {
 	private trove: Trove = new Trove();
+	private stats = {
+		stomachDecayRate: BASE_STOMACH_DECAY_PER_SECOND,
+		toxicityDecayRate: BASE_TOXICITY_DECAY_PER_SECOND,
+	};
+	private profile: PlayerProfile;
 
 	constructor(
 		private dataService: DataService,
 		private ragdoll: RagdollServer,
 	) {
 		super();
+		this.profile = this.dataService.getProfile(this.getPlayer());
 	}
 
 	onStart(): void {
@@ -64,6 +76,9 @@ export class Character
 	}
 
 	onTick(dt: number): void {
+		this.decayStomach(dt);
+		this.decayToxicity(dt);
+
 		const humanoid = this.getHumanoid();
 		if (humanoid.Health >= humanoid.MaxHealth) return;
 
@@ -142,22 +157,6 @@ export class Character
 		return humanoidRootPart;
 	}
 
-	adjustTemperature(amount: number) {
-		const profile = this.dataService.getProfile(this.getPlayer());
-		const newTemperature = math.clamp(
-			profile.Data.Temperature + amount,
-			MINIMUM_TEMPERATURE,
-			MAXIMUM_TEMPERATURE,
-		);
-		profile.Data.Temperature = newTemperature;
-		this.attributes.temperature = newTemperature;
-
-		if (newTemperature === MINIMUM_TEMPERATURE)
-			this.instance.AddTag("Frostbite");
-		else if (newTemperature === MAXIMUM_TEMPERATURE)
-			this.instance.AddTag("BurnScar");
-	}
-
 	knock(): void {
 		if (this.attributes.isKnocked) return;
 		this.attributes.isKnocked = true;
@@ -221,6 +220,40 @@ export class Character
 
 				if (timeExpired || leftSpawn) ffTrove.destroy();
 			}, 0.5),
+		);
+	}
+
+	adjustTemperature(amount: number) {
+		const profile = this.dataService.getProfile(this.getPlayer());
+		const newTemperature = math.clamp(
+			profile.Data.Temperature + amount,
+			MINIMUM_TEMPERATURE,
+			MAXIMUM_TEMPERATURE,
+		);
+		profile.Data.Temperature = newTemperature;
+		this.attributes.temperature = newTemperature;
+
+		if (newTemperature === MINIMUM_TEMPERATURE)
+			this.instance.AddTag("Frostbite");
+		else if (newTemperature === MAXIMUM_TEMPERATURE)
+			this.instance.AddTag("BurnScar");
+	}
+
+	decayStomach(deltaTime: number): void {
+		const data = this.profile.Data;
+		if (data.Stomach <= 0) return;
+		data.Stomach -= math.min(
+			data.Stomach,
+			deltaTime * this.stats.stomachDecayRate,
+		);
+	}
+
+	decayToxicity(deltaTime: number): void {
+		const data = this.profile.Data;
+		if (data.Toxicity <= 0) return;
+		data.Toxicity -= math.min(
+			data.Toxicity,
+			deltaTime * this.stats.toxicityDecayRate,
 		);
 	}
 }
