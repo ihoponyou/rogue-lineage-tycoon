@@ -313,12 +313,12 @@ export class IdentityService
 					// TODO: subtract old armor's stats
 				},
 			);
-			Object.entries(ARMORS[oldArmorName].StatChanges).forEach(
-				(entry) => {
-					// TODO: add new armor's stats
-				},
-			);
 		}
+		Object.entries(armor.StatChanges).forEach(
+			(entry) => {
+				// TODO: add new armor's stats
+			},
+		);
 
 		variation.Shirt.Clone().Parent = character;
 		variation.Pants.Clone().Parent = character;

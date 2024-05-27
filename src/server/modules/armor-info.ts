@@ -904,5 +904,5 @@ export const STARTER_ARMORS = Object.fromEntries(
 
 export function getRandomStarterArmor(): string {
 	const armorNames = Object.keys(STARTER_ARMORS);
-	return armorNames[math.random(0, armorNames.size())] as string;
+	return armorNames[math.random(0, armorNames.size()-1)] as string;
 }
