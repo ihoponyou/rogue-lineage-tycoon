@@ -11,6 +11,7 @@ interface Attributes {
 	isKnocked: boolean;
 	isAlive: boolean;
 	temperature: number;
+	armor: string;
 }
 
 const FF_DURATION = 15;
@@ -26,6 +27,7 @@ const KNOCK_PERCENT_THRESHOLD = 0.15;
 		isKnocked: false,
 		isAlive: true,
 		temperature: 50,
+		armor: "",
 	},
 })
 export class Character

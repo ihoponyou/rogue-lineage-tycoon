@@ -300,6 +300,7 @@ export class IdentityService
 			Players.GetPlayerFromCharacter(character) as Player,
 		);
 		const armor = ARMORS[armorName];
+		print(armorName);
 		let variation = armor.Variations[profile.Data.Sex];
 		if (!variation) variation = armor.Variations.Male;
 
@@ -313,10 +314,12 @@ export class IdentityService
 					// TODO: subtract old armor's stats
 				},
 			);
+			Object.entries(ARMORS[oldArmorName].StatChanges).forEach(
+				(entry) => {
+					// TODO: add new armor's stats
+				},
+			);
 		}
-		Object.entries(ARMORS[oldArmorName].StatChanges).forEach((entry) => {
-			// TODO: add new armor's stats
-		});
 
 		variation.Shirt.Clone().Parent = character;
 		variation.Pants.Clone().Parent = character;
