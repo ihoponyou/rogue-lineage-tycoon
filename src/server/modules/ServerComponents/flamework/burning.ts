@@ -4,7 +4,7 @@ import { setInterval } from "@rbxts/set-timeout";
 import { Character } from "./character";
 import { Players, TweenService } from "@rbxts/services";
 import { OnRemoved } from "../../../../../types/lifecycles";
-import { Trove } from "@rbxts/trove";
+import { DisposableComponent } from "shared/modules/components/disposable-component";
 
 const HEAT_AMOUNT = 1.5;
 const BURN_DAMAGE = 6;
@@ -14,10 +14,12 @@ const TICKS_TO_DIE = 8;
 @Component({
 	tag: "Burning",
 })
-export class Burning extends BaseComponent implements OnStart, OnRemoved {
+export class Burning
+	extends DisposableComponent<{}, Model>
+	implements OnStart, OnRemoved
+{
 	private killTicks = 0;
 	private cleanupBurnInterval() {}
-	private trove = new Trove();
 
 	constructor(private character: Character) {
 		super();
@@ -28,15 +30,12 @@ export class Burning extends BaseComponent implements OnStart, OnRemoved {
 		torso.OrangeFire.Enabled = true;
 		torso.Burning.Play();
 
-		this.cleanupBurnInterval = setInterval(
-			() => this.burn(),
-			BURN_INTERVAL,
-		);
+		this.trove.add(setInterval(() => this.burn(), BURN_INTERVAL));
 	}
 
-	onRemoved(): void {
-		this.cleanupBurnInterval();
-		this.trove.destroy();
+	override onRemoved(): void {
+		super.onRemoved();
+		this.extinguish();
 	}
 
 	burn(): void {
@@ -44,20 +43,13 @@ export class Burning extends BaseComponent implements OnStart, OnRemoved {
 		else this.killTicks = 0;
 
 		if (this.killTicks >= TICKS_TO_DIE) {
-			const torso = this.character.getTorso();
-			if (torso) {
-				torso.OrangeFire.Enabled = false;
-				torso.Burning.Stop();
-				torso.Extinguish.Play();
-			}
-
 			this.character.instance.GetChildren().forEach((value) => {
 				if (value.IsA("BasePart")) this.incineratePart(value);
 				else if (value.IsA("Clothing")) value.Destroy();
 			});
 
 			this.character.kill();
-			this.cleanupBurnInterval();
+			this.instance.RemoveTag("Burning");
 		} else {
 			if (this.killTicks >= TICKS_TO_DIE / 2)
 				this.instance.AddTag("BurnScar");
@@ -66,6 +58,15 @@ export class Burning extends BaseComponent implements OnStart, OnRemoved {
 			humanoid.TakeDamage(math.min(BURN_DAMAGE, humanoid.Health));
 
 			this.character.adjustTemperature(HEAT_AMOUNT);
+		}
+	}
+
+	extinguish(): void {
+		const torso = this.character.getTorso();
+		if (torso) {
+			torso.OrangeFire.Enabled = false;
+			torso.Burning.Stop();
+			torso.Extinguish.Play();
 		}
 	}
 

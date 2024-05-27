@@ -1,6 +1,4 @@
-import { BaseComponent, Component, Components } from "@flamework/components";
-import { Trove } from "@rbxts/trove";
-import { OnRemoved } from "../../../../../types/lifecycles";
+import { Component, Components } from "@flamework/components";
 import { DisposableComponent } from "shared/modules/components/disposable-component";
 import { Character } from "./character";
 import { Dependency, OnStart } from "@flamework/core";
@@ -23,17 +21,25 @@ export class Carriable
 	implements OnStart
 {
 	private components = Dependency<Components>();
-	private carryTrove: Trove | undefined;
+	private carryTrove = this.trove.extend();
 
 	constructor(
 		private character: Character,
 		private interactable: Interactable,
+		private ragdoll: RagdollServer,
 	) {
 		super();
 	}
 
 	onStart(): void {
 		// hide the proximity prompt for local player
+
+		this.interactable.proximityPrompt.Enabled = false;
+		this.trove.add(
+			this.ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
+				this.interactable.proximityPrompt.Enabled = newValue;
+			}),
+		);
 
 		this.trove.connect(
 			this.interactable.proximityPrompt.Triggered,
@@ -42,39 +48,38 @@ export class Carriable
 				const characterComponent =
 					this.components.getComponent<Character>(player.Character);
 				if (!characterComponent) return;
-				this.pickUp(characterComponent);
+
+				this.attributes.isCarried
+					? this.drop(characterComponent)
+					: this.pickUp(characterComponent);
 			},
 		);
 	}
 
-	override onRemoved(): void {
-		super.onRemoved();
-	}
-
 	pickUp(carrier: Character): void {
-		if (this.carryTrove) this.carryTrove.clean();
-		this.carryTrove = this.trove.extend();
+		this.attributes.isCarried = true;
+
+		this.carryTrove.clean();
 		const components = Dependency<Components>();
 		const ragdoll = components.getComponent<RagdollServer>(
 			carrier.instance,
 		);
 		if (ragdoll) {
-			this.carryTrove.add(
+			this.carryTrove?.add(
 				ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
 					if (newValue) this.drop(carrier);
 				}),
 			);
 		}
 
-		this.attributes.isCarried = true;
 		this.instance.PrimaryPart?.SetNetworkOwner(carrier.getPlayer());
 		this.instance.RemoveTag("Burning");
 
 		// tell carrier to play carrying animation
 		// tell this to play carried animation
 
-		const carrierAttachment = carrier.getHumanoidRootPart().CarryAttachment;
 		const humanoidRootPart = this.character.getHumanoidRootPart();
+		const carrierAttachment = carrier.getHumanoidRootPart().CarryAttachment;
 		humanoidRootPart.CarryOrientation.Attachment1 = carrierAttachment;
 		humanoidRootPart.CarryPosition.Attachment1 = carrierAttachment;
 		this.character.getTorso().CarryCollision.Part1 = carrier.getTorso();
@@ -92,9 +97,10 @@ export class Carriable
 	}
 
 	drop(carrier: Character): void {
-		this.carryTrove?.clean();
-
 		this.attributes.isCarried = false;
+
+		this.carryTrove.clean();
+
 		this.instance.PrimaryPart?.SetNetworkOwner(
 			Players.GetPlayerFromCharacter(this.instance),
 		);
