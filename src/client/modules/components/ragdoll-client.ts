@@ -23,7 +23,7 @@ export class RagdollClient extends Ragdoll implements OnStart {
 
 	stopAnimations(): void {
 		for (const track of this.animator.GetPlayingAnimationTracks()) {
-			track.Stop();
+			track.Stop(2);
 		}
 	}
 }
