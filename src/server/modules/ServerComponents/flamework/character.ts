@@ -80,6 +80,7 @@ export class Character
 		const percentHealth = health / humanoid.MaxHealth;
 		if (this.attributes.isKnocked) {
 			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
+				if (this.instance.GetAttribute("isCarried")) return;
 				this.attributes.isKnocked = false;
 				this.ragdoll.toggle(false);
 			}

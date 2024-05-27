@@ -9,16 +9,24 @@ export class Interactable
 	extends DisposableComponent<{}, BasePart | Attachment | Model>
 	implements OnStart
 {
-	public proximityPrompt = new Instance("ProximityPrompt");
+	private promptDebounce = false;
+	private proximityPrompt = new Instance("ProximityPrompt");
 
 	onStart(): void {
 		this.proximityPrompt.Parent = this.instance;
-
-		this.trove.connect(
-			this.proximityPrompt.Triggered,
-			(playerWhoTriggered) => this.onTriggered(playerWhoTriggered),
-		);
 	}
 
-	onTriggered(player: Player): void {}
+	onTriggered(handler: (playerWhoTriggered: Player) => void): void {
+		this.trove.connect(this.proximityPrompt.Triggered, (player) => {
+			// this is stupid
+			if (this.promptDebounce) return;
+			this.promptDebounce = true;
+			handler(player);
+			task.defer(() => (this.promptDebounce = false));
+		});
+	}
+
+	setEnabled(bool: boolean): void {
+		this.proximityPrompt.Enabled = bool;
+	}
 }

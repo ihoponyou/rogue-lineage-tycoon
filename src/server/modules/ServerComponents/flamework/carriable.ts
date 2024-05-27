@@ -20,7 +20,6 @@ export class Carriable
 	extends DisposableComponent<Attributes, Model>
 	implements OnStart
 {
-	private components = Dependency<Components>();
 	private carryTrove = this.trove.extend();
 
 	constructor(
@@ -33,33 +32,33 @@ export class Carriable
 
 	onStart(): void {
 		// hide the proximity prompt for local player
-
-		this.interactable.proximityPrompt.Enabled = false;
+		this.interactable.setEnabled(false);
 		this.trove.add(
 			this.ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
-				this.interactable.proximityPrompt.Enabled = newValue;
+				this.interactable.setEnabled(newValue);
 			}),
 		);
+		this.interactable.onTriggered((player) => this.onPrompted(player));
+	}
 
-		this.trove.connect(
-			this.interactable.proximityPrompt.Triggered,
-			(player) => {
-				if (!player.Character) return;
-				const characterComponent =
-					this.components.getComponent<Character>(player.Character);
-				if (!characterComponent) return;
-
-				this.attributes.isCarried
-					? this.drop(characterComponent)
-					: this.pickUp(characterComponent);
-			},
+	onPrompted(player: Player): void {
+		print("triggered");
+		if (!player.Character) return;
+		const components = Dependency<Components>();
+		const characterComponent = components.getComponent<Character>(
+			player.Character,
 		);
+		if (!characterComponent) return;
+
+		this.attributes.isCarried
+			? this.drop(characterComponent)
+			: this.pickUp(characterComponent);
 	}
 
 	pickUp(carrier: Character): void {
+		print("picking up");
 		this.attributes.isCarried = true;
 
-		this.carryTrove.clean();
 		const components = Dependency<Components>();
 		const ragdoll = components.getComponent<RagdollServer>(
 			carrier.instance,
@@ -67,7 +66,10 @@ export class Carriable
 		if (ragdoll) {
 			this.carryTrove?.add(
 				ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
-					if (newValue) this.drop(carrier);
+					if (newValue) {
+						print("carrier got ragdolled");
+						this.drop(carrier);
+					}
 				}),
 			);
 		}
@@ -97,6 +99,7 @@ export class Carriable
 	}
 
 	drop(carrier: Character): void {
+		print("dropping");
 		this.attributes.isCarried = false;
 
 		this.carryTrove.clean();
