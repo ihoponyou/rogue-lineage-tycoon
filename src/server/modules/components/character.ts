@@ -15,6 +15,7 @@ interface Attributes {
 	isAlive: boolean;
 	temperature: number;
 	armor: string;
+	manaColor: Color3;
 }
 
 const FF_DURATION = 15;
@@ -24,8 +25,9 @@ const MINIMUM_TEMPERATURE = 0;
 const MAXIMUM_TEMPERATURE = 100;
 const KNOCK_PERCENT_THRESHOLD = 0.15;
 
-const BASE_STOMACH_DECAY_PER_SECOND = 0.1;
-const BASE_TOXICITY_DECAY_PER_SECOND = 0.05;
+// all rates are per second
+const BASE_STOMACH_DECAY_RATE = 0.1;
+const BASE_TOXICITY_DECAY_RATE = 0.05;
 
 @Component({
 	tag: "Character",
@@ -34,6 +36,7 @@ const BASE_TOXICITY_DECAY_PER_SECOND = 0.05;
 		isAlive: true,
 		temperature: 50,
 		armor: "",
+		manaColor: new Color3(1, 1, 1),
 	},
 })
 export class Character
@@ -42,8 +45,8 @@ export class Character
 {
 	private trove: Trove = new Trove();
 	private stats = {
-		stomachDecayRate: BASE_STOMACH_DECAY_PER_SECOND,
-		toxicityDecayRate: BASE_TOXICITY_DECAY_PER_SECOND,
+		stomachDecayRate: BASE_STOMACH_DECAY_RATE,
+		toxicityDecayRate: BASE_TOXICITY_DECAY_RATE,
 	};
 	private profile: PlayerProfile;
 
@@ -134,8 +137,7 @@ export class Character
 
 	getHead(): Head {
 		const head = this.instance.FindFirstChild("Head") as Head | undefined;
-		if (head === undefined)
-			error(`Head not found in character ${this.instance.Name}`);
+		if (!head) error(`Head not found in character ${this.instance.Name}`);
 		return head;
 	}
 
@@ -143,8 +145,7 @@ export class Character
 		const torso = this.instance.FindFirstChild("Torso") as
 			| Torso
 			| undefined;
-		if (torso === undefined)
-			error(`Torso not found in character ${this.instance.Name}`);
+		if (!torso) error(`Torso not found in character ${this.instance.Name}`);
 		return torso;
 	}
 
@@ -152,7 +153,7 @@ export class Character
 		const humanoidRootPart = this.instance.FindFirstChild(
 			"HumanoidRootPart",
 		) as HumanoidRootPart | undefined;
-		if (humanoidRootPart === undefined)
+		if (!humanoidRootPart)
 			error(`HRP not found in character ${this.instance.Name}`);
 		return humanoidRootPart;
 	}
@@ -194,7 +195,7 @@ export class Character
 
 	snipe(): void {
 		const particleAttachment = this.getHead().ParticleAttachment;
-		if (particleAttachment === undefined) return;
+		if (!particleAttachment) return;
 
 		particleAttachment.Critted.Play();
 		particleAttachment.Sniped.Play();

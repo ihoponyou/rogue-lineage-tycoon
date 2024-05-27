@@ -37,7 +37,7 @@ export class Frostbite extends BaseInjury implements OnTick {
 		}
 
 		const skinColor = this.character.instance.GetAttribute("SkinColor");
-		if (skinColor === undefined) return;
+		if (!skinColor) return;
 		const [h, s, v] = (skinColor as Color3).ToHSV();
 		this.identityService.setCharacterSkinColor(
 			this.character.instance,

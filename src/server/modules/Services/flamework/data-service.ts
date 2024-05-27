@@ -215,7 +215,7 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 
 	private updateLifeLength(player: Player): void {
 		const joinTick = this.joinTicks.get(player);
-		if (joinTick === undefined) error("wtf 2");
+		if (!joinTick) error("wtf 2");
 
 		const profile = this.getProfile(player);
 		profile.Data.Seconds += math.round(tick()) - joinTick;

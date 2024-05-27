@@ -102,11 +102,10 @@ export class RagdollServer extends Ragdoll implements OnStart {
 			if (motor.Name === "RootJoint") continue;
 
 			const socketType =
-				// eslint-disable-next-line roblox-ts/lua-truthiness
 				motor.Name.match("Hip")[0] ||
 				motor.Name.match("Shoulder")[0] ||
 				motor.Name.match("Neck")[0];
-			if (socketType === undefined)
+			if (!socketType)
 				error(`${motor.Name} does not contain Hip/Shoulder/Neck`);
 
 			const jointName = motor.Name.gsub(" ", "")[0];
