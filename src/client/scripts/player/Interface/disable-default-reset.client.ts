@@ -1,11 +1,20 @@
 import { ReplicatedStorage, StarterGui } from "@rbxts/services";
+import { Events } from "client/modules/networking";
 
 const resetBindable = new Instance("BindableEvent");
-const resetRequest = ReplicatedStorage.WaitForChild("ResetRequest") as RemoteEvent;
-resetBindable.Event.Connect(() => resetRequest.FireServer());
+resetBindable.Event.Connect(() => {
+	Events.reset();
+});
 
-function setCore() {
-	return new Promise(() => pcall(() => StarterGui.SetCore("ResetButtonCallback", resetBindable)));
+let success = false;
+while (!success) {
+	const [succeeded, message] = pcall(
+		(parameter: keyof SettableCores, args) => {
+			StarterGui.SetCore(parameter, args);
+		},
+		"ResetButtonCallback",
+		resetBindable,
+	);
+	success = succeeded;
+	task.wait();
 }
-
-Promise.retry(setCore, 10);

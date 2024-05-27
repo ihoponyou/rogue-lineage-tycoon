@@ -74,7 +74,6 @@ export class IdentityService
 		}
 		const race = RACES[raceName];
 
-		this.cleanCharacterFace(character);
 		if (!race.HasCustomHead) {
 			let personality = profile.Data.Personality;
 			if (personality === "") {
@@ -82,6 +81,8 @@ export class IdentityService
 				profile.Data.Personality = personality;
 			}
 			this.setFace(character, raceName, personality);
+		} else {
+			this.cleanCharacterFace(character);
 		}
 
 		let phenotypeName = profile.Data.PhenotypeName;
@@ -247,14 +248,6 @@ export class IdentityService
 
 		const oldColor = face.Color3;
 		face.Color3 = color;
-
-		this.logger.Info(
-			SET_MESSAGE_TEMPLATE,
-			"Eye Color",
-			character.Name,
-			oldColor,
-			color,
-		);
 	}
 
 	setFace(character: Model, raceName: string, personality: string) {
