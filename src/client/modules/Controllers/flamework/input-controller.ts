@@ -22,6 +22,7 @@ interface Keybinds {
 	grip: Enum.KeyCode;
 	injure: Enum.KeyCode;
 	forceFeed: Enum.KeyCode;
+	resetKeybindsToDefault : Enum.KeyCode.RightBracket,
 }
 
 const DEFAULT_KEYBINDS: Keybinds = {
@@ -40,6 +41,7 @@ const DEFAULT_KEYBINDS: Keybinds = {
 	grip		: Enum.KeyCode.B,
 	injure		: Enum.KeyCode.N,
 	forceFeed	: Enum.KeyCode.P,
+	resetKeybindsToDefault : Enum.KeyCode.RightBracket,
 }
 
 export enum InputAxis {
@@ -49,7 +51,7 @@ export enum InputAxis {
 
 @Controller()
 export class InputController implements OnStart {
-	private lastW = 0;
+	private lastForwardInputTick = 0;
 	private trove = new Trove();
 	
 	keybinds = DEFAULT_KEYBINDS;
@@ -89,6 +91,34 @@ export class InputController implements OnStart {
 			false,
 			keybind
 		)
+	}
+
+	loadAllKeybinds() {
+		for (const [action, key] of Object.entries(this.keybinds)) {
+			this.loadKeybind(action, key);
+		}
+	}
+
+	unloadKeybind(action: keyof Keybinds) {
+		ContextActionService.UnbindAction(`input_${action}`);
+	}
+
+	unloadAllKeybinds() {
+		for (const action of Object.keys(this.keybinds)) {
+			this.unloadKeybind(action);
+		}
+	}
+
+	resetKeybindsToDefault() {
+		this.unloadAllKeybinds();
+		for (const [action, key] of Object.entries(DEFAULT_KEYBINDS)) {
+			this.loadKeybind(action, key);
+		}
+	}
+
+	changeKeybind(action: keyof Keybinds, newKey: valueof<Keybinds>) {
+		this.unloadKeybind(action);
+		this.loadKeybind(action, newKey);
 	}
 
 	forward(state: Enum.UserInputState) {}
