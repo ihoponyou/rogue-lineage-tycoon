@@ -36,7 +36,6 @@ export class ManaService
 
 	onTick(dt: number): void {
 		this.sessionData.forEach((value, key) => {
-			print(value, key);
 			value.ChargingMana
 				? this.chargeMana(key, dt)
 				: this.decayMana(key, dt);
@@ -91,6 +90,7 @@ export class ManaService
 	decayMana(player: Player, deltaTime: number): void {
 		const data = this.sessionData.get(player);
 		if (!data) return;
+		if (data.Mana === 0) return;
 
 		const decayRate = data.DecayRate; // if climbing then half
 
@@ -103,6 +103,7 @@ export class ManaService
 	chargeMana(player: Player, deltaTime: number): void {
 		const data = this.sessionData.get(player);
 		if (!data) return;
+		if(data.Mana === 100) return;
 
 		data.Mana = math.clamp(data.Mana + data.ChargeRate * deltaTime, 0, 100);
 
