@@ -1,7 +1,7 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { setInterval } from "@rbxts/set-timeout";
-import { Character } from "./character";
+import { CharacterServer } from "./character-server";
 import { Players, TweenService } from "@rbxts/services";
 import { OnRemoved } from "../../../../types/lifecycles";
 import { DisposableComponent } from "shared/modules/components/disposable-component";
@@ -19,9 +19,8 @@ export class Burning
 	implements OnStart, OnRemoved
 {
 	private killTicks = 0;
-	private cleanupBurnInterval() {}
 
-	constructor(private character: Character) {
+	constructor(private character: CharacterServer) {
 		super();
 	}
 
@@ -54,7 +53,7 @@ export class Burning
 			if (this.killTicks >= TICKS_TO_DIE / 2)
 				this.instance.AddTag("BurnScar");
 
-			const humanoid = this.character.getHumanoid();
+			const humanoid = this.character.instance.Humanoid;
 			humanoid.TakeDamage(math.min(BURN_DAMAGE, humanoid.Health));
 
 			this.character.adjustTemperature(HEAT_AMOUNT);

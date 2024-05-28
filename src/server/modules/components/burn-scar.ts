@@ -1,6 +1,6 @@
 import { Component } from "@flamework/components";
 import { BaseInjury } from "./base-injury";
-import { Character } from "./character";
+import { CharacterServer } from "./character-server";
 import { ReplicatedStorage } from "@rbxts/services";
 import { DataService } from "server/modules/Services/flamework/data-service";
 import { OnTick } from "@flamework/core";
@@ -14,7 +14,7 @@ export class BurnScar extends BaseInjury implements OnTick {
 	readonly name = "BurnScar";
 
 	constructor(
-		protected character: Character,
+		protected character: CharacterServer,
 		protected dataService: DataService,
 	) {
 		super(character, dataService);

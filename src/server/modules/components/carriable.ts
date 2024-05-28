@@ -1,6 +1,6 @@
 import { Component, Components } from "@flamework/components";
 import { DisposableComponent } from "shared/modules/components/disposable-component";
-import { Character } from "./character";
+import { CharacterServer } from "./character-server";
 import { Dependency, OnStart } from "@flamework/core";
 import { RagdollServer } from "./ragdoll-server";
 import { Players, Workspace } from "@rbxts/services";
@@ -23,7 +23,7 @@ export class Carriable
 	private carryTrove = this.trove.extend();
 
 	constructor(
-		private character: Character,
+		private character: CharacterServer,
 		private ragdoll: RagdollServer,
 	) {
 		super();
@@ -44,7 +44,7 @@ export class Carriable
 	override onInteract(player: Player): void {
 		if (!player.Character) return;
 		const components = Dependency<Components>();
-		const characterComponent = components.getComponent<Character>(
+		const characterComponent = components.getComponent<CharacterServer>(
 			player.Character,
 		);
 		if (!characterComponent) return;
@@ -54,7 +54,7 @@ export class Carriable
 			: this.pickUp(characterComponent);
 	}
 
-	pickUp(carrier: Character): void {
+	pickUp(carrier: CharacterServer): void {
 		this.attributes.isCarried = true;
 
 		const components = Dependency<Components>();
@@ -92,11 +92,11 @@ export class Carriable
 		}
 
 		this.character
-			.getHumanoid()
+			.instance.Humanoid
 			.ChangeState(Enum.HumanoidStateType.Physics);
 	}
 
-	drop(carrier: Character): void {
+	drop(carrier: CharacterServer): void {
 		this.attributes.isCarried = false;
 
 		this.carryTrove.clean();
@@ -135,7 +135,7 @@ export class Carriable
 		}
 
 		this.character
-			.getHumanoid()
+			.instance.Humanoid
 			.ChangeState(Enum.HumanoidStateType.GettingUp);
 	}
 }

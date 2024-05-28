@@ -1,5 +1,5 @@
 import { Component, Components } from "@flamework/components";
-import { Character } from "./character";
+import { CharacterServer } from "./character-server";
 import { Dependency, OnStart } from "@flamework/core";
 import { RagdollServer } from "./ragdoll-server";
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
@@ -25,7 +25,7 @@ export class Grippable
 	private gripTrove = this.trove.extend();
 
 	constructor(
-		private character: Character,
+		private character: CharacterServer,
 		private ragdoll: RagdollServer,
 	) {
 		super();
@@ -46,7 +46,7 @@ export class Grippable
 	override onInteract(player: Player): void {
 		if (!player.Character) return;
 		const components = Dependency<Components>();
-		const characterComponent = components.getComponent<Character>(
+		const characterComponent = components.getComponent<CharacterServer>(
 			player.Character,
 		);
 		if (!characterComponent) return;
@@ -56,7 +56,7 @@ export class Grippable
 			: this.grip(characterComponent);
 	}
 
-	grip(gripper: Character): void {
+	grip(gripper: CharacterServer): void {
 		const floorCheck = Workspace.Raycast(
 			this.character.getHumanoidRootPart().Position,
 			Vector3.yAxis.mul(-4),
@@ -82,8 +82,8 @@ export class Grippable
 
 		this.instance.RemoveTag("Burning");
 
-		const gripperHumanoid = gripper.getHumanoid();
-		const humanoid = this.character.getHumanoid();
+		const gripperHumanoid = gripper.instance.Humanoid;
+		const humanoid = this.character.instance.Humanoid;
 
 		humanoid.AutoRotate = false;
 		gripperHumanoid.AutoRotate = false;
@@ -145,8 +145,8 @@ export class Grippable
 
 	snapToGround(
 		floorCheck: RaycastResult,
-		gripper: Character,
-		grippee: Character,
+		gripper: CharacterServer,
+		grippee: CharacterServer,
 	) {
 		const gripperRootPart = gripper.getHumanoidRootPart();
 		const grippeeRootPart = grippee.getHumanoidRootPart();
@@ -174,12 +174,12 @@ export class Grippable
 		);
 	}
 
-	release(gripper: Character): void {
+	release(gripper: CharacterServer): void {
 		this.attributes.gettingGripped = false;
 
 		this.gripTrove.clean();
 
-		gripper.getHumanoid().AutoRotate = true;
+		gripper.instance.Humanoid.AutoRotate = true;
 		gripper.getHumanoidRootPart().Anchored = false;
 		this.character.getHumanoidRootPart().Anchored = false;
 

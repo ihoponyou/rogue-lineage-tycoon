@@ -16,7 +16,7 @@ import { getRandomFirstName } from "server/modules/name-generator";
 import { ARMORS, getRandomStarterArmor } from "server/modules/armor-info";
 import Object from "@rbxts/object-utils";
 import { Components } from "@flamework/components";
-import { Character } from "server/modules/components/character";
+import { CharacterServer } from "server/modules/components/character-server";
 
 export type Sex = "Male" | "Female";
 const SET_MESSAGE_TEMPLATE = "Set {Attribute} of {Player} ({Old} -> {New})";
@@ -142,7 +142,7 @@ export class IdentityService
 		// player:SetAttribute("IdentityLoaded", true)
 		// IdentityService.Client.IdentityLoaded:Fire(player)
 		const components = Dependency<Components>();
-		components.waitForComponent<Character>(character).then((component) => {
+		components.waitForComponent<CharacterServer>(character).then((component) => {
 			component.giveForceField();
 		});
 	}

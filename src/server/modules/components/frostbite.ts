@@ -1,7 +1,7 @@
 import { Component } from "@flamework/components";
 import { BaseInjury } from "./base-injury";
 import { IdentityService } from "server/modules/Services/flamework/identity-service";
-import { Character } from "./character";
+import { CharacterServer } from "./character-server";
 import { DataService } from "server/modules/Services/flamework/data-service";
 import { OnTick } from "@flamework/core";
 import { Logger } from "@rbxts/log";
@@ -20,7 +20,7 @@ export class Frostbite extends BaseInjury implements OnTick {
 	constructor(
 		private logger: Logger,
 		private identityService: IdentityService,
-		protected character: Character,
+		protected character: CharacterServer,
 		protected dataService: DataService,
 	) {
 		super(character, dataService);
@@ -49,7 +49,7 @@ export class Frostbite extends BaseInjury implements OnTick {
 		if (this.character.attributes.temperature > UPPER_TEMPERATURE_THRESHOLD)
 			return;
 
-		const humanoid = this.character.getHumanoid();
+		const humanoid = this.character.instance.Humanoid;
 		humanoid.TakeDamage(this.calculateTickDamage(humanoid, dt));
 
 		if (humanoid.Health > 0) return;

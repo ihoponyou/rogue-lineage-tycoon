@@ -1,5 +1,5 @@
 import { BaseComponent, Component } from "@flamework/components";
-import { Character } from "./character";
+import { CharacterServer } from "./character-server";
 import { OnStart } from "@flamework/core";
 import { DataService } from "server/modules/Services/flamework/data-service";
 
@@ -11,7 +11,7 @@ export abstract class BaseInjury
 	abstract readonly name: string;
 
 	constructor(
-		protected character: Character,
+		protected character: CharacterServer,
 		protected dataService: DataService,
 	) {
 		super();

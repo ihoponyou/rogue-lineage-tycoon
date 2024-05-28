@@ -2,21 +2,13 @@ import { BaseComponent, Component } from "@flamework/components";
 import { OnStart, OnTick } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
-import { Trove } from "@rbxts/trove";
 import {
 	DataService,
 	PlayerProfile,
 } from "server/modules/Services/flamework/data-service";
 import { RagdollServer } from "./ragdoll-server";
 import { OnRemoved } from "../../../../types/lifecycles";
-
-interface Attributes {
-	isKnocked: boolean;
-	isAlive: boolean;
-	temperature: number;
-	armor: string;
-	manaColor: Color3;
-}
+import { Character, CharacterInstance } from "shared/modules/components/character";
 
 const FF_DURATION = 15;
 const PROTECTED_DISTANCE = 5;
@@ -29,6 +21,14 @@ const KNOCK_PERCENT_THRESHOLD = 0.15;
 const BASE_STOMACH_DECAY_RATE = 0.1;
 const BASE_TOXICITY_DECAY_RATE = 0.05;
 
+interface Attributes {
+	isKnocked: boolean;
+	isAlive: boolean;
+	temperature: number;
+	armor: string;
+	manaColor: Color3;
+}
+
 @Component({
 	tag: "Character",
 	defaults: {
@@ -39,11 +39,10 @@ const BASE_TOXICITY_DECAY_RATE = 0.05;
 		manaColor: new Color3(1, 1, 1),
 	},
 })
-export class Character
-	extends BaseComponent<Attributes, Model>
-	implements OnStart, OnTick, OnRemoved
+export class CharacterServer
+	extends Character<Attributes, CharacterInstance>
+	implements OnTick, OnRemoved
 {
-	private trove: Trove = new Trove();
 	private stats = {
 		stomachDecayRate: BASE_STOMACH_DECAY_RATE,
 		toxicityDecayRate: BASE_TOXICITY_DECAY_RATE,
@@ -58,31 +57,24 @@ export class Character
 		this.profile = this.dataService.getProfile(this.getPlayer());
 	}
 
-	onStart(): void {
-		const humanoid = this.getHumanoid();
-		humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
-
-		const profile = this.dataService.getProfile(this.getPlayer());
-		let savedHealth = profile.Data.Health;
+	override onStart(): void {
+		super.onStart();
+		let savedHealth = this.profile.Data.Health;
 		if (savedHealth < 1) savedHealth = 100;
-		humanoid.Health = savedHealth;
+		this.instance.Humanoid.Health = savedHealth;
 
-		for (const condition of profile.Data.Conditions) {
+		for (const condition of this.profile.Data.Conditions) {
 			this.instance.AddTag(condition);
 		}
 
 		this.instance.AddTag("FallDamage");
-
-		this.trove.connect(humanoid.HealthChanged, (health) =>
-			this.onHealthChanged(health, humanoid),
-		);
 	}
 
 	onTick(dt: number): void {
 		this.decayStomach(dt);
 		this.decayToxicity(dt);
 
-		const humanoid = this.getHumanoid();
+		const humanoid = this.instance.Humanoid;
 		if (humanoid.Health >= humanoid.MaxHealth) return;
 
 		const boost = 0; // TODO: health regen multiplier
@@ -94,8 +86,8 @@ export class Character
 		this.trove.destroy();
 	}
 
-	onHealthChanged(health: number, humanoid: Humanoid): void {
-		const percentHealth = health / humanoid.MaxHealth;
+	override onHealthChanged(health: number): void {
+		const percentHealth = health / this.instance.Humanoid.MaxHealth;
 		if (this.attributes.isKnocked) {
 			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
 				if (this.instance.GetAttribute("isCarried")) return;
@@ -108,54 +100,6 @@ export class Character
 		if (health > 0) return;
 
 		this.knock();
-	}
-
-	getHumanoid(): Humanoid {
-		const humanoid = this.instance.FindFirstChild("Humanoid") as
-			| Humanoid
-			| undefined;
-		if (!humanoid)
-			error(`Humanoid not found in character ${this.instance.Name}`);
-		return humanoid;
-	}
-
-	getAnimator(): Animator {
-		const animator = this.getHumanoid().FindFirstChild("Animator") as
-			| Animator
-			| undefined;
-		if (!animator)
-			error(`Animator not found in character ${this.instance.Name}`);
-		return animator;
-	}
-
-	getPlayer(): Player {
-		const player = Players.GetPlayerFromCharacter(this.instance);
-		if (!player)
-			error(`Player not found from character ${this.instance.Name}`);
-		return player;
-	}
-
-	getHead(): Head {
-		const head = this.instance.FindFirstChild("Head") as Head | undefined;
-		if (!head) error(`Head not found in character ${this.instance.Name}`);
-		return head;
-	}
-
-	getTorso(): Torso {
-		const torso = this.instance.FindFirstChild("Torso") as
-			| Torso
-			| undefined;
-		if (!torso) error(`Torso not found in character ${this.instance.Name}`);
-		return torso;
-	}
-
-	getHumanoidRootPart(): HumanoidRootPart {
-		const humanoidRootPart = this.instance.FindFirstChild(
-			"HumanoidRootPart",
-		) as HumanoidRootPart | undefined;
-		if (!humanoidRootPart)
-			error(`HRP not found in character ${this.instance.Name}`);
-		return humanoidRootPart;
 	}
 
 	knock(): void {
@@ -179,7 +123,7 @@ export class Character
 		if (!this.attributes.isAlive) return;
 		this.attributes.isAlive = false;
 
-		this.getHumanoid().Health = 0;
+		this.instance.Humanoid.Health = 0;
 		this.breakJoints();
 
 		const profile = this.dataService.getProfile(this.getPlayer());

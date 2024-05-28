@@ -1,6 +1,6 @@
 import { Components } from "@flamework/components";
 import { Dependency, OnStart, Service } from "@flamework/core";
-import { Character } from "server/modules/components/character";
+import { CharacterServer } from "server/modules/components/character-server";
 import { Events } from "server/modules/networking";
 
 @Service()
@@ -12,7 +12,7 @@ export class ResetService implements OnStart {
 		this.events.reset.connect((player) => {
 			if (!player.Character) return;
 
-			const character = this.components.getComponent<Character>(
+			const character = this.components.getComponent<CharacterServer>(
 				player.Character,
 			);
 			if (!character) return;
