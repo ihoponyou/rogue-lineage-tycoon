@@ -72,7 +72,7 @@ export class InputController implements OnStart, OnTick {
 		if (state === BEGIN) {
 			const now = tick();
 			if (now - this.lastForwardInputTick < RUN_INPUT_INTERVAL) {
-				this.movementController.startRun();
+				this.movementController.startRun(this.manaController.hasMana());
 			}
 			this.lastForwardInputTick = now;
 		} else if (state === END) {
@@ -101,11 +101,16 @@ export class InputController implements OnStart, OnTick {
 			direction = "right";
 		}
 
-		this.movementController.startDodge(false, direction);
+		this.movementController.startDodge(this.manaController.hasMana(), direction);
 	}
 	
 	chargeMana(state: Enum.UserInputState) {
+		if (this.movementController.isClimbing || this.movementController.isDodging) return;
+		
 		this.manaController.onChargeManaInput(state);
+		if (state === BEGIN) {
+			this.movementController.stopRun();
+		}
 	}
 
 	lightAttack(state: Enum.UserInputState) {

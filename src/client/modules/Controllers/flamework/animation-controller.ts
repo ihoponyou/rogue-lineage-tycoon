@@ -1,13 +1,12 @@
 import { Controller, Dependency } from "@flamework/core";
-import { OnLocalCharacterAdded } from "../../../../../types/lifecycles";
+import { OnLocalCharacterAdded, OnLocalCharacterRemoving } from "../../../../../types/lifecycles";
 import { CharacterClient as Character } from "client/modules/components/character-client";
 import { Components } from "@flamework/components";
-import { ReplicatedStorage } from "@rbxts/services";
+import { AnimationClipProvider, ReplicatedStorage } from "@rbxts/services";
 
 @Controller()
-export class AnimationController implements OnLocalCharacterAdded {
+export class AnimationController implements OnLocalCharacterAdded, OnLocalCharacterRemoving {
 	private character?: Character;
-	private animationQueue = new Set<Animation>();
 	private loadedTracks = new Map<string, AnimationTrack>();
 
 	onLocalCharacterAdded(character: Model): void {
@@ -16,6 +15,7 @@ export class AnimationController implements OnLocalCharacterAdded {
 			.andThen((value) => this.character = value);
 
 		character.WaitForChild("Humanoid").WaitForChild("Animator");
+		task.wait();
 		
 		for (const animation of ReplicatedStorage.Animations.GetDescendants()) {
 			if (!animation.IsA("Animation")) continue;
@@ -23,24 +23,26 @@ export class AnimationController implements OnLocalCharacterAdded {
 		}
 	}
 
+	onLocalCharacterRemoving(character: Model): void {
+		this.loadedTracks.clear();
+	}
+
 	loadAnimation(animation: Animation): boolean {
 		const animator = this.character?.getAnimator();
 		if (!animator) error(`animator unavailable;`);
 		
+		// TODO: handle missing AnimationClipProvider
 		const track = animator.LoadAnimation(animation);
 		this.loadedTracks.set(animation.Name, track);
 		
-		if (animation.Name === "ClimbUp")
+		if (animation.Name === "ClimbUp" ||
+			animation.Name === "ClimbRight" ||
+			animation.Name === "ClimbLeft"
+		) {
 			track.Priority = Enum.AnimationPriority.Action2;
+		}
 
 		return true;
-	}
-
-	loadQueuedAnimations(): void {
-		this.animationQueue.forEach((animation) => {
-			const success = this.loadAnimation(animation);
-			if (success) this.animationQueue.delete(animation);
-		});
 	}
 
 	play(trackName: string): void {

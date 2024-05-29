@@ -9,10 +9,12 @@ import { hasLineOfSight } from "shared/modules/line-of-sight";
 import { Events } from "client/modules/networking";
 import { AnimationController } from "./animation-controller";
 import { KeybindController } from "./keybind-controller";
+import { ManaController } from "./mana-controller";
 
 const BASE_CLIMB_SPEED = 10;
 const BASE_WALK_SPEED = 20;
 const DASH_DURATION = 0.4;
+const DASH_COOLDOWN = 1;
 const TRAINED_CLIMB_BONUS_DURATION = 10;
 
 const VFX = ReplicatedStorage.Effects.Visuals;
@@ -39,22 +41,27 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 	private raycastParams = new RaycastParams();
 	private character: Character | undefined;
 
+	isRunning = false;
+	private runTrail?: Trail = this.newRunTrail();
+
+	isClimbing = false;
 	private climbTrove = new Trove();
 	private climbForce: LinearVelocity | undefined;
 	private climbConstraint: AlignOrientation | undefined;
 	private goalPart: Part | undefined;
 	private goalAttachment: Attachment | undefined;
 
+	isDodging = false;
+	dashDebounce = false;
+	private manaDashSound = this.newDashSound();
+	private manaDashParticles = this.newDashParticles();
 	private dashTrove = new Trove();
 	private dashVelocity: BodyVelocity | undefined;
-
-	isRunning = false;
-	isClimbing = false;
-	isDodging = false;
-
+	
 	constructor(
 		private animationController: AnimationController,
 		private keybindController: KeybindController,
+		private manaController: ManaController,
 	) {}
 
 	onStart(): void {
@@ -68,25 +75,51 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 	onLocalCharacterAdded(character: Model): void {
 		const components = Dependency<Components>();
 		components.waitForComponent<Character>(character).andThen((value) => this.character = value);
+
 		this.raycastParams.AddToFilter(character);
+
+		const humanoidRootPart = character.WaitForChild("HumanoidRootPart");
+		const torso = character.WaitForChild("Torso") as Torso;
+		if (!torso) error("wtf");
+
+		if (this.runTrail) {
+			this.runTrail.Parent = torso;
+			this.runTrail.Attachment0 = torso.BodyFrontAttachment;
+			this.runTrail.Attachment1 = torso.BodyBackAttachment;
+		}
+
+		if (this.manaDashSound) {
+			this.manaDashSound.Parent = humanoidRootPart;
+		}
+
+		if (this.manaDashParticles) {
+			this.manaDashParticles.Parent = torso;
+		}
 	}
 
 	onManaEmptied(): void {
 		if (this.isRunning) {
-			// downgrade from manarun to normal run
+			this.animationController.stop("ManaRun");
+			if (this.runTrail) this.runTrail.Enabled = false;
+			const BASE_PLAYER_SPEED = BASE_WALK_SPEED // + speedBoost
+			this.run(BASE_PLAYER_SPEED);
 		} else if (this.isClimbing) {
 			this.stopClimb();
 		}
 	}
 
-	private alignCharacterToWall(deltaTime: number, wallCastResult: RaycastResult): void {
-		if (!this.goalPart) return;
-		const goal = CFrame.lookAt(wallCastResult.Position.add(wallCastResult.Normal), wallCastResult.Position)
-		this.goalPart.CFrame = goal;
+	private newDashSound(): Sound {
+		return SFX.ManaDash.Clone();
+	}
 
-		if (!this.character) return;
-		const humanoidRootPart = this.character.getHumanoidRootPart();
-		humanoidRootPart.CFrame = humanoidRootPart.CFrame.Lerp(goal, 1-math.pow(1e-9, deltaTime));
+	private newDashParticles(): ParticleEmitter {
+		return VFX.ManaStopParticle.Clone();
+	}
+
+	private newRunTrail(): Trail {
+		const trail = VFX.ManaRunTrail.Clone();
+		trail.Enabled = false;
+		return trail;
 	}
 
 	private newClimbForce(): LinearVelocity {
@@ -119,9 +152,21 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		bv.P = 1250;
 		return bv;
 	}
+	
+	private alignCharacterToWall(deltaTime: number, wallCastResult: RaycastResult): void {
+		if (!this.goalPart) return;
+		const goal = CFrame.lookAt(wallCastResult.Position.add(wallCastResult.Normal), wallCastResult.Position)
+		this.goalPart.CFrame = goal;
+
+		if (!this.character) return;
+		const humanoidRootPart = this.character.getHumanoidRootPart();
+		humanoidRootPart.CFrame = humanoidRootPart.CFrame.Lerp(goal, 1-math.pow(1e-9, deltaTime));
+	}
 
 	startClimb(wallCastResult: RaycastResult) {
 		if (!this.character) return;
+		if (!this.manaController.hasMana()) return;
+		this.manaController.onChargeManaInput(Enum.UserInputState.End);
 
 		this.isClimbing = true;
 
@@ -150,6 +195,17 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		humanoid.ChangeState(Enum.HumanoidStateType.Climbing);
 
 		this.alignCharacterToWall(0, wallCastResult);
+
+		const input = InputController.inputVector;
+		if (input.Y !== 0) {
+			this.animationController.play("ClimbUp");
+		} else if (input.X === 1) {
+			this.animationController.play("ClimbRight");
+		} else if (input.X === -1) {
+			this.animationController.play("ClimbLeft");
+		} else {
+			this.animationController.play("ClimbIdle");
+		}
 
 		this.climbTrove.bindToRenderStep(
 			"climb_update",
@@ -187,6 +243,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 			this.stopClimb();
 		})
 		tween.Play();
+		this.animationController.play("LedgeClimbUp");
 	}
 
 	private calculateClimbSpeed(mana: number, climbTrains: number, climbBoost: number) {
@@ -195,6 +252,10 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 
 	updateClimb(deltaTime: number, inputVector: Vector2): void {
 		if (!this.character) return;
+		if (!this.manaController.hasMana()) {
+			this.stopClimb();
+			return;
+		}
 		
 		const humanoidRootPart = this.character.getHumanoidRootPart();
 		const upVector = humanoidRootPart.CFrame.UpVector;
@@ -316,7 +377,22 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		if (this.keybindController.isDirectionalKeyDown()) this.animationController.play("ClimbIdle");
 	}
 
-	startRun(): void {
+	private manaRun(baseSpeed: number): void {
+		if (!this.character) return;
+
+		this.character.instance.Humanoid.WalkSpeed = baseSpeed * 2;
+		this.animationController.play("ManaRun");
+		if (this.runTrail) this.runTrail.Enabled = true;
+	}
+
+	private run(baseSpeed: number): void {
+		if (!this.character) return;
+		
+		this.character.instance.Humanoid.WalkSpeed = baseSpeed * 1.5;
+		this.animationController.play("Run");
+	}
+
+	startRun(hasMana: boolean): void {
 		if (this.isClimbing || this.isRunning || this.isDodging) return;
 		if (!this.character) return;
 		if (this.character.instance.GetAttribute("isRagdolled")) return;
@@ -324,7 +400,10 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		this.isRunning = true;
 
 		const BASE_PLAYER_SPEED = BASE_WALK_SPEED; // + speedBoost
-		this.character.instance.Humanoid.WalkSpeed = BASE_PLAYER_SPEED * 1.5;
+		
+		hasMana
+			? this.manaRun(BASE_PLAYER_SPEED)
+			: this.run(BASE_PLAYER_SPEED);
 	}
 
 	stopRun(): void {
@@ -335,10 +414,19 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 
 		const BASE_PLAYER_SPEED = BASE_WALK_SPEED; // + speedBoost
 		this.character.instance.Humanoid.WalkSpeed = BASE_PLAYER_SPEED;
+
+		this.animationController.stop("Run");
+		this.animationController.stop("ManaRun");
+		if (this.runTrail) this.runTrail.Enabled = false;
+	}
+
+	directionToDashAnimationName(direction: Direction): string {
+		return "Dash" + direction.gsub("^%l", string.char(direction.byte(1)[0]).upper(), 1)[0];
 	}
 
 	startDodge(hasMana: boolean, direction: Direction): void {
 		if (this.isClimbing || this.isDodging) return;
+		if (this.dashDebounce) return;
 		if (!this.character) return;
 		if (this.character.instance.GetAttribute("isRagdolled")) return;
 
@@ -356,6 +444,12 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 			.LookVector
 			.mul(hasMana ? 60 : 50);
 
+		if (hasMana) {
+			this.manaController.onChargeManaInput(Enum.UserInputState.End);
+			if (this.manaDashSound) this.manaDashSound.Play();
+			if (this.manaDashParticles) this.manaDashParticles.Enabled = true;
+		}
+
 		task.delay(DASH_DURATION, () => this.stopDodge());
 		
 		this.dashTrove.bindToRenderStep(
@@ -363,6 +457,8 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 			Enum.RenderPriority.Character.Value,
 			() => this.updateDodge(directionAngle)
 		);
+
+		this.animationController.play(this.directionToDashAnimationName(direction));
 	}
 
 	updateDodge(angle: number): void {
@@ -390,8 +486,14 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 	}
 
 	stopDodge(): void {
-		this.isDodging = false;
 		this.dashTrove.clean();
+		
+		this.isDodging = false;
+		this.dashDebounce = true;
+
+		if (this.manaDashParticles) this.manaDashParticles.Enabled = false;
+		
+		task.delay(DASH_COOLDOWN, () => this.dashDebounce = false);
 	}
 
 	handleJump(): void {

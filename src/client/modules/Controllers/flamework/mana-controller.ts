@@ -1,6 +1,5 @@
 import { Controller, Dependency, OnStart, OnTick } from "@flamework/core";
 import { Events } from "client/modules/networking";
-import { MovementController } from "./movement-controller";
 import { ReplicatedStorage } from "@rbxts/services";
 import { OnLocalCharacterAdded } from "../../../../../types/lifecycles";
 import { CharacterClient as Character } from "client/modules/components/character-client";
@@ -20,7 +19,7 @@ export class ManaController implements OnStart, OnTick, OnLocalCharacterAdded {
 	manaEnabled = false;
 	mana = 0;
 
-	constructor(private movementController: MovementController) {}
+	constructor() {}
 
 	onStart(): void {
 		this.chargeSound = SFX.Charging.Clone();
@@ -29,15 +28,8 @@ export class ManaController implements OnStart, OnTick, OnLocalCharacterAdded {
 		EVENTS.manaObtained.connect(() => this.manaEnabled = true);
 		EVENTS.manaDisabled.connect(() => this.manaEnabled = false);
 		EVENTS.manaFilled.connect(() => this.onManaFilled());
-		EVENTS.manaEmptied.connect(() => this.onManaEmptied());
-		EVENTS.manaChanged.connect((value) => {
-			// print(value);
-			this.mana = value;
-		});
-		EVENTS.charge.connect((isCharging) => {
-			// print(isCharging);
-			this.isCharging = isCharging;
-		});
+		EVENTS.manaChanged.connect((value) => this.mana = value);
+		EVENTS.charge.connect((isCharging) => this.isCharging = isCharging);
 	}
 
 	onTick(dt: number): void {
@@ -57,14 +49,13 @@ export class ManaController implements OnStart, OnTick, OnLocalCharacterAdded {
 
 	onChargeManaInput(state: Enum.UserInputState): void {
 		if (!this.manaEnabled) return;
-		if (this.movementController.isClimbing || this.movementController.isDodging) return;
 		if (this.character?.instance.GetAttribute("isRagdolled")) return;
-		// print(state === Enum.UserInputState.Begin)
+
 		const doCharge = state === Enum.UserInputState.Begin
 		EVENTS.charge(doCharge);
+		// print(doCharge)
 
 		if (doCharge) {
-			this.movementController.stopRun();
 			this.chargeSound?.Play();
 			// reduce walkspeed
 		} else {
@@ -74,10 +65,6 @@ export class ManaController implements OnStart, OnTick, OnLocalCharacterAdded {
 
 	onManaFilled(): void {
 		this.filledSound?.Play();
-	}
-
-	onManaEmptied(): void {
-		print("emptied")
 	}
 
 	hasMana(): boolean {
