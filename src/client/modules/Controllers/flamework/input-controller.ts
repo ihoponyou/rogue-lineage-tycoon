@@ -1,10 +1,14 @@
-import { Controller, OnStart } from "@flamework/core";
+import { Controller, OnStart, OnTick } from "@flamework/core";
 import Object from "@rbxts/object-utils";
 import { ContextActionService, UserInputService } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
 import { valueof } from "../../../../../types/valueof";
+import { ManaController } from "./mana-controller";
+import { Direction, MovementController } from "./movement-controller";
 
 const RUN_INPUT_INTERVAL = 0.2;
+const BEGIN = Enum.UserInputState.Begin;
+const END = Enum.UserInputState.End;
 
 interface Keybinds {
 	forward: Enum.KeyCode;
@@ -50,14 +54,24 @@ export enum InputAxis {
 }
 
 @Controller()
-export class InputController implements OnStart {
+export class InputController implements OnStart, OnTick {
 	private lastForwardInputTick = 0;
-	private trove = new Trove();
 	
 	keybinds = DEFAULT_KEYBINDS;
 
+	static inputVector = new Vector2();
+
+	constructor(
+		private manaController: ManaController,
+		private movementController: MovementController
+	) {}
+
 	onStart(): void {
-		
+		this.loadAllKeybinds();
+	}
+
+	onTick(dt: number): void {
+		InputController.inputVector = this.getInputVector();
 	}
 
 	// like the old unity one
@@ -80,14 +94,25 @@ export class InputController implements OnStart {
 		}
 	}
 
+	getInputVector(): Vector2 {
+		return new Vector2(this.getAxis(InputAxis.Horizontal), this.getAxis(InputAxis.Vertical));
+	}
+
 	isMovementKeyDown(): boolean {
 		return UserInputService.IsKeyDown(this.keybinds.forward) || UserInputService.IsKeyDown(this.keybinds.backward) || UserInputService.IsKeyDown(this.keybinds.left) || UserInputService.IsKeyDown(this.keybinds.right);	
+	}
+
+	isKeyDown(action: keyof Keybinds) {
+		return UserInputService.IsKeyDown(this.keybinds[action] as Enum.KeyCode);
 	}
 
 	loadKeybind(action: keyof Keybinds, keybind: valueof<Keybinds>) {
 		ContextActionService.BindAction(
 			`input_${action}`,
-			(actionName, state, inputObject) => this[action](state),
+			(actionName, state, inputObject) => {
+				this[action](state)
+				return Enum.ContextActionResult.Pass;
+			},
 			false,
 			keybind
 		)
@@ -121,17 +146,60 @@ export class InputController implements OnStart {
 		this.loadKeybind(action, newKey);
 	}
 
-	forward(state: Enum.UserInputState) {}
+	forward(state: Enum.UserInputState) {
+		if (state === BEGIN) {
+			const now = tick();
+			if (now - this.lastForwardInputTick < RUN_INPUT_INTERVAL) {
+				this.movementController.startRun();
+			}
+			this.lastForwardInputTick = now;
+		} else if (state === END) {
+			this.movementController.stopRun();
+		}
+	}
+
 	left(state: Enum.UserInputState) {}
 	right(state: Enum.UserInputState) {}
 	backward(state: Enum.UserInputState) {}
-	jump(state: Enum.UserInputState) {}
-	dash(state: Enum.UserInputState) {}
-	chargeMana(state: Enum.UserInputState) {}
+
+	jump(state: Enum.UserInputState) {
+		if (state === BEGIN)
+			this.movementController.handleJump();
+	}
+	
+	dash(state: Enum.UserInputState) {
+		if (state !== BEGIN) return;
+
+		let direction: Direction = "backward";
+		if (this.isKeyDown("forward")) {
+			direction = "forward";
+		} else if (this.isKeyDown("left")) {
+			direction = "left";
+		} else if (this.isKeyDown("right")) {
+			direction = "right";
+		}
+
+		this.movementController.startDodge(false, direction);
+	}
+	
+	chargeMana(state: Enum.UserInputState) {
+		this.manaController.onChargeManaInput(state);
+	}
+
+	lightAttack(state: Enum.UserInputState) {
+		
+	}
+	
+	heavyAttack(state: Enum.UserInputState) {
+		
+	}
+
+	block(state: Enum.UserInputState) {
+		
+	}
+
+	// these are handled by components (as of writing)
 	interact(state: Enum.UserInputState) {}
-	lightAttack(state: Enum.UserInputState) {}
-	heavyAttack(state: Enum.UserInputState) {}
-	block(state: Enum.UserInputState) {}
 	carry(state: Enum.UserInputState) {}
 	grip(state: Enum.UserInputState) {}
 	injure(state: Enum.UserInputState) {}
