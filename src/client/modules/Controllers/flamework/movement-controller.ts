@@ -361,8 +361,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		const humanoidRootPart = this.character?.getHumanoidRootPart();
 		const forwardCast = Workspace.Raycast(
 			humanoidRootPart.Position,
-			humanoidRootPart.Position
-				.add(humanoidRootPart.CFrame.LookVector.mul(new Vector3(2, 0, 2))),
+			humanoidRootPart.CFrame.LookVector.mul(new Vector3(2, 0, 2)),
 			this.raycastParams
 		);
 
