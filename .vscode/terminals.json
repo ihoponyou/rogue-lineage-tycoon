@@ -15,11 +15,13 @@
     {
       "name": "io-serve",
       "description": "necessary for rbxts-object-to-tree",
+      "split": "compiler",
       "command": "npx io-serve"
     },
     {
       "name": "rojo",
       "description": "you know",
+      "split": "compiler",
       "commands": [
         "Start-Sleep -Seconds 10",
         "rojo serve"
