@@ -5,48 +5,11 @@ import { Trove } from "@rbxts/trove";
 import { valueof } from "../../../../../types/valueof";
 import { ManaController } from "./mana-controller";
 import { Direction, MovementController } from "./movement-controller";
+import { KeybindController } from "./keybind-controller";
 
 const RUN_INPUT_INTERVAL = 0.2;
 const BEGIN = Enum.UserInputState.Begin;
 const END = Enum.UserInputState.End;
-
-interface Keybinds {
-	forward: Enum.KeyCode;
-	left: Enum.KeyCode;
-	right: Enum.KeyCode;
-	backward: Enum.KeyCode;
-	jump: Enum.KeyCode;
-	dash: Enum.KeyCode;
-	chargeMana: Enum.KeyCode;
-	interact: Enum.KeyCode;
-	lightAttack: Enum.UserInputType;
-	heavyAttack: Enum.UserInputType;
-	block: Enum.KeyCode;
-	carry: Enum.KeyCode;
-	grip: Enum.KeyCode;
-	injure: Enum.KeyCode;
-	forceFeed: Enum.KeyCode;
-	resetKeybindsToDefault : Enum.KeyCode.RightBracket,
-}
-
-const DEFAULT_KEYBINDS: Keybinds = {
-	forward 	: Enum.KeyCode.W,
-	left 		: Enum.KeyCode.A,
-	right 		: Enum.KeyCode.D,
-	backward 	: Enum.KeyCode.S,
-	jump 		: Enum.KeyCode.Space,
-	dash 		: Enum.KeyCode.Q,
-	chargeMana 	: Enum.KeyCode.G,
-	interact	: Enum.KeyCode.E,
-	lightAttack : Enum.UserInputType.MouseButton1,
-	heavyAttack : Enum.UserInputType.MouseButton2,
-	block 		: Enum.KeyCode.F,
-	carry		: Enum.KeyCode.V,
-	grip		: Enum.KeyCode.B,
-	injure		: Enum.KeyCode.N,
-	forceFeed	: Enum.KeyCode.P,
-	resetKeybindsToDefault : Enum.KeyCode.RightBracket,
-}
 
 export enum InputAxis {
 	Horizontal,
@@ -56,18 +19,25 @@ export enum InputAxis {
 @Controller()
 export class InputController implements OnStart, OnTick {
 	private lastForwardInputTick = 0;
-	
-	keybinds = DEFAULT_KEYBINDS;
 
 	static inputVector = new Vector2();
 
 	constructor(
 		private manaController: ManaController,
-		private movementController: MovementController
+		private movementController: MovementController,
+		private keybindController: KeybindController
 	) {}
 
 	onStart(): void {
-		this.loadAllKeybinds();
+		for (const [action, key] of Object.entries(this.keybindController.keybinds)) {
+			this.keybindController.loadKeybind(
+				action,
+				key,
+				(state) => {
+					return this[action](state);
+				}
+			);
+		}
 	}
 
 	onTick(dt: number): void {
@@ -76,10 +46,10 @@ export class InputController implements OnStart, OnTick {
 
 	// like the old unity one
 	getAxis(axis: InputAxis): 1 | 0 | -1 {
-		const isRightDown = UserInputService.IsKeyDown(this.keybinds.right);
-		const isLeftDown = UserInputService.IsKeyDown(this.keybinds.left);
-		const isForwardDown = UserInputService.IsKeyDown(this.keybinds.forward);
-		const isBackwardDown = UserInputService.IsKeyDown(this.keybinds.backward);
+		const isRightDown = UserInputService.IsKeyDown(this.keybindController.keybinds.right);
+		const isLeftDown = UserInputService.IsKeyDown(this.keybindController.keybinds.left);
+		const isForwardDown = UserInputService.IsKeyDown(this.keybindController.keybinds.forward);
+		const isBackwardDown = UserInputService.IsKeyDown(this.keybindController.keybinds.backward);
 
 		if (axis === InputAxis.Horizontal) {
 			if (isRightDown && isLeftDown) return 0;
@@ -96,54 +66,6 @@ export class InputController implements OnStart, OnTick {
 
 	getInputVector(): Vector2 {
 		return new Vector2(this.getAxis(InputAxis.Horizontal), this.getAxis(InputAxis.Vertical));
-	}
-
-	isMovementKeyDown(): boolean {
-		return UserInputService.IsKeyDown(this.keybinds.forward) || UserInputService.IsKeyDown(this.keybinds.backward) || UserInputService.IsKeyDown(this.keybinds.left) || UserInputService.IsKeyDown(this.keybinds.right);	
-	}
-
-	isKeyDown(action: keyof Keybinds) {
-		return UserInputService.IsKeyDown(this.keybinds[action] as Enum.KeyCode);
-	}
-
-	loadKeybind(action: keyof Keybinds, keybind: valueof<Keybinds>) {
-		ContextActionService.BindAction(
-			`input_${action}`,
-			(actionName, state, inputObject) => {
-				this[action](state)
-				return Enum.ContextActionResult.Pass;
-			},
-			false,
-			keybind
-		)
-	}
-
-	loadAllKeybinds() {
-		for (const [action, key] of Object.entries(this.keybinds)) {
-			this.loadKeybind(action, key);
-		}
-	}
-
-	unloadKeybind(action: keyof Keybinds) {
-		ContextActionService.UnbindAction(`input_${action}`);
-	}
-
-	unloadAllKeybinds() {
-		for (const action of Object.keys(this.keybinds)) {
-			this.unloadKeybind(action);
-		}
-	}
-
-	resetKeybindsToDefault() {
-		this.unloadAllKeybinds();
-		for (const [action, key] of Object.entries(DEFAULT_KEYBINDS)) {
-			this.loadKeybind(action, key);
-		}
-	}
-
-	changeKeybind(action: keyof Keybinds, newKey: valueof<Keybinds>) {
-		this.unloadKeybind(action);
-		this.loadKeybind(action, newKey);
 	}
 
 	forward(state: Enum.UserInputState) {
@@ -171,11 +93,11 @@ export class InputController implements OnStart, OnTick {
 		if (state !== BEGIN) return;
 
 		let direction: Direction = "backward";
-		if (this.isKeyDown("forward")) {
+		if (this.keybindController.isKeyDown("forward")) {
 			direction = "forward";
-		} else if (this.isKeyDown("left")) {
+		} else if (this.keybindController.isKeyDown("left")) {
 			direction = "left";
-		} else if (this.isKeyDown("right")) {
+		} else if (this.keybindController.isKeyDown("right")) {
 			direction = "right";
 		}
 

@@ -7,6 +7,8 @@ import { Trove } from "@rbxts/trove";
 import { InputController } from "./input-controller";
 import { hasLineOfSight } from "shared/modules/line-of-sight";
 import { Events } from "client/modules/networking";
+import { AnimationController } from "./animation-controller";
+import { KeybindController } from "./keybind-controller";
 
 const BASE_CLIMB_SPEED = 10;
 const BASE_WALK_SPEED = 20;
@@ -15,6 +17,13 @@ const TRAINED_CLIMB_BONUS_DURATION = 10;
 
 const VFX = ReplicatedStorage.Effects.Visuals;
 const SFX = ReplicatedStorage.Effects.Sounds;
+
+const CLIMB_DIRECTION_TO_ANIMATION_NAME = {
+	forward: "ClimbUp",
+	backward: "ClimbDown",
+	left: "ClimbLeft",
+	right: "ClimbRight",
+}
 
 export type Direction = "forward" | "backward" | "left" | "right";
 
@@ -42,6 +51,11 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 	isRunning = false;
 	isClimbing = false;
 	isDodging = false;
+
+	constructor(
+		private animationController: AnimationController,
+		private keybindController: KeybindController,
+	) {}
 
 	onStart(): void {
 		this.raycastParams.CollisionGroup = "Characters";
@@ -144,6 +158,12 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 				const input = InputController.inputVector;
 				this.updateClimb(deltaTime, input);
 			}
+		);
+		this.climbTrove.connect(UserInputService.InputBegan,
+			(input, gpe) => this.handleClimbAnimations(input, gpe)
+		);
+		this.climbTrove.connect(UserInputService.InputEnded,
+			(input, gpe) => this.handleClimbAnimations(input, gpe)
 		);
 	}
 
@@ -270,6 +290,30 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		humanoid.AutoRotate = true;
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Running, true)
+
+		this.animationController.stop("ClimbUp");
+		this.animationController.stop("ClimbDown");
+		this.animationController.stop("ClimbLeft");
+		this.animationController.stop("ClimbRight");
+		this.animationController.stop("ClimbIdle");
+	}
+
+	handleClimbAnimations(input: InputObject, gameProcessedEvent: boolean): void {
+		if (gameProcessedEvent) return;
+		if (!this.keybindController.isDirectionalKey(input.KeyCode)) return;
+		const actionName = this.keybindController.getKeyActionName(input.KeyCode) as Direction | undefined;
+		if (!actionName) return;
+
+		switch (input.UserInputState) {
+			case Enum.UserInputState.Begin:
+				this.animationController.stop("ClimbIdle");
+				this.animationController.play(CLIMB_DIRECTION_TO_ANIMATION_NAME[actionName])
+				break;
+			case Enum.UserInputState.End:
+				this.animationController.stop(CLIMB_DIRECTION_TO_ANIMATION_NAME[actionName])
+		}
+
+		if (this.keybindController.isDirectionalKeyDown()) this.animationController.play("ClimbIdle");
 	}
 
 	startRun(): void {
