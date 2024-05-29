@@ -3,6 +3,8 @@ export interface ManaServerToClientEvents {
 	manaEmptied(): void;
 	manaFilled(): void;
 	manaDisabled(): void;
+	manaChanged(value: number): void;
+	charge(bool: boolean): void;
 }
 
 export interface ManaClientToServerEvents {

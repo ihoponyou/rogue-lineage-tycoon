@@ -9,6 +9,7 @@ import { Players } from "@rbxts/services";
 
 const BASE_MANA_CHARGE_RATE = 100 / 3.5;
 const BASE_MANA_DECAY_RATE = 100 / 2.5;
+const EVENTS = Events.manaEvents;
 
 interface PlayerData {
 	ChargingMana: boolean;
@@ -21,17 +22,14 @@ interface PlayerData {
 export class ManaService
 	implements OnStart, OnTick, OnPlayerRemoving, OnCharacterAdded
 {
-	private events = Events.manaEvents;
 	private sessionData = new Map<Player, PlayerData>();
 
 	constructor(private dataService: DataService) {}
 
 	onStart(): void {
-		this.events.charge.connect((player: Player, bool: boolean) => {
-			const data = this.sessionData.get(player);
-			if (!data) return;
-			data.ChargingMana = bool;
-		});
+		EVENTS.charge.connect(
+			(player: Player, bool: boolean) => this.onChargeRequested(player, bool)
+		);
 	}
 
 	onTick(dt: number): void {
@@ -55,6 +53,13 @@ export class ManaService
 		this.sessionData.delete(player);
 	}
 
+	onChargeRequested(player: Player, bool: boolean) {
+		const data = this.sessionData.get(player);
+		if (!data) return;
+		data.ChargingMana = bool;
+		EVENTS.charge(player, bool);
+	}
+
 	onManaObtained(player: Player): void {
 		const race = this.dataService.getProfile(player).Data.RaceName;
 
@@ -69,13 +74,13 @@ export class ManaService
 			DecayRate: BASE_MANA_DECAY_RATE,
 		});
 
-		this.events.manaObtained(player);
+		EVENTS.manaObtained(player);
 	}
 
 	onManaDisabled(player: Player): void {
 		this.sessionData.delete(player);
 
-		this.events.manaDisabled(player);
+		EVENTS.manaDisabled(player);
 	}
 
 	toggleManaObtained(player: Player, bool: boolean): void {
@@ -96,8 +101,10 @@ export class ManaService
 
 		data.Mana -= math.min(data.Mana, decayRate * deltaTime);
 		if (data.Mana === 0) {
-			this.events.manaEmptied(player);
+			EVENTS.manaEmptied(player);
 		}
+
+		EVENTS.manaChanged.fire(player, data.Mana);
 	}
 
 	chargeMana(player: Player, deltaTime: number): void {
@@ -109,7 +116,10 @@ export class ManaService
 
 		if (data.Mana === 100) {
 			data.ChargingMana = false;
-			this.events.manaFilled(player);
+			EVENTS.manaFilled(player);
+			EVENTS.charge(player, false);
 		}
+
+		EVENTS.manaChanged.fire(player, data.Mana);
 	}
 }
