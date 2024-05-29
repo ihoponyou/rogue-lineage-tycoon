@@ -4,14 +4,17 @@ import {
 	ManaClientToServerEvents,
 	ManaServerToClientEvents,
 } from "./mana-events";
+import { CharacterClientToServerEvents, CharacterServerToClientEvents } from "./character-events";
+
+interface ServerToClientEvents {
+	manaEvents: ManaServerToClientEvents;
+	characterEvents: CharacterServerToClientEvents;
+}
 
 interface ClientToServerEvents {
 	resetEvents: ResetEvents;
 	manaEvents: ManaClientToServerEvents;
-}
-
-interface ServerToClientEvents {
-	manaEvents: ManaServerToClientEvents;
+	characterEvents: CharacterClientToServerEvents;
 }
 
 export const GlobalEvents = Networking.createEvent<

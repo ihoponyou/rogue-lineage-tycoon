@@ -9,6 +9,7 @@ import {
 import { RagdollServer } from "./ragdoll-server";
 import { OnRemoved } from "../../../../types/lifecycles";
 import { Character, CharacterInstance } from "shared/modules/components/character";
+import { Events } from "../networking";
 
 const FF_DURATION = 15;
 const PROTECTED_DISTANCE = 5;
@@ -20,6 +21,8 @@ const KNOCK_PERCENT_THRESHOLD = 0.15;
 // all rates are per second
 const BASE_STOMACH_DECAY_RATE = 0.1;
 const BASE_TOXICITY_DECAY_RATE = 0.05;
+
+const EVENTS = Events.characterEvents;
 
 interface Attributes {
 	isKnocked: boolean;
@@ -134,6 +137,8 @@ export class CharacterServer
 			this.dataService.resetCharacterValues(profile.Data);
 		}
 
+		EVENTS.killed.fire(this.getPlayer());
+		
 		task.delay(Players.RespawnTime, () => this.getPlayer().LoadCharacter());
 	}
 
