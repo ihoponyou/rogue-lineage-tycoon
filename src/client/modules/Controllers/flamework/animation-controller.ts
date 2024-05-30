@@ -2,7 +2,7 @@ import { Controller, Dependency } from "@flamework/core";
 import { OnLocalCharacterAdded, OnLocalCharacterRemoving } from "../../../../../types/lifecycles";
 import { CharacterClient as Character } from "client/modules/components/character-client";
 import { Components } from "@flamework/components";
-import { AnimationClipProvider, ReplicatedStorage } from "@rbxts/services";
+import { ReplicatedStorage } from "@rbxts/services";
 
 @Controller()
 export class AnimationController implements OnLocalCharacterAdded, OnLocalCharacterRemoving {
@@ -12,15 +12,14 @@ export class AnimationController implements OnLocalCharacterAdded, OnLocalCharac
 	onLocalCharacterAdded(character: Model): void {
 		const components = Dependency<Components>();
 		components.waitForComponent<Character>(character)
-			.andThen((value) => this.character = value);
-
-		character.WaitForChild("Humanoid").WaitForChild("Animator");
-		task.wait();
-		
-		for (const animation of ReplicatedStorage.Animations.GetDescendants()) {
-			if (!animation.IsA("Animation")) continue;
-			this.loadAnimation(animation);
-		}
+			.andThen((value) => {
+				this.character = value
+				
+				for (const animation of ReplicatedStorage.Animations.GetDescendants()) {
+					if (!animation.IsA("Animation")) continue;
+					this.loadAnimation(animation);
+				}
+			});
 	}
 
 	onLocalCharacterRemoving(character: Model): void {

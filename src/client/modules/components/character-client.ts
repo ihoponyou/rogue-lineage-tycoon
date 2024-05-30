@@ -11,7 +11,7 @@ const events = Events.characterEvents;
 export class CharacterClient extends Character<{}, CharacterInstance> {
 	override onStart(): void {
 		super.onStart();
-
+		
 		this.trove.add(events.killed.connect(() => this.onKilled()));
 	}
 

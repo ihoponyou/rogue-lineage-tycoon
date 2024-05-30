@@ -19,8 +19,6 @@ export class ManaController implements OnStart, OnTick, OnLocalCharacterAdded {
 	manaEnabled = false;
 	mana = 0;
 
-	constructor() {}
-
 	onStart(): void {
 		this.chargeSound = SFX.Charging.Clone();
 		this.filledSound = SFX.FinishedCharging.Clone();
