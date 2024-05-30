@@ -10,6 +10,7 @@ import { RagdollServer } from "./ragdoll-server";
 import { OnRemoved } from "../../../../types/lifecycles";
 import {
 	Character,
+	CharacterAttributes,
 	CharacterInstance,
 } from "shared/modules/components/character";
 import { Events } from "../networking";
@@ -27,7 +28,7 @@ const BASE_TOXICITY_DECAY_RATE = 0.05;
 
 const EVENTS = Events.characterEvents;
 
-interface Attributes {
+interface Attributes extends CharacterAttributes {
 	isKnocked: boolean;
 	isAlive: boolean;
 	temperature: number;

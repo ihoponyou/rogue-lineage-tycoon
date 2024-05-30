@@ -48,7 +48,7 @@ export class ManaController implements OnStart, OnTick, OnLocalCharacterAdded {
 
 	onChargeManaInput(state: Enum.UserInputState): void {
 		if (!this.manaEnabled) return;
-		if (this.character?.instance.GetAttribute("isRagdolled")) return;
+		if (this.character?.attributes.isRagdolled) return;
 
 		const doCharge = state === Enum.UserInputState.Begin;
 		EVENTS.charge(doCharge);

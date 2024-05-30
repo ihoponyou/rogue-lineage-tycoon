@@ -1,5 +1,9 @@
 import { Component } from "@flamework/components";
-import { Character, CharacterInstance } from "shared/modules/components/character";
+import {
+	Character,
+	CharacterAttributes,
+	CharacterInstance,
+} from "shared/modules/components/character";
 import { Events } from "../networking";
 import { Workspace } from "@rbxts/services";
 
@@ -8,7 +12,10 @@ const events = Events.characterEvents;
 @Component({
 	tag: "Character",
 })
-export class CharacterClient extends Character<{}, CharacterInstance> {
+export class CharacterClient extends Character<
+	CharacterAttributes,
+	CharacterInstance
+> {
 	override onStart(): void {
 		super.onStart();
 

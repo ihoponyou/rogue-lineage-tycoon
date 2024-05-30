@@ -1,11 +1,11 @@
 import { BaseComponent, Component } from "@flamework/components";
 
-interface Attributes {
+export interface RagdollAttributes {
 	isRagdolled: boolean;
 }
 
 @Component()
-export abstract class Ragdoll extends BaseComponent<Attributes, Model> {
+export abstract class Ragdoll extends BaseComponent<RagdollAttributes, Model> {
 	protected humanoid = this.instance.WaitForChild("Humanoid") as Humanoid;
 
 	protected configureHumanoid(): void {

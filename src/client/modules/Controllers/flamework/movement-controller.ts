@@ -477,7 +477,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 	startRun(hasMana: boolean): void {
 		if (this.isClimbing || this.isRunning || this.isDodging) return;
 		if (!this.character) return;
-		if (this.character.instance.GetAttribute("isRagdolled")) return;
+		if (this.character.attributes.isRagdolled) return;
 
 		this.isRunning = true;
 
@@ -515,7 +515,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		if (this.isClimbing || this.isDodging) return;
 		if (this.dashDebounce) return;
 		if (!this.character) return;
-		if (this.character.instance.GetAttribute("isRagdolled")) return;
+		if (this.character.attributes.isRagdolled) return;
 
 		if (this.isRunning) this.stopRun();
 

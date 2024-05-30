@@ -2,13 +2,20 @@ import { Component } from "@flamework/components";
 import { DisposableComponent } from "./disposable-component";
 import { Players } from "@rbxts/services";
 import { OnStart } from "@flamework/core";
+import { RagdollAttributes } from "./ragdoll";
 
 export interface CharacterInstance extends StarterCharacter {
 	Humanoid: Humanoid;
 }
 
+// this may be unsafe
+export interface CharacterAttributes extends RagdollAttributes {}
+
 @Component()
-export abstract class Character<A extends {}, I extends CharacterInstance>
+export abstract class Character<
+		A extends CharacterAttributes,
+		I extends CharacterInstance,
+	>
 	extends DisposableComponent<A, I>
 	implements OnStart
 {

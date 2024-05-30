@@ -1,11 +1,16 @@
 import { Controller, Dependency } from "@flamework/core";
-import { OnLocalCharacterAdded, OnLocalCharacterRemoving } from "../../../../../types/lifecycles";
+import {
+	OnLocalCharacterAdded,
+	OnLocalCharacterRemoving,
+} from "../../../../../types/lifecycles";
 import { CharacterClient as Character } from "client/modules/components/character-client";
 import { Components } from "@flamework/components";
 import { ReplicatedStorage } from "@rbxts/services";
 
 @Controller()
-export class AnimationController implements OnLocalCharacterAdded, OnLocalCharacterRemoving {
+export class AnimationController
+	implements OnLocalCharacterAdded, OnLocalCharacterRemoving
+{
 	private character?: Character;
 	private loadedTracks = new Map<string, AnimationTrack>();
 
