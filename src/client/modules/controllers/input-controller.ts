@@ -107,7 +107,7 @@ export class InputController implements OnStart, OnTick {
 			direction = "right";
 		}
 
-		this.movementController.startDodge(
+		this.movementController.startDash(
 			this.manaController.hasMana(),
 			direction,
 		);

@@ -521,7 +521,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		);
 	}
 
-	startDodge(hasMana: boolean, direction: Direction): void {
+	startDash(hasMana: boolean, direction: Direction): void {
 		if (this.isClimbing || this.isDodging) return;
 		if (this.dashDebounce) return;
 		if (!this.character) return;
@@ -546,12 +546,12 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 			if (this.manaDashParticles) this.manaDashParticles.Enabled = true;
 		}
 
-		task.delay(DASH_DURATION, () => this.stopDodge());
+		task.delay(DASH_DURATION, () => this.stopDash());
 
 		this.dashTrove.bindToRenderStep(
 			"dash_update",
 			Enum.RenderPriority.Character.Value,
-			() => this.updateDodge(directionAngle),
+			() => this.updateDash(directionAngle),
 		);
 
 		this.animationController.play(
@@ -559,7 +559,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		);
 	}
 
-	updateDodge(angle: number): void {
+	updateDash(angle: number): void {
 		if (!this.character) return;
 		if (!Workspace.CurrentCamera) return;
 
@@ -578,11 +578,11 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 				CFrame.Angles(0, math.rad(angle), 0),
 			).LookVector.mul(speed);
 		} else {
-			this.stopDodge();
+			this.stopDash();
 		}
 	}
 
-	stopDodge(): void {
+	stopDash(): void {
 		this.dashTrove.clean();
 
 		this.isDodging = false;

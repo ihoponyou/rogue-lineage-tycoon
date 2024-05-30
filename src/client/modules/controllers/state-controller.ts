@@ -19,8 +19,8 @@ class AttackState extends State {
 	}
 }
 
-class DodgeState extends State {
-	name = "Dodge";
+class DashState extends State {
+	name = "Dash";
 }
 
 class SprintState extends State {
@@ -39,7 +39,7 @@ class ChargeManaState extends State {
 export class StateController {
 	private IDLE = new IdleState();
 	private ATTACK = new AttackState();
-	private DODGE = new DodgeState();
+	private DASH = new DashState();
 	private SPRINT = new SprintState();
 	private BLOCK = new BlockState();
 	private CHARGE_MANA = new ChargeManaState();
@@ -48,23 +48,23 @@ export class StateController {
 
 	constructor() {
 		this.IDLE.addTransition(this.ATTACK);
-		this.IDLE.addTransition(this.DODGE);
+		this.IDLE.addTransition(this.DASH);
 		this.IDLE.addTransition(this.SPRINT);
 		this.IDLE.addTransition(this.CHARGE_MANA);
 		this.IDLE.addTransition(this.BLOCK);
 
 		this.ATTACK.addTransition(this.IDLE);
 
-		this.DODGE.addTransition(this.IDLE);
-		this.DODGE.addTransition(this.SPRINT);
-		this.DODGE.addTransition(this.CHARGE_MANA);
+		this.DASH.addTransition(this.IDLE);
+		this.DASH.addTransition(this.SPRINT);
+		this.DASH.addTransition(this.CHARGE_MANA);
 
 		this.SPRINT.addTransition(this.IDLE);
 		this.SPRINT.addTransition(this.CHARGE_MANA);
 		this.SPRINT.addTransition(this.BLOCK);
 
 		this.CHARGE_MANA.addTransition(this.IDLE);
-		
+
 		this.BLOCK.addTransition(this.IDLE);
 
 		this.stateMachine = new StateMachine(this.IDLE);
@@ -74,8 +74,8 @@ export class StateController {
 		this.stateMachine.transitionTo(this.ATTACK);
 	}
 
-	dodge(): void {
-		this.stateMachine.transitionTo(this.DODGE);
+	dash(): void {
+		this.stateMachine.transitionTo(this.DASH);
 	}
 
 	sprint(): void {
