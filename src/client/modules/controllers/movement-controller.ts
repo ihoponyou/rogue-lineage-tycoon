@@ -5,7 +5,7 @@ import {
 	UserInputService,
 	Workspace,
 } from "@rbxts/services";
-import { OnLocalCharacterAdded } from "../../../../../types/lifecycles";
+import { OnLocalCharacterAdded } from "../../../../types/lifecycles";
 import { Components } from "@flamework/components";
 import { CharacterClient as Character } from "client/modules/components/character-client";
 import { Trove } from "@rbxts/trove";

@@ -4,6 +4,7 @@ export interface ManaServerToClientEvents {
 	manaFilled(): void;
 	manaDisabled(): void;
 	manaChanged(value: number): void;
+	manaColorChanged(color: Color3): void;
 	charge(bool: boolean): void;
 }
 

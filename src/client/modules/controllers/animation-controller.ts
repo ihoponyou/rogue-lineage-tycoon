@@ -2,7 +2,7 @@ import { Controller, Dependency } from "@flamework/core";
 import {
 	OnLocalCharacterAdded,
 	OnLocalCharacterRemoving,
-} from "../../../../../types/lifecycles";
+} from "../../../../types/lifecycles";
 import { CharacterClient as Character } from "client/modules/components/character-client";
 import { Components } from "@flamework/components";
 import { ReplicatedStorage } from "@rbxts/services";

@@ -5,7 +5,7 @@ Log.SetLogger(Logger.configure().WriteTo(Log.RobloxOutput()).Create());
 
 Flamework.addPaths("src/shared/modules/components");
 Flamework.addPaths("src/client/modules/components");
-Flamework.addPaths("src/client/modules/Controllers/flamework");
+Flamework.addPaths("src/client/modules/controllers");
 
 Modding.registerDependency<Logger>((ctor) => {
 	return Log.ForContext(ctor);

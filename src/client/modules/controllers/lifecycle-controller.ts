@@ -3,7 +3,7 @@ import {
 	OnLocalCharacterAdded,
 	OnLocalCharacterRemoving,
 	OnRemoved,
-} from "../../../../../types/lifecycles";
+} from "../../../../types/lifecycles";
 import { Players } from "@rbxts/services";
 import { Components } from "@flamework/components";
 

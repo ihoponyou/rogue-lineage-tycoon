@@ -1,0 +1,2 @@
+type TemperatureSlider = Frame & {
+}

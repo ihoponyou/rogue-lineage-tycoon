@@ -17,9 +17,9 @@ import { ARMORS, getRandomStarterArmor } from "server/modules/armor-info";
 import Object from "@rbxts/object-utils";
 import { Components } from "@flamework/components";
 import { CharacterServer } from "server/modules/components/character-server";
+import { Events } from "server/modules/networking";
 
 export type Sex = "Male" | "Female";
-const SET_MESSAGE_TEMPLATE = "Set {Attribute} of {Player} ({Old} -> {New})";
 const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
 
 @Service()
@@ -125,12 +125,6 @@ export class IdentityService
 		let manaColor = profile.Data.ManaColor;
 		if (manaColor.R === 0 && manaColor.G === 0 && manaColor.B === 0)
 			manaColor = this.getRandomManaColor();
-		else
-			manaColor = {
-				R: math.random(0, 255),
-				G: math.random(0, 255),
-				B: math.random(0, 255),
-			};
 		this.setManaColor(
 			player,
 			Color3.fromRGB(manaColor.R, manaColor.G, manaColor.B),
@@ -327,7 +321,7 @@ export class IdentityService
 	}
 
 	setManaColor(player: Player, color: Color3) {
-		// IdentityService.Client.ManaColorChanged:Fire(player, color)
+		Events.manaEvents.manaColorChanged(player, color);
 	}
 
 	setFirstName(player: Player, name: string) {
@@ -337,7 +331,7 @@ export class IdentityService
 			if (humanoid) humanoid.DisplayName = name;
 		}
 
-		// IdentityService.Client.FirstNameChanged:Fire(player, name)
+		Events.characterEvents.firstNameChanged(player, name);
 	}
 
 	addCustomHead(

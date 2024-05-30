@@ -1,7 +1,7 @@
 import { Controller, Dependency, OnStart, OnTick } from "@flamework/core";
 import { Events } from "client/modules/networking";
 import { ReplicatedStorage } from "@rbxts/services";
-import { OnLocalCharacterAdded } from "../../../../../types/lifecycles";
+import { OnLocalCharacterAdded } from "../../../../types/lifecycles";
 import { CharacterClient as Character } from "client/modules/components/character-client";
 import { Components } from "@flamework/components";
 
