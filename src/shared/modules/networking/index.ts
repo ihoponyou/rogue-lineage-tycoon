@@ -10,6 +10,7 @@ import {
 } from "./character-events";
 
 interface ServerToClientEvents {
+	kicked(): void;
 	manaEvents: ManaServerToClientEvents;
 	characterEvents: CharacterServerToClientEvents;
 }
@@ -20,7 +21,16 @@ interface ClientToServerEvents {
 	characterEvents: CharacterClientToServerEvents;
 }
 
+interface ServerToClientFunctions {}
+
+interface ClientToServerFunctions {}
+
 export const GlobalEvents = Networking.createEvent<
 	ClientToServerEvents,
+	ServerToClientEvents
+>();
+
+export const GlobalFunctions = Networking.createFunction<
+	ClientToServerFunctions,
 	ServerToClientEvents
 >();
