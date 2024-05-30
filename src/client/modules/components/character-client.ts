@@ -28,7 +28,6 @@ export class CharacterClient extends Character<
 	}
 
 	override onHealthChanged(health: number): void {
-		print("health", health);
 		this.hudController.updateHealth(
 			health,
 			this.instance.Humanoid.MaxHealth,
@@ -36,7 +35,6 @@ export class CharacterClient extends Character<
 	}
 
 	onKilled(): void {
-		print("refocusing camera");
 		const camera = Workspace.CurrentCamera;
 		if (!camera) return;
 		camera.CameraSubject = this.instance.Head;

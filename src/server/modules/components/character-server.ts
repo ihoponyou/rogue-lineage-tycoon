@@ -78,6 +78,8 @@ export class CharacterServer
 	}
 
 	onTick(dt: number): void {
+		if (!this.attributes.isAlive) return;
+
 		this.decayStomach(dt);
 		this.decayToxicity(dt);
 

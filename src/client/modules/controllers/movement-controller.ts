@@ -75,6 +75,9 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		this.raycastParams.IgnoreWater = true;
 
 		Events.manaEvents.manaEmptied.connect(() => this.onManaEmptied());
+		Events.manaEvents.manaColorChanged.connect((color) =>
+			this.onManaColorChanged(color),
+		);
 	}
 
 	onLocalCharacterAdded(character: Model): void {
@@ -113,6 +116,13 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		} else if (this.isClimbing) {
 			this.stopClimb();
 		}
+	}
+
+	onManaColorChanged(color: Color3): void {
+		while (!(this.runTrail && this.manaDashParticles)) task.wait();
+		const colorSequence = new ColorSequence(color);
+		this.runTrail.Color = colorSequence;
+		this.manaDashParticles.Color = colorSequence;
 	}
 
 	private newDashSound(): Sound {

@@ -122,13 +122,21 @@ export class IdentityService
 		}
 		this.setArmor(character, armorName);
 
-		let manaColor = profile.Data.ManaColor;
-		if (manaColor.R === 0 && manaColor.G === 0 && manaColor.B === 0)
-			manaColor = this.getRandomManaColor();
-		this.setManaColor(
-			player,
-			Color3.fromRGB(manaColor.R, manaColor.G, manaColor.B),
-		);
+		const serializedColor = profile.Data.ManaColor;
+		let newColor;
+		if (
+			serializedColor.R === 0 &&
+			serializedColor.G === 0 &&
+			serializedColor.B === 0
+		)
+			newColor = this.getRandomManaColor();
+		else
+			newColor = new Color3(
+				serializedColor.R,
+				serializedColor.G,
+				serializedColor.B,
+			);
+		this.setManaColor(player, newColor);
 
 		while (!character.IsDescendantOf(Workspace))
 			character.AncestryChanged.Wait();
@@ -321,6 +329,10 @@ export class IdentityService
 	}
 
 	setManaColor(player: Player, color: Color3) {
+		const data = this.dataService.getProfile(player).Data;
+		data.ManaColor.R = color.R;
+		data.ManaColor.G = color.G;
+		data.ManaColor.B = color.B;
 		Events.manaEvents.manaColorChanged(player, color);
 	}
 
@@ -422,11 +434,7 @@ export class IdentityService
 	}
 
 	getRandomManaColor(): Color3 {
-		return Color3.fromRGB(
-			math.random(0, 255),
-			math.random(0, 255),
-			math.random(0, 255),
-		);
+		return new Color3(math.random(), math.random(), math.random());
 	}
 
 	getRandomNewRace(oldRace: keyof RaceGlossary): string {

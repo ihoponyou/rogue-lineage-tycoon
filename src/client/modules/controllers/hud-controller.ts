@@ -68,14 +68,14 @@ export class HudController
 	constructor(private manaController: ManaController) {}
 
 	onStart(): void {
-		Events.manaEvents.manaColorChanged.connect((color) => {
-			while (!this.manaSlider) task.wait();
-			this.manaSlider.BackgroundColor3 = color;
-		});
-		Events.characterEvents.firstNameChanged.connect((name) => {
-			while (!this.nameLabel) task.wait();
-			this.nameLabel.Text = name; // TODO: + house name
-		});
+		Events.manaEvents.manaObtained.connect(() => this.toggleManaBar(true));
+		Events.manaEvents.manaDisabled.connect(() => this.toggleManaBar(false));
+		Events.manaEvents.manaColorChanged.connect((color) =>
+			this.onManaColorChanged(color),
+		);
+		Events.characterEvents.firstNameChanged.connect((name) =>
+			this.onFirstNameChanged(name),
+		);
 	}
 
 	onLocalCharacterAdded(character: Model): void {
@@ -121,11 +121,17 @@ export class HudController
 	}
 
 	onManaColorChanged(color: Color3): void {
-		if (this.manaSlider) this.manaSlider.BackgroundColor3 = color;
+		while (!this.manaSlider) task.wait();
+		this.manaSlider.BackgroundColor3 = color;
+	}
+
+	onFirstNameChanged(name: string): void {
+		while (!this.nameLabel) task.wait();
+		this.nameLabel.Text = name.upper(); // TODO: + house name
 	}
 
 	toggleManaBar(bool: boolean): void {
-		if (!this.manaGui) error("missing mana gui");
+		while (!this.manaGui) task.wait();
 
 		this.manaGui.Enabled = bool;
 		if (bool) {
@@ -147,7 +153,7 @@ export class HudController
 		if (this.manaTweenTimeStep <= 0.1) return;
 
 		TweenService.Create(this.manaSlider, MANA_TWEEN_INFO, {
-			Size: UDim2.fromScale(1, this.manaController.mana),
+			Size: UDim2.fromScale(1, this.manaController.mana / 100),
 		}).Play();
 
 		this.manaTweenTimeStep = 0;
@@ -239,9 +245,5 @@ export class HudController
 
 	updateLives(lives: number) {
 		if (this.lives) this.updateCounter(this.lives, lives);
-	}
-
-	updateFirstName(name: string) {
-		if (this.nameLabel) this.nameLabel.Text = name.upper();
 	}
 }
