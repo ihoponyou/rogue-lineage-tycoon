@@ -13,11 +13,11 @@ export abstract class State {
 
 	enter(): void {
 		this.enterTime = tick();
-		print(`+ ${this.name}`)
+		print(`+ ${this.name}`);
 	}
 
 	exit(): void {
-		print(`- ${this.name}`)
+		print(`- ${this.name}`);
 	}
 
 	addTransition(state: State) {

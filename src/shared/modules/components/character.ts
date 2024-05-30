@@ -4,20 +4,26 @@ import { Players } from "@rbxts/services";
 import { OnStart } from "@flamework/core";
 
 export interface CharacterInstance extends StarterCharacter {
-	Humanoid: Humanoid
+	Humanoid: Humanoid;
 }
 
 @Component()
-export abstract class Character<A extends {}, I extends CharacterInstance> extends DisposableComponent<A, I> implements OnStart {
+export abstract class Character<A extends {}, I extends CharacterInstance>
+	extends DisposableComponent<A, I>
+	implements OnStart
+{
 	onStart(): void {
-		this.instance.Humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
+		this.instance.Humanoid.SetStateEnabled(
+			Enum.HumanoidStateType.Dead,
+			false,
+		);
 
 		this.trove.connect(this.instance.Humanoid.HealthChanged, (health) =>
 			this.onHealthChanged(health),
 		);
 	}
 
-	protected abstract onHealthChanged(health: number): void
+	protected abstract onHealthChanged(health: number): void;
 
 	getAnimator(): Animator {
 		const animator = this.instance.Humanoid.FindFirstChild("Animator") as

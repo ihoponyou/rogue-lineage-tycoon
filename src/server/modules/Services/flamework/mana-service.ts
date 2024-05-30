@@ -27,8 +27,8 @@ export class ManaService
 	constructor(private dataService: DataService) {}
 
 	onStart(): void {
-		EVENTS.charge.connect(
-			(player: Player, bool: boolean) => this.onChargeRequested(player, bool)
+		EVENTS.charge.connect((player: Player, bool: boolean) =>
+			this.onChargeRequested(player, bool),
 		);
 	}
 
@@ -110,7 +110,7 @@ export class ManaService
 	chargeMana(player: Player, deltaTime: number): void {
 		const data = this.sessionData.get(player);
 		if (!data) return;
-		if(data.Mana === 100) return;
+		if (data.Mana === 100) return;
 
 		data.Mana = math.clamp(data.Mana + data.ChargeRate * deltaTime, 0, 100);
 

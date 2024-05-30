@@ -142,9 +142,11 @@ export class IdentityService
 		// player:SetAttribute("IdentityLoaded", true)
 		// IdentityService.Client.IdentityLoaded:Fire(player)
 		const components = Dependency<Components>();
-		components.waitForComponent<CharacterServer>(character).then((component) => {
-			component.giveForceField();
-		});
+		components
+			.waitForComponent<CharacterServer>(character)
+			.then((component) => {
+				component.giveForceField();
+			});
 	}
 
 	getPlayerAvatarDescription(playerId: number): HumanoidDescription {
@@ -314,11 +316,9 @@ export class IdentityService
 				},
 			);
 		}
-		Object.entries(armor.StatChanges).forEach(
-			(entry) => {
-				// TODO: add new armor's stats
-			},
-		);
+		Object.entries(armor.StatChanges).forEach((entry) => {
+			// TODO: add new armor's stats
+		});
 
 		variation.Shirt.Clone().Parent = character;
 		variation.Pants.Clone().Parent = character;

@@ -13,7 +13,7 @@ const END = Enum.UserInputState.End;
 
 export enum InputAxis {
 	Horizontal,
-	Vertical		
+	Vertical,
 }
 
 @Controller()
@@ -25,18 +25,16 @@ export class InputController implements OnStart, OnTick {
 	constructor(
 		private manaController: ManaController,
 		private movementController: MovementController,
-		private keybindController: KeybindController
+		private keybindController: KeybindController,
 	) {}
 
 	onStart(): void {
-		for (const [action, key] of Object.entries(this.keybindController.keybinds)) {
-			this.keybindController.loadKeybind(
-				action,
-				key,
-				(state) => {
-					return this[action](state);
-				}
-			);
+		for (const [action, key] of Object.entries(
+			this.keybindController.keybinds,
+		)) {
+			this.keybindController.loadKeybind(action, key, (state) => {
+				return this[action](state);
+			});
 		}
 	}
 
@@ -46,10 +44,18 @@ export class InputController implements OnStart, OnTick {
 
 	// like the old unity one
 	getAxis(axis: InputAxis): 1 | 0 | -1 {
-		const isRightDown = UserInputService.IsKeyDown(this.keybindController.keybinds.right);
-		const isLeftDown = UserInputService.IsKeyDown(this.keybindController.keybinds.left);
-		const isForwardDown = UserInputService.IsKeyDown(this.keybindController.keybinds.forward);
-		const isBackwardDown = UserInputService.IsKeyDown(this.keybindController.keybinds.backward);
+		const isRightDown = UserInputService.IsKeyDown(
+			this.keybindController.keybinds.right,
+		);
+		const isLeftDown = UserInputService.IsKeyDown(
+			this.keybindController.keybinds.left,
+		);
+		const isForwardDown = UserInputService.IsKeyDown(
+			this.keybindController.keybinds.forward,
+		);
+		const isBackwardDown = UserInputService.IsKeyDown(
+			this.keybindController.keybinds.backward,
+		);
 
 		if (axis === InputAxis.Horizontal) {
 			if (isRightDown && isLeftDown) return 0;
@@ -65,7 +71,10 @@ export class InputController implements OnStart, OnTick {
 	}
 
 	getInputVector(): Vector2 {
-		return new Vector2(this.getAxis(InputAxis.Horizontal), this.getAxis(InputAxis.Vertical));
+		return new Vector2(
+			this.getAxis(InputAxis.Horizontal),
+			this.getAxis(InputAxis.Vertical),
+		);
 	}
 
 	forward(state: Enum.UserInputState) {
@@ -85,10 +94,9 @@ export class InputController implements OnStart, OnTick {
 	backward(state: Enum.UserInputState) {}
 
 	jump(state: Enum.UserInputState) {
-		if (state === BEGIN)
-			this.movementController.handleJump();
+		if (state === BEGIN) this.movementController.handleJump();
 	}
-	
+
 	dash(state: Enum.UserInputState) {
 		if (state !== BEGIN) return;
 
@@ -101,29 +109,30 @@ export class InputController implements OnStart, OnTick {
 			direction = "right";
 		}
 
-		this.movementController.startDodge(this.manaController.hasMana(), direction);
+		this.movementController.startDodge(
+			this.manaController.hasMana(),
+			direction,
+		);
 	}
-	
+
 	chargeMana(state: Enum.UserInputState) {
-		if (this.movementController.isClimbing || this.movementController.isDodging) return;
-		
+		if (
+			this.movementController.isClimbing ||
+			this.movementController.isDodging
+		)
+			return;
+
 		this.manaController.onChargeManaInput(state);
 		if (state === BEGIN) {
 			this.movementController.stopRun();
 		}
 	}
 
-	lightAttack(state: Enum.UserInputState) {
-		
-	}
-	
-	heavyAttack(state: Enum.UserInputState) {
-		
-	}
+	lightAttack(state: Enum.UserInputState) {}
 
-	block(state: Enum.UserInputState) {
-		
-	}
+	heavyAttack(state: Enum.UserInputState) {}
+
+	block(state: Enum.UserInputState) {}
 
 	// these are handled by components (as of writing)
 	interact(state: Enum.UserInputState) {}

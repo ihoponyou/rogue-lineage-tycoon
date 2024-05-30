@@ -6,4 +6,4 @@ type HumanoidRootPart = Part & {
 	CarryAttachment: Attachment;
 	CarryPosition: AlignPosition;
 	RootAttachment: Attachment;
-}
+};

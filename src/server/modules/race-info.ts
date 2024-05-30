@@ -10,8 +10,8 @@ export type RaceCategory = "Rollable" | "Obtainable" | "Exclusive";
 
 export interface Race {
 	Category: RaceCategory;
-	Actives: string[];
-	Passives: string[];
+	Actives: Array<string>;
+	Passives: Array<string>;
 	StatChanges: { [key: string]: number };
 	Phenotypes: { [key: string]: Phenotype };
 	IsBald: boolean;

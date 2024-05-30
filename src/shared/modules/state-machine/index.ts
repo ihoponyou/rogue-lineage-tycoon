@@ -1,7 +1,7 @@
 import { State } from "./state";
 
 export class StateMachine {
-	currentState: State
+	currentState: State;
 
 	constructor(initialState: State) {
 		this.currentState = initialState;
@@ -10,10 +10,12 @@ export class StateMachine {
 
 	transitionTo(state: State): boolean {
 		if (!this.currentState.transitions.has(state)) {
-			warn(`transition not found (${this.currentState.name} -> ${state.name})`);
+			warn(
+				`transition not found (${this.currentState.name} -> ${state.name})`,
+			);
 			return false;
 		}
-		
+
 		if (this.currentState.isBusy) {
 			warn(`${this.currentState} is busy`);
 			return false;

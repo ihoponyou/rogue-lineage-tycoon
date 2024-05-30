@@ -8,7 +8,6 @@
       "focus": true,
       "commands": [
         "if (Test-Path out) { Remove-Item -Recurse out }",
-        "npm i",
         "npm run watch"
       ]
     },
@@ -23,7 +22,7 @@
       "description": "you know",
       "split": "compiler",
       "commands": [
-        "Start-Sleep -Seconds 10",
+        "Start-Sleep -Seconds 20",
         "rojo serve"
       ]
     }

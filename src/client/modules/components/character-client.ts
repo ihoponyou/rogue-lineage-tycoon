@@ -6,12 +6,12 @@ import { Workspace } from "@rbxts/services";
 const events = Events.characterEvents;
 
 @Component({
-	tag: "Character"
+	tag: "Character",
 })
 export class CharacterClient extends Character<{}, CharacterInstance> {
 	override onStart(): void {
 		super.onStart();
-		
+
 		this.trove.add(events.killed.connect(() => this.onKilled()));
 	}
 

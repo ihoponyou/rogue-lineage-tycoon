@@ -12,4 +12,4 @@ type Head = Part & {
 	RagdollAttachment: Attachment;
 	Mesh: SpecialMesh;
 	FaceCenterAttachment: Attachment;
-}
+};

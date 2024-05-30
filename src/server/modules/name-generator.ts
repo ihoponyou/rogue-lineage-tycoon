@@ -2,7 +2,7 @@ import Object from "@rbxts/object-utils";
 import { Sex } from "./Services/flamework/identity-service";
 import { RaceGlossary } from "./race-info";
 
-export const NAMES: { [category: string]: string[] } = {
+export const NAMES: { [category: string]: Array<string> } = {
 	Azael: [
 		"Arumanfi",
 		"Asura",
@@ -917,7 +917,7 @@ export function getRandomFirstName(
 	raceName: keyof RaceGlossary,
 	sex: Sex,
 ): string {
-	let names: string[] = NAMES[raceName];
+	let names: Array<string> = NAMES[raceName];
 	if (!names) {
 		switch (raceName) {
 			case "Metascroom":

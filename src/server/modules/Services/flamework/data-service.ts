@@ -1,4 +1,4 @@
-import { OnStart, Service } from "@flamework/core";
+import { Service } from "@flamework/core";
 import { GetProfileStore } from "@rbxts/profileservice";
 import { Profile } from "@rbxts/profileservice/globals";
 import { Players, RunService } from "@rbxts/services";
@@ -33,7 +33,7 @@ export const DEFAULT_CURRENCY: Currency = {
 };
 
 export type PlayerData = {
-	Conditions: string[];
+	Conditions: Array<string>;
 	Health: number;
 	Stomach: number;
 	Toxicity: number;
@@ -66,14 +66,14 @@ export type PlayerData = {
 	HybridClass: string;
 	UltraClass: string;
 	LastSkill: string;
-	Skills: string[];
+	Skills: Array<string>;
 	IsHybrid: boolean;
 	CanHybrid: boolean;
 	SigilObtained: boolean;
 	Alignment: number;
 
-	Spells: string[];
-	Snaps: string[];
+	Spells: Array<string>;
+	Snaps: Array<string>;
 	ManaColor: Color;
 	ManaObtained: boolean;
 	SnapSlots: number;
@@ -93,7 +93,7 @@ export type PlayerData = {
 	HouseName: string;
 	BankedArtifact: string;
 
-	UnlockIds: string[];
+	UnlockIds: Array<string>;
 	Rebirths: number;
 };
 

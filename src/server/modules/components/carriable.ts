@@ -91,9 +91,9 @@ export class Carriable
 			child.Massless = true;
 		}
 
-		this.character
-			.instance.Humanoid
-			.ChangeState(Enum.HumanoidStateType.Physics);
+		this.character.instance.Humanoid.ChangeState(
+			Enum.HumanoidStateType.Physics,
+		);
 	}
 
 	drop(carrier: CharacterServer): void {
@@ -134,8 +134,8 @@ export class Carriable
 			child.Massless = false;
 		}
 
-		this.character
-			.instance.Humanoid
-			.ChangeState(Enum.HumanoidStateType.GettingUp);
+		this.character.instance.Humanoid.ChangeState(
+			Enum.HumanoidStateType.GettingUp,
+		);
 	}
 }

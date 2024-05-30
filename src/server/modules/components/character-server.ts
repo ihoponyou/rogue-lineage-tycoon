@@ -8,7 +8,10 @@ import {
 } from "server/modules/Services/flamework/data-service";
 import { RagdollServer } from "./ragdoll-server";
 import { OnRemoved } from "../../../../types/lifecycles";
-import { Character, CharacterInstance } from "shared/modules/components/character";
+import {
+	Character,
+	CharacterInstance,
+} from "shared/modules/components/character";
 import { Events } from "../networking";
 
 const FF_DURATION = 15;
@@ -138,7 +141,7 @@ export class CharacterServer
 		}
 
 		EVENTS.killed.fire(this.getPlayer());
-		
+
 		task.delay(Players.RespawnTime, () => this.getPlayer().LoadCharacter());
 	}
 

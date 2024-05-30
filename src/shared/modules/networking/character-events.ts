@@ -2,6 +2,4 @@ export interface CharacterServerToClientEvents {
 	killed(): void;
 }
 
-export interface CharacterClientToServerEvents {
-	
-}
+export interface CharacterClientToServerEvents {}

@@ -4,7 +4,10 @@ import {
 	ManaClientToServerEvents,
 	ManaServerToClientEvents,
 } from "./mana-events";
-import { CharacterClientToServerEvents, CharacterServerToClientEvents } from "./character-events";
+import {
+	CharacterClientToServerEvents,
+	CharacterServerToClientEvents,
+} from "./character-events";
 
 interface ServerToClientEvents {
 	manaEvents: ManaServerToClientEvents;

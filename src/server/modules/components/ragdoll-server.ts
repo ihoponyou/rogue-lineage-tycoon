@@ -1,6 +1,5 @@
-import { BaseComponent, Component } from "@flamework/components";
+import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { CharacterServer } from "./character-server";
 import { Ragdoll } from "shared/modules/components/ragdoll";
 import Trove from "../../../../Packages/_Index/sleitnick_trove@1.3.0/trove";
 

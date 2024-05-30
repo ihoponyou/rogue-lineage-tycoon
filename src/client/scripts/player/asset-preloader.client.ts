@@ -2,7 +2,7 @@ import { ContentProvider, ReplicatedStorage } from "@rbxts/services";
 
 let animations = 0;
 let sounds = 0;
-let assets = new Array<Instance>();
+const assets = new Array<Instance>();
 // TODO: make dedicated asset folder
 for (const asset of ReplicatedStorage.GetDescendants()) {
 	if (asset.IsA("Animation")) {
