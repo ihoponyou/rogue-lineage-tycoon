@@ -1,4 +1,5 @@
-import { Controller, OnStart } from "@flamework/core";
+import { BaseComponent, Component } from "@flamework/components";
+import { OnStart } from "@flamework/core";
 import { StateMachine } from "shared/modules/state-machine";
 import { State } from "shared/modules/state-machine/state";
 
@@ -42,8 +43,13 @@ class ClimbState extends State {
 	name = "Climb";
 }
 
-@Controller()
-export class StateController implements OnStart {
+// @Component({
+// 	tag: "Character",
+// })
+export class CharacterStateMachine
+	extends BaseComponent<{}, Model>
+	implements OnStart
+{
 	private IDLE = new IdleState();
 	private ATTACK = new AttackState();
 	private BLOCK = new BlockState();
@@ -53,9 +59,10 @@ export class StateController implements OnStart {
 	private RUN = new RunState();
 	private CLIMB = new ClimbState();
 
-	private stateMachine: StateMachine;
+	stateMachine: StateMachine;
 
 	constructor() {
+		super();
 		this.stateMachine = new StateMachine(this.IDLE);
 	}
 
@@ -88,37 +95,5 @@ export class StateController implements OnStart {
 		this.RUN.addTransitionTo(this.DASH);
 
 		this.CLIMB.addTransitionTo(this.IDLE);
-	}
-
-	idle(): void {
-		this.stateMachine.transitionTo(this.IDLE);
-	}
-
-	attack(): void {
-		this.stateMachine.transitionTo(this.ATTACK);
-	}
-
-	block(): void {
-		this.stateMachine.transitionTo(this.BLOCK);
-	}
-
-	chargeMana(): void {
-		this.stateMachine.transitionTo(this.CHARGE_MANA);
-	}
-
-	ragdoll(): void {
-		this.stateMachine.transitionTo(this.RAGDOLL);
-	}
-
-	dash(): void {
-		this.stateMachine.transitionTo(this.DASH);
-	}
-
-	run(): void {
-		this.stateMachine.transitionTo(this.RUN);
-	}
-
-	climb(): void {
-		this.stateMachine.transitionTo(this.CLIMB);
 	}
 }
