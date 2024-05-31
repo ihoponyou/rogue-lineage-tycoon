@@ -1,7 +1,7 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
+import { Trove } from "@rbxts/trove";
 import { Ragdoll } from "shared/modules/components/ragdoll";
-import Trove from "../../../../Packages/_Index/sleitnick_trove@1.3.0/trove";
 
 type SocketType = "Hip" | "Shoulder" | "Neck";
 
@@ -40,9 +40,9 @@ export class RagdollServer extends Ragdoll implements OnStart {
 	private trove = new Trove();
 	private joints = new Map<string, RagdollJoint>();
 
-	private createJoint(
+	private newJoint(
 		motor: Motor6D,
-		socketType: string,
+		socketType: SocketType,
 		jointName: string,
 	): RagdollJoint {
 		const attachment0 = new Instance("Attachment");
@@ -72,11 +72,20 @@ export class RagdollServer extends Ragdoll implements OnStart {
 			attachment1.CFrame = motor.C1;
 		}
 
-		const socket = new Instance("BallSocketConstraint");
-		socket.Name = jointName + "Socket";
+		const socket = this.newSocket(jointName, socketType);
 		socket.Parent = motor.Part1;
 		socket.Attachment0 = attachment0;
 		socket.Attachment1 = attachment1;
+
+		return { motor: motor, socket: socket };
+	}
+
+	private newSocket(
+		jointName: string,
+		socketType: SocketType,
+	): BallSocketConstraint {
+		const socket = new Instance("BallSocketConstraint");
+		socket.Name = `${jointName}Socket`;
 		socket.LimitsEnabled = true;
 		socket.MaxFrictionTorque = 100;
 		socket.Restitution = 0.25;
@@ -87,11 +96,8 @@ export class RagdollServer extends Ragdoll implements OnStart {
 			socket.TwistUpperAngle = twistAngle;
 			socket.TwistLowerAngle = -twistAngle;
 		}
-
-		return { motor: motor, socket: socket };
+		return socket;
 	}
-
-	private createSocket(jointName: string, socketType: SocketType) {}
 
 	onStart(): void {
 		this.configureHumanoid();
@@ -100,22 +106,17 @@ export class RagdollServer extends Ragdoll implements OnStart {
 			if (!motor.IsA("Motor6D")) continue;
 			if (motor.Name === "RootJoint") continue;
 
-			const socketType =
-				motor.Name.match("Hip")[0] ||
+			const socketType = (motor.Name.match("Hip")[0] ||
 				motor.Name.match("Shoulder")[0] ||
-				motor.Name.match("Neck")[0];
+				motor.Name.match("Neck")[0]) as SocketType;
 			if (!socketType)
 				error(`${motor.Name} does not contain Hip/Shoulder/Neck`);
 
 			const jointName = motor.Name.gsub(" ", "")[0];
-			const newJoint = this.createJoint(
-				motor,
-				socketType as string,
-				jointName,
-			);
+			const newJoint = this.newJoint(motor, socketType, jointName);
 			this.joints.set(jointName, newJoint);
 
-			this.trove.Connect(motor.GetPropertyChangedSignal("Parent"), () => {
+			this.trove.connect(motor.GetPropertyChangedSignal("Parent"), () => {
 				if (motor.Parent) return;
 
 				newJoint.socket.Destroy();
