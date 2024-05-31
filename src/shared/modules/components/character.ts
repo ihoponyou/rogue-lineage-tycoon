@@ -26,7 +26,15 @@ export abstract class Character<
 	extends DisposableComponent<A, I>
 	implements OnStart
 {
+	protected raycastParams = new RaycastParams();
+
 	onStart(): void {
+		this.raycastParams.CollisionGroup = "Characters";
+		this.raycastParams.FilterType = Enum.RaycastFilterType.Exclude;
+		this.raycastParams.IgnoreWater = true;
+
+		this.raycastParams.AddToFilter(this.instance);
+
 		this.instance.Humanoid.SetStateEnabled(
 			Enum.HumanoidStateType.Dead,
 			false,
@@ -76,5 +84,9 @@ export abstract class Character<
 		if (!humanoidRootPart)
 			error(`HRP not found in character ${this.instance.Name}`);
 		return humanoidRootPart;
+	}
+
+	getRaycastParams(): RaycastParams {
+		return this.raycastParams;
 	}
 }

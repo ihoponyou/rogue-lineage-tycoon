@@ -1,34 +1,52 @@
 import { State } from "./state";
 
-export class StateMachine {
-	private currentState: State;
+class NullState extends State {
+	name = "null/nil/undefined";
+}
 
-	constructor(initialState: State) {
+export class StateMachine {
+	private states = new Map<string, State>();
+	private currentState = new NullState(this);
+	private initialized = false;
+
+	initialize(initialState: State) {
+		if (this.initialized) return;
+
 		this.currentState = initialState;
 		initialState.enter();
+
+		this.initialized = true;
 	}
 
-	transitionTo(state: State): boolean {
-		if (!this.currentState.hasTransitionTo(state)) {
-			warn(
-				`transition not found (${this.currentState.name} -> ${state.name})`,
-			);
-			return false;
+	getCurrentState(): State {
+		return this.currentState;
+	}
+
+	addState(state: State): void {
+		this.states.set(state.name.lower(), state);
+	}
+
+	addStates(states: Array<State>): void {
+		states.forEach((value) => this.addState(value));
+	}
+
+	update(deltaTime: number): void {
+		this.currentState.update(deltaTime);
+	}
+
+	transitionTo(newStateName: string, ...args: Array<unknown>) {
+		const newState = this.states.get(newStateName.lower());
+		if (!newState) {
+			warn(`no ${newStateName}`);
+			return;
 		}
 
-		if (this.currentState.isBusy()) {
-			warn(`${this.currentState} is busy`);
-			return false;
-		}
-
-		const oldState = this.currentState;
+		const oldStateName = this.currentState.name;
 
 		this.currentState.exit();
-		this.currentState = state;
-		this.currentState.enter();
+		this.currentState = newState;
+		newState.enter(...args);
 
-		print(`${oldState.name} -> ${this.currentState.name}`);
-
-		return true;
+		print(`${oldStateName} -> ${newStateName}`);
 	}
 }

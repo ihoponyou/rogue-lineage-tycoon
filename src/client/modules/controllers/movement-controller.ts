@@ -15,6 +15,7 @@ import { Events } from "client/modules/networking";
 import { AnimationController } from "./animation-controller";
 import { KeybindController } from "./keybind-controller";
 import { ManaController } from "./mana-controller";
+import Signal from "@rbxts/signal";
 
 const BASE_CLIMB_SPEED = 10;
 const BASE_WALK_SPEED = 20;
@@ -43,25 +44,25 @@ const directionToAngle: { [direction: string]: number } = {
 
 @Controller()
 export class MovementController implements OnStart, OnLocalCharacterAdded {
-	private raycastParams = new RaycastParams();
-	private character: Character | undefined;
+	private character?: Character;
 
 	isRunning = false;
 	private runTrail?: Trail = this.newRunTrail();
 
 	isClimbing = false;
+	private stoppedClimbing = new Signal();
 	private climbTrove = new Trove();
-	private climbForce: LinearVelocity | undefined;
-	private climbConstraint: AlignOrientation | undefined;
-	private goalPart: Part | undefined;
-	private goalAttachment: Attachment | undefined;
+	private climbForce?: LinearVelocity;
+	private climbConstraint?: AlignOrientation;
+	private goalPart?: Part;
+	private goalAttachment?: Attachment;
 
 	isDodging = false;
-	dashDebounce = false;
+	private dashDebounce = false;
 	private manaDashSound = this.newDashSound();
 	private manaDashParticles = this.newDashParticles();
 	private dashTrove = new Trove();
-	private dashVelocity: BodyVelocity | undefined;
+	private dashVelocity?: BodyVelocity;
 
 	constructor(
 		private animationController: AnimationController,
@@ -70,10 +71,6 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 	) {}
 
 	onStart(): void {
-		this.raycastParams.CollisionGroup = "Characters";
-		this.raycastParams.FilterType = Enum.RaycastFilterType.Exclude;
-		this.raycastParams.IgnoreWater = true;
-
 		Events.manaEvents.manaEmptied.connect(() => this.onManaEmptied());
 		Events.manaEvents.manaColorChanged.connect((color) =>
 			this.onManaColorChanged(color),
@@ -84,9 +81,8 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		const components = Dependency<Components>();
 		components
 			.waitForComponent<Character>(character)
-			.andThen((value) => (this.character = value));
-
-		this.raycastParams.AddToFilter(character);
+			.andThen((value) => (this.character = value))
+			.await();
 
 		const humanoidRootPart = character.WaitForChild("HumanoidRootPart");
 		const torso = character.WaitForChild("Torso") as Torso;
@@ -293,12 +289,13 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		}
 
 		const humanoidRootPart = this.character.getHumanoidRootPart();
+		const params = this.character.getRaycastParams();
 		const upVector = humanoidRootPart.CFrame.UpVector;
 
 		const floorCheck = Workspace.Raycast(
 			humanoidRootPart.Position.sub(Vector3.yAxis.mul(0.5)),
 			upVector.mul(-1),
-			this.raycastParams,
+			params,
 		);
 		if (floorCheck) {
 			this.stopClimb();
@@ -327,17 +324,17 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 			diagonalIn = Workspace.Raycast(
 				inOrigin,
 				inPoint.sub(inOrigin),
-				this.raycastParams,
+				params,
 			);
 			diagonalOut = Workspace.Raycast(
 				outOrigin,
 				outPoint.sub(outOrigin),
-				this.raycastParams,
+				params,
 			);
 			sideways = Workspace.Raycast(
 				humanoidRootPart.Position,
 				withInput.mul(2),
-				this.raycastParams,
+				params,
 			);
 		}
 
@@ -350,7 +347,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 			humanoidRootPart.CFrame,
 			blockSize,
 			doubledLookVector,
-			this.raycastParams,
+			params,
 		);
 
 		if (!(blockForwardCast || diagonalIn || diagonalOut)) {
@@ -368,23 +365,19 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 				headCastOrigin,
 				headCastSize,
 				doubledLookVector,
-				this.raycastParams,
+				params,
 			)
 		) {
 			const to = humanoidRootPart.Position.add(lookVector.mul(1.5)).add(
 				Vector3.yAxis,
 			);
-			seesTop = hasLineOfSight(
-				headCastOrigin.Position,
-				to,
-				this.raycastParams,
-			);
+			seesTop = hasLineOfSight(headCastOrigin.Position, to, params);
 		}
 
 		const centerForward = Workspace.Raycast(
 			humanoidRootPart.Position,
 			doubledLookVector,
-			this.raycastParams,
+			params,
 		);
 
 		if (seesTop) {
@@ -396,21 +389,25 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 				ledgeCastOrigin,
 				ledgeCastSize,
 				lookVector,
-				this.raycastParams,
+				params,
 			);
 
-			if (ledgeCast)
+			if (ledgeCast) {
 				this.climbUp(
 					new CFrame(ledgeCast.Position).mul(
 						humanoidRootPart.CFrame.Rotation,
 					),
 				);
-			else this.stopClimb();
-		} else if (diagonalIn && !diagonalOut)
+			} else {
+				this.stopClimb();
+			}
+		} else if (diagonalIn && !diagonalOut) {
 			this.alignCharacterToWall(deltaTime, diagonalIn);
-		else if (sideways) this.alignCharacterToWall(deltaTime, sideways);
-		else if (centerForward)
+		} else if (sideways) {
+			this.alignCharacterToWall(deltaTime, sideways);
+		} else if (centerForward) {
 			this.alignCharacterToWall(deltaTime, centerForward);
+		}
 
 		if (this.climbForce) {
 			const lateral = rightVector.mul(inputVector.X);
@@ -439,6 +436,9 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		this.animationController.stop("ClimbLeft");
 		this.animationController.stop("ClimbRight");
 		this.animationController.stop("ClimbIdle");
+
+		print("the climb stopped");
+		this.stoppedClimbing.Fire();
 	}
 
 	handleClimbAnimations(
@@ -484,7 +484,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		this.animationController.play("Run");
 	}
 
-	startRun(hasMana: boolean): void {
+	startRun(): void {
 		if (this.isClimbing || this.isRunning || this.isDodging) return;
 		if (!this.character) return;
 		if (this.character.attributes.isRagdolled) return;
@@ -493,7 +493,9 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 
 		const BASE_PLAYER_SPEED = BASE_WALK_SPEED; // + speedBoost
 
-		hasMana ? this.manaRun(BASE_PLAYER_SPEED) : this.run(BASE_PLAYER_SPEED);
+		this.manaController.hasMana()
+			? this.manaRun(BASE_PLAYER_SPEED)
+			: this.run(BASE_PLAYER_SPEED);
 	}
 
 	stopRun(): void {
@@ -521,7 +523,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		);
 	}
 
-	startDash(hasMana: boolean, direction: Direction): void {
+	startDash(direction: Direction): void {
 		if (this.isClimbing || this.isDodging) return;
 		if (this.dashDebounce) return;
 		if (!this.character) return;
@@ -533,6 +535,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 
 		const directionAngle = directionToAngle[direction];
 		const humanoidRootPart = this.character.getHumanoidRootPart();
+		const hasMana = this.manaController.hasMana();
 
 		this.dashVelocity = this.dashTrove.add(this.newDashVelocity());
 		this.dashVelocity.Parent = humanoidRootPart;
@@ -591,35 +594,5 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		if (this.manaDashParticles) this.manaDashParticles.Enabled = false;
 
 		task.delay(DASH_COOLDOWN, () => (this.dashDebounce = false));
-	}
-
-	handleJump(): void {
-		if (!this.character) return;
-
-		if (this.isClimbing) {
-			this.stopClimb();
-			return;
-		}
-
-		const humanoidRootPart = this.character?.getHumanoidRootPart();
-		const forwardCast = Workspace.Raycast(
-			humanoidRootPart.Position,
-			humanoidRootPart.CFrame.LookVector.mul(new Vector3(2, 0, 2)),
-			this.raycastParams,
-		);
-
-		const inAir =
-			this.character.instance.Humanoid.FloorMaterial ===
-			Enum.Material.Air;
-		if (forwardCast && inAir) {
-			const castInstance = forwardCast.Instance;
-			if (
-				castInstance.Anchored &&
-				castInstance.CanCollide &&
-				!castInstance.IsA("TrussPart")
-			) {
-				this.startClimb(forwardCast);
-			}
-		}
 	}
 }

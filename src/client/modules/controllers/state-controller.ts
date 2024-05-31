@@ -1,124 +1,61 @@
-import { Controller, OnStart } from "@flamework/core";
+import { Controller, OnStart, OnTick } from "@flamework/core";
 import { StateMachine } from "shared/modules/state-machine";
-import { State } from "shared/modules/state-machine/state";
-
-class IdleState extends State {
-	name = "Idle";
-}
-
-class AttackState extends State {
-	name = "Attack";
-	override enter(): void {
-		this.busy = true;
-
-		super.enter();
-		task.wait(2);
-
-		this.busy = false;
-	}
-}
-
-class BlockState extends State {
-	name = "Block";
-}
-
-class ChargeManaState extends State {
-	name = "ChargeMana";
-}
-
-class RagdollState extends State {
-	name = "Ragdoll";
-}
-
-class DashState extends State {
-	name = "Dash";
-}
-
-class RunState extends State {
-	name = "Run";
-}
-
-class ClimbState extends State {
-	name = "Climb";
-}
+import { MovementController } from "./movement-controller";
+import { IdleState } from "client/modules/player-state/idle-state";
+import { DashState } from "client/modules/player-state/dash-state";
+import { RunState } from "client/modules/player-state/run-state";
+import { ClimbState } from "client/modules/player-state/climb-state";
+import { KeybindController } from "./keybind-controller";
 
 @Controller()
-export class StateController implements OnStart {
-	private IDLE = new IdleState();
-	private ATTACK = new AttackState();
-	private BLOCK = new BlockState();
-	private CHARGE_MANA = new ChargeManaState();
-	private RAGDOLL = new RagdollState();
-	private DASH = new DashState();
-	private RUN = new RunState();
-	private CLIMB = new ClimbState();
+export class StateController implements OnStart, OnTick {
+	readonly IDLE: IdleState;
+	// readonly ATTACK: AttackSt;
+	// readonly BLOCK: BlockState;
+	// readonly CHARGE_MANA: ChargeManaState;
+	// readonly RAGDOLL: RagdollState;
+	readonly DASH: DashState;
+	readonly RUN: RunState;
+	readonly CLIMB: ClimbState;
 
-	private stateMachine: StateMachine;
+	readonly stateMachine: StateMachine;
 
-	constructor() {
-		this.stateMachine = new StateMachine(this.IDLE);
+	constructor(
+		private movementController: MovementController,
+		private keybindController: KeybindController,
+	) {
+		this.stateMachine = new StateMachine();
+
+		this.IDLE = new IdleState(this.stateMachine, keybindController);
+		this.DASH = new DashState(
+			this.stateMachine,
+			keybindController,
+			movementController,
+		);
+		this.RUN = new RunState(
+			this.stateMachine,
+			keybindController,
+			movementController,
+		);
+		this.CLIMB = new ClimbState(
+			this.stateMachine,
+			keybindController,
+			movementController,
+		);
+
+		this.stateMachine.addStates([
+			this.IDLE,
+			this.DASH,
+			this.RUN,
+			this.CLIMB,
+		]);
 	}
 
 	onStart() {
-		this.IDLE.addTransitionTo(this.ATTACK);
-		this.IDLE.addTransitionTo(this.BLOCK);
-		this.IDLE.addTransitionTo(this.CHARGE_MANA);
-		this.IDLE.addTransitionTo(this.RAGDOLL);
-		this.IDLE.addTransitionTo(this.DASH);
-		this.IDLE.addTransitionTo(this.RUN);
-		this.IDLE.addTransitionTo(this.CLIMB);
-
-		this.ATTACK.addTransitionTo(this.IDLE);
-		this.ATTACK.addTransitionTo(this.RAGDOLL);
-
-		this.BLOCK.addTransitionTo(this.IDLE);
-		this.BLOCK.addTransitionTo(this.RAGDOLL);
-
-		this.CHARGE_MANA.addTransitionTo(this.IDLE);
-
-		this.RAGDOLL.addTransitionTo(this.IDLE);
-
-		this.DASH.addTransitionTo(this.IDLE);
-		// this.DASH.addTransitionTo(this.RUN);
-		// this.DASH.addTransitionTo(this.CHARGE_MANA);
-
-		this.RUN.addTransitionTo(this.IDLE);
-		this.RUN.addTransitionTo(this.BLOCK);
-		this.RUN.addTransitionTo(this.CHARGE_MANA);
-		this.RUN.addTransitionTo(this.DASH);
-
-		this.CLIMB.addTransitionTo(this.IDLE);
+		this.stateMachine.initialize(this.IDLE);
 	}
 
-	idle(): void {
-		this.stateMachine.transitionTo(this.IDLE);
-	}
-
-	attack(): void {
-		this.stateMachine.transitionTo(this.ATTACK);
-	}
-
-	block(): void {
-		this.stateMachine.transitionTo(this.BLOCK);
-	}
-
-	chargeMana(): void {
-		this.stateMachine.transitionTo(this.CHARGE_MANA);
-	}
-
-	ragdoll(): void {
-		this.stateMachine.transitionTo(this.RAGDOLL);
-	}
-
-	dash(): void {
-		this.stateMachine.transitionTo(this.DASH);
-	}
-
-	run(): void {
-		this.stateMachine.transitionTo(this.RUN);
-	}
-
-	climb(): void {
-		this.stateMachine.transitionTo(this.CLIMB);
+	onTick(dt: number): void {
+		this.stateMachine.update(dt);
 	}
 }
