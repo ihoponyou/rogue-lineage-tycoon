@@ -4,14 +4,14 @@ local ACTIONS = require(script.Actions)
 
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
+local ServerStorage = game:GetService("ServerStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local ManaService
-local Burning = require(ServerScriptService.Knit.Components.Burning)
+local Burning = require(ServerStorage.Source.ServerComponents.Burning)
 
 local ActionService = Knit.CreateService {
 	Name = "ActionService";

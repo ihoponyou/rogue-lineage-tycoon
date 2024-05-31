@@ -2,7 +2,11 @@
 
 const RAY_THICKNESS = 0.05;
 
-export function createVisualizer(from: Vector3, to: Vector3, duration: number): void {
+export function createVisualizer(
+	from: Vector3,
+	to: Vector3,
+	duration: number,
+): void {
 	const visualizer = new Instance("Part");
 	visualizer.Parent = game.Workspace;
 
@@ -17,5 +21,7 @@ export function createVisualizer(from: Vector3, to: Vector3, duration: number): 
 
 	const distance: number = to.sub(from).Magnitude;
 	visualizer.Size = new Vector3(RAY_THICKNESS, RAY_THICKNESS, distance);
-	visualizer.CFrame = new CFrame(from, to).mul(new CFrame(0, 0, -distance / 2));
+	visualizer.CFrame = new CFrame(from, to).mul(
+		new CFrame(0, 0, -distance / 2),
+	);
 }

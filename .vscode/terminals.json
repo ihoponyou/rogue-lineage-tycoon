@@ -6,17 +6,25 @@
       "name": "compiler",
       "description": "compiles source code into lua with rbxtsc",
       "focus": true,
-      "command": "npm run watch"
+      "commands": [
+        "if (Test-Path out) { Remove-Item -Recurse out }",
+        "npm run watch"
+      ]
     },
     {
       "name": "io-serve",
       "description": "necessary for rbxts-object-to-tree",
+      "split": "compiler",
       "command": "npx io-serve"
     },
     {
       "name": "rojo",
       "description": "you know",
-      "command": "rojo serve"
+      "split": "compiler",
+      "commands": [
+        "Start-Sleep -Seconds 20",
+        "rojo serve"
+      ]
     }
   ]
 }
