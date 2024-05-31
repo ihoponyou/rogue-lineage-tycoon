@@ -1,4 +1,4 @@
-import { Controller, OnStart } from "@flamework/core";
+import { Controller, Dependency, OnStart } from "@flamework/core";
 import { Players, ReplicatedStorage, TweenService } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
 import { ManaController } from "./mana-controller";
@@ -8,6 +8,8 @@ import {
 } from "../../../../types/lifecycles";
 import { charAt } from "shared/modules/charAt";
 import { Events } from "client/modules/networking";
+import { Components } from "@flamework/components";
+import { CharacterClient } from "../components/character-client";
 
 const WHITE_STOMACH_RACES = [
 	"Gaian",
@@ -114,6 +116,27 @@ export class HudController
 		this.manaGui.Enabled = true;
 		this.silverGui.Enabled = true;
 		this.statGui.Enabled = true;
+
+		const components = Dependency<Components>();
+		components
+			.waitForComponent<CharacterClient>(character)
+			.andThen((value) => {
+				this.characterTrove.add(
+					value.onAttributeChanged("stomach", (newValue) =>
+						this.updateStomach(newValue),
+					),
+				);
+				this.characterTrove.add(
+					value.onAttributeChanged("temperature", (newValue) =>
+						this.updateTemperature(newValue),
+					),
+				);
+				this.characterTrove.add(
+					value.onAttributeChanged("toxicity", (newValue) =>
+						this.updateToxicity(newValue),
+					),
+				);
+			});
 	}
 
 	onLocalCharacterRemoving(character: Model): void {
@@ -206,7 +229,7 @@ export class HudController
 			0,
 			1,
 		);
-		this.temperatureSlider.TweenSize(
+		this.temperatureSlider.TweenPosition(
 			UDim2.fromScale(percentTemperature, 0),
 			Enum.EasingDirection.Out,
 			Enum.EasingStyle.Quad,

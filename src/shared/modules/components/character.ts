@@ -8,8 +8,15 @@ export interface CharacterInstance extends StarterCharacter {
 	Humanoid: Humanoid;
 }
 
-// this may be unsafe
-export interface CharacterAttributes extends RagdollAttributes {}
+export interface CharacterAttributes extends RagdollAttributes {
+	isKnocked: boolean;
+	isAlive: boolean;
+	temperature: number;
+	stomach: number;
+	toxicity: number;
+	armor: string;
+	manaColor: Color3;
+}
 
 @Component()
 export abstract class Character<

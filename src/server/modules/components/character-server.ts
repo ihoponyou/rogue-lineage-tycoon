@@ -28,26 +28,20 @@ const BASE_TOXICITY_DECAY_RATE = 0.05;
 
 const EVENTS = Events.characterEvents;
 
-interface Attributes extends CharacterAttributes {
-	isKnocked: boolean;
-	isAlive: boolean;
-	temperature: number;
-	armor: string;
-	manaColor: Color3;
-}
-
 @Component({
 	tag: "Character",
 	defaults: {
 		isKnocked: false,
 		isAlive: true,
 		temperature: 50,
+		stomach: 100,
+		toxicity: 0,
 		armor: "",
 		manaColor: new Color3(1, 1, 1),
 	},
 })
 export class CharacterServer
-	extends Character<Attributes, CharacterInstance>
+	extends Character<CharacterAttributes, CharacterInstance>
 	implements OnTick, OnRemoved
 {
 	private stats = {
@@ -202,6 +196,7 @@ export class CharacterServer
 			data.Stomach,
 			deltaTime * this.stats.stomachDecayRate,
 		);
+		this.attributes.stomach = data.Stomach;
 	}
 
 	decayToxicity(deltaTime: number): void {
@@ -211,5 +206,6 @@ export class CharacterServer
 			data.Toxicity,
 			deltaTime * this.stats.toxicityDecayRate,
 		);
+		this.attributes.toxicity = data.Toxicity;
 	}
 }
