@@ -1,11 +1,15 @@
-import { Controller, OnStart, OnTick } from "@flamework/core";
+import { Controller, Dependency, OnStart, OnTick } from "@flamework/core";
 import {
 	ContextActionService,
+	Players,
 	UserInputService,
 	Workspace,
 } from "@rbxts/services";
 import { KeybindController } from "./keybind-controller";
 import Signal from "@rbxts/signal";
+import { OnLocalCharacterAdded } from "../../../../types/lifecycles";
+import { CharacterClient } from "../components/character-client";
+import { Components } from "@flamework/components";
 
 const BEGIN = Enum.UserInputState.Begin;
 const END = Enum.UserInputState.End;
@@ -19,14 +23,16 @@ export enum InputAxis {
 export type Direction = "forward" | "backward" | "left" | "right";
 
 @Controller()
-export class InputController implements OnStart, OnTick {
+export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	static inputVector = new Vector2();
 	readonly runTriggered = new Signal();
 	readonly dashTriggered = new Signal<(direction: Direction) => void>();
 	readonly climbTriggered = new Signal<
 		(wallCastResult: RaycastResult) => void
 	>();
+	readonly chargeManaTriggered = new Signal<(bool: boolean) => void>();
 
+	private character?: CharacterClient;
 	private lastForwardInputTick = 0;
 
 	constructor(private keybindController: KeybindController) {}
@@ -48,10 +54,33 @@ export class InputController implements OnStart, OnTick {
 			true,
 			this.keybindController.keybinds.dash,
 		);
+		ContextActionService.BindAction(
+			"input_jump",
+			(_, state) => {
+				return this.handleJumpInput(state);
+			},
+			false,
+			this.keybindController.keybinds.jump,
+		);
+		ContextActionService.BindAction(
+			"input_mana",
+			(_, state) => {
+				return this.handleManaInput(state);
+			},
+			true,
+			this.keybindController.keybinds.chargeMana,
+		);
 	}
 
 	onTick(dt: number): void {
 		InputController.inputVector = this.getInputVector();
+	}
+
+	onLocalCharacterAdded(character: Model): void {
+		const components = Dependency<Components>();
+		components
+			.waitForComponent<CharacterClient>(character)
+			.andThen((component) => (this.character = component));
 	}
 
 	// like the old unity one
@@ -118,7 +147,8 @@ export class InputController implements OnStart, OnTick {
 	}
 
 	private handleJumpInput(state: Enum.UserInputState) {
-		if (state !== BEGIN) return;
+		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
+		if (!this.character) return Enum.ContextActionResult.Pass;
 
 		const humanoidRootPart = this.character.getHumanoidRootPart();
 		const forwardCast = Workspace.Raycast(
@@ -130,15 +160,24 @@ export class InputController implements OnStart, OnTick {
 		const inAir =
 			this.character.instance.Humanoid.FloorMaterial ===
 			Enum.Material.Air;
-		if (forwardCast && inAir) {
-			const castInstance = forwardCast.Instance;
-			if (
-				castInstance.Anchored &&
-				castInstance.CanCollide &&
-				!castInstance.IsA("TrussPart")
-			) {
-				this.climbTriggered.Fire(forwardCast);
-			}
+		if (!forwardCast || !inAir) {
+			return Enum.ContextActionResult.Pass;
 		}
+
+		const castInstance = forwardCast.Instance;
+		if (
+			castInstance.Anchored &&
+			castInstance.CanCollide &&
+			!castInstance.IsA("TrussPart")
+		) {
+			this.climbTriggered.Fire(forwardCast);
+		}
+	}
+
+	private handleManaInput(state: Enum.UserInputState) {
+		if (state === BEGIN || state === END) {
+			this.chargeManaTriggered.Fire(state === BEGIN);
+		}
+		return Enum.ContextActionResult.Pass;
 	}
 }

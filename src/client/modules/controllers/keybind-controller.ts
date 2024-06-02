@@ -3,7 +3,6 @@ import Object from "@rbxts/object-utils";
 import { ContextActionService, UserInputService } from "@rbxts/services";
 import { valueof } from "../../../../types/valueof";
 
-const RUN_INPUT_INTERVAL = 0.2;
 const BEGIN = Enum.UserInputState.Begin;
 const END = Enum.UserInputState.End;
 

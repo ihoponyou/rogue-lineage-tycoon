@@ -21,14 +21,16 @@ export class IdleState extends State {
 			this.stateMachine.transitionTo("run");
 		});
 		this.dashConnection = this.inputController.dashTriggered.Connect(
-			(direction) => {
-				this.stateMachine.transitionTo("dash", direction);
-			},
+			(direction) => this.stateMachine.transitionTo("dash", direction),
+		);
+		this.climbConnection = this.inputController.climbTriggered.Connect(
+			(cast) => this.stateMachine.transitionTo("climb", cast),
 		);
 	}
 
 	override exit(): void {
 		if (this.runConnection) this.runConnection.Disconnect();
 		if (this.dashConnection) this.dashConnection.Disconnect();
+		if (this.climbConnection) this.climbConnection.Disconnect();
 	}
 }

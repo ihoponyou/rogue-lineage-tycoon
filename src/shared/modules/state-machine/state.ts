@@ -7,6 +7,8 @@ export abstract class State {
 
 	constructor(protected readonly stateMachine: StateMachine) {}
 
+	initialize(): void {}
+
 	enter(...args: Array<unknown>): void {
 		this.tickEntered = tick();
 		// print(`+ ${this.name}`);

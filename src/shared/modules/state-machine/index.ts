@@ -24,6 +24,7 @@ export class StateMachine {
 
 	addState(state: State): void {
 		this.states.set(state.name.lower(), state);
+		state.initialize();
 	}
 
 	addStates(states: Array<State>): void {
@@ -31,6 +32,7 @@ export class StateMachine {
 	}
 
 	update(deltaTime: number): void {
+		// print("updating sm", this.currentState.name);
 		this.currentState.update(deltaTime);
 	}
 

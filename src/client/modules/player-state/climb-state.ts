@@ -3,7 +3,12 @@ import { Direction, InputController } from "../controllers/input-controller";
 import { CharacterState } from "./character-state";
 import { CharacterClient } from "../components/character-client";
 import { AnimationController } from "../controllers/animation-controller";
-import { TweenService, UserInputService, Workspace } from "@rbxts/services";
+import {
+	ContextActionService,
+	TweenService,
+	UserInputService,
+	Workspace,
+} from "@rbxts/services";
 import { KeybindController } from "../controllers/keybind-controller";
 import { ManaController } from "../controllers/mana-controller";
 import { hasLineOfSight } from "shared/modules/line-of-sight";
@@ -46,6 +51,9 @@ export class ClimbState extends CharacterState {
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Running, false);
 		humanoid.ChangeState(Enum.HumanoidStateType.Climbing);
 
+		this.climbConstraint.Enabled = true;
+		this.climbForce.Enabled = true;
+
 		this.alignCharacterToWall(0, wallCastResult);
 
 		const input = InputController.inputVector;
@@ -59,12 +67,18 @@ export class ClimbState extends CharacterState {
 			this.animationController.play("ClimbIdle");
 		}
 
-		this.inputBeganConnection = UserInputService.InputBegan.Connect(
-			(input, gpe) => {
-				if (input.KeyCode === Enum.KeyCode.Space)
-					this.stateMachine.transitionTo("idle");
-				else this.handleClimbAnimations(input, gpe);
+		ContextActionService.BindAction(
+			"input_cancel_climb",
+			(_, state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.stateMachine.transitionTo("idle");
 			},
+			false,
+			this.keybindController.keybinds.jump,
+		);
+
+		this.inputBeganConnection = UserInputService.InputBegan.Connect(
+			(input, gpe) => this.handleClimbAnimations(input, gpe),
 		);
 		this.inputEndedConnection = UserInputService.InputEnded.Connect(
 			(input, gpe) => this.handleClimbAnimations(input, gpe),
@@ -87,6 +101,7 @@ export class ClimbState extends CharacterState {
 			params,
 		);
 		if (floorCheck) {
+			print("too close to floor");
 			this.stateMachine.transitionTo("idle");
 			return;
 		}
@@ -141,6 +156,7 @@ export class ClimbState extends CharacterState {
 		);
 
 		if (!(blockForwardCast || diagonalIn || diagonalOut)) {
+			print("wall not found");
 			this.stateMachine.transitionTo("idle");
 			return;
 		}
@@ -189,6 +205,7 @@ export class ClimbState extends CharacterState {
 					),
 				);
 			} else {
+				print("ledge not found");
 				this.stateMachine.transitionTo("idle");
 				return;
 			}
@@ -200,20 +217,37 @@ export class ClimbState extends CharacterState {
 			this.alignCharacterToWall(deltaTime, centerForward);
 		}
 
-		if (this.climbForce) {
-			const lateral = rightVector.mul(inputVector.X);
-			const vertical = upVector.mul(inputVector.Y);
-			let combined = lateral.add(vertical);
-			if (combined.Magnitude > 1) combined = combined.Unit;
-			this.climbForce.VectorVelocity = combined.mul(
-				this.calculateClimbSpeed(100, 0, 0),
-			); // TODO: fix this
-		}
+		const lateral = rightVector.mul(inputVector.X);
+		const vertical = upVector.mul(inputVector.Y);
+		let combined = lateral.add(vertical);
+		if (combined.Magnitude > 1) combined = combined.Unit;
+		this.climbForce.VectorVelocity = combined.mul(
+			this.calculateClimbSpeed(100, 0, 0),
+		); // TODO: fix this
 	}
 
 	public override exit(): void {
+		const humanoid = this.character.instance.Humanoid;
+		humanoid.AutoRotate = true;
+		humanoid.SetStateEnabled(Enum.HumanoidStateType.Freefall, true);
+		humanoid.SetStateEnabled(Enum.HumanoidStateType.Running, true);
+		// humanoid.ChangeState(Enum.HumanoidStateType.GettingUp);
+
+		this.climbConstraint.Enabled = false;
+		this.climbForce.Enabled = false;
+
+		this.animationController.stop("ClimbUp");
+		this.animationController.stop("ClimbDown");
+		this.animationController.stop("ClimbLeft");
+		this.animationController.stop("ClimbRight");
+		this.animationController.stop("ClimbIdle");
+
 		if (this.inputBeganConnection) this.inputBeganConnection.Disconnect();
 		if (this.inputEndedConnection) this.inputEndedConnection.Disconnect();
+
+		ContextActionService.UnbindAction("input_cancel_climb");
+
+		// TODO: cooldown
 	}
 
 	private newGoalPart(): Part {
@@ -237,6 +271,7 @@ export class ClimbState extends CharacterState {
 	private newClimbForce(): LinearVelocity {
 		const force = new Instance("LinearVelocity");
 		force.MaxForce = math.huge;
+		force.Enabled = false;
 		force.Parent = this.character.instance;
 		force.Attachment0 = this.character.getHumanoidRootPart().RootAttachment;
 		return force;
@@ -244,6 +279,7 @@ export class ClimbState extends CharacterState {
 
 	private newClimbConstraint(): AlignOrientation {
 		const constraint = new Instance("AlignOrientation");
+		constraint.Enabled = false;
 		constraint.AlignType = Enum.AlignType.Parallel;
 		constraint.MaxTorque = 1e7;
 		constraint.Parent = this.character.instance;
@@ -312,8 +348,10 @@ export class ClimbState extends CharacterState {
 			new TweenInfo(0.3, Enum.EasingStyle.Linear),
 			{ CFrame: goal },
 		);
+		// TODO: secure this?
 		tween.Completed.Once(() => {
 			humanoidRootPart.Anchored = false;
+			print("climbed up");
 			this.stateMachine.transitionTo("idle");
 		});
 		tween.Play();
