@@ -90,7 +90,11 @@ export abstract class Character<
 		return this.raycastParams;
 	}
 
-	getWalkspeed(): number {
+	getWalkSpeed(): number {
 		return 20;
+	}
+
+	resetToWalkSpeed(): void {
+		this.instance.Humanoid.WalkSpeed = this.getWalkSpeed();
 	}
 }

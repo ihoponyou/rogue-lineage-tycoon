@@ -15,6 +15,7 @@ import { KeybindController } from "../controllers/keybind-controller";
 import { ManaController } from "../controllers/mana-controller";
 import { AnimationController } from "../controllers/animation-controller";
 import { ClimbState } from "../player-state/climb-state";
+import { ChargeManaState } from "../player-state/charge-mana-state";
 
 // TODO: only for local player
 @Component({
@@ -29,6 +30,7 @@ export class CharacterStateMachine
 	private RUN: RunState;
 	private DASH: DashState;
 	private CLIMB: ClimbState;
+	private CHARGE_MANA: ChargeManaState;
 
 	constructor(
 		private character: CharacterClient,
@@ -43,8 +45,8 @@ export class CharacterStateMachine
 		this.RUN = new RunState(
 			this.stateMachine,
 			character,
-			inputController,
 			keybindController,
+			inputController,
 			manaController,
 			animationController,
 		);
@@ -62,6 +64,12 @@ export class CharacterStateMachine
 			manaController,
 			animationController,
 		);
+		this.CHARGE_MANA = new ChargeManaState(
+			this.stateMachine,
+			character,
+			keybindController,
+			inputController,
+		);
 	}
 
 	onStart(): void {
@@ -70,6 +78,7 @@ export class CharacterStateMachine
 			this.RUN,
 			this.DASH,
 			this.CLIMB,
+			this.CHARGE_MANA,
 		]);
 		this.stateMachine.initialize(this.IDLE);
 	}

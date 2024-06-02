@@ -6,22 +6,32 @@ import { ReplicatedStorage, UserInputService } from "@rbxts/services";
 import { AnimationController } from "../controllers/animation-controller";
 import { ManaController } from "../controllers/mana-controller";
 import { Events } from "../networking";
+import { KeybindController } from "../controllers/keybind-controller";
 
 export class RunState extends CharacterState {
 	readonly name = "Run";
 
-	private runTrail = this.newRunTrail();
+	private manaTrail = this.newManaTrail();
 	private dashConnection?: RBXScriptConnection;
 	private manaEmptiedConnection?: RBXScriptConnection;
+	private chargeManaConnection?: RBXScriptConnection;
 
 	constructor(
 		stateMachine: StateMachine,
 		character: CharacterClient,
+
+		private keybindController: KeybindController,
 		private inputController: InputController,
 		private manaController: ManaController,
 		private animationController: AnimationController,
 	) {
 		super(stateMachine, character);
+	}
+
+	public override initialize(): void {
+		Events.manaEvents.manaColorChanged.connect((color) => {
+			this.manaTrail.Color = new ColorSequence(color);
+		});
 	}
 
 	override enter(): void {
@@ -36,48 +46,54 @@ export class RunState extends CharacterState {
 		this.manaEmptiedConnection = Events.manaEvents.manaEmptied.connect(() =>
 			this.onManaEmptied(),
 		);
+
+		this.chargeManaConnection =
+			this.inputController.chargeManaTriggered.Connect((charging) => {
+				if (charging) this.stateMachine.transitionTo("chargemana");
+			});
 	}
 
-	override update(deltaTime: number): void {
-		if (!UserInputService.IsKeyDown(Enum.KeyCode.W))
+	override update(): void {
+		if (!this.keybindController.isKeyDown("forward"))
 			this.stateMachine.transitionTo("idle");
 	}
 
 	override exit(): void {
 		this.character.instance.Humanoid.WalkSpeed =
-			this.character.getWalkspeed();
+			this.character.getWalkSpeed();
 
 		this.animationController.stop("Run");
 		this.animationController.stop("ManaRun");
-		this.runTrail.Enabled = false;
+		this.manaTrail.Enabled = false;
 
 		if (this.dashConnection) this.dashConnection.Disconnect();
 		if (this.manaEmptiedConnection) this.manaEmptiedConnection.Disconnect();
+		if (this.chargeManaConnection) this.chargeManaConnection.Disconnect();
 	}
 
 	private onManaEmptied(): void {
 		this.animationController.stop("ManaRun");
-		if (this.runTrail) this.runTrail.Enabled = false;
+		if (this.manaTrail) this.manaTrail.Enabled = false;
 		this.run();
 	}
 
 	private run(): void {
 		this.character.instance.Humanoid.WalkSpeed =
-			this.character.getWalkspeed() * 1.5;
+			this.character.getWalkSpeed() * 1.5;
 
 		this.animationController.play("Run");
 	}
 
 	private manaRun(): void {
 		this.character.instance.Humanoid.WalkSpeed =
-			this.character.getWalkspeed() * 2;
+			this.character.getWalkSpeed() * 2;
 
 		this.animationController.play("ManaRun");
 
-		this.runTrail.Enabled = true;
+		this.manaTrail.Enabled = true;
 	}
 
-	private newRunTrail(): Trail {
+	private newManaTrail(): Trail {
 		const trail = ReplicatedStorage.Effects.Visuals.ManaRunTrail.Clone();
 		trail.Enabled = false;
 		const torso = this.character.getTorso();

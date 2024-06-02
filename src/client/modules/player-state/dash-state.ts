@@ -35,6 +35,11 @@ export class DashState extends CharacterState {
 	) {
 		super(stateMachine, character);
 
+		this.manaDashSound.Parent = character.getTorso();
+		this.manaParticles.Parent = character.getTorso();
+	}
+
+	public override initialize(): void {
 		Events.manaEvents.manaColorChanged.connect((color) => {
 			this.manaParticles.Color = new ColorSequence(color);
 		});
@@ -54,7 +59,6 @@ export class DashState extends CharacterState {
 		).LookVector.mul(hasMana ? 60 : 50);
 
 		if (hasMana) {
-			this.manaController.onChargeManaInput(Enum.UserInputState.End);
 			this.manaDashSound.Play();
 			this.manaParticles.Enabled = true;
 		}

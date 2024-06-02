@@ -8,6 +8,7 @@ export class IdleState extends State {
 	private runConnection?: RBXScriptConnection;
 	private dashConnection?: RBXScriptConnection;
 	private climbConnection?: RBXScriptConnection;
+	private chargeManaConnection?: RBXScriptConnection;
 
 	constructor(
 		stateMachine: StateMachine,
@@ -26,11 +27,16 @@ export class IdleState extends State {
 		this.climbConnection = this.inputController.climbTriggered.Connect(
 			(cast) => this.stateMachine.transitionTo("climb", cast),
 		);
+		this.chargeManaConnection =
+			this.inputController.chargeManaTriggered.Connect((charging) => {
+				if (charging) this.stateMachine.transitionTo("chargemana");
+			});
 	}
 
 	override exit(): void {
 		if (this.runConnection) this.runConnection.Disconnect();
 		if (this.dashConnection) this.dashConnection.Disconnect();
 		if (this.climbConnection) this.climbConnection.Disconnect();
+		if (this.chargeManaConnection) this.chargeManaConnection.Disconnect();
 	}
 }

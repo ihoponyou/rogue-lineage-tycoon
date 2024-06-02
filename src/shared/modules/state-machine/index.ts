@@ -49,6 +49,6 @@ export class StateMachine {
 		this.currentState = newState;
 		newState.enter(...args);
 
-		print(`${oldStateName} -> ${newStateName}`);
+		print(`${oldStateName} -> ${newState.name}`);
 	}
 }
