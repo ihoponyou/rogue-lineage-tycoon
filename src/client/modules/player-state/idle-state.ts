@@ -1,48 +1,31 @@
 import { StateMachine } from "shared/modules/state-machine";
-import { State } from "../../../shared/modules/state-machine/state";
-import { KeybindController } from "client/modules/controllers/keybind-controller";
-import { StateController } from "client/modules/controllers/state-controller";
-import { PlayerState } from ".";
+import { State } from "shared/modules/state-machine/state";
+import { InputController } from "../controllers/input-controller";
 
-const RUN_INPUT_INTERVAL = 0.2;
+export class IdleState extends State {
+	readonly name = "Idle";
 
-// standing still / walking around
-export class IdleState extends PlayerState {
-	readonly name = "idle";
-
-	private lastForwardInputTick = 0;
+	private runConnection?: RBXScriptConnection;
+	private dashConnection?: RBXScriptConnection;
 
 	constructor(
 		stateMachine: StateMachine,
-		keybindController: KeybindController,
+		private inputController: InputController,
 	) {
-		super(stateMachine, keybindController);
+		super(stateMachine);
 	}
 
 	override enter(...args: Array<unknown>): void {
-		this.keybindController.loadKeybind(
-			"forward",
-			this.keybindController.keybinds.forward,
-			(state) => this.handleForwardInput(state),
-		);
+		this.runConnection = this.inputController.runTriggered.Connect(() => {
+			this.stateMachine.transitionTo("run");
+		});
+		this.dashConnection = this.inputController.dashTriggered.Connect(() => {
+			this.stateMachine.transitionTo("dash");
+		});
 	}
 
 	override exit(): void {
-		this.keybindController.unloadKeybind("forward");
-	}
-
-	private handleForwardInput(
-		inputState: Enum.UserInputState,
-	): Enum.ContextActionResult {
-		if (inputState !== Enum.UserInputState.Begin)
-			return Enum.ContextActionResult.Pass;
-
-		const now = tick();
-		if (now - this.lastForwardInputTick < RUN_INPUT_INTERVAL) {
-			this.stateMachine.transitionTo("Run");
-		}
-		this.lastForwardInputTick = now;
-
-		return Enum.ContextActionResult.Sink;
+		if (this.runConnection) this.runConnection.Disconnect();
+		if (this.dashConnection) this.dashConnection.Disconnect();
 	}
 }

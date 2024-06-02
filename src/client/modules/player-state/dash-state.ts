@@ -1,31 +1,27 @@
-import { Direction } from "client/modules/controllers/movement-controller";
-import { MovementState } from "./movement-state";
+import { CharacterState } from "./character-state";
 
-export class DashState extends MovementState {
-	readonly name = "Dash";
+export class DashState extends CharacterState {
+	public readonly name = "Dash";
 
-	override enter(): void {
-		// if (!typeIs(args[0], "string")) error("direction must be string");
-		// TODO: more type checking :^)
+	private bodyVelocity = new Instance("BodyVelocity");
 
-		let direction: Direction = "backward";
-		if (this.keybindController.isKeyDown("forward")) {
-			direction = "forward";
-		} else if (this.keybindController.isKeyDown("left")) {
-			direction = "left";
-		} else if (this.keybindController.isKeyDown("right")) {
-			direction = "right";
-		}
+	public enter(...args: Array<unknown>): void {
+		super.enter();
 
-		this.movementController.startDash(direction);
+		this.bodyVelocity.MaxForce = Vector3.one.sub(Vector3.yAxis).mul(1e10);
+
+		const humanoidRootPart = this.character.getHumanoidRootPart();
+
+		this.bodyVelocity.Parent = humanoidRootPart;
+		this.bodyVelocity.Velocity = humanoidRootPart.CFrame.LookVector.mul(50);
 	}
 
-	override update(): void {
-		if (!this.movementController.isDodging)
+	public update(deltaTime: number): void {
+		if (tick() - this.tickEntered >= 0.4)
 			this.stateMachine.transitionTo("idle");
 	}
 
-	override exit(): void {
-		this.movementController.stopDash();
+	public exit(): void {
+		this.bodyVelocity.Parent = this.character.instance;
 	}
 }

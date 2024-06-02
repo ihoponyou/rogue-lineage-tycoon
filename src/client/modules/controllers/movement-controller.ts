@@ -162,7 +162,6 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 	private newDashVelocity(): BodyVelocity {
 		const bv = new Instance("BodyVelocity");
 		bv.MaxForce = new Vector3(1e10, 0, 1e10);
-		bv.P = 1250;
 		return bv;
 	}
 
