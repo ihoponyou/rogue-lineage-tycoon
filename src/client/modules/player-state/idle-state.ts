@@ -19,9 +19,11 @@ export class IdleState extends State {
 		this.runConnection = this.inputController.runTriggered.Connect(() => {
 			this.stateMachine.transitionTo("run");
 		});
-		this.dashConnection = this.inputController.dashTriggered.Connect(() => {
-			this.stateMachine.transitionTo("dash");
-		});
+		this.dashConnection = this.inputController.dashTriggered.Connect(
+			(direction) => {
+				this.stateMachine.transitionTo("dash", direction);
+			},
+		);
 	}
 
 	override exit(): void {

@@ -11,6 +11,9 @@ import { IdleState } from "../player-state/idle-state";
 import { RunState } from "../player-state/run-state";
 import { DashState } from "../player-state/dash-state";
 import { InputController } from "../controllers/input-controller";
+import { KeybindController } from "../controllers/keybind-controller";
+import { ManaController } from "../controllers/mana-controller";
+import { AnimationController } from "../controllers/animation-controller";
 
 // TODO: only for local player
 @Component({
@@ -28,6 +31,9 @@ export class CharacterStateMachine
 	constructor(
 		private character: CharacterClient,
 		private inputController: InputController,
+		private keybindController: KeybindController,
+		private manaController: ManaController,
+		private animationController: AnimationController,
 	) {
 		super();
 
@@ -37,7 +43,13 @@ export class CharacterStateMachine
 			this.character,
 			this.inputController,
 		);
-		this.DASH = new DashState(this.stateMachine, this.character);
+		this.DASH = new DashState(
+			this.stateMachine,
+			this.character,
+			this.keybindController,
+			this.manaController,
+			this.animationController,
+		);
 	}
 
 	onStart(): void {
