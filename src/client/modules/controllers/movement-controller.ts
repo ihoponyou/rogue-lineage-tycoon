@@ -9,7 +9,7 @@ import { OnLocalCharacterAdded } from "../../../../types/lifecycles";
 import { Components } from "@flamework/components";
 import { CharacterClient as Character } from "client/modules/components/character-client";
 import { Trove } from "@rbxts/trove";
-import { InputController } from "./input-controller";
+import { Direction, InputController } from "./input-controller";
 import { hasLineOfSight } from "shared/modules/line-of-sight";
 import { Events } from "client/modules/networking";
 import { AnimationController } from "./animation-controller";
@@ -31,15 +31,6 @@ const CLIMB_DIRECTION_TO_ANIMATION_NAME = {
 	backward: "ClimbDown",
 	left: "ClimbLeft",
 	right: "ClimbRight",
-};
-
-export type Direction = "forward" | "backward" | "left" | "right";
-
-const directionToAngle: { [direction: string]: number } = {
-	forward: 0,
-	backward: 180,
-	left: 90,
-	right: -90,
 };
 
 @Controller()
@@ -108,7 +99,7 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 			this.animationController.stop("ManaRun");
 			if (this.runTrail) this.runTrail.Enabled = false;
 			const BASE_PLAYER_SPEED = BASE_WALK_SPEED; // + speedBoost
-			this.run(BASE_PLAYER_SPEED);
+			// this.run(BASE_PLAYER_SPEED);
 		} else if (this.isClimbing) {
 			this.stopClimb();
 		}
@@ -157,12 +148,6 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 		part.Anchored = true;
 		part.Transparency = 1;
 		return part;
-	}
-
-	private newDashVelocity(): BodyVelocity {
-		const bv = new Instance("BodyVelocity");
-		bv.MaxForce = new Vector3(1e10, 0, 1e10);
-		return bv;
 	}
 
 	private alignCharacterToWall(
@@ -466,48 +451,5 @@ export class MovementController implements OnStart, OnLocalCharacterAdded {
 
 		if (this.keybindController.isDirectionalKeyDown())
 			this.animationController.play("ClimbIdle");
-	}
-
-	private manaRun(baseSpeed: number): void {
-		if (!this.character) return;
-
-		this.character.instance.Humanoid.WalkSpeed = baseSpeed * 2;
-		this.animationController.play("ManaRun");
-		if (this.runTrail) this.runTrail.Enabled = true;
-	}
-
-	private run(baseSpeed: number): void {
-		if (!this.character) return;
-
-		this.character.instance.Humanoid.WalkSpeed = baseSpeed * 1.5;
-		this.animationController.play("Run");
-	}
-
-	startRun(): void {
-		if (this.isClimbing || this.isRunning || this.isDodging) return;
-		if (!this.character) return;
-		if (this.character.attributes.isRagdolled) return;
-
-		this.isRunning = true;
-
-		const BASE_PLAYER_SPEED = BASE_WALK_SPEED; // + speedBoost
-
-		this.manaController.hasMana()
-			? this.manaRun(BASE_PLAYER_SPEED)
-			: this.run(BASE_PLAYER_SPEED);
-	}
-
-	stopRun(): void {
-		if (!this.character) return;
-		if (!this.isRunning) return;
-
-		this.isRunning = false;
-
-		const BASE_PLAYER_SPEED = BASE_WALK_SPEED; // + speedBoost
-		this.character.instance.Humanoid.WalkSpeed = BASE_PLAYER_SPEED;
-
-		this.animationController.stop("Run");
-		this.animationController.stop("ManaRun");
-		if (this.runTrail) this.runTrail.Enabled = false;
 	}
 }

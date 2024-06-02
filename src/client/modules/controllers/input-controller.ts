@@ -1,6 +1,9 @@
 import { Controller, OnStart, OnTick } from "@flamework/core";
-import { ContextActionService, UserInputService } from "@rbxts/services";
-import { Direction } from "./movement-controller";
+import {
+	ContextActionService,
+	UserInputService,
+	Workspace,
+} from "@rbxts/services";
 import { KeybindController } from "./keybind-controller";
 import Signal from "@rbxts/signal";
 
@@ -13,11 +16,16 @@ export enum InputAxis {
 	Vertical,
 }
 
+export type Direction = "forward" | "backward" | "left" | "right";
+
 @Controller()
 export class InputController implements OnStart, OnTick {
 	static inputVector = new Vector2();
 	readonly runTriggered = new Signal();
 	readonly dashTriggered = new Signal<(direction: Direction) => void>();
+	readonly climbTriggered = new Signal<
+		(wallCastResult: RaycastResult) => void
+	>();
 
 	private lastForwardInputTick = 0;
 
@@ -112,26 +120,25 @@ export class InputController implements OnStart, OnTick {
 	private handleJumpInput(state: Enum.UserInputState) {
 		if (state !== BEGIN) return;
 
-		// const humanoidRootPart = this.character.getHumanoidRootPart();
-		// const forwardCast = Workspace.Raycast(
-		// 	humanoidRootPart.Position,
-		// 	humanoidRootPart.CFrame.LookVector.mul(new Vector3(2, 0, 2)),
-		// 	this.character.getRaycastParams(),
-		// );
+		const humanoidRootPart = this.character.getHumanoidRootPart();
+		const forwardCast = Workspace.Raycast(
+			humanoidRootPart.Position,
+			humanoidRootPart.CFrame.LookVector.mul(new Vector3(2, 0, 2)),
+			this.character.getRaycastParams(),
+		);
 
-		// const inAir =
-		// 	this.character.instance.Humanoid.FloorMaterial ===
-		// 	Enum.Material.Air;
-		// if (forwardCast && inAir) {
-		// 	const castInstance = forwardCast.Instance;
-		// 	if (
-		// 		castInstance.Anchored &&
-		// 		castInstance.CanCollide &&
-		// 		!castInstance.IsA("TrussPart")
-		// 	) {
-		// 		// this.startClimb(forwardCast);
-		// 		// this.stateController.climb(forwardCast);
-		// 	}
-		// }
+		const inAir =
+			this.character.instance.Humanoid.FloorMaterial ===
+			Enum.Material.Air;
+		if (forwardCast && inAir) {
+			const castInstance = forwardCast.Instance;
+			if (
+				castInstance.Anchored &&
+				castInstance.CanCollide &&
+				!castInstance.IsA("TrussPart")
+			) {
+				this.climbTriggered.Fire(forwardCast);
+			}
+		}
 	}
 }

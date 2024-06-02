@@ -1,5 +1,4 @@
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
-import { Direction } from "../controllers/movement-controller";
 import { CharacterState } from "./character-state";
 import { StateMachine } from "shared/modules/state-machine";
 import { CharacterClient } from "../components/character-client";
@@ -7,6 +6,7 @@ import { Events } from "../networking";
 import { KeybindController } from "../controllers/keybind-controller";
 import { ManaController } from "../controllers/mana-controller";
 import { AnimationController } from "../controllers/animation-controller";
+import { Direction } from "../controllers/input-controller";
 
 const DIRECTION_TO_ANGLE: { [direction: string]: number } = {
 	forward: 0,
@@ -40,6 +40,7 @@ export class DashState extends CharacterState {
 		});
 	}
 
+	// TODO: direction does not need to be an arg
 	public enter(direction: Direction): void {
 		super.enter();
 

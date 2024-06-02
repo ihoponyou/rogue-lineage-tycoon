@@ -7,6 +7,7 @@ export class IdleState extends State {
 
 	private runConnection?: RBXScriptConnection;
 	private dashConnection?: RBXScriptConnection;
+	private climbConnection?: RBXScriptConnection;
 
 	constructor(
 		stateMachine: StateMachine,
