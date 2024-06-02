@@ -37,18 +37,20 @@ export class CharacterStateMachine
 	) {
 		super();
 
-		this.IDLE = new IdleState(this.stateMachine, this.inputController);
+		this.IDLE = new IdleState(this.stateMachine, inputController);
 		this.RUN = new RunState(
 			this.stateMachine,
-			this.character,
-			this.inputController,
+			character,
+			inputController,
+			manaController,
+			animationController,
 		);
 		this.DASH = new DashState(
 			this.stateMachine,
-			this.character,
-			this.keybindController,
-			this.manaController,
-			this.animationController,
+			character,
+			keybindController,
+			manaController,
+			animationController,
 		);
 	}
 

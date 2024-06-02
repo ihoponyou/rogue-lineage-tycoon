@@ -89,4 +89,8 @@ export abstract class Character<
 	getRaycastParams(): RaycastParams {
 		return this.raycastParams;
 	}
+
+	getWalkspeed(): number {
+		return 20;
+	}
 }
