@@ -351,7 +351,7 @@ export class ClimbState extends CharacterState {
 		// TODO: secure this?
 		tween.Completed.Once(() => {
 			humanoidRootPart.Anchored = false;
-			print("climbed up");
+			// print("climbed up");
 			this.stateMachine.transitionTo("idle");
 		});
 		tween.Play();

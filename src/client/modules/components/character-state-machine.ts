@@ -1,8 +1,5 @@
-import { BaseComponent, Component } from "@flamework/components";
-import {
-	CharacterAttributes,
-	CharacterInstance,
-} from "shared/modules/components/character";
+import { Component } from "@flamework/components";
+import { CharacterInstance } from "shared/modules/components/character";
 import { CharacterClient } from "./character-client";
 import { DisposableComponent } from "shared/modules/components/disposable-component";
 import { OnStart, OnTick } from "@flamework/core";

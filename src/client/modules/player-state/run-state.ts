@@ -15,6 +15,7 @@ export class RunState extends CharacterState {
 	private dashConnection?: RBXScriptConnection;
 	private manaEmptiedConnection?: RBXScriptConnection;
 	private chargeManaConnection?: RBXScriptConnection;
+	private climbConnection?: RBXScriptConnection;
 
 	constructor(
 		stateMachine: StateMachine,
@@ -51,6 +52,10 @@ export class RunState extends CharacterState {
 			this.inputController.chargeManaTriggered.Connect((charging) => {
 				if (charging) this.stateMachine.transitionTo("chargemana");
 			});
+
+		this.climbConnection = this.inputController.climbTriggered.Connect(
+			(cast) => this.stateMachine.transitionTo("climb", cast),
+		);
 	}
 
 	override update(): void {
@@ -66,9 +71,10 @@ export class RunState extends CharacterState {
 		this.animationController.stop("ManaRun");
 		this.manaTrail.Enabled = false;
 
-		if (this.dashConnection) this.dashConnection.Disconnect();
-		if (this.manaEmptiedConnection) this.manaEmptiedConnection.Disconnect();
-		if (this.chargeManaConnection) this.chargeManaConnection.Disconnect();
+		this.dashConnection?.Disconnect();
+		this.manaEmptiedConnection?.Disconnect();
+		this.chargeManaConnection?.Disconnect();
+		this.climbConnection?.Disconnect();
 	}
 
 	private onManaEmptied(): void {
