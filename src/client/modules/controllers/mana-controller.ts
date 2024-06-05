@@ -5,7 +5,7 @@ import { OnLocalCharacterAdded } from "../../../../types/lifecycles";
 import { CharacterClient as Character } from "client/modules/components/character-client";
 import { Components } from "@flamework/components";
 
-const EVENTS = Events.manaEvents;
+const EVENTS = Events.mana;
 
 const SFX = ReplicatedStorage.Effects.Sounds;
 
@@ -15,9 +15,9 @@ export class ManaController implements OnStart {
 	mana = 0;
 
 	onStart(): void {
-		EVENTS.manaObtained.connect(() => (this.manaEnabled = true));
-		EVENTS.manaDisabled.connect(() => (this.manaEnabled = false));
-		EVENTS.manaChanged.connect((value) => (this.mana = value));
+		EVENTS.obtained.connect(() => (this.manaEnabled = true));
+		EVENTS.disabled.connect(() => (this.manaEnabled = false));
+		EVENTS.changed.connect((value) => (this.mana = value));
 	}
 
 	hasMana(): boolean {

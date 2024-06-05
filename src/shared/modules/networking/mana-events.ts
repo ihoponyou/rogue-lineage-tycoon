@@ -1,10 +1,10 @@
 export interface ManaServerToClientEvents {
-	manaObtained(): void;
-	manaEmptied(): void;
-	manaFilled(): void;
-	manaDisabled(): void;
-	manaChanged(value: number): void;
-	manaColorChanged(color: Color3): void;
+	obtained(): void;
+	emptied(): void;
+	filled(): void;
+	disabled(): void;
+	changed(value: number): void;
+	colorChanged(color: Color3): void;
 	charge(bool: boolean): void;
 }
 

@@ -40,7 +40,7 @@ export class DashState extends CharacterState {
 	}
 
 	public override initialize(): void {
-		Events.manaEvents.manaColorChanged.connect((color) => {
+		Events.mana.colorChanged.connect((color) => {
 			this.manaParticles.Color = new ColorSequence(color);
 		});
 	}

@@ -8,7 +8,7 @@ import { Events } from "../networking";
 import { Workspace } from "@rbxts/services";
 import { HudController } from "../controllers/hud-controller";
 
-const events = Events.characterEvents;
+const events = Events.character;
 
 @Component({
 	tag: "Character",

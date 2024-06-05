@@ -70,12 +70,12 @@ export class HudController
 	constructor(private manaController: ManaController) {}
 
 	onStart(): void {
-		Events.manaEvents.manaObtained.connect(() => this.toggleManaBar(true));
-		Events.manaEvents.manaDisabled.connect(() => this.toggleManaBar(false));
-		Events.manaEvents.manaColorChanged.connect((color) =>
+		Events.mana.obtained.connect(() => this.toggleManaBar(true));
+		Events.mana.disabled.connect(() => this.toggleManaBar(false));
+		Events.mana.colorChanged.connect((color) =>
 			this.onManaColorChanged(color),
 		);
-		Events.characterEvents.firstNameChanged.connect((name) =>
+		Events.character.firstNameChanged.connect((name) =>
 			this.onFirstNameChanged(name),
 		);
 	}

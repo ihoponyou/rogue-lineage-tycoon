@@ -30,7 +30,7 @@ export class RunState extends CharacterState {
 	}
 
 	public override initialize(): void {
-		Events.manaEvents.manaColorChanged.connect((color) => {
+		Events.mana.colorChanged.connect((color) => {
 			this.manaTrail.Color = new ColorSequence(color);
 		});
 	}
@@ -44,7 +44,7 @@ export class RunState extends CharacterState {
 			},
 		);
 
-		this.manaEmptiedConnection = Events.manaEvents.manaEmptied.connect(() =>
+		this.manaEmptiedConnection = Events.mana.emptied.connect(() =>
 			this.onManaEmptied(),
 		);
 

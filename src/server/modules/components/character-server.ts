@@ -26,7 +26,7 @@ const KNOCK_PERCENT_THRESHOLD = 0.15;
 const BASE_STOMACH_DECAY_RATE = 0.1;
 const BASE_TOXICITY_DECAY_RATE = 0.05;
 
-const EVENTS = Events.characterEvents;
+const EVENTS = Events.character;
 
 @Component({
 	tag: "Character",

@@ -9,7 +9,7 @@ import { Players } from "@rbxts/services";
 
 const BASE_MANA_CHARGE_RATE = 100 / 3.5;
 const BASE_MANA_DECAY_RATE = 100 / 2.5;
-const EVENTS = Events.manaEvents;
+const EVENTS = Events.mana;
 
 interface PlayerData {
 	ChargingMana: boolean;
@@ -74,13 +74,13 @@ export class ManaService
 			DecayRate: BASE_MANA_DECAY_RATE,
 		});
 
-		EVENTS.manaObtained(player);
+		EVENTS.obtained(player);
 	}
 
 	onManaDisabled(player: Player): void {
 		this.sessionData.delete(player);
 
-		EVENTS.manaDisabled(player);
+		EVENTS.disabled(player);
 	}
 
 	toggleManaObtained(player: Player, bool: boolean): void {
@@ -101,10 +101,10 @@ export class ManaService
 
 		data.Mana -= math.min(data.Mana, decayRate * deltaTime);
 		if (data.Mana === 0) {
-			EVENTS.manaEmptied(player);
+			EVENTS.emptied(player);
 		}
 
-		EVENTS.manaChanged.fire(player, data.Mana);
+		EVENTS.changed.fire(player, data.Mana);
 	}
 
 	chargeMana(player: Player, deltaTime: number): void {
@@ -116,10 +116,10 @@ export class ManaService
 
 		if (data.Mana === 100) {
 			data.ChargingMana = false;
-			EVENTS.manaFilled(player);
+			EVENTS.filled(player);
 			EVENTS.charge(player, false);
 		}
 
-		EVENTS.manaChanged.fire(player, data.Mana);
+		EVENTS.changed.fire(player, data.Mana);
 	}
 }

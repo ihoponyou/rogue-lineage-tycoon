@@ -34,14 +34,14 @@ export class ChargeManaState extends CharacterState {
 	public override enter(): void {
 		this.character.instance.Humanoid.WalkSpeed =
 			this.character.getWalkSpeed() * 0.85;
-		Events.manaEvents.charge(true);
+		Events.mana.charge(true);
 		this.chargeSound.Play();
 
 		this.dashConnection = this.inputController.dashTriggered.Connect(
 			(direction) => this.stateMachine.transitionTo("dash", direction),
 		);
 
-		this.manaFilledConnection = Events.manaEvents.manaFilled.connect(() =>
+		this.manaFilledConnection = Events.mana.filled.connect(() =>
 			this.stateMachine.transitionTo("idle"),
 		);
 
@@ -64,7 +64,7 @@ export class ChargeManaState extends CharacterState {
 
 	public override exit(): void {
 		this.character.resetToWalkSpeed();
-		Events.manaEvents.charge(false);
+		Events.mana.charge(false);
 
 		this.dashConnection?.Disconnect();
 		this.climbConnection?.Disconnect();

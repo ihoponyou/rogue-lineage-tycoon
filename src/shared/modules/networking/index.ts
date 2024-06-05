@@ -1,5 +1,4 @@
 import { Networking } from "@flamework/networking";
-import { ResetEvents } from "./reset-events";
 import {
 	ManaClientToServerEvents,
 	ManaServerToClientEvents,
@@ -11,14 +10,14 @@ import {
 
 interface ServerToClientEvents {
 	kicked(): void;
-	manaEvents: ManaServerToClientEvents;
-	characterEvents: CharacterServerToClientEvents;
+	mana: ManaServerToClientEvents;
+	character: CharacterServerToClientEvents;
 }
 
 interface ClientToServerEvents {
-	resetEvents: ResetEvents;
-	manaEvents: ManaClientToServerEvents;
-	characterEvents: CharacterClientToServerEvents;
+	reset(): void;
+	mana: ManaClientToServerEvents;
+	character: CharacterClientToServerEvents;
 }
 
 interface ServerToClientFunctions {}
