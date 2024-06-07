@@ -39,9 +39,7 @@ interface Counter extends Frame {
 }
 
 @Controller()
-export class HudController
-	implements OnStart, OnLocalCharacterAdded, OnLocalCharacterRemoving
-{
+export class HudController implements OnStart, OnLocalCharacterAdded {
 	private playerGui = Players.LocalPlayer.WaitForChild(
 		"PlayerGui",
 	) as PlayerGui;
@@ -70,18 +68,18 @@ export class HudController
 	constructor(private manaController: ManaController) {}
 
 	onStart(): void {
-		Events.manaEvents.manaObtained.connect(() => this.toggleManaBar(true));
-		Events.manaEvents.manaDisabled.connect(() => this.toggleManaBar(false));
-		Events.manaEvents.manaColorChanged.connect((color) =>
+		Events.mana.obtained.connect(() => this.toggleManaBar(true));
+		Events.mana.disabled.connect(() => this.toggleManaBar(false));
+		Events.mana.colorChanged.connect((color) =>
 			this.onManaColorChanged(color),
 		);
-		Events.characterEvents.firstNameChanged.connect((name) =>
+		Events.character.firstNameChanged.connect((name) =>
 			this.onFirstNameChanged(name),
 		);
 	}
 
 	onLocalCharacterAdded(character: Model): void {
-		this.characterTrove.clean();
+		this.characterTrove.attachToInstance(character);
 		this.manaTrove = this.characterTrove.extend();
 
 		this.manaGui = this.characterTrove.clone(
@@ -139,9 +137,9 @@ export class HudController
 			});
 	}
 
-	onLocalCharacterRemoving(character: Model): void {
-		this.characterTrove.clean();
-	}
+	// onLocalCharacterRemoving(character: Model): void {
+	// 	this.characterTrove.clean();
+	// }
 
 	onManaColorChanged(color: Color3): void {
 		while (!this.manaSlider) task.wait();
@@ -154,8 +152,8 @@ export class HudController
 	}
 
 	toggleManaBar(bool: boolean): void {
+		print("a");
 		while (!this.manaGui) task.wait();
-
 		this.manaGui.Enabled = bool;
 		if (bool) {
 			this.manaTrove = this.characterTrove.extend();

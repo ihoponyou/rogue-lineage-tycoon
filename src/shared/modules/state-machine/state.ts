@@ -1,28 +1,22 @@
+import { StateMachine } from ".";
+
 export abstract class State {
-	private transitions = new Set<State>();
-	protected busy = false;
-	protected enterTime = 0;
+	abstract readonly name: string;
 
-	abstract name: string;
+	protected tickEntered = 0;
 
-	enter(): void {
-		this.enterTime = tick();
+	constructor(protected readonly stateMachine: StateMachine) {}
+
+	initialize(): void {}
+
+	enter(...args: Array<unknown>): void {
+		this.tickEntered = tick();
 		// print(`+ ${this.name}`);
 	}
 
+	update(deltaTime: number): void {}
+
 	exit(): void {
 		// print(`- ${this.name}`);
-	}
-
-	isBusy(): boolean {
-		return this.busy;
-	}
-
-	addTransitionTo(state: State) {
-		this.transitions.add(state);
-	}
-
-	hasTransitionTo(state: State) {
-		return this.transitions.has(state);
 	}
 }

@@ -1,12 +1,8 @@
 import { Controller, OnStart, OnTick } from "@flamework/core";
 import Object from "@rbxts/object-utils";
 import { ContextActionService, UserInputService } from "@rbxts/services";
-import { Trove } from "@rbxts/trove";
 import { valueof } from "../../../../types/valueof";
-import { ManaController } from "./mana-controller";
-import { Direction, MovementController } from "./movement-controller";
 
-const RUN_INPUT_INTERVAL = 0.2;
 const BEGIN = Enum.UserInputState.Begin;
 const END = Enum.UserInputState.End;
 
@@ -55,8 +51,6 @@ type Action = (state: Enum.UserInputState) => Enum.ContextActionResult | void;
 
 @Controller()
 export class KeybindController {
-	private lastForwardInputTick = 0;
-
 	keybinds = DEFAULT_KEYBINDS;
 
 	// like the old unity one

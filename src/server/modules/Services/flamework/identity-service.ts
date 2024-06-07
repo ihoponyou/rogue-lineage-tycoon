@@ -333,7 +333,7 @@ export class IdentityService
 		data.ManaColor.R = color.R;
 		data.ManaColor.G = color.G;
 		data.ManaColor.B = color.B;
-		Events.manaEvents.manaColorChanged(player, color);
+		Events.mana.colorChanged(player, color);
 	}
 
 	setFirstName(player: Player, name: string) {
@@ -343,7 +343,7 @@ export class IdentityService
 			if (humanoid) humanoid.DisplayName = name;
 		}
 
-		Events.characterEvents.firstNameChanged(player, name);
+		Events.character.firstNameChanged(player, name);
 	}
 
 	addCustomHead(
