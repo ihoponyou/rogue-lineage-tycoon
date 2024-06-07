@@ -1,0 +1,51 @@
+import { BaseComponent, Component } from "@flamework/components";
+import { OnStart } from "@flamework/core";
+import { Players } from "@rbxts/services";
+import { Trove } from "@rbxts/trove";
+import { IdentityService } from "server/Services/flamework/identity-service";
+import { OnRemoved } from "../../../types/lifecycles";
+
+interface Attributes {
+	armorToSet: string;
+}
+
+@Component({
+	tag: "ArmorPortal",
+	defaults: {
+		armorToSet: "SpiderCloak",
+	},
+})
+export class ArmorPortal
+	extends BaseComponent<Attributes, BasePart>
+	implements OnStart, OnRemoved
+{
+	private trove = new Trove();
+	private debounce = new Array<Player>();
+
+	constructor(private identityService: IdentityService) {
+		super();
+	}
+
+	onStart(): void {
+		this.trove.connect(this.instance.Touched, (otherPart) =>
+			this.onTouched(otherPart),
+		);
+	}
+
+	onRemoved(): void {
+		this.trove.destroy();
+	}
+
+	onTouched(otherPart: BasePart): void {
+		const character = otherPart.Parent as Model | undefined;
+		if (!character) return;
+		const player = Players.GetPlayerFromCharacter(character);
+		if (!player) return;
+		if (this.debounce.includes(player)) return;
+
+		const index = this.debounce.push(player) - 1;
+		this.identityService.setArmor(character, this.attributes.armorToSet);
+
+		task.delay(2, () => this.debounce.remove(index));
+	}
+}

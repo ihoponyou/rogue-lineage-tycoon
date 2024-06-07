@@ -23,23 +23,23 @@
 			"Source": {
 				"$className": "Folder",
 				"Modules": {
-					"$path": "out/shared/modules"
+					"$path": "out/shared"
 				},
-				"ClientModules": {
-					"$path": "out/client/modules"
+				"Client": {
+					"$path": "out/client"
 				}
 			}
 		},
 		"ServerScriptService": {
 			"$className": "ServerScriptService",
 			"Source": {
-				"$path": "out/server/scripts"
+				"$path": "out/scripts/server"
 			}
 		},
 		"ServerStorage": {
 			"$className": "ServerStorage",
 			"Source": {
-				"$path": "out/server/modules"
+				"$path": "out/server"
 			}
 		},
 		"StarterPlayer": {
@@ -47,13 +47,13 @@
 			"StarterCharacterScripts": {
 				"$className": "StarterCharacterScripts",
 				"Source": {
-					"$path": "out/client/scripts/character"
+					"$path": "out/scripts/character"
 				}
 			},
 			"StarterPlayerScripts": {
 				"$className": "StarterPlayerScripts",
 				"Source": {
-					"$path": "out/client/scripts/player"
+					"$path": "out/scripts/player"
 				}
 			}
 		}
