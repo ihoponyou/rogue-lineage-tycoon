@@ -2,6 +2,7 @@ import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Ragdoll } from "shared/modules/components/ragdoll";
 
+// TODO: local player exclusivity
 @Component({
 	tag: "Ragdoll",
 	defaults: {

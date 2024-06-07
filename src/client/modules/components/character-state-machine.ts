@@ -1,5 +1,4 @@
 import { Component } from "@flamework/components";
-import { CharacterInstance } from "shared/modules/components/character";
 import { CharacterClient } from "./character-client";
 import { DisposableComponent } from "shared/modules/components/disposable-component";
 import { OnStart, OnTick } from "@flamework/core";
@@ -14,12 +13,9 @@ import { AnimationController } from "../controllers/animation-controller";
 import { ClimbState } from "../player-state/climb-state";
 import { ChargeManaState } from "../player-state/charge-mana-state";
 
-// TODO: only for local player
-@Component({
-	tag: "Character",
-})
+@Component()
 export class CharacterStateMachine
-	extends DisposableComponent<{}, CharacterInstance>
+	extends DisposableComponent<{}, Instance>
 	implements OnStart, OnTick
 {
 	private stateMachine = new StateMachine();
@@ -67,9 +63,7 @@ export class CharacterStateMachine
 			keybindController,
 			inputController,
 		);
-	}
 
-	onStart(): void {
 		this.stateMachine.addStates([
 			this.IDLE,
 			this.RUN,
@@ -77,6 +71,9 @@ export class CharacterStateMachine
 			this.CLIMB,
 			this.CHARGE_MANA,
 		]);
+	}
+
+	onStart(): void {
 		this.stateMachine.initialize(this.IDLE);
 	}
 

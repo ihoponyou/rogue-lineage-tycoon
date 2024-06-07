@@ -39,9 +39,7 @@ interface Counter extends Frame {
 }
 
 @Controller()
-export class HudController
-	implements OnStart, OnLocalCharacterAdded, OnLocalCharacterRemoving
-{
+export class HudController implements OnStart, OnLocalCharacterAdded {
 	private playerGui = Players.LocalPlayer.WaitForChild(
 		"PlayerGui",
 	) as PlayerGui;
@@ -81,7 +79,7 @@ export class HudController
 	}
 
 	onLocalCharacterAdded(character: Model): void {
-		this.characterTrove.clean();
+		this.characterTrove.attachToInstance(character);
 		this.manaTrove = this.characterTrove.extend();
 
 		this.manaGui = this.characterTrove.clone(
@@ -139,9 +137,9 @@ export class HudController
 			});
 	}
 
-	onLocalCharacterRemoving(character: Model): void {
-		this.characterTrove.clean();
-	}
+	// onLocalCharacterRemoving(character: Model): void {
+	// 	this.characterTrove.clean();
+	// }
 
 	onManaColorChanged(color: Color3): void {
 		while (!this.manaSlider) task.wait();
@@ -154,8 +152,8 @@ export class HudController
 	}
 
 	toggleManaBar(bool: boolean): void {
+		print("a");
 		while (!this.manaGui) task.wait();
-
 		this.manaGui.Enabled = bool;
 		if (bool) {
 			this.manaTrove = this.characterTrove.extend();

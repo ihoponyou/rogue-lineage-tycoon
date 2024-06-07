@@ -1,13 +1,5 @@
-import { Controller, Dependency, OnStart, OnTick } from "@flamework/core";
+import { Controller, OnStart } from "@flamework/core";
 import { Events } from "client/modules/networking";
-import { ReplicatedStorage } from "@rbxts/services";
-import { OnLocalCharacterAdded } from "../../../../types/lifecycles";
-import { CharacterClient as Character } from "client/modules/components/character-client";
-import { Components } from "@flamework/components";
-
-const EVENTS = Events.mana;
-
-const SFX = ReplicatedStorage.Effects.Sounds;
 
 @Controller()
 export class ManaController implements OnStart {
@@ -15,9 +7,9 @@ export class ManaController implements OnStart {
 	mana = 0;
 
 	onStart(): void {
-		EVENTS.obtained.connect(() => (this.manaEnabled = true));
-		EVENTS.disabled.connect(() => (this.manaEnabled = false));
-		EVENTS.changed.connect((value) => (this.mana = value));
+		Events.mana.obtained.connect(() => (this.manaEnabled = true));
+		Events.mana.disabled.connect(() => (this.manaEnabled = false));
+		Events.mana.changed.connect((value) => (this.mana = value));
 	}
 
 	hasMana(): boolean {
