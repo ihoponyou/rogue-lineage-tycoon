@@ -60,8 +60,6 @@ export class HudController implements OnStart, OnLocalCharacterAdded {
 
 	private nameLabel?: TextLabel;
 
-	private silverGui?: SilverGui;
-
 	constructor(private manaController: ManaController) {}
 
 	onStart(): void {
@@ -105,11 +103,7 @@ export class HudController implements OnStart, OnLocalCharacterAdded {
 
 		this.nameLabel = this.statGui.Container.CharacterName;
 
-		this.silverGui = this.characterTrove.clone(UI.Currency.SilverGui);
-		this.silverGui.Parent = this.playerGui;
-
 		this.manaGui.Enabled = true;
-		this.silverGui.Enabled = true;
 		this.statGui.Enabled = true;
 
 		const components = Dependency<Components>();
@@ -149,7 +143,6 @@ export class HudController implements OnStart, OnLocalCharacterAdded {
 	}
 
 	toggleManaBar(bool: boolean): void {
-		print("a");
 		while (!this.manaGui) task.wait();
 		this.manaGui.Enabled = bool;
 		if (bool) {

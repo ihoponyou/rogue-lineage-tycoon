@@ -7,11 +7,13 @@ import {
 	CharacterClientToServerEvents,
 	CharacterServerToClientEvents,
 } from "./character-events";
+import { SilverServerToClientEvents } from "./silver-events";
 
 interface ServerToClientEvents {
 	kicked(): void;
 	mana: ManaServerToClientEvents;
 	character: CharacterServerToClientEvents;
+	silver: SilverServerToClientEvents;
 }
 
 interface ClientToServerEvents {
@@ -31,5 +33,5 @@ export const GlobalEvents = Networking.createEvent<
 
 export const GlobalFunctions = Networking.createFunction<
 	ClientToServerFunctions,
-	ServerToClientEvents
+	ServerToClientFunctions
 >();

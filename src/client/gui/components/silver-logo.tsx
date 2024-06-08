@@ -1,12 +1,24 @@
-import React from "@rbxts/react";
+import React, { useBinding, useState } from "@rbxts/react";
+import { Events } from "client/networking";
+import { useEventListener } from "@rbxts/pretty-react-hooks";
 
 export function SilverLogo() {
+	const [amount, setAmount] = useState(0);
+
+	useEventListener(
+		Events.silver.changed,
+		(value: number) => {
+			setAmount(value);
+		},
+		{},
+	);
+
 	return (
-		<imagebutton
+		<imagelabel
 			key="SilverLogo"
 			Active={false}
 			AnchorPoint={new Vector2(0, 1)}
-			AutoButtonColor={false}
+			// AutoButtonColor={false}
 			BackgroundTransparency={1}
 			Image="rbxassetid://2630515520"
 			Position={new UDim2(0, 10, 1, -10)}
@@ -29,7 +41,7 @@ export function SilverLogo() {
 				}
 				Position={new UDim2(1, 5, 0, -1)}
 				Size={new UDim2(0, 0, 0, 20)}
-				Text="0"
+				Text={`${amount}`}
 				TextColor3={Color3.fromRGB(255, 255, 255)}
 				TextSize={18}
 				TextStrokeColor3={Color3.fromRGB(74, 74, 74)}
@@ -111,6 +123,6 @@ export function SilverLogo() {
 					/>
 				</textbutton>
 			</frame>
-		</imagebutton>
+		</imagelabel>
 	);
 }
