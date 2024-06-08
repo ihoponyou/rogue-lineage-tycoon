@@ -1,15 +1,13 @@
-import { Component, Components } from "@flamework/components";
-import { Dependency, OnStart } from "@flamework/core";
+import { Component } from "@flamework/components";
 import { Timer, TimerState } from "@rbxts/timer";
-import { DisposableComponent } from "shared/components/disposable-component";
 import { t } from "@rbxts/t";
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
-import { Plot } from "./plot";
 import {
 	PlotAsset,
 	PlotAssetAttributes,
 	PlotAssetInstance,
 } from "./plot-asset";
+import { ProductInstance } from "./product";
 
 interface DropperAttributes extends PlotAssetAttributes {
 	dropsPerSecond: number;
@@ -20,8 +18,6 @@ interface DropperAttributes extends PlotAssetAttributes {
 type DropperInstance = PlotAssetInstance & {
 	Spout: Attachment;
 };
-
-type Product = BasePart | Model;
 
 @Component({
 	tag: "Dropper",
@@ -38,7 +34,7 @@ type Product = BasePart | Model;
 })
 export class Dropper extends PlotAsset<DropperAttributes, DropperInstance> {
 	private timer = new Timer(this.attributes.dropsPerSecond);
-	private product?: Product;
+	private product?: ProductInstance;
 
 	public override onStart(): void {
 		super.onStart();
@@ -83,6 +79,8 @@ export class Dropper extends PlotAsset<DropperAttributes, DropperInstance> {
 			// TODO: use a part cache, maybe move to client
 			const clone = this.trove.clone(this.product);
 			clone.Parent = Workspace;
+			clone.AddTag("Product");
+			clone.SetAttribute("value", 100);
 
 			if (this.product.IsA("Model")) {
 				(clone as Model).PivotTo(this.instance.Spout.WorldCFrame);

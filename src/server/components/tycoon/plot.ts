@@ -1,8 +1,9 @@
-import { Component, Components } from "@flamework/components";
-import { Dependency, OnStart } from "@flamework/core";
+import { Component } from "@flamework/components";
+import { OnStart } from "@flamework/core";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { GenericPlotAsset } from "./plot-asset";
 import { ClickInteractable } from "../interactable/click-interactable";
+import { Currency } from "./product";
 
 interface PlotAttributes {
 	id: number;
@@ -18,10 +19,17 @@ export class Plot
 	extends DisposableComponent<PlotAttributes, BasePart>
 	implements OnStart
 {
+	public assets = new Map<ClickInteractable, GenericPlotAsset>();
+
 	private static totalPlots = 0;
 
 	private owner?: Player;
-	public assets = new Map<ClickInteractable, GenericPlotAsset>();
+	private bank: { [currency in Currency]: number } = {
+		Silver: 0,
+		Insight: 0,
+		Valu: 0,
+		Alignment: 0,
+	};
 
 	public onStart(): void {
 		this.attributes.id = ++Plot.totalPlots;
@@ -45,5 +53,10 @@ export class Plot
 		} catch (err: unknown) {
 			warn(err + "; Pad may be missing CollectionService tag");
 		}
+	}
+
+	public deposit(currency: Currency, value: number): void {
+		this.bank[currency] += value;
+		print(this.bank);
 	}
 }
