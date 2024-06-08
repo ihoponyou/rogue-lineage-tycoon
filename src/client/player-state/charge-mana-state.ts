@@ -5,12 +5,12 @@ import { StateMachine } from "shared/state-machine";
 import { CharacterClient } from "../components/character-client";
 import { KeybindController } from "../controllers/keybind-controller";
 import { InputController } from "../controllers/input-controller";
+import { SFX } from "shared/constants";
 
 export class ChargeManaState extends CharacterState {
 	public readonly name = "ChargeMana";
-	private chargeSound = ReplicatedStorage.Effects.Sounds.Charging.Clone();
-	private filledSound =
-		ReplicatedStorage.Effects.Sounds.FinishedCharging.Clone();
+	private chargeSound = SFX.Charging.Clone();
+	private filledSound = SFX.FinishedCharging.Clone();
 
 	private dashConnection?: RBXScriptConnection;
 	private climbConnection?: RBXScriptConnection;

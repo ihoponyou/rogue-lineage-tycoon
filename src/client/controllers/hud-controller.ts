@@ -29,7 +29,7 @@ const MAX_STOMACH = 100;
 const MAX_TOXICITY = 100;
 const MAX_TEMPERATURE = 100;
 
-const UI = ReplicatedStorage.UI;
+const UI = ReplicatedStorage.Assets.UI;
 
 interface Counter extends Frame {
 	Digit: TextLabel;

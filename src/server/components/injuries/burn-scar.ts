@@ -4,6 +4,7 @@ import { CharacterServer } from "../character-server";
 import { ReplicatedStorage } from "@rbxts/services";
 import { DataService } from "server/services/data-service";
 import { OnTick } from "@flamework/core";
+import { APPEARANCE } from "shared/constants";
 
 const LOWER_TEMPERATURE_THRESHOLD = 95;
 
@@ -31,7 +32,7 @@ export class BurnScar extends BaseInjury implements OnTick {
 			data.Temperature = 70;
 		}
 
-		ReplicatedStorage.Appearance.FacialExtras.Scars.BurnScar.Clone().Parent =
+		APPEARANCE.FacialExtras.Scars.BurnScar.Clone().Parent =
 			this.character.getHead();
 	}
 

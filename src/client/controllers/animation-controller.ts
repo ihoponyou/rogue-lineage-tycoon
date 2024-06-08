@@ -6,6 +6,7 @@ import {
 import { CharacterClient as Character } from "client/components/character-client";
 import { Components } from "@flamework/components";
 import { ReplicatedStorage } from "@rbxts/services";
+import { ANIMATIONS } from "shared/constants";
 
 @Controller()
 export class AnimationController
@@ -19,7 +20,7 @@ export class AnimationController
 		components.waitForComponent<Character>(character).andThen((value) => {
 			this.character = value;
 
-			for (const animation of ReplicatedStorage.Animations.GetDescendants()) {
+			for (const animation of ANIMATIONS.GetDescendants()) {
 				if (!animation.IsA("Animation")) continue;
 				this.loadAnimation(animation);
 			}

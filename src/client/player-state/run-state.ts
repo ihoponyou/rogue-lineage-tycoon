@@ -7,6 +7,7 @@ import { AnimationController } from "../controllers/animation-controller";
 import { ManaController } from "../controllers/mana-controller";
 import { Events } from "../networking";
 import { KeybindController } from "../controllers/keybind-controller";
+import { VFX } from "shared/constants";
 
 export class RunState extends CharacterState {
 	readonly name = "Run";
@@ -100,7 +101,7 @@ export class RunState extends CharacterState {
 	}
 
 	private newManaTrail(): Trail {
-		const trail = ReplicatedStorage.Effects.Visuals.ManaRunTrail.Clone();
+		const trail = VFX.ManaRunTrail.Clone();
 		trail.Enabled = false;
 		const torso = this.character.getTorso();
 		trail.Parent = torso;

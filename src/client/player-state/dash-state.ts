@@ -7,6 +7,7 @@ import { KeybindController } from "../controllers/keybind-controller";
 import { ManaController } from "../controllers/mana-controller";
 import { AnimationController } from "../controllers/animation-controller";
 import { Direction } from "../controllers/input-controller";
+import { SFX, VFX } from "shared/constants";
 
 const DIRECTION_TO_ANGLE: { [direction: string]: number } = {
 	forward: 0,
@@ -105,11 +106,11 @@ export class DashState extends CharacterState {
 	}
 
 	private newDashSound(): Sound {
-		return ReplicatedStorage.Effects.Sounds.ManaDash.Clone();
+		return SFX.ManaDash.Clone();
 	}
 
 	private newDashParticles(): ParticleEmitter {
-		return ReplicatedStorage.Effects.Visuals.ManaStopParticle.Clone();
+		return VFX.ManaStopParticle.Clone();
 	}
 
 	private directionToDashAnimationName(direction: Direction): string {

@@ -15,6 +15,7 @@ import Object from "@rbxts/object-utils";
 import { Components } from "@flamework/components";
 import { CharacterServer } from "server/components/character-server";
 import { Events } from "server/networking";
+import { APPEARANCE } from "shared/constants";
 
 export type Sex = "Male" | "Female";
 const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
@@ -260,7 +261,7 @@ export class IdentityService
 			raceName = "Other";
 		}
 
-		const FACES = ReplicatedStorage.Appearance.Faces;
+		const FACES = APPEARANCE.Faces;
 		const faceFolder = FACES.FindFirstChild(raceName);
 		if (!faceFolder) error(`Faces not found for ${raceName}`);
 
@@ -282,7 +283,7 @@ export class IdentityService
 		if (!head || head.Size !== new Vector3(2, 1, 1)) return;
 		if (head.FindFirstChild("Lashes")) return;
 
-		const lashes = ReplicatedStorage.Appearance.FacialExtras.Lashes.Clone();
+		const lashes = APPEARANCE.FacialExtras.Lashes.Clone();
 		lashes.Parent = head;
 	}
 
@@ -353,8 +354,7 @@ export class IdentityService
 		const mesh = head?.FindFirstChild("Mesh");
 		if (mesh) mesh.Destroy();
 
-		let customHead =
-			ReplicatedStorage.Appearance.CustomHeads.FindFirstChild(raceName);
+		let customHead = APPEARANCE.CustomHeads.FindFirstChild(raceName);
 		if (!customHead) {
 			this.logger.Error(
 				ERROR_404_MESSAGE_TEMPLATE,
@@ -374,9 +374,7 @@ export class IdentityService
 				}
 			} else {
 				customHead =
-					ReplicatedStorage.Appearance.CustomHeads.FindFirstChild(
-						"Glowscroom",
-					);
+					APPEARANCE.CustomHeads.FindFirstChild("Glowscroom");
 			}
 		}
 
@@ -388,9 +386,7 @@ export class IdentityService
 
 	addCustomAccessory(character: Model, raceName: keyof RaceGlossary) {
 		const customAccessory =
-			ReplicatedStorage.Appearance.CustomAccessories.FindFirstChild(
-				raceName,
-			);
+			APPEARANCE.CustomAccessories.FindFirstChild(raceName);
 
 		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
 		if (!humanoid) error(`Failed to find Humanoid in ${character}`);
@@ -445,21 +441,17 @@ export class IdentityService
 	getRandomPersonality(raceName: keyof RaceGlossary): string {
 		if (raceName === "Fischeran") {
 			raceName = "Rigan";
-		} else if (
-			!ReplicatedStorage.Appearance.Faces.FindFirstChild(raceName)
-		) {
+		} else if (!APPEARANCE.Faces.FindFirstChild(raceName)) {
 			raceName = "Other";
 		}
 
 		let personality = "Default";
 		if (
-			ReplicatedStorage.Appearance.Faces.FindFirstChild(
-				raceName,
-			)?.FindFirstChild("Emotions")
-		) {
-			const emotions = ReplicatedStorage.Appearance.Faces?.FindFirstChild(
-				raceName,
+			APPEARANCE.Faces.FindFirstChild(raceName)?.FindFirstChild(
+				"Emotions",
 			)
+		) {
+			const emotions = APPEARANCE.Faces?.FindFirstChild(raceName)
 				?.FindFirstChild("Emotions")
 				?.GetChildren();
 			if (!emotions) return personality;

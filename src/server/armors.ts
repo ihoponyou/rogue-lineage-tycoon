@@ -20,7 +20,7 @@ export type Armor = {
 	};
 };
 
-export const OUTFITS = ReplicatedStorage.Appearance.Outfits;
+export const OUTFITS = ReplicatedStorage.Assets.Appearance.Outfits;
 
 export const ARMORS: { [key: string]: Armor } = {
 	Abysswalker: {

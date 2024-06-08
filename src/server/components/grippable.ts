@@ -4,13 +4,14 @@ import { Dependency, OnStart } from "@flamework/core";
 import { RagdollServer } from "./ragdoll-server";
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
 import { KeyInteractable } from "./interactable/key-interactable";
+import { ANIMATIONS, SFX, VFX } from "shared/constants";
 
 interface Attributes {
 	gettingGripped: boolean;
 }
 
-const GETTING_GRIPPED_ANIMATION = ReplicatedStorage.Animations.Combat.Gripped;
-const GRIPPING_ANIMATION = ReplicatedStorage.Animations.Combat.Gripping;
+const GETTING_GRIPPED_ANIMATION = ANIMATIONS.Combat.Gripped;
+const GRIPPING_ANIMATION = ANIMATIONS.Combat.Gripping;
 
 @Component({
 	tag: "Grippable",
@@ -90,12 +91,8 @@ export class Grippable
 
 		const torso = this.character.getTorso();
 		const head = this.character.getHead();
-		const hitSound = this.gripTrove.clone(
-			ReplicatedStorage.Effects.Sounds.PunchHit,
-		);
-		const hitParticle = this.gripTrove.clone(
-			ReplicatedStorage.Effects.Visuals.PunchEmit,
-		);
+		const hitSound = this.gripTrove.clone(SFX.PunchHit);
+		const hitParticle = this.gripTrove.clone(VFX.PunchEmit);
 		hitSound.Parent = torso;
 		hitParticle.Parent = head;
 
