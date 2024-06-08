@@ -6,8 +6,8 @@ type InteractedCallback = (player: Player) => void;
 
 @Component()
 export abstract class Interactable<
-	A extends {},
-	I extends Instance,
+	A extends {} = {},
+	I extends Instance = Instance,
 > extends DisposableComponent<A, I> {
 	private interacted = new Signal<InteractedCallback>();
 

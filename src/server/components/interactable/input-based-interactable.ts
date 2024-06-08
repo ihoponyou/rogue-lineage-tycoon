@@ -5,8 +5,11 @@ import { Interactable } from ".";
 @Component({
 	instanceGuard: Flamework.createGuard<BasePart | Model>(),
 })
-export abstract class InputBasedInteractable
-	extends Interactable<{}, Instance>
+export abstract class InputBasedInteractable<
+		A extends {} = {},
+		I extends Instance = Instance,
+	>
+	extends Interactable<A, I>
 	implements OnStart
 {
 	protected abstract inputInstance: ClickDetector | ProximityPrompt;

@@ -2,7 +2,10 @@ import { Component } from "@flamework/components";
 import { InputBasedInteractable } from "./input-based-interactable";
 
 @Component()
-export class KeyInteractable extends InputBasedInteractable {
+export class KeyInteractable<
+	A extends {} = {},
+	I extends Instance = Instance,
+> extends InputBasedInteractable<A, I> {
 	private promptDebounce = false;
 	protected inputInstance = new Instance("ProximityPrompt");
 

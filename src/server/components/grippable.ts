@@ -21,11 +21,10 @@ const GRIPPING_ANIMATION = ANIMATIONS.Combat.Gripping;
 	},
 })
 export class Grippable
-	extends DisposableComponent<Attributes, Model>
+	extends KeyInteractable<Attributes, Model>
 	implements OnStart
 {
 	private gripTrove = this.trove.extend();
-	private interactable: KeyInteractable;
 
 	constructor(
 		private character: CharacterServer,
@@ -34,23 +33,21 @@ export class Grippable
 		super();
 
 		const components = Dependency<Components>();
-		this.interactable = this.trove.add(
-			components.addComponent<KeyInteractable>(this.instance),
-		);
 	}
 
-	public onStart(): void {
-		this.interactable.toggle(false);
-		this.interactable.setKey(Enum.KeyCode.V);
-		this.interactable.onInteracted((player) => this.onInteracted(player));
+	public override onStart(): void {
+		super.onStart();
+
+		this.toggle(false);
+		this.setKey(Enum.KeyCode.B);
 		this.trove.add(
 			this.ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
-				this.interactable.toggle(newValue);
+				this.toggle(newValue);
 			}),
 		);
 	}
 
-	private onInteracted(player: Player): void {
+	public override interact(player: Player): void {
 		if (!player.Character) return;
 		const components = Dependency<Components>();
 		const characterComponent = components.getComponent<CharacterServer>(
