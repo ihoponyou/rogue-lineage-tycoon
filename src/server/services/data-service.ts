@@ -2,12 +2,9 @@ import { Service } from "@flamework/core";
 import { GetProfileStore } from "@rbxts/profileservice";
 import { Profile } from "@rbxts/profileservice/globals";
 import { Players, RunService } from "@rbxts/services";
-import {
-	OnPlayerAdded,
-	OnPlayerRemoving,
-} from "../../../../types/lifecycles";
-import { Sex } from "./identity-service";
+import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 import { Logger } from "@rbxts/log";
+import { Sex } from "./identity-service";
 import { SECONDS_PER_DAY } from "./daylight-service";
 
 interface Vector {

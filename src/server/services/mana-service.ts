@@ -1,8 +1,5 @@
 import { OnStart, OnTick, Service } from "@flamework/core";
-import {
-	OnCharacterAdded,
-	OnPlayerRemoving,
-} from "../../../../types/lifecycles";
+import { OnCharacterAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 import { DataService } from "./data-service";
 import { Events } from "server/networking";
 import { Players } from "@rbxts/services";

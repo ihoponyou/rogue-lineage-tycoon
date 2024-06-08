@@ -1,9 +1,9 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { setInterval } from "@rbxts/set-timeout";
-import { CharacterServer } from "./character-server";
+import { CharacterServer } from "../character-server";
 import { Players, TweenService } from "@rbxts/services";
-import { OnRemoved } from "../../../types/lifecycles";
+import { OnRemoved } from "../../../../types/lifecycles";
 import { DisposableComponent } from "shared/components/disposable-component";
 
 const HEAT_AMOUNT = 1.5;

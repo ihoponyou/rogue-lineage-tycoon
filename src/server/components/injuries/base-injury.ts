@@ -1,7 +1,7 @@
 import { BaseComponent, Component } from "@flamework/components";
-import { CharacterServer } from "./character-server";
+import { CharacterServer } from "../character-server";
 import { OnStart } from "@flamework/core";
-import { DataService } from "server/Services/flamework/data-service";
+import { DataService } from "server/services/data-service";
 
 @Component()
 export abstract class BaseInjury

@@ -5,7 +5,7 @@ import { setInterval } from "@rbxts/set-timeout";
 import {
 	DataService,
 	PlayerProfile,
-} from "server/Services/flamework/data-service";
+} from "server/services/data-service";
 import { RagdollServer } from "./ragdoll-server";
 import { OnRemoved } from "../../../types/lifecycles";
 import {

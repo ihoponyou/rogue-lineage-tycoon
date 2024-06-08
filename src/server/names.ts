@@ -1,6 +1,6 @@
 import Object from "@rbxts/object-utils";
-import { Sex } from "./Services/flamework/identity-service";
-import { RaceGlossary } from "./race-info";
+import { Sex } from "./services/identity-service";
+import { RaceGlossary } from "./races";
 
 export const NAMES: { [category: string]: Array<string> } = {
 	Azael: [

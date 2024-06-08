@@ -1,8 +1,8 @@
 import { Component } from "@flamework/components";
 import { BaseInjury } from "./base-injury";
-import { CharacterServer } from "./character-server";
+import { CharacterServer } from "../character-server";
 import { ReplicatedStorage } from "@rbxts/services";
-import { DataService } from "server/Services/flamework/data-service";
+import { DataService } from "server/services/data-service";
 import { OnTick } from "@flamework/core";
 
 const LOWER_TEMPERATURE_THRESHOLD = 95;

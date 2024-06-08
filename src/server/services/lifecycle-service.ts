@@ -6,7 +6,7 @@ import {
 	OnPlayerAdded,
 	OnPlayerRemoving,
 	OnRemoved,
-} from "../../../../types/lifecycles";
+} from "../../../types/lifecycles";
 import { Components } from "@flamework/components";
 
 @Service()

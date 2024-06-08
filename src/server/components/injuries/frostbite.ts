@@ -1,8 +1,8 @@
 import { Component } from "@flamework/components";
 import { BaseInjury } from "./base-injury";
-import { IdentityService } from "server/Services/flamework/identity-service";
-import { CharacterServer } from "./character-server";
-import { DataService } from "server/Services/flamework/data-service";
+import { IdentityService } from "server/services/identity-service";
+import { CharacterServer } from "../character-server";
+import { DataService } from "server/services/data-service";
 import { OnTick } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import { Workspace } from "@rbxts/services";

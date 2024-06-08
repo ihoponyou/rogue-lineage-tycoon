@@ -2,7 +2,7 @@ import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
-import { IdentityService } from "server/Services/flamework/identity-service";
+import { IdentityService } from "server/services/identity-service";
 import { OnRemoved } from "../../../types/lifecycles";
 
 interface Attributes {
