@@ -6,5 +6,15 @@ export abstract class ClickInteractable<
 > extends Interactable<A, I> {
 	protected inputInstance = new Instance("ClickDetector");
 
-	// TODO
+	override onStart(): void {
+		super.onStart();
+
+		this.trove.connect(this.inputInstance.MouseClick, (player) =>
+			this.onClick(player),
+		);
+	}
+
+	private onClick(player: Player): void {
+		this.onInteract(player);
+	}
 }

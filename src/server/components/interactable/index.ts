@@ -9,10 +9,10 @@ export abstract class Interactable<A extends {}, I extends BasePart | Model>
 {
 	protected abstract inputInstance: ClickDetector | ProximityPrompt;
 
-	onStart(): void {
+	public onStart(): void {
 		this.inputInstance.Parent = this.instance;
 		this.trove.add(this.inputInstance);
 	}
 
-	abstract onInteract(player: Player): void;
+	protected abstract onInteract(player: Player): void;
 }
