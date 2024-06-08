@@ -1,17 +1,17 @@
-import { Component } from "@flamework/components";
-import { OnStart } from "@flamework/core";
+import { Component, Components } from "@flamework/components";
+import { Dependency, OnStart } from "@flamework/core";
 import { DisposableComponent } from "shared/components/disposable-component";
+import { Pad } from "./pad";
+import { GenericPlotAsset } from "./plot-asset";
 
 interface PlotAttributes {
 	id: number;
-	ownerId: number;
 }
 
 @Component({
 	tag: "Plot",
 	defaults: {
 		id: -1,
-		ownerId: -1,
 	},
 })
 export class Plot
@@ -20,12 +20,30 @@ export class Plot
 {
 	private static totalPlots = 0;
 
+	private owner?: Player;
+	public assets = new Map<Pad, GenericPlotAsset>();
+
 	public onStart(): void {
 		this.attributes.id = ++Plot.totalPlots;
 	}
 
 	public claim(player: Player): void {
-		if (this.attributes.ownerId !== -1) return;
-		this.attributes.ownerId = player.UserId;
+		if (this.owner !== undefined) return;
+		if (player === this.owner) return;
+		this.owner = player;
+		print(`${player.Name} claimed T${this.attributes.id}`);
+	}
+
+	public getOwner(): Player | undefined {
+		return this.owner;
+	}
+
+	public addAsset(asset: GenericPlotAsset): void {
+		try {
+			this.assets.set(asset.getPad(), asset);
+			print(this.assets);
+		} catch (err: unknown) {
+			warn(err + "; Pad may be missing CollectionService tag");
+		}
 	}
 }
