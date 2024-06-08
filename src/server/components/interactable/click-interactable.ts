@@ -1,20 +1,15 @@
-import { Interactable } from ".";
+import { Component } from "@flamework/components";
+import { InputBasedInteractable } from "./input-based-interactable";
 
-export abstract class ClickInteractable<
-	A extends {},
-	I extends BasePart | Model,
-> extends Interactable<A, I> {
+@Component()
+export class ClickInteractable extends InputBasedInteractable {
 	protected inputInstance = new Instance("ClickDetector");
 
 	override onStart(): void {
 		super.onStart();
 
 		this.trove.connect(this.inputInstance.MouseClick, (player) =>
-			this.onClick(player),
+			this.interact(player),
 		);
-	}
-
-	private onClick(player: Player): void {
-		this.onInteract(player);
 	}
 }

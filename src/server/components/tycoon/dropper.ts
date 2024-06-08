@@ -36,10 +36,7 @@ type Product = BasePart | Model;
 		cost: 0,
 	},
 })
-export class Dropper
-	extends PlotAsset<DropperAttributes, DropperInstance>
-	implements OnStart
-{
+export class Dropper extends PlotAsset<DropperAttributes, DropperInstance> {
 	private timer = new Timer(this.attributes.dropsPerSecond);
 	private product?: Product;
 

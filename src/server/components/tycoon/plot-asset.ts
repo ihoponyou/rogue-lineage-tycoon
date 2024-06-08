@@ -3,7 +3,7 @@ import { Dependency, OnStart } from "@flamework/core";
 import { t } from "@rbxts/t";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Plot } from "./plot";
-import { Pad } from "./pad";
+import { ClickInteractable } from "../interactable/click-interactable";
 
 export interface PlotAssetAttributes {
 	enabled: boolean;
@@ -33,14 +33,18 @@ export abstract class PlotAsset<
 	implements OnStart
 {
 	protected plot!: Plot;
-	protected pad!: Pad;
+	protected pad!: ClickInteractable;
 
 	public onStart(): void {
 		const components = Dependency<Components>();
-		this.plot = components.getComponent<Plot>(this.instance.Parent)!;
-		this.pad = components.getComponent<Pad>(this.instance.Pad)!;
+		const plot = components.getComponent<Plot>(this.instance.Parent);
+		if (!plot) error("parent is not a Plot or is missing Plot component");
+		this.plot = plot;
+		this.pad = this.trove.add(
+			components.addComponent<ClickInteractable>(this.instance.Pad),
+		);
 
-		this.pad.listenToInteracted(() => this.purchase());
+		this.pad.onInteracted(() => this.purchase());
 
 		this.plot.addAsset(this);
 	}
@@ -51,7 +55,7 @@ export abstract class PlotAsset<
 		print(`-${this.attributes.cost}`);
 	}
 
-	public getPad(): Pad {
+	public getPad(): ClickInteractable {
 		return this.pad;
 	}
 }

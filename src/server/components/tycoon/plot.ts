@@ -1,8 +1,8 @@
 import { Component, Components } from "@flamework/components";
 import { Dependency, OnStart } from "@flamework/core";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { Pad } from "./pad";
 import { GenericPlotAsset } from "./plot-asset";
+import { ClickInteractable } from "../interactable/click-interactable";
 
 interface PlotAttributes {
 	id: number;
@@ -21,7 +21,7 @@ export class Plot
 	private static totalPlots = 0;
 
 	private owner?: Player;
-	public assets = new Map<Pad, GenericPlotAsset>();
+	public assets = new Map<ClickInteractable, GenericPlotAsset>();
 
 	public onStart(): void {
 		this.attributes.id = ++Plot.totalPlots;
@@ -41,7 +41,7 @@ export class Plot
 	public addAsset(asset: GenericPlotAsset): void {
 		try {
 			this.assets.set(asset.getPad(), asset);
-			print(this.assets);
+			// print(this.assets);
 		} catch (err: unknown) {
 			warn(err + "; Pad may be missing CollectionService tag");
 		}

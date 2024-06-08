@@ -5,6 +5,7 @@ import { RagdollServer } from "./ragdoll-server";
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
 import { KeyInteractable } from "./interactable/key-interactable";
 import { ANIMATIONS, SFX, VFX } from "shared/constants";
+import { DisposableComponent } from "shared/components/disposable-component";
 
 interface Attributes {
 	gettingGripped: boolean;
@@ -20,31 +21,36 @@ const GRIPPING_ANIMATION = ANIMATIONS.Combat.Gripping;
 	},
 })
 export class Grippable
-	extends KeyInteractable<Attributes, Model>
+	extends DisposableComponent<Attributes, Model>
 	implements OnStart
 {
 	private gripTrove = this.trove.extend();
+	private interactable: KeyInteractable;
 
 	constructor(
 		private character: CharacterServer,
 		private ragdoll: RagdollServer,
 	) {
 		super();
+
+		const components = Dependency<Components>();
+		this.interactable = this.trove.add(
+			components.addComponent<KeyInteractable>(this.instance),
+		);
 	}
 
-	override onStart(): void {
-		super.onStart();
-		// hide the proximity prompt for local player
-		this.inputInstance.Enabled = false;
-		this.inputInstance.KeyboardKeyCode = Enum.KeyCode.B;
+	public onStart(): void {
+		this.interactable.toggle(false);
+		this.interactable.setKey(Enum.KeyCode.V);
+		this.interactable.onInteracted((player) => this.onInteracted(player));
 		this.trove.add(
 			this.ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
-				this.inputInstance.Enabled = newValue;
+				this.interactable.toggle(newValue);
 			}),
 		);
 	}
 
-	override onInteract(player: Player): void {
+	private onInteracted(player: Player): void {
 		if (!player.Character) return;
 		const components = Dependency<Components>();
 		const characterComponent = components.getComponent<CharacterServer>(

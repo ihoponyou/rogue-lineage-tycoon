@@ -1,9 +1,8 @@
-import { Interactable } from ".";
+import { Component } from "@flamework/components";
+import { InputBasedInteractable } from "./input-based-interactable";
 
-export abstract class KeyInteractable<
-	A extends {},
-	I extends BasePart | Model,
-> extends Interactable<A, I> {
+@Component()
+export class KeyInteractable extends InputBasedInteractable {
 	private promptDebounce = false;
 	protected inputInstance = new Instance("ProximityPrompt");
 
@@ -21,7 +20,15 @@ export abstract class KeyInteractable<
 	private onPromptTriggered(player: Player): void {
 		if (this.promptDebounce) return;
 		this.promptDebounce = true;
-		this.onInteract(player);
+		this.interact(player);
 		task.defer(() => (this.promptDebounce = false));
+	}
+
+	public toggle(bool: boolean): void {
+		this.inputInstance.Enabled = bool;
+	}
+
+	public setKey(key: Enum.KeyCode): void {
+		this.inputInstance.KeyboardKeyCode = key;
 	}
 }
