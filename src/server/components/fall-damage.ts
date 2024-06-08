@@ -6,7 +6,7 @@ import { RagdollServer } from "./ragdoll-server";
 @Component({
 	tag: "FallDamage",
 })
-export class FallDamage extends BaseComponent<{}, Model> implements OnTick {
+export class FallDamage extends BaseComponent implements OnTick {
 	airTime = 0;
 	startHeight = 0;
 
@@ -23,9 +23,14 @@ export class FallDamage extends BaseComponent<{}, Model> implements OnTick {
 
 	onTick(dt: number): void {
 		if (!this.character.attributes.isAlive) return;
+		let humanoidRootPart;
+		try {
+			humanoidRootPart = this.character.getHumanoidRootPart();
+		} catch (e) {
+			// warn(e);
+			return;
+		}
 
-		const humanoidRootPart = (this.character.instance as StarterCharacter)
-			.HumanoidRootPart;
 		const falling = humanoidRootPart.AssemblyLinearVelocity.Y < -1;
 
 		if (falling) {
