@@ -46,6 +46,5 @@ export class Collector extends PlotAsset<
 		const calculatedValue =
 			product.attributes.value * this.attributes.multiplier;
 		this.plot.deposit(product.attributes.currency, calculatedValue);
-		print(`+${calculatedValue}`);
 	}
 }

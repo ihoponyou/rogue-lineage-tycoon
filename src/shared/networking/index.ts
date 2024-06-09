@@ -7,14 +7,16 @@ import {
 	CharacterClientToServerEvents,
 	CharacterServerToClientEvents,
 } from "./character-events";
-import { SilverServerToClientEvents } from "./silver-events";
-import { Currency } from "../../../types/currency";
+import {
+	CurrencyClientToServerFunctions,
+	CurrencyServerToClientEvents,
+} from "./currency";
 
 interface ServerToClientEvents {
 	kicked(): void;
 	mana: ManaServerToClientEvents;
 	character: CharacterServerToClientEvents;
-	currency: { changed(currency: Currency, value: number): void };
+	currency: CurrencyServerToClientEvents;
 }
 
 interface ClientToServerEvents {
@@ -25,7 +27,9 @@ interface ClientToServerEvents {
 
 interface ServerToClientFunctions {}
 
-interface ClientToServerFunctions {}
+interface ClientToServerFunctions {
+	currency: CurrencyClientToServerFunctions;
+}
 
 export const GlobalEvents = Networking.createEvent<
 	ClientToServerEvents,

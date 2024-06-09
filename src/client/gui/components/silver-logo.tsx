@@ -1,17 +1,10 @@
-import React, { useBinding, useState } from "@rbxts/react";
-import { Events } from "client/networking";
-import { useEventListener } from "@rbxts/pretty-react-hooks";
+import React from "@rbxts/react";
+import { useSelector } from "@rbxts/react-reflex";
+import { CurrenciesState } from "../producer/currencies";
+import { RootState } from "../producer";
 
 export function SilverLogo() {
-	const [amount, setAmount] = useState(0);
-
-	useEventListener(
-		Events.silver.changed,
-		(value: number) => {
-			setAmount(value);
-		},
-		{},
-	);
+	const amount = useSelector((state: RootState) => state.currencies.silver);
 
 	return (
 		<imagelabel

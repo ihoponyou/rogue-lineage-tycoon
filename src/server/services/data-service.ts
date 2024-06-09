@@ -6,6 +6,7 @@ import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 import { Logger } from "@rbxts/log";
 import { Sex } from "./identity-service";
 import { SECONDS_PER_DAY } from "./daylight-service";
+import { Events } from "server/networking";
 
 interface Vector {
 	X: number | 0;
@@ -197,6 +198,7 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 		this.joinTicks.set(player, math.round(tick()));
 
 		this.giveLeaderStatsFolder(player);
+		this.fireGuiEvents(player);
 
 		player.LoadCharacter();
 	}
@@ -208,6 +210,14 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 		this.updateLifeLength(player);
 
 		profile.Release();
+	}
+
+	private fireGuiEvents(player: Player) {
+		Events.currency.changed(
+			player,
+			"Silver",
+			this.getProfile(player).Data.Silver.Amount,
+		);
 	}
 
 	private updateLifeLength(player: Player): void {
