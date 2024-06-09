@@ -26,26 +26,18 @@ export class OwnerDoor extends PlotAsset<
 > {
 	private touchedConnection?: RBXScriptConnection;
 
-	public override onStart(): void {
-		super.onStart();
-
-		this.onAttributeChanged("enabled", (newValue) => this.toggle(newValue));
-		this.toggle(this.attributes.enabled);
+	protected override onEnabled(): void {
+		this.show();
+		this.touchedConnection = this.trove.connect(
+			this.instance.Touched,
+			(part) => this.onTouched(part),
+		);
 	}
 
-	private toggle(bool: boolean): void {
-		if (bool) {
-			this.show();
-			this.touchedConnection = this.trove.connect(
-				this.instance.Touched,
-				(part) => this.onTouched(part),
-			);
-		} else {
-			this.hide();
-			if (this.touchedConnection)
-				this.trove.remove(this.touchedConnection);
-			this.touchedConnection = undefined;
-		}
+	protected override onDisabled(): void {
+		this.hide();
+		if (this.touchedConnection) this.trove.remove(this.touchedConnection);
+		this.touchedConnection = undefined;
 	}
 
 	private onTouched(part: BasePart): void {

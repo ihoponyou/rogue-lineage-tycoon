@@ -12,7 +12,6 @@ import { ProductInstance } from "./product";
 interface DropperAttributes extends PlotAssetAttributes {
 	dropsPerSecond: number;
 	productsPerDrop: number;
-	enabled: boolean;
 }
 
 type DropperInstance = PlotAssetInstance & {
@@ -26,13 +25,13 @@ type DropperInstance = PlotAssetInstance & {
 		dropsPerSecond: t.numberPositive,
 	},
 	defaults: {
-		dropsPerSecond: 1,
-		productsPerDrop: 1,
 		enabled: false,
 		bought: false,
-		unlocked: true,
+		unlocked: false,
 		cost: 0,
 		currency: "Silver",
+		dropsPerSecond: 1,
+		productsPerDrop: 1,
 	},
 })
 export class Dropper extends PlotAsset<DropperAttributes, DropperInstance> {
@@ -48,23 +47,19 @@ export class Dropper extends PlotAsset<DropperAttributes, DropperInstance> {
 			this.onDropsPerSecondChanged(newValue),
 		);
 
-		this.onAttributeChanged("enabled", (enabled) =>
-			this.onEnabledChanged(enabled),
-		);
-
 		this.trove.connect(this.timer.completed, () => this.onTimerCompleted());
-		if (this.attributes.enabled) this.timer.start();
 	}
 
 	private onDropsPerSecondChanged(newValue: number): void {
 		this.timer.setLength(1 / newValue);
 	}
 
-	private onEnabledChanged(enabled: boolean): void {
-		if (enabled && this.timer.getState() === TimerState.NotRunning)
-			this.timer.start();
-		else if (this.timer.getState() === TimerState.Running)
-			this.timer.stop();
+	protected override onEnabled(): void {
+		if (this.timer.getState() === TimerState.NotRunning) this.timer.start();
+	}
+
+	protected override onDisabled(): void {
+		if (this.timer.getState() === TimerState.Running) this.timer.stop();
 	}
 
 	private onTimerCompleted(): void {

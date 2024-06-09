@@ -16,12 +16,12 @@ type CollectorInstance = PlotAssetInstance;
 @Component({
 	tag: "Collector",
 	defaults: {
-		multiplier: 1,
 		enabled: false,
 		bought: false,
-		unlocked: true,
+		unlocked: false,
 		cost: 0,
 		currency: "Silver",
+		multiplier: 1,
 	},
 })
 export class Collector extends PlotAsset<
@@ -34,27 +34,22 @@ export class Collector extends PlotAsset<
 		super.onStart();
 
 		this.instance.CollisionGroup = "Collector";
-
-		this.onAttributeChanged("enabled", (newValue) => this.toggle(newValue));
-		this.toggle(this.attributes.enabled);
 	}
 
-	private toggle(bool: boolean): void {
-		if (bool) {
-			this.touchedConnection = this.trove.connect(
-				this.instance.Touched,
-				(part) => {
-					const components = Dependency<Components>();
-					const productComponent =
-						components.getComponent<Product>(part);
-					if (productComponent) this.collect(productComponent);
-				},
-			);
-		} else {
-			if (this.touchedConnection)
-				this.trove.remove(this.touchedConnection);
-			this.touchedConnection = undefined;
-		}
+	protected override onEnabled(): void {
+		this.touchedConnection = this.trove.connect(
+			this.instance.Touched,
+			(part) => {
+				const components = Dependency<Components>();
+				const productComponent = components.getComponent<Product>(part);
+				if (productComponent) this.collect(productComponent);
+			},
+		);
+	}
+
+	protected override onDisabled(): void {
+		if (this.touchedConnection) this.trove.remove(this.touchedConnection);
+		this.touchedConnection = undefined;
 	}
 
 	private collect(product: Product): void {

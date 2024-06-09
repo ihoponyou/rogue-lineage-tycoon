@@ -30,6 +30,13 @@ export type GenericPlotAsset = PlotAsset<
 	attributes: {
 		cost: t.numberPositive,
 	},
+	defaults: {
+		enabled: false,
+		bought: false,
+		unlocked: false,
+		cost: 0,
+		currency: "Silver",
+	},
 })
 export abstract class PlotAsset<
 		A extends PlotAssetAttributes,
@@ -49,24 +56,29 @@ export abstract class PlotAsset<
 
 	public onStart(): void {
 		const components = Dependency<Components>();
+
 		const plot = components.getComponent<Plot>(this.instance.Parent);
 		if (!plot) error("parent is not a Plot or is missing Plot component");
 		this.plot = plot;
+
 		this.pad = this.trove.add(
 			components.addComponent<ClickInteractable>(this.instance.Pad),
 		);
-
 		this.pad.onInteracted((player) => this.purchase(player));
 
 		this.plot.addAsset(this);
 
 		this.originalTransparency = this.instance.Transparency;
-		this.hide();
 
 		this.onAttributeChanged("bought", (newValue) =>
 			newValue ? this.onBought() : this.onRefund(),
 		);
 		this.attributes.bought ? this.onBought() : this.onRefund();
+
+		this.onAttributeChanged("enabled", (newValue) =>
+			newValue ? this.onEnabled() : this.onDisabled(),
+		);
+		this.attributes.enabled ? this.onEnabled() : this.onDisabled();
 	}
 
 	protected show(): void {
@@ -85,6 +97,10 @@ export abstract class PlotAsset<
 	}
 
 	protected onRefund(): void {}
+
+	protected onEnabled(): void {}
+
+	protected onDisabled(): void {}
 
 	public purchase(player: Player): void {
 		if (player !== this.plot.getOwner()) return;
