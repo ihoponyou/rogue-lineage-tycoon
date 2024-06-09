@@ -28,15 +28,33 @@ export class Collector extends PlotAsset<
 	CollectorAttributes,
 	CollectorInstance
 > {
+	private touchedConnection?: RBXScriptConnection;
+
 	public override onStart(): void {
 		super.onStart();
 
 		this.instance.CollisionGroup = "Collector";
-		this.trove.connect(this.instance.Touched, (part) => {
-			const components = Dependency<Components>();
-			const productComponent = components.getComponent<Product>(part);
-			if (productComponent) this.collect(productComponent);
-		});
+
+		this.onAttributeChanged("enabled", (newValue) => this.toggle(newValue));
+		this.toggle(this.attributes.enabled);
+	}
+
+	private toggle(bool: boolean): void {
+		if (bool) {
+			this.touchedConnection = this.trove.connect(
+				this.instance.Touched,
+				(part) => {
+					const components = Dependency<Components>();
+					const productComponent =
+						components.getComponent<Product>(part);
+					if (productComponent) this.collect(productComponent);
+				},
+			);
+		} else {
+			if (this.touchedConnection)
+				this.trove.remove(this.touchedConnection);
+			this.touchedConnection = undefined;
+		}
 	}
 
 	private collect(product: Product): void {

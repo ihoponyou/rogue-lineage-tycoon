@@ -1,7 +1,4 @@
 import { Component, Components } from "@flamework/components";
-import { Dependency, OnStart } from "@flamework/core";
-import { DisposableComponent } from "shared/components/disposable-component";
-import { Plot } from "./plot";
 import { Players } from "@rbxts/services";
 import {
 	PlotAsset,
@@ -16,8 +13,8 @@ type OwnerDoorInstance = PlotAssetInstance;
 @Component({
 	tag: "OwnerDoor",
 	defaults: {
-		enabled: false,
-		bought: false,
+		enabled: true,
+		bought: true,
 		unlocked: true,
 		cost: 0,
 		currency: "Silver",
@@ -27,12 +24,28 @@ export class OwnerDoor extends PlotAsset<
 	OwnerDoorAttributes,
 	OwnerDoorInstance
 > {
+	private touchedConnection?: RBXScriptConnection;
+
 	public override onStart(): void {
 		super.onStart();
 
-		this.trove.connect(this.instance.Touched, (part) =>
-			this.onTouched(part),
-		);
+		this.onAttributeChanged("enabled", (newValue) => this.toggle(newValue));
+		this.toggle(this.attributes.enabled);
+	}
+
+	private toggle(bool: boolean): void {
+		if (bool) {
+			this.show();
+			this.touchedConnection = this.trove.connect(
+				this.instance.Touched,
+				(part) => this.onTouched(part),
+			);
+		} else {
+			this.hide();
+			if (this.touchedConnection)
+				this.trove.remove(this.touchedConnection);
+			this.touchedConnection = undefined;
+		}
 	}
 
 	private onTouched(part: BasePart): void {

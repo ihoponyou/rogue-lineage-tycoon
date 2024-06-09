@@ -31,10 +31,9 @@ export class GuiController implements OnStart {
 
 		Promise.retry(
 			() =>
-				Functions.currency.getSilver().andThen((value) => {
-					producer.setSilver(value);
-					print("success");
-				}),
+				Functions.currency
+					.getSilver()
+					.andThen((value) => producer.setSilver(value)),
 			MAX_FETCH_RETRIES,
 		);
 	}
