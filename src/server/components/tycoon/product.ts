@@ -1,6 +1,7 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { DisposableComponent } from "shared/components/disposable-component";
+import { Currency } from "../../../../types/currency";
 
 interface ProductAttributes {
 	isProcessed: boolean;
@@ -9,8 +10,6 @@ interface ProductAttributes {
 }
 
 export type ProductInstance = BasePart | Model;
-
-export type Currency = "Silver" | "Insight" | "Valu" | "Alignment";
 
 @Component({
 	tag: "Product",

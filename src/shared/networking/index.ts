@@ -8,12 +8,13 @@ import {
 	CharacterServerToClientEvents,
 } from "./character-events";
 import { SilverServerToClientEvents } from "./silver-events";
+import { Currency } from "../../../types/currency";
 
 interface ServerToClientEvents {
 	kicked(): void;
 	mana: ManaServerToClientEvents;
 	character: CharacterServerToClientEvents;
-	silver: SilverServerToClientEvents;
+	currency: { changed(currency: Currency, value: number): void };
 }
 
 interface ClientToServerEvents {

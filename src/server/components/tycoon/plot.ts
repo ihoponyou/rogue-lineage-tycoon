@@ -1,13 +1,18 @@
-import { Component } from "@flamework/components";
-import { OnStart } from "@flamework/core";
+import { Component, Components } from "@flamework/components";
+import { Dependency, OnStart } from "@flamework/core";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { GenericPlotAsset } from "./plot-asset";
 import { ClickInteractable } from "../interactable/click-interactable";
-import { Currency } from "./product";
+import { CurrencyService } from "server/services/currency-service";
+import { Currency } from "../../../../types/currency";
 
 interface PlotAttributes {
 	id: number;
 }
+
+type PlotInstance = BasePart & {
+	Teller: Teller;
+};
 
 @Component({
 	tag: "Plot",
@@ -16,7 +21,7 @@ interface PlotAttributes {
 	},
 })
 export class Plot
-	extends DisposableComponent<PlotAttributes, BasePart>
+	extends DisposableComponent<PlotAttributes, PlotInstance>
 	implements OnStart
 {
 	public assets = new Map<ClickInteractable, GenericPlotAsset>();
@@ -30,9 +35,29 @@ export class Plot
 		Valu: 0,
 		Alignment: 0,
 	};
+	private teller!: ClickInteractable;
+
+	constructor(private currencyService: CurrencyService) {
+		super();
+	}
 
 	public onStart(): void {
 		this.attributes.id = ++Plot.totalPlots;
+
+		const components = Dependency<Components>();
+		this.teller = components.addComponent<ClickInteractable>(
+			this.instance.Teller,
+		);
+		this.teller.onInteracted((player) => {
+			if (player !== this.owner) return;
+			this.currencyService.addCurrency(
+				this.owner,
+				"Silver",
+				this.bank.Silver,
+			);
+			this.bank.Silver = 0;
+			this.instance.Teller.SurfaceGui.TextLabel.Text = `0`;
+		});
 	}
 
 	public claim(player: Player): void {
@@ -57,6 +82,6 @@ export class Plot
 
 	public deposit(currency: Currency, value: number): void {
 		this.bank[currency] += value;
-		print(this.bank);
+		this.instance.Teller.SurfaceGui.TextLabel.Text = `${this.bank[currency]}`;
 	}
 }

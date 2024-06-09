@@ -19,12 +19,12 @@ interface Color {
 	B: number;
 }
 
-interface Currency {
+export interface CurrencyData {
 	Amount: number;
 	Multiplier: number;
 }
 
-export const DEFAULT_CURRENCY: Currency = {
+const DEFAULT_CURRENCY: CurrencyData = {
 	Amount: 0,
 	Multiplier: 1,
 };
@@ -67,7 +67,6 @@ export type PlayerData = {
 	IsHybrid: boolean;
 	CanHybrid: boolean;
 	SigilObtained: boolean;
-	Alignment: number;
 
 	Spells: Array<string>;
 	Snaps: Array<string>;
@@ -81,9 +80,10 @@ export type PlayerData = {
 	PDDay: number;
 	GachaDay: number;
 
-	Silver: Currency;
-	Valu: Currency;
-	Insight: Currency;
+	Silver: CurrencyData;
+	Valu: CurrencyData;
+	Insight: CurrencyData;
+	Alignment: CurrencyData;
 
 	RaceName: string;
 	Edict: string;
@@ -111,7 +111,6 @@ export const PROFILE_TEMPLATE: PlayerData = {
 	Seconds: 0,
 	Runes: 0,
 	Lives: 3,
-	Alignment: 0,
 	SnapSlots: 0,
 	ManaProgression: 0,
 	PDDay: 0,
@@ -146,6 +145,7 @@ export const PROFILE_TEMPLATE: PlayerData = {
 	Silver: DEFAULT_CURRENCY,
 	Valu: DEFAULT_CURRENCY,
 	Insight: DEFAULT_CURRENCY,
+	Alignment: DEFAULT_CURRENCY,
 	// life
 	Health: 100,
 	Stomach: 100,
@@ -173,7 +173,7 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 	onPlayerAdded(player: Player): void {
 		const key = `Player${player.UserId}`;
 
-		this.profileStore.WipeProfileAsync(key);
+		// this.profileStore.WipeProfileAsync(key);
 
 		const profile = this.profileStore.LoadProfileAsync(key);
 		if (!profile) {

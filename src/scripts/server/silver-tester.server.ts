@@ -1,5 +1,5 @@
 import { Events } from "server/networking";
 
 while (task.wait(1)) {
-	Events.silver.changed.broadcast(math.random(1e6));
+	Events.currency.changed.broadcast("Silver", math.random(1e6));
 }

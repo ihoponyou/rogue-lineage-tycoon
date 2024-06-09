@@ -29,7 +29,10 @@ type DropperInstance = PlotAssetInstance & {
 		dropsPerSecond: 1,
 		productsPerDrop: 1,
 		enabled: false,
+		bought: false,
+		unlocked: true,
 		cost: 0,
+		currency: "Silver",
 	},
 })
 export class Dropper extends PlotAsset<DropperAttributes, DropperInstance> {

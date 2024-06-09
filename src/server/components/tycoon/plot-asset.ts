@@ -4,10 +4,15 @@ import { t } from "@rbxts/t";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Plot } from "./plot";
 import { ClickInteractable } from "../interactable/click-interactable";
+import { CurrencyService } from "server/services/currency-service";
+import { Currency } from "../../../../types/currency";
 
 export interface PlotAssetAttributes {
 	enabled: boolean;
+	bought: boolean;
+	unlocked: boolean;
 	cost: number;
+	currency: Currency;
 }
 
 export type PlotAssetInstance = BasePart & {
@@ -35,6 +40,10 @@ export abstract class PlotAsset<
 	protected plot!: Plot;
 	protected pad!: ClickInteractable;
 
+	constructor(private currencyService: CurrencyService) {
+		super();
+	}
+
 	public onStart(): void {
 		const components = Dependency<Components>();
 		const plot = components.getComponent<Plot>(this.instance.Parent);
@@ -44,15 +53,34 @@ export abstract class PlotAsset<
 			components.addComponent<ClickInteractable>(this.instance.Pad),
 		);
 
-		this.pad.onInteracted(() => this.purchase());
+		this.pad.onInteracted((player) => {
+			if (player !== plot.getOwner()) return;
+			this.purchase();
+		});
 
 		this.plot.addAsset(this);
 	}
 
 	public purchase() {
-		print(`bought ${this.instance}`);
+		if (!this.attributes.unlocked) return;
+		if (this.attributes.bought) return;
+		const owner = this.plot.getOwner()!;
+		const ownerCurrencyAmount = this.currencyService.getCurrencyData(
+			owner,
+			this.attributes.currency,
+		).Amount;
+		if (ownerCurrencyAmount < this.attributes.cost) return;
+
+		this.currencyService.subtractCurrency(
+			owner,
+			this.attributes.currency,
+			this.attributes.cost,
+		);
+
 		this.attributes.enabled = true;
-		print(`-${this.attributes.cost}`);
+		this.attributes.bought = true;
+
+		print(`${owner.Name} bought ${this.instance}`);
 	}
 
 	public getPad(): ClickInteractable {

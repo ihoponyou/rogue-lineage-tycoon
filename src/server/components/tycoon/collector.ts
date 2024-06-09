@@ -18,7 +18,10 @@ type CollectorInstance = PlotAssetInstance;
 	defaults: {
 		multiplier: 1,
 		enabled: false,
+		bought: false,
+		unlocked: true,
 		cost: 0,
+		currency: "Silver",
 	},
 })
 export class Collector extends PlotAsset<

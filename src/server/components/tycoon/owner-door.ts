@@ -17,7 +17,10 @@ type OwnerDoorInstance = PlotAssetInstance;
 	tag: "OwnerDoor",
 	defaults: {
 		enabled: false,
+		bought: false,
+		unlocked: true,
 		cost: 0,
+		currency: "Silver",
 	},
 })
 export class OwnerDoor extends PlotAsset<
