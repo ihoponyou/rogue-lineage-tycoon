@@ -7,6 +7,8 @@ import { ReflexProvider } from "@rbxts/react-reflex";
 import { producer } from "client/gui/producer";
 import { Events, Functions } from "client/networking";
 
+const MAX_FETCH_RETRIES = 10;
+
 @Controller()
 export class GuiController implements OnStart {
 	private playerGui = Players.LocalPlayer.WaitForChild("PlayerGui");
@@ -25,6 +27,15 @@ export class GuiController implements OnStart {
 					{createPortal(<App />, this.playerGui)}
 				</ReflexProvider>
 			</StrictMode>,
+		);
+
+		Promise.retry(
+			() =>
+				Functions.currency.getSilver().andThen((value) => {
+					producer.setSilver(value);
+					print("success");
+				}),
+			MAX_FETCH_RETRIES,
 		);
 	}
 }

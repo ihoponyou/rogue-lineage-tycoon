@@ -1,5 +1,4 @@
 import { createProducer } from "@rbxts/reflex";
-import { RootState, producer } from ".";
 
 export interface CurrenciesState {
 	readonly silver: number;

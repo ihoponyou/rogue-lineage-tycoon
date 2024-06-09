@@ -8,13 +8,13 @@ import { Sex } from "./identity-service";
 import { SECONDS_PER_DAY } from "./daylight-service";
 import { Events } from "server/networking";
 
-interface Vector {
+export interface SerializedVector {
 	X: number | 0;
 	Y: number | 0;
 	Z: number | 0;
 }
 
-interface Color {
+export interface SerializedColor3 {
 	R: number;
 	G: number;
 	B: number;
@@ -25,19 +25,14 @@ export interface CurrencyData {
 	Multiplier: number;
 }
 
-const DEFAULT_CURRENCY: CurrencyData = {
-	Amount: 0,
-	Multiplier: 1,
-};
-
 export type PlayerData = {
 	Conditions: Array<string>;
 	Health: number;
 	Stomach: number;
 	Toxicity: number;
 	Temperature: number;
-	Position: Vector;
-	Direction: Vector;
+	Position: SerializedVector;
+	Direction: SerializedVector;
 
 	HasResGrip: boolean;
 	HasMadeHouse: boolean;
@@ -51,7 +46,7 @@ export type PlayerData = {
 	ArmorName: string;
 	Artifact: string;
 	EmulatedSkill: string;
-	Dye: Color;
+	Dye: SerializedColor3;
 	Days: number;
 	Seconds: number;
 	Runes: number;
@@ -71,7 +66,7 @@ export type PlayerData = {
 
 	Spells: Array<string>;
 	Snaps: Array<string>;
-	ManaColor: Color;
+	ManaColor: SerializedColor3;
 	ManaObtained: boolean;
 	SnapSlots: number;
 	ManaProgression: number;
@@ -96,6 +91,11 @@ export type PlayerData = {
 };
 
 export type PlayerProfile = Profile<PlayerData>;
+
+const DEFAULT_CURRENCY_DATA: CurrencyData = {
+	Amount: 0,
+	Multiplier: 1,
+};
 
 export const PROFILE_TEMPLATE: PlayerData = {
 	// player
@@ -143,10 +143,10 @@ export const PROFILE_TEMPLATE: PlayerData = {
 	Snaps: [],
 	Dye: { R: 0, G: 0, B: 0 },
 	ManaColor: { R: 0, G: 0, B: 0 },
-	Silver: DEFAULT_CURRENCY,
-	Valu: DEFAULT_CURRENCY,
-	Insight: DEFAULT_CURRENCY,
-	Alignment: DEFAULT_CURRENCY,
+	Silver: DEFAULT_CURRENCY_DATA,
+	Valu: DEFAULT_CURRENCY_DATA,
+	Insight: DEFAULT_CURRENCY_DATA,
+	Alignment: DEFAULT_CURRENCY_DATA,
 	// life
 	Health: 100,
 	Stomach: 100,
@@ -198,7 +198,6 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 		this.joinTicks.set(player, math.round(tick()));
 
 		this.giveLeaderStatsFolder(player);
-		this.fireGuiEvents(player);
 
 		player.LoadCharacter();
 	}
@@ -210,14 +209,6 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 		this.updateLifeLength(player);
 
 		profile.Release();
-	}
-
-	private fireGuiEvents(player: Player) {
-		Events.currency.changed(
-			player,
-			"Silver",
-			this.getProfile(player).Data.Silver.Amount,
-		);
 	}
 
 	private updateLifeLength(player: Player): void {

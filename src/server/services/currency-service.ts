@@ -25,7 +25,7 @@ export class CurrencyService implements OnStart {
 		const playerData = this.dataService.getProfile(player).Data;
 		const currencyData = playerData[currency];
 
-		currencyData.Amount += amount;
+		currencyData.Amount += amount * currencyData.Multiplier;
 		Events.currency.changed(player, currency, currencyData.Amount);
 	}
 
