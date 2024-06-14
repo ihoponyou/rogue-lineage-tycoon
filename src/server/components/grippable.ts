@@ -6,6 +6,7 @@ import { ReplicatedStorage, Workspace } from "@rbxts/services";
 import { KeyInteractable } from "./interactable/key-interactable";
 import { ANIMATIONS, SFX, VFX } from "shared/constants";
 import { DisposableComponent } from "shared/components/disposable-component";
+import { Inject } from "shared/inject";
 
 interface Attributes {
 	gettingGripped: boolean;
@@ -26,13 +27,14 @@ export class Grippable
 {
 	private gripTrove = this.trove.extend();
 
+	@Inject
+	private components!: Components;
+
 	constructor(
 		private character: CharacterServer,
 		private ragdoll: RagdollServer,
 	) {
 		super();
-
-		const components = Dependency<Components>();
 	}
 
 	public override onStart(): void {
@@ -49,10 +51,8 @@ export class Grippable
 
 	public override interact(player: Player): void {
 		if (!player.Character) return;
-		const components = Dependency<Components>();
-		const characterComponent = components.getComponent<CharacterServer>(
-			player.Character,
-		);
+		const characterComponent =
+			this.components.getComponent<CharacterServer>(player.Character);
 		if (!characterComponent) return;
 		print(this.attributes.gettingGripped);
 		this.attributes.gettingGripped
@@ -70,8 +70,7 @@ export class Grippable
 
 		this.attributes.gettingGripped = true;
 
-		const components = Dependency<Components>();
-		const ragdoll = components.getComponent<RagdollServer>(
+		const ragdoll = this.components.getComponent<RagdollServer>(
 			gripper.instance,
 		);
 		if (ragdoll) {

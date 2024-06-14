@@ -5,6 +5,7 @@ import { Dependency, OnStart } from "@flamework/core";
 import { RagdollServer } from "./ragdoll-server";
 import { Players, Workspace } from "@rbxts/services";
 import { KeyInteractable } from "./interactable/key-interactable";
+import { Inject } from "shared/inject";
 
 interface Attributes {
 	isCarried: boolean;
@@ -21,6 +22,9 @@ export class Carriable
 	implements OnStart
 {
 	private carryTrove = this.trove.extend();
+
+	@Inject
+	private components!: Components;
 
 	constructor(
 		private character: CharacterServer,
@@ -43,10 +47,8 @@ export class Carriable
 
 	public override interact(player: Player): void {
 		if (!player.Character) return;
-		const components = Dependency<Components>();
-		const characterComponent = components.getComponent<CharacterServer>(
-			player.Character,
-		);
+		const characterComponent =
+			this.components.getComponent<CharacterServer>(player.Character);
 		if (!characterComponent) return;
 
 		this.attributes.isCarried
@@ -57,8 +59,7 @@ export class Carriable
 	pickUp(carrier: CharacterServer): void {
 		this.attributes.isCarried = true;
 
-		const components = Dependency<Components>();
-		const ragdoll = components.getComponent<RagdollServer>(
+		const ragdoll = this.components.getComponent<RagdollServer>(
 			carrier.instance,
 		);
 		if (ragdoll) {

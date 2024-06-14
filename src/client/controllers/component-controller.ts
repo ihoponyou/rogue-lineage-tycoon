@@ -6,14 +6,17 @@ import {
 import { Components } from "@flamework/components";
 import { CharacterClient } from "../components/character-client";
 import { CharacterStateMachine } from "../components/character-state-machine";
+import { Inject } from "shared/inject";
 
 @Controller()
 export class ComponentController
 	implements OnLocalCharacterAdded, OnLocalCharacterRemoving
 {
+	@Inject
+	private components!: Components;
+
 	onLocalCharacterAdded(character: Model): void {
-		const components = Dependency<Components>();
-		components.addComponent<CharacterClient>(character);
+		this.components.addComponent<CharacterClient>(character);
 		// components
 		// 	.waitForComponent<CharacterClient>(character)
 		// 	.andThen(
@@ -26,7 +29,6 @@ export class ComponentController
 	}
 
 	onLocalCharacterRemoving(character: Model): void {
-		const components = Dependency<Components>();
-		components.removeComponent<CharacterClient>(character);
+		this.components.removeComponent<CharacterClient>(character);
 	}
 }

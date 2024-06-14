@@ -9,6 +9,7 @@ import { CollectionService, Workspace } from "@rbxts/services";
 import { HudController } from "../controllers/hud-controller";
 import { Dependency } from "@flamework/core";
 import { CharacterStateMachine } from "./character-state-machine";
+import { Inject } from "shared/inject";
 
 const events = Events.character;
 
@@ -17,6 +18,9 @@ export class CharacterClient extends Character<
 	CharacterAttributes,
 	CharacterInstance
 > {
+	@Inject
+	private components!: Components;
+
 	constructor(private hudController: HudController) {
 		super();
 	}
@@ -26,10 +30,8 @@ export class CharacterClient extends Character<
 
 		this.trove.add(events.killed.connect(() => this.onKilled()));
 
-		const components = Dependency<Components>();
-		const stateMachine = components.addComponent<CharacterStateMachine>(
-			this.instance,
-		);
+		const stateMachine =
+			this.components.addComponent<CharacterStateMachine>(this.instance);
 
 		this.trove.add(stateMachine);
 	}
@@ -43,8 +45,7 @@ export class CharacterClient extends Character<
 
 	override onRemoved(): void {
 		super.onRemoved();
-		const components = Dependency<Components>();
-		components.removeComponent<CharacterStateMachine>(this.instance);
+		this.components.removeComponent<CharacterStateMachine>(this.instance);
 	}
 
 	onKilled(): void {

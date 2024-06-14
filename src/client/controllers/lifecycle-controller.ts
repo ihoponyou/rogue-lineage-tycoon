@@ -6,11 +6,15 @@ import {
 	OnLocalCharacterRemoving,
 	OnRemoved,
 } from "../../../types/lifecycles";
+import { Inject } from "shared/inject";
 
 export const LOCAL_PLAYER = Players.LocalPlayer;
 
 @Controller()
 export class LifecycleController implements OnStart {
+	@Inject
+	private components!: Components;
+
 	onStart(): void {
 		const localCharacterAddedListeners = new Set<OnLocalCharacterAdded>();
 		Modding.onListenerAdded<OnLocalCharacterAdded>((obj) =>
@@ -51,9 +55,7 @@ export class LifecycleController implements OnStart {
 			}
 		});
 
-		const components = Dependency<Components>();
-
-		components.onComponentRemoved<OnRemoved>((value) => {
+		this.components.onComponentRemoved<OnRemoved>((value) => {
 			value.onRemoved();
 		});
 	}

@@ -8,6 +8,7 @@ import {
 	OnRemoved,
 } from "../../../types/lifecycles";
 import { Components } from "@flamework/components";
+import { Inject } from "shared/inject";
 
 @Service()
 export class LifecycleService implements OnStart {
@@ -18,6 +19,9 @@ export class LifecycleService implements OnStart {
 	// 	Modding.onListenerRemoved<E>((obj) => listeners.delete(obj));
 	// 	return listeners;
 	// }
+
+	@Inject
+	private components!: Components;
 
 	onStart(): void {
 		// const playerAddedListeners = this.newLifecycleEvent<OnPlayerAdded>();
@@ -98,9 +102,7 @@ export class LifecycleService implements OnStart {
 			}
 		});
 
-		const components = Dependency<Components>();
-
-		components.onComponentRemoved<OnRemoved>((value) => {
+		this.components.onComponentRemoved<OnRemoved>((value) => {
 			value.onRemoved();
 		});
 	}
