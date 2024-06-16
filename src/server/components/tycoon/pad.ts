@@ -10,7 +10,13 @@ import { Toggleable } from "shared/toggleable";
 import { Hideable } from "shared/hideable";
 
 type PadInstance = Model & {
-	Part: Part & { BillboardGui: BillboardGui };
+	Part: Part & {
+		BillboardGui: BillboardGui & {
+			Frame: Frame & {
+				TextLabel: TextLabel;
+			};
+		};
+	};
 	Asset: ObjectValue;
 };
 
@@ -33,6 +39,10 @@ export class Pad
 	public onStart(): void {
 		const assetInstance = this.instance.Asset.Value;
 		if (!assetInstance) error("unassigned asset");
+
+		this.instance.Part.BillboardGui.Frame.TextLabel.Text =
+			assetInstance.Name;
+
 		this.components
 			.waitForComponent<PlotAsset>(assetInstance)
 			.andThen((component) => (this.asset = component))
