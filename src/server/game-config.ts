@@ -52,7 +52,7 @@ export const PRODUCTS: { [name: string]: ProductConfig } = {
 
 export const DROPPERS: { [name: string]: DropperConfig } = {
 	SilverDropper: {
-		dropsPerSecond: 1,
+		dropsPerSecond: 5,
 		productsPerDrop: 1,
 		productModel: PRODUCT_MODELS.shilling,
 	},

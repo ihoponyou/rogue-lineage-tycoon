@@ -41,10 +41,23 @@ export class Collector
 		this.touchedConnection = this.trove.connect(
 			this.instance.Collider.Touched,
 			(part) => {
+				if (part.HasTag("Product")) return;
+				if (!part.Parent) return;
+				if (part.Parent.ClassName !== "Model") return;
+
 				this.components
-					.waitForComponent<Product>(part.Parent as Model)
+					.waitForComponent<Product>(part.Parent)
 					.timeout(5)
-					.andThen((value) => this.collect(value));
+					.andThen((value) => this.collect(value))
+					.catch((e) => {
+						if (
+							Promise.Error.isKind(e, Promise.Error.Kind.TimedOut)
+						) {
+							warn("Operation timed out!");
+						} else {
+							warn("Operation encountered an error!", e);
+						}
+					});
 			},
 		);
 	}

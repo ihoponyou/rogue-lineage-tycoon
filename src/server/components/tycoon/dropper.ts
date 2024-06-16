@@ -22,7 +22,7 @@ export class Dropper
 	implements OnStart, Toggleable
 {
 	private readonly config = DROPPERS[this.instance.Name];
-	private timer = new Timer(this.config.dropsPerSecond);
+	private timer = new Timer(1 / this.config.dropsPerSecond);
 
 	constructor(
 		private plotAsset: PlotAsset,
