@@ -62,6 +62,8 @@ export class Pad
 
 		this.asset.buy(player);
 
+		if (!this.asset.attributes.bought) return;
+
 		this.hide();
 		this.disable();
 	}
