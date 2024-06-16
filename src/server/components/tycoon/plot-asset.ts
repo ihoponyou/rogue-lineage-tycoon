@@ -6,7 +6,7 @@ import { ClickInteractable } from "../interactable/click-interactable";
 import { CurrencyService } from "server/services/currency-service";
 import { Inject } from "shared/inject";
 import { ModelComponent } from "shared/components/model";
-import { ASSETS } from "server/game-config";
+import { ASSETS } from "server/tycoon-config";
 import { Hideable } from "shared/hideable";
 import { PlayerServer } from "../player-server";
 import { Toggleable } from "shared/toggleable";

@@ -2,7 +2,7 @@ import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Currency } from "../../../../types/currency";
-import { PRODUCTS } from "server/game-config";
+import { PRODUCTS } from "server/tycoon-config";
 import { ModelComponent } from "shared/components/model";
 
 interface ProductAttributes {

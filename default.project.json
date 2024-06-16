@@ -17,9 +17,6 @@
 					}
 				}
 			},
-			"libs": {
-				"$path": "out/shared/libs"
-			},
 			"Source": {
 				"$className": "Folder",
 				"Modules": {
