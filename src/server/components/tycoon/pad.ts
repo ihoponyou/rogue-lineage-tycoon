@@ -5,6 +5,7 @@ import { Plot } from "./plot";
 import { ModelComponent } from "shared/components/model";
 import { PlotAsset } from "./plot-asset";
 import { Inject } from "shared/inject";
+import { DisposableComponent } from "shared/components/disposable-component";
 
 type PadInstance = Model & {
 	Part: Part & { BillboardGui: BillboardGui };
@@ -14,9 +15,11 @@ type PadInstance = Model & {
 @Component({
 	tag: "Pad",
 })
-export class Pad extends BaseComponent<{}, PadInstance> implements OnStart {
+export class Pad
+	extends DisposableComponent<{}, PadInstance>
+	implements OnStart
+{
 	private asset?: PlotAsset;
-	private touchedConnection?: RBXScriptConnection;
 
 	@Inject
 	private components!: Components;
@@ -34,12 +37,11 @@ export class Pad extends BaseComponent<{}, PadInstance> implements OnStart {
 			.await();
 		if (!this.asset) error("assigned asset missing PlotAsset component");
 
-		this.touchedConnection = this.instance.Part.Touched.Connect((part) =>
-			this.onTouched(part),
-		);
+		this.enable();
 	}
 
 	private onTouched(otherPart: BasePart): void {
+		print();
 		const parent = otherPart.Parent;
 		if (!parent) return;
 		const player = Players.GetPlayerFromCharacter(parent);
@@ -52,13 +54,21 @@ export class Pad extends BaseComponent<{}, PadInstance> implements OnStart {
 		this.asset.buy(player);
 
 		this.model.hide();
-
-		this.touchedConnection?.Disconnect();
-		this.touchedConnection = undefined;
+		this.disable();
 	}
 
 	public setAsset(asset: PlotAsset): void {
 		this.asset = asset;
+	}
+
+	public enable(): void {
+		this.trove.connect(this.instance.Part.Touched, (part) =>
+			this.onTouched(part),
+		);
+	}
+
+	public disable(): void {
+		this.trove.clean();
 	}
 
 	public hide(): void {
