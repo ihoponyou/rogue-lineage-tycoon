@@ -8,6 +8,7 @@ import { Inject } from "shared/inject";
 import { ModelComponent } from "shared/components/model";
 import { ASSETS } from "server/asset-config";
 import { Hideable } from "shared/hideable";
+import { PlayerServer } from "../player-server";
 
 export interface PlotAssetAttributes {
 	enabled: boolean;
@@ -65,12 +66,7 @@ export class PlotAsset
 		const owner = this.plot.getOwner();
 		if (!owner) return;
 		if (player !== owner.instance) return;
-
-		// print(this.config.prerequisites);
-		for (const assetName of this.config.prerequisites) {
-			if (!owner.hasAsset(assetName)) return;
-			// print(`owner has ${assetName}`);
-		}
+		if (!this.hasPrerequisites(owner)) return;
 
 		const ownerCurrencyAmount = this.currencyService.getCurrencyData(
 			player,
@@ -90,6 +86,15 @@ export class PlotAsset
 		this.attributes.bought = true;
 		this.model.show();
 
+		this.plot.refreshPads();
+
 		print(`${player.Name} bought ${this.instance}`);
+	}
+
+	public hasPrerequisites(player: PlayerServer): boolean {
+		for (const assetName of this.config.prerequisites) {
+			if (!player.hasAsset(assetName)) return false;
+		}
+		return true;
 	}
 }

@@ -10,10 +10,6 @@ import { Pad } from "./pad";
 import { PlotAsset } from "./plot-asset";
 import { Players } from "@rbxts/services";
 
-interface PlotAttributes {
-	// id: number;
-}
-
 type PlotInstance = Model & {
 	Teller: Teller;
 	ClaimDoor: BasePart;
@@ -23,14 +19,13 @@ type PlotInstance = Model & {
 	tag: "Plot",
 })
 export class Plot
-	extends DisposableComponent<PlotAttributes, PlotInstance>
+	extends DisposableComponent<{}, PlotInstance>
 	implements OnStart
 {
 	private static totalPlots = 0;
 
 	private id = -1;
 	private pads = new Map<string, Pad>();
-	private assets = new Map<string, PlotAsset>();
 	private bank: { [currency in Currency]: number } = {
 		Silver: 0,
 		Insight: 0,
@@ -53,7 +48,7 @@ export class Plot
 
 		this.instance
 			.GetDescendants()
-			.forEach((value) => this.initDescendant(value));
+			.forEach((value) => task.spawn(() => this.initDescendant(value)));
 
 		this.teller = this.components.addComponent<ClickInteractable>(
 			this.instance.Teller,
@@ -75,24 +70,20 @@ export class Plot
 	}
 
 	private initDescendant(instance: Instance) {
-		let component: PlotAsset | Pad | undefined;
-		component = this.components.getComponent<Pad>(instance);
-		if (component !== undefined) {
-			if (this.pads.has(component.instance.Name)) {
-				warn(`duplicate pad @ ${instance}`);
-			}
-			this.pads.set(component.instance.Name, component as Pad);
-			component.hide();
-			return;
+		const pad = this.components.getComponent<Pad>(instance);
+		if (!pad) return;
+		if (this.pads.has(pad.instance.Name)) {
+			warn(`duplicate pad @ ${instance}`);
 		}
-		component = this.components.getComponent<PlotAsset>(instance);
-		if (!component) return;
-		if (this.assets.has(component.instance.Name)) {
-			warn(`duplicate asset @ ${instance}`);
-			return;
-		}
-		this.assets.set(component.instance.Name, component);
-		component.hide();
+
+		const asset = pad.getAsset();
+		while (!asset) task.wait();
+
+		this.pads.set(asset.instance.Name, pad);
+
+		pad.hide();
+		pad.enable();
+		asset.hide();
 	}
 
 	private onClaimDoorTouched(otherPart: BasePart): void {
@@ -116,29 +107,27 @@ export class Plot
 		this.claimTouchedConnection = undefined;
 
 		this.instance.ClaimDoor.Transparency = 1;
-
-		// TODO: only unlocked pads
-		for (const [assetName, pad] of this.pads) {
-			pad.show();
-			pad.enable();
-		}
+		this.refreshPads();
 	}
 
 	public getOwner(): PlayerServer | undefined {
 		return this.owner;
 	}
 
-	public addAsset(asset: PlotAsset): void {
-		try {
-			this.assets.set(asset.instance.Name, asset);
-			// print(this.assets);
-		} catch (err: unknown) {
-			warn(err + "; Pad may be missing CollectionService tag");
-		}
-	}
-
 	public deposit(currency: Currency, value: number): void {
 		this.bank[currency] += value;
 		this.instance.Teller.SurfaceGui.TextLabel.Text = `${this.bank[currency]}`;
+	}
+
+	public refreshPads(): void {
+		if (!this.owner) return;
+		for (const [assetName, pad] of this.pads) {
+			const asset = pad.getAsset();
+			if (!asset) continue;
+			if (asset.attributes.bought) continue;
+			if (!asset.hasPrerequisites(this.owner)) continue;
+
+			pad.show();
+		}
 	}
 }

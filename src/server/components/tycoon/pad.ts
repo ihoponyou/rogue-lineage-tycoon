@@ -72,6 +72,10 @@ export class Pad
 		this.asset = asset;
 	}
 
+	public getAsset(): PlotAsset | undefined {
+		return this.asset;
+	}
+
 	public enable(): void {
 		this.trove.connect(this.instance.Part.Touched, (part) =>
 			this.onTouched(part),
