@@ -63,7 +63,14 @@ export class PlotAsset
 	public buy(player: Player): void {
 		if (this.attributes.bought) return;
 		const owner = this.plot.getOwner();
-		if (player !== owner?.instance) return;
+		if (!owner) return;
+		if (player !== owner.instance) return;
+
+		// print(this.config.prerequisites);
+		for (const assetName of this.config.prerequisites) {
+			if (!owner.hasAsset(assetName)) return;
+			// print(`owner has ${assetName}`);
+		}
 
 		const ownerCurrencyAmount = this.currencyService.getCurrencyData(
 			player,
@@ -76,6 +83,8 @@ export class PlotAsset
 			this.config.currency,
 			this.config.cost,
 		);
+
+		owner.addAsset(this.instance.Name);
 
 		this.attributes.enabled = true;
 		this.attributes.bought = true;

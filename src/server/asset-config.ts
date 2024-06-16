@@ -15,11 +15,6 @@ export const ASSETS: { [name: string]: Asset } = {
 	Walls: {
 		cost: 0,
 		currency: "Silver",
-		prerequisites: [],
-	},
-	ClaimDoor: {
-		cost: 0,
-		currency: "Silver",
-		prerequisites: [],
+		prerequisites: ["Door"],
 	},
 };
