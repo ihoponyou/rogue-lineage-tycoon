@@ -84,7 +84,6 @@ export class Plot
 			warn(`duplicate asset @ ${instance}`);
 			return;
 		}
-		print(component.instance, instance);
 		this.assets.set(component.instance.Name, component);
 		component.hide();
 	}
