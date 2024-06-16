@@ -7,6 +7,7 @@ import { CurrencyService } from "server/services/currency-service";
 import { Inject } from "shared/inject";
 import { ModelComponent } from "shared/components/model";
 import { ASSETS } from "server/asset-config";
+import { Hideable } from "shared/hideable";
 
 export interface PlotAssetAttributes {
 	enabled: boolean;
@@ -28,7 +29,7 @@ export type PlotAssetInstance = Model & {
 })
 export class PlotAsset
 	extends DisposableComponent<PlotAssetAttributes, PlotAssetInstance>
-	implements OnStart
+	implements OnStart, Hideable
 {
 	protected readonly config = ASSETS[this.instance.Name];
 	protected plot!: Plot;
@@ -54,6 +55,7 @@ export class PlotAsset
 	public show(): void {
 		this.model.show();
 	}
+
 	public hide(): void {
 		this.model.hide();
 	}

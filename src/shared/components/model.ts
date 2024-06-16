@@ -1,12 +1,13 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
+import { Hideable } from "shared/hideable";
 
 @Component({
 	tag: "Model",
 })
 export class ModelComponent
 	extends BaseComponent<{}, Model>
-	implements OnStart
+	implements OnStart, Hideable
 {
 	private parts = new Array<BasePart>();
 	private transparencies = new Map<BasePart, number>();

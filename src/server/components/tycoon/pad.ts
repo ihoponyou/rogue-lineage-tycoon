@@ -6,6 +6,8 @@ import { ModelComponent } from "shared/components/model";
 import { PlotAsset } from "./plot-asset";
 import { Inject } from "shared/inject";
 import { DisposableComponent } from "shared/components/disposable-component";
+import { Toggleable } from "shared/toggleable";
+import { Hideable } from "shared/hideable";
 
 type PadInstance = Model & {
 	Part: Part & { BillboardGui: BillboardGui };
@@ -17,7 +19,7 @@ type PadInstance = Model & {
 })
 export class Pad
 	extends DisposableComponent<{}, PadInstance>
-	implements OnStart
+	implements OnStart, Toggleable, Hideable
 {
 	private asset?: PlotAsset;
 
