@@ -6,36 +6,36 @@ import {
 	PlotAssetInstance,
 } from "./plot-asset";
 
-interface OwnerDoorAttributes extends PlotAssetAttributes {}
+interface ClaimDoorAttributes extends PlotAssetAttributes {}
 
-type OwnerDoorInstance = PlotAssetInstance;
+type ClaimDoorInstance = PlotAssetInstance & {
+	Collider: BasePart;
+};
 
 @Component({
-	tag: "OwnerDoor",
+	tag: "ClaimDoor",
 	defaults: {
-		enabled: true,
-		bought: true,
+		enabled: false,
+		bought: false,
 		unlocked: true,
-		cost: 0,
-		currency: "Silver",
 	},
 })
-export class OwnerDoor extends PlotAsset<
-	OwnerDoorAttributes,
-	OwnerDoorInstance
+export class ClaimDoor extends PlotAsset<
+	ClaimDoorAttributes,
+	ClaimDoorInstance
 > {
 	private touchedConnection?: RBXScriptConnection;
 
 	protected override onEnabled(): void {
-		this.show();
+		this.model.show();
 		this.touchedConnection = this.trove.connect(
-			this.instance.Touched,
+			this.instance.Collider.Touched,
 			(part) => this.onTouched(part),
 		);
 	}
 
 	protected override onDisabled(): void {
-		this.hide();
+		this.model.hide();
 		if (this.touchedConnection) this.trove.remove(this.touchedConnection);
 		this.touchedConnection = undefined;
 	}
