@@ -11,7 +11,7 @@ import { ASSETS } from "server/asset-config";
 export interface PlotAssetAttributes {
 	enabled: boolean;
 	bought: boolean;
-	unlocked: false;
+	unlocked: boolean;
 }
 
 export type PlotAssetInstance = Model & {
@@ -32,7 +32,6 @@ export class PlotAsset
 {
 	protected readonly config = ASSETS[this.instance.Name];
 	protected plot!: Plot;
-	protected pad!: ClickInteractable;
 
 	@Inject
 	protected components!: Components;
@@ -51,10 +50,6 @@ export class PlotAsset
 		if (!plot) error("parent is not a Plot or is missing Plot component");
 		this.plot = plot;
 	}
-
-	protected onEnabled(): void {}
-
-	protected onDisabled(): void {}
 
 	public show(): void {
 		this.model.show();
@@ -81,8 +76,7 @@ export class PlotAsset
 		);
 
 		this.attributes.enabled = true;
-
-		this.pad.instance.Destroy();
+		this.attributes.bought = true;
 		this.model.show();
 
 		print(`${player.Name} bought ${this.instance}`);
