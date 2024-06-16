@@ -1,12 +1,9 @@
 import { Component, Components } from "@flamework/components";
 import { Dependency, OnStart } from "@flamework/core";
-import { t } from "@rbxts/t";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Plot } from "./plot";
 import { ClickInteractable } from "../interactable/click-interactable";
 import { CurrencyService } from "server/services/currency-service";
-import { Currency } from "../../../../types/currency";
-import { Tech } from "shared/tech";
 import { Inject } from "shared/inject";
 import { ModelComponent } from "shared/components/model";
 import { ASSETS } from "server/asset-config";
@@ -18,27 +15,19 @@ export interface PlotAssetAttributes {
 }
 
 export type PlotAssetInstance = Model & {
-	Parent: Instance;
-	Pad: Instance;
+	Parent: Model;
 };
 
-export type GenericPlotAsset = PlotAsset<
-	PlotAssetAttributes,
-	PlotAssetInstance
->;
-
 @Component({
+	tag: "PlotAsset",
 	defaults: {
 		enabled: false,
 		bought: false,
 		unlocked: false,
 	},
 })
-export abstract class PlotAsset<
-		A extends PlotAssetAttributes,
-		I extends PlotAssetInstance,
-	>
-	extends DisposableComponent<A, I>
+export class PlotAsset
+	extends DisposableComponent<PlotAssetAttributes, PlotAssetInstance>
 	implements OnStart
 {
 	protected readonly config = ASSETS[this.instance.Name];
@@ -47,37 +36,32 @@ export abstract class PlotAsset<
 
 	@Inject
 	protected components!: Components;
-	@Inject
-	protected model!: ModelComponent;
 
-	constructor(private currencyService: CurrencyService) {
+	constructor(
+		private currencyService: CurrencyService,
+		private model: ModelComponent,
+	) {
 		super();
-		if (!this.config) error(`asset "${this.instance.Name}" does not exist`);
+		if (!this.config)
+			error(`config for asset "${this.instance.Name}" does not exist`);
 	}
 
 	public onStart(): void {
 		const plot = this.components.getComponent<Plot>(this.instance.Parent);
 		if (!plot) error("parent is not a Plot or is missing Plot component");
 		this.plot = plot;
-
-		this.pad = this.trove.add(
-			this.components.addComponent<ClickInteractable>(this.instance.Pad),
-		);
-		this.pad.onInteracted((player) => this.buy(player));
-
-		this.plot.addAsset(this);
-
-		this.onAttributeChanged("enabled", (newValue) =>
-			newValue ? this.onEnabled() : this.onDisabled(),
-		);
-		this.attributes.enabled ? this.onEnabled() : this.onDisabled();
-
-		this.model.hide();
 	}
 
 	protected onEnabled(): void {}
 
 	protected onDisabled(): void {}
+
+	public show(): void {
+		this.model.show();
+	}
+	public hide(): void {
+		this.model.hide();
+	}
 
 	public buy(player: Player): void {
 		if (this.attributes.bought) return;
@@ -102,9 +86,5 @@ export abstract class PlotAsset<
 		this.model.show();
 
 		print(`${player.Name} bought ${this.instance}`);
-	}
-
-	public getPad(): ClickInteractable {
-		return this.pad;
 	}
 }

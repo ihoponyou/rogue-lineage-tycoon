@@ -1,12 +1,13 @@
 import { Component, Components } from "@flamework/components";
 import { Dependency, OnStart } from "@flamework/core";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { GenericPlotAsset } from "./plot-asset";
 import { ClickInteractable } from "../interactable/click-interactable";
 import { CurrencyService } from "server/services/currency-service";
 import { Currency } from "../../../../types/currency";
 import { PlayerServer } from "../player-server";
 import { Inject } from "shared/inject";
+import { Pad } from "./pad";
+import { PlotAsset } from "./plot-asset";
 
 interface PlotAttributes {
 	// id: number;
@@ -25,9 +26,9 @@ export class Plot
 {
 	private static totalPlots = 0;
 
-	public assets = new Map<string, GenericPlotAsset>();
-
 	private id = -1;
+	private pads = new Map<string, Pad>();
+	private assets = new Map<string, PlotAsset>();
 	private bank: { [currency in Currency]: number } = {
 		Silver: 0,
 		Insight: 0,
@@ -47,6 +48,10 @@ export class Plot
 	public onStart(): void {
 		this.id = ++Plot.totalPlots;
 
+		this.instance
+			.GetDescendants()
+			.forEach((value) => this.initDescendant(value));
+
 		this.teller = this.components.addComponent<ClickInteractable>(
 			this.instance.Teller,
 		);
@@ -62,6 +67,28 @@ export class Plot
 		});
 	}
 
+	private initDescendant(instance: Instance) {
+		let component: PlotAsset | Pad | undefined;
+		component = this.components.getComponent<Pad>(instance);
+		if (component !== undefined) {
+			if (this.pads.has(component.instance.Name)) {
+				warn(`duplicate pad @ ${instance}`);
+			}
+			this.pads.set(component.instance.Name, component as Pad);
+			component.hide();
+			return;
+		}
+		component = this.components.getComponent<PlotAsset>(instance);
+		if (!component) return;
+		if (this.assets.has(component.instance.Name)) {
+			warn(`duplicate asset @ ${instance}`);
+			return;
+		}
+		print(component.instance, instance);
+		this.assets.set(component.instance.Name, component);
+		component.hide();
+	}
+
 	public claim(player: Player): void {
 		if (this.owner !== undefined) return;
 		this.owner = this.components.getComponent<PlayerServer>(player);
@@ -72,7 +99,7 @@ export class Plot
 		return this.owner;
 	}
 
-	public addAsset(asset: GenericPlotAsset): void {
+	public addAsset(asset: PlotAsset): void {
 		try {
 			this.assets.set(asset.instance.Name, asset);
 			// print(this.assets);

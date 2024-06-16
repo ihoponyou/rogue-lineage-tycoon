@@ -1,6 +1,5 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { RunService } from "@rbxts/services";
 
 @Component({
 	tag: "Model",

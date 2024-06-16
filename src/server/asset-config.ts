@@ -7,7 +7,17 @@ interface Asset {
 }
 
 export const ASSETS: { [name: string]: Asset } = {
-	"Basic Door": {
+	Door: {
+		cost: 0,
+		currency: "Silver",
+		prerequisites: [],
+	},
+	Walls: {
+		cost: 0,
+		currency: "Silver",
+		prerequisites: [],
+	},
+	ClaimDoor: {
 		cost: 0,
 		currency: "Silver",
 		prerequisites: [],
