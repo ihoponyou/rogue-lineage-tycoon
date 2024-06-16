@@ -35,4 +35,20 @@ export class ModelComponent
 			part.CanCollide = false;
 		}
 	}
+
+	public setCollisionGroup(group: string): void {
+		for (const part of this.parts) {
+			part.CollisionGroup = group;
+		}
+	}
+
+	public setNetworkOwner(owner: Player | undefined): void {
+		for (const part of this.parts) {
+			if (!part.CanSetNetworkOwnership()[0]) {
+				warn(`cannot set network owner of ${part.GetFullName()}`);
+				continue;
+			}
+			part.SetNetworkOwner(owner);
+		}
+	}
 }

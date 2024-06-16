@@ -6,9 +6,10 @@ import { ClickInteractable } from "../interactable/click-interactable";
 import { CurrencyService } from "server/services/currency-service";
 import { Inject } from "shared/inject";
 import { ModelComponent } from "shared/components/model";
-import { ASSETS } from "server/asset-config";
+import { ASSETS } from "server/game-config";
 import { Hideable } from "shared/hideable";
 import { PlayerServer } from "../player-server";
+import { Toggleable } from "shared/toggleable";
 
 export interface PlotAssetAttributes {
 	enabled: boolean;
@@ -96,5 +97,9 @@ export class PlotAsset
 			if (!player.hasAsset(assetName)) return false;
 		}
 		return true;
+	}
+
+	public getPlot(): Plot {
+		return this.plot;
 	}
 }

@@ -1,7 +1,9 @@
-import { Component } from "@flamework/components";
+import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Currency } from "../../../../types/currency";
+import { PRODUCTS } from "server/game-config";
+import { ModelComponent } from "shared/components/model";
 
 interface ProductAttributes {
 	isProcessed: boolean;
@@ -9,11 +11,10 @@ interface ProductAttributes {
 	currency: Currency;
 }
 
-export type ProductInstance = BasePart | Model;
+export type ProductInstance = Model;
 
 @Component({
 	tag: "Product",
-	// instanceGuard: Flamework.createGuard<BasePart | Model>(),
 	defaults: {
 		isProcessed: false,
 		value: 0,
@@ -24,12 +25,20 @@ export class Product
 	extends DisposableComponent<ProductAttributes, ProductInstance>
 	implements OnStart
 {
-	public onStart(): void {
-		if (this.instance.IsA("BasePart"))
-			this.instance.CollisionGroup = "Product";
+	constructor(private model: ModelComponent) {
+		super();
+	}
 
-		this.onAttributeChanged("isProcessed", (isProcessed) => {
-			if (isProcessed) this.instance.Destroy();
-		});
+	public onStart(): void {
+		this.model.setCollisionGroup("Product");
+
+		this.attributes.currency = PRODUCTS[this.instance.Name].currency;
+		this.attributes.value = PRODUCTS[this.instance.Name].value;
+
+		this.trove.add(
+			this.onAttributeChanged("isProcessed", (isProcessed) => {
+				if (isProcessed) this.instance.Destroy();
+			}),
+		);
 	}
 }

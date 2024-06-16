@@ -1264,7 +1264,9 @@ interface ReplicatedStorage extends Instance {
 		};
 		Tycoon: Folder & {
 			Products: Folder & {
-				shilling: Part;
+				shilling: Model & {
+					Part: Part;
+				};
 			};
 		};
 		Animations: Folder & {
@@ -1401,37 +1403,48 @@ interface ReplicatedStorage extends Instance {
 	};
 	Source: Folder & {
 		Modules: Folder & {
-			AnimationManager: ModuleScript;
+			RaycastUtil: ModuleScript;
 			networking: ModuleScript & {
 				["character-events"]: ModuleScript;
+				currency: ModuleScript;
 				["mana-events"]: ModuleScript;
 				["silver-events"]: ModuleScript;
 			};
 			charAt: ModuleScript;
 			MathFunctions: ModuleScript;
+			constants: ModuleScript;
 			ModelUtil: ModuleScript;
+			getCharacterFromBodyPart: ModuleScript;
 			OffsetManager: ModuleScript;
 			CastVisualizer: ModuleScript;
+			toggleable: ModuleScript;
+			graph: ModuleScript & {
+				node: ModuleScript;
+			};
+			hideable: ModuleScript;
+			HitboxManager: ModuleScript;
 			["line-of-sight"]: ModuleScript;
 			NumberLerp: ModuleScript;
-			Find: ModuleScript;
-			TableFunctions: ModuleScript;
-			RaycastUtil: ModuleScript;
 			["get-digit"]: ModuleScript;
+			TableFunctions: ModuleScript;
+			Find: ModuleScript;
+			AnimationManager: ModuleScript;
 			VectorMath: ModuleScript;
+			inject: ModuleScript;
 			libs: Folder & {
 				ProfileService: ModuleScript;
 			};
-			["cast-visualizer"]: ModuleScript;
 			["state-machine"]: ModuleScript & {
 				state: ModuleScript;
 			};
 			components: Folder & {
 				character: ModuleScript;
-				ragdoll: ModuleScript;
 				["disposable-component"]: ModuleScript;
+				ragdoll: ModuleScript;
+				player: ModuleScript;
+				model: ModuleScript;
 			};
-			HitboxManager: ModuleScript;
+			["cast-visualizer"]: ModuleScript;
 		};
 		Client: Folder & {
 			["player-state"]: Folder & {
@@ -1444,17 +1457,23 @@ interface ReplicatedStorage extends Instance {
 			};
 			networking: ModuleScript;
 			gui: Folder & {
+				hooks: Folder & {
+					["reflex-hooks"]: ModuleScript;
+				};
 				components: Folder & {
 					["silver-logo"]: ModuleScript;
 					app: ModuleScript;
 					layer: ModuleScript;
 				};
-				hooks: Folder;
+				producer: ModuleScript & {
+					currencies: ModuleScript;
+					stats: ModuleScript;
+				};
 			};
 			components: Folder & {
-				["ragdoll-client"]: ModuleScript;
+				["player-client"]: ModuleScript;
 				["character-client"]: ModuleScript;
-				["abstract-race"]: ModuleScript;
+				["ragdoll-client"]: ModuleScript;
 				["character-state-machine"]: ModuleScript;
 			};
 			controllers: Folder & {
@@ -1475,21 +1494,11 @@ interface ReplicatedStorage extends Instance {
 				["reflex-class"]: Folder & {
 					out: ModuleScript & {
 						source: Folder & {
+							["class-producer"]: ModuleScript;
 							decorators: ModuleScript & {
 								action: ModuleScript;
 								subscribe: ModuleScript;
 							};
-							["custom-broadcaster"]: Folder & {
-								patch: ModuleScript;
-								["broadcast-receiver"]: ModuleScript;
-								broadcaster: ModuleScript;
-								hydrate: ModuleScript;
-							};
-							["class-producer"]: ModuleScript;
-						};
-						utilities: Folder & {
-							restoreNotChangedProperties: ModuleScript;
-							["patch-utilities"]: ModuleScript;
 						};
 					};
 				};
@@ -1513,26 +1522,64 @@ interface ReplicatedStorage extends Instance {
 						utilities: ModuleScript;
 						remotes: ModuleScript;
 						source: Folder & {
-							["shared-component-network"]: ModuleScript & {
-								action: ModuleScript;
-								event: ModuleScript;
-							};
 							["shared-component-handler"]: ModuleScript;
-							functions: Folder & {
-								restoreNotChangedProperties: ModuleScript;
-								["registery-decorator-implementation"]: ModuleScript;
-							};
-							decorators: ModuleScript & {
+							decorators: Folder & {
 								["only-server"]: ModuleScript;
 								["only-client"]: ModuleScript;
 							};
 							pointer: ModuleScript;
 							["shared-component"]: ModuleScript;
+							network: ModuleScript & {
+								action: ModuleScript;
+								event: ModuleScript;
+							};
 						};
 						types: ModuleScript;
 					};
 				};
+				charm: ModuleScript & {
+					mapped: ModuleScript;
+					atom: ModuleScript;
+					effect: ModuleScript;
+					observe: ModuleScript;
+					utils: Folder & {
+						collect: ModuleScript;
+						count: ModuleScript;
+						setInterval: ModuleScript;
+					};
+					modules: Folder & {
+						React: ModuleScript;
+						Promise: ModuleScript;
+						ReactRoblox: ModuleScript;
+					};
+					types: ModuleScript;
+					sync: ModuleScript & {
+						validate: ModuleScript;
+						client: ModuleScript;
+						patch: ModuleScript;
+						server: ModuleScript;
+					};
+					subscribe: ModuleScript;
+					react: Folder & {
+						useAtom: ModuleScript;
+					};
+					computed: ModuleScript;
+					store: ModuleScript;
+					__tests__: Folder & {
+						react: Folder & {
+							helpers: Folder & {
+								renderHook: ModuleScript;
+							};
+						};
+						benchmarks: Folder & {
+							["atom.bench"]: ModuleScript;
+						};
+					};
+				};
 				["object-utils"]: ModuleScript;
+				react: ModuleScript & {
+					tags: ModuleScript;
+				};
 				flipper: Folder & {
 					typings: Folder;
 					src: ModuleScript & {
@@ -1597,8 +1644,18 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 				["react-roblox"]: ModuleScript;
-				react: ModuleScript & {
-					tags: ModuleScript;
+				["react-reflex"]: ModuleScript & {
+					React: ModuleScript;
+					hooks: Folder & {
+						useSelector: ModuleScript;
+						useSelectorCreator: ModuleScript;
+						useProducer: ModuleScript;
+					};
+					components: Folder & {
+						ReflexContext: ModuleScript;
+						ReflexProvider: ModuleScript;
+					};
+					Reflex: ModuleScript;
 				};
 				ReactLua: Folder & {
 					node_modules: Folder & {
