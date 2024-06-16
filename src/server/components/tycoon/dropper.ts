@@ -1,7 +1,7 @@
 import { Component } from "@flamework/components";
 import { Timer, TimerState } from "@rbxts/timer";
 import { t } from "@rbxts/t";
-import { ReplicatedStorage, Workspace } from "@rbxts/services";
+import { Debris, ReplicatedStorage, Workspace } from "@rbxts/services";
 import {
 	PlotAsset,
 	PlotAssetAttributes,
@@ -18,6 +18,8 @@ type DropperInstance = PlotAssetInstance & {
 	Spout: Attachment;
 };
 
+const PRODUCT_LIFETIME = 10;
+
 @Component({
 	tag: "Dropper",
 	attributes: {
@@ -27,9 +29,7 @@ type DropperInstance = PlotAssetInstance & {
 	defaults: {
 		enabled: false,
 		bought: false,
-		unlocked: false,
-		cost: 0,
-		currency: "Silver",
+		unlocked: true,
 		dropsPerSecond: 1,
 		productsPerDrop: 1,
 	},
@@ -79,11 +79,12 @@ export class Dropper extends PlotAsset<DropperAttributes, DropperInstance> {
 			clone.Parent = Workspace;
 			clone.AddTag("Product");
 			clone.SetAttribute("value", 100);
+			Debris.AddItem(clone, PRODUCT_LIFETIME);
 
-			if (this.product.IsA("Model")) {
-				(clone as Model).PivotTo(this.instance.Spout.WorldCFrame);
-			} else if (this.product.IsA("BasePart")) {
-				(clone as BasePart).CFrame = this.instance.Spout.WorldCFrame;
+			if (clone.IsA("Model")) {
+				clone.PivotTo(this.instance.Spout.WorldCFrame);
+			} else if (clone.IsA("BasePart")) {
+				clone.CFrame = this.instance.Spout.WorldCFrame;
 			}
 		}
 	}
