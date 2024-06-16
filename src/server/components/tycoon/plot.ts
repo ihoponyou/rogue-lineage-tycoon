@@ -8,6 +8,7 @@ import { PlayerServer } from "../player-server";
 import { Inject } from "shared/inject";
 import { Pad } from "./pad";
 import { PlotAsset } from "./plot-asset";
+import { Players } from "@rbxts/services";
 
 interface PlotAttributes {
 	// id: number;
@@ -15,6 +16,7 @@ interface PlotAttributes {
 
 type PlotInstance = Model & {
 	Teller: Teller;
+	ClaimDoor: BasePart;
 };
 
 @Component({
@@ -37,6 +39,7 @@ export class Plot
 	};
 	private owner?: PlayerServer;
 	private teller!: ClickInteractable;
+	private claimTouchedConnection?: RBXScriptConnection;
 
 	@Inject
 	private components!: Components;
@@ -65,6 +68,10 @@ export class Plot
 			this.bank.Silver = 0;
 			this.instance.Teller.SurfaceGui.TextLabel.Text = `0`;
 		});
+
+		this.instance.ClaimDoor.Touched.Connect((otherPart) =>
+			this.onClaimDoorTouched(otherPart),
+		);
 	}
 
 	private initDescendant(instance: Instance) {
@@ -88,10 +95,27 @@ export class Plot
 		component.hide();
 	}
 
+	private onClaimDoorTouched(otherPart: BasePart): void {
+		if (this.owner !== undefined) return;
+		const parent = otherPart.Parent;
+		if (!parent) return;
+		const player = Players.GetPlayerFromCharacter(parent);
+		if (!player) return;
+
+		this.claim(player);
+	}
+
 	public claim(player: Player): void {
 		if (this.owner !== undefined) return;
 		this.owner = this.components.getComponent<PlayerServer>(player);
-		print(`${player.Name} claimed Plot ${this.id}`);
+		if (!this.owner) return;
+
+		print(`${this.instance} claimed by ${this.owner.instance.Name}`);
+
+		this.claimTouchedConnection?.Disconnect();
+		this.claimTouchedConnection = undefined;
+
+		this.instance.ClaimDoor.Transparency = 1;
 	}
 
 	public getOwner(): PlayerServer | undefined {
