@@ -36,12 +36,9 @@ export class Pad
 			.andThen((component) => (this.asset = component))
 			.await();
 		if (!this.asset) error("assigned asset missing PlotAsset component");
-
-		this.enable();
 	}
 
 	private onTouched(otherPart: BasePart): void {
-		print();
 		const parent = otherPart.Parent;
 		if (!parent) return;
 		const player = Players.GetPlayerFromCharacter(parent);
@@ -53,7 +50,7 @@ export class Pad
 
 		this.asset.buy(player);
 
-		this.model.hide();
+		this.hide();
 		this.disable();
 	}
 

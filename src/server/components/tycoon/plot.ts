@@ -116,6 +116,12 @@ export class Plot
 		this.claimTouchedConnection = undefined;
 
 		this.instance.ClaimDoor.Transparency = 1;
+
+		// TODO: only unlocked pads
+		for (const [assetName, pad] of this.pads) {
+			pad.show();
+			pad.enable();
+		}
 	}
 
 	public getOwner(): PlayerServer | undefined {
