@@ -6,21 +6,22 @@ import {
 } from "./plot-asset";
 import { Dependency } from "@flamework/core";
 import { Product } from "./product";
+import { Inject } from "shared/inject";
 
 interface CollectorAttributes extends PlotAssetAttributes {
 	multiplier: number;
 }
 
-type CollectorInstance = PlotAssetInstance;
+type CollectorInstance = PlotAssetInstance & {
+	Collider: BasePart;
+};
 
 @Component({
 	tag: "Collector",
 	defaults: {
 		enabled: false,
 		bought: false,
-		unlocked: false,
-		cost: 0,
-		currency: "Silver",
+		unlocked: true,
 		multiplier: 1,
 	},
 })
@@ -33,15 +34,15 @@ export class Collector extends PlotAsset<
 	public override onStart(): void {
 		super.onStart();
 
-		this.instance.CollisionGroup = "Collector";
+		this.instance.Collider.CollisionGroup = "Collector";
 	}
 
 	protected override onEnabled(): void {
 		this.touchedConnection = this.trove.connect(
-			this.instance.Touched,
+			this.instance.Collider.Touched,
 			(part) => {
-				const components = Dependency<Components>();
-				const productComponent = components.getComponent<Product>(part);
+				const productComponent =
+					this.components.getComponent<Product>(part);
 				if (productComponent) this.collect(productComponent);
 			},
 		);
