@@ -6,9 +6,9 @@ import { CurrencyService } from "server/services/currency-service";
 import { Currency } from "../../../../types/currency";
 import { PlayerServer } from "../player-server";
 import { Inject } from "shared/inject";
-import { Pad } from "./pad";
-import { PlotAsset } from "./plot-asset";
 import { Players } from "@rbxts/services";
+import { Pad } from "./pad";
+import { AssetPad } from "./pad/asset-pad";
 
 type PlotInstance = Model & {
 	Teller: Teller;
@@ -25,7 +25,7 @@ export class Plot
 	private static totalPlots = 0;
 
 	private id = -1;
-	private pads = new Map<string, Pad>();
+	private pads = new Map<string, AssetPad>();
 	private bank: { [currency in Currency]: number } = {
 		Silver: 0,
 		Insight: 0,
@@ -70,7 +70,7 @@ export class Plot
 	}
 
 	private initDescendant(instance: Instance) {
-		const pad = this.components.getComponent<Pad>(instance);
+		const pad = this.components.getComponent<AssetPad>(instance);
 		if (!pad) return;
 		if (this.pads.has(pad.instance.Name)) {
 			warn(`duplicate pad @ ${instance}`);

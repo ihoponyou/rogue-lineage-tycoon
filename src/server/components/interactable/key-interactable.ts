@@ -1,6 +1,8 @@
 import { Component } from "@flamework/components";
 import { InputBasedInteractable } from "./input-based-interactable";
 
+// TODO: allow a KeyInteractable to handle multiple keys each with their own unique callbacks (replace grippable/carriable extension)
+
 @Component()
 export class KeyInteractable<
 	A extends {} = {},

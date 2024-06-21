@@ -2,9 +2,7 @@ import { Component } from "@flamework/components";
 import { Flamework, OnStart } from "@flamework/core";
 import { Interactable } from ".";
 
-@Component({
-	instanceGuard: Flamework.createGuard<BasePart | Model>(),
-})
+@Component()
 export abstract class InputBasedInteractable<
 		A extends {} = {},
 		I extends Instance = Instance,
