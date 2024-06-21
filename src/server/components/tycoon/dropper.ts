@@ -22,6 +22,7 @@ export class Dropper
 	implements OnStart, Toggleable
 {
 	private readonly config = DROPPERS[this.instance.Name];
+	private _isEnabled = false;
 	private timer = new Timer(1 / this.config.dropsPerSecond);
 
 	constructor(
@@ -50,11 +51,17 @@ export class Dropper
 	}
 
 	public enable(): void {
+		this._isEnabled = true;
 		if (this.timer.getState() !== TimerState.Running) this.timer.start();
 	}
 
 	public disable(): void {
+		this._isEnabled = false;
 		if (this.timer.getState() === TimerState.Running) this.timer.stop();
+	}
+
+	public isEnabled(): boolean {
+		return this._isEnabled;
 	}
 
 	private onTimerCompleted(): void {
