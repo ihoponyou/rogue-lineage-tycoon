@@ -1,5 +1,5 @@
 import { ReplicatedStorage } from "@rbxts/services";
-import { Currency } from "../../types/currency";
+import { Currency } from "../../../types/currency";
 
 interface AssetConfig {
 	cost: number;

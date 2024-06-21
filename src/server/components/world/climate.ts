@@ -1,8 +1,8 @@
 import { BaseComponent, Component, Components } from "@flamework/components";
 import { Dependency, OnStart, OnTick } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
-import { OnCharacterAdded } from "../../../types/lifecycles";
-import { CharacterServer } from "./character-server";
+import { OnCharacterAdded } from "../../../../types/lifecycles";
+import { CharacterServer } from "../character-server";
 
 interface Attributes {
 	temperature: number;

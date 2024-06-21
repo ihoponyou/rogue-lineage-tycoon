@@ -6,11 +6,11 @@ import {
 	RaceGlossary,
 	getRandomPhenotype,
 	getRandomRollable,
-} from "server/races";
+} from "server/configs/races";
 import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
 import { DataService } from "./data-service";
-import { getRandomFirstName } from "server/names";
-import { ARMORS, getRandomStarterArmor } from "server/armors";
+import { getRandomFirstName } from "server/configs/names";
+import { ARMORS, getRandomStarterArmor } from "server/configs/armors";
 import Object from "@rbxts/object-utils";
 import { Components } from "@flamework/components";
 import { CharacterServer } from "server/components/character-server";

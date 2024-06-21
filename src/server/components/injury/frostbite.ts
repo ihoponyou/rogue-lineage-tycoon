@@ -1,5 +1,5 @@
 import { Component } from "@flamework/components";
-import { BaseInjury } from "./base-injury";
+import { BaseInjury } from ".";
 import { IdentityService } from "server/services/identity-service";
 import { CharacterServer } from "../character-server";
 import { DataService } from "server/services/data-service";

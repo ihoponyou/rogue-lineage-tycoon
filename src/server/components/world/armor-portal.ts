@@ -3,7 +3,7 @@ import { OnStart } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
 import { IdentityService } from "server/services/identity-service";
-import { OnRemoved } from "../../../types/lifecycles";
+import { OnRemoved } from "../../../../types/lifecycles";
 
 interface Attributes {
 	armorToSet: string;

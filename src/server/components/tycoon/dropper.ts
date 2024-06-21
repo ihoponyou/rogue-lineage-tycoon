@@ -2,7 +2,7 @@ import { Component, Components } from "@flamework/components";
 import { Timer, TimerState } from "@rbxts/timer";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Toggleable } from "shared/toggleable";
-import { DROPPERS, PRODUCTS } from "server/tycoon-config";
+import { DROPPERS, PRODUCTS } from "server/configs/tycoon";
 import { PlotAsset } from "./plot-asset";
 import { OnStart } from "@flamework/core";
 import { ModelComponent } from "shared/components/model";
