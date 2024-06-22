@@ -1,5 +1,5 @@
 import { Component } from "@flamework/components";
-import { ASSETS } from "server/tycoon-config";
+import { ASSETS } from "server/configs/tycoon";
 import { AbstractPlayer } from "shared/components/player";
 
 @Component({

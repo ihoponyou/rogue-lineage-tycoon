@@ -17,6 +17,7 @@ export class Collector
 	extends DisposableComponent<{}, CollectorInstance>
 	implements OnStart, Toggleable
 {
+	private _isEnabled = false;
 	private multiplier = 1;
 	private touchedConnection?: RBXScriptConnection;
 
@@ -35,37 +36,41 @@ export class Collector
 			newValue ? this.enable() : this.disable(),
 		);
 		this.plotAsset.attributes.enabled ? this.enable() : this.disable();
-	}
 
-	public enable(): void {
-		this.touchedConnection = this.trove.connect(
-			this.instance.Collider.Touched,
-			(part) => {
-				if (part.HasTag("Product")) return;
-				if (!part.Parent) return;
-				if (part.Parent.ClassName !== "Model") return;
-
-				this.components
-					.waitForComponent<Product>(part.Parent)
-					.timeout(5)
-					.andThen((value) => this.collect(value))
-					.catch((e) => {
-						if (
-							Promise.Error.isKind(e, Promise.Error.Kind.TimedOut)
-						) {
-							warn("Operation timed out!");
-						} else {
-							warn("Operation encountered an error!", e);
-						}
-					});
-			},
+		this.trove.connect(this.instance.Collider.Touched, (otherPart) =>
+			this.onTouched(otherPart),
 		);
 	}
 
+	private onTouched(otherPart: BasePart): void {
+		if (!this._isEnabled) return;
+		if (otherPart.HasTag("Product")) return;
+		if (!otherPart.Parent) return;
+		if (otherPart.Parent.ClassName !== "Model") return;
+
+		this.components
+			.waitForComponent<Product>(otherPart.Parent)
+			.timeout(5)
+			.andThen((value) => this.collect(value))
+			.catch((e) => {
+				if (Promise.Error.isKind(e, Promise.Error.Kind.TimedOut)) {
+					warn("Operation timed out!");
+				} else {
+					warn("Operation encountered an error!", e);
+				}
+			});
+	}
+
+	public isEnabled(): boolean {
+		return this._isEnabled;
+	}
+
+	public enable(): void {
+		this._isEnabled = true;
+	}
+
 	public disable(): void {
-		if (this.touchedConnection) this.trove.remove(this.touchedConnection);
-		this.touchedConnection?.Disconnect();
-		this.touchedConnection = undefined;
+		this._isEnabled = false;
 	}
 
 	public setMultiplier(multiplier: number): void {
