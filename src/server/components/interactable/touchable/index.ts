@@ -9,7 +9,7 @@ type TouchableInstance = BasePart | Model;
 @Component()
 export abstract class Touchable<
 		A extends {} = {},
-		I extends TouchableInstance = BasePart,
+		I extends TouchableInstance = TouchableInstance,
 	>
 	extends Interactable<A, I>
 	implements OnStart
