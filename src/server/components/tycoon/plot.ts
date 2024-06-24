@@ -9,6 +9,7 @@ import { Inject } from "shared/inject";
 import { Players } from "@rbxts/services";
 import { Pad } from "./pad";
 import { AssetPad } from "./pad/asset-pad";
+import { TouchablePart } from "../interactable/touchable/touchable-part";
 
 type PlotInstance = Model & {
 	Teller: Teller;
@@ -34,7 +35,7 @@ export class Plot
 	};
 	private owner?: PlayerServer;
 	private teller!: ClickInteractable;
-	private claimTouchedConnection?: RBXScriptConnection;
+	private claimDoor!: TouchablePart;
 
 	@Inject
 	private components!: Components;
@@ -46,65 +47,54 @@ export class Plot
 	public onStart(): void {
 		this.id = ++Plot.totalPlots;
 
-		this.instance
-			.GetDescendants()
-			.forEach((value) => task.spawn(() => this.initDescendant(value)));
+		this.instance.GetChildren().forEach((value) => this.initChild(value));
 
-		this.teller = this.components.addComponent<ClickInteractable>(
+		this.teller = this.components.getComponent<ClickInteractable>(
 			this.instance.Teller,
-		);
-		this.teller.onInteracted((player) => {
-			if (player !== this.owner?.instance) return;
-			this.currencyService.addCurrency(
-				this.owner.instance,
-				"Silver",
-				this.bank.Silver,
-			);
-			this.bank.Silver = 0;
-			this.instance.Teller.SurfaceGui.TextLabel.Text = `0`;
-		});
+		)!;
+		if (!this.teller) error("teller is not clickable");
+		this.teller.onInteracted((player) => this.onTellerInteracted(player));
 
-		this.instance.ClaimDoor.Touched.Connect((otherPart) =>
-			this.onClaimDoorTouched(otherPart),
+		this.claimDoor = this.components.getComponent<TouchablePart>(
+			this.instance.ClaimDoor,
+		)!;
+		if (!this.claimDoor) error("door is not touchable");
+		this.claimDoor.onInteracted((player) =>
+			this.onClaimDoorInteracted(player),
 		);
+		this.claimDoor.enable();
 	}
 
-	private initDescendant(instance: Instance) {
+	private initChild(instance: Instance) {
 		const pad = this.components.getComponent<AssetPad>(instance);
 		if (!pad) return;
 		if (this.pads.has(pad.instance.Name)) {
-			warn(`duplicate pad @ ${instance}`);
+			warn(`duplicate pad @ ${instance.GetFullName()}`);
 		}
 
-		const asset = pad.getAsset();
-		while (!asset) task.wait();
-
-		this.pads.set(asset.instance.Name, pad);
-
 		pad.hide();
-		pad.enable();
-		asset.hide();
 	}
 
-	private onClaimDoorTouched(otherPart: BasePart): void {
-		if (this.owner !== undefined) return;
-		const parent = otherPart.Parent;
-		if (!parent) return;
-		const player = Players.GetPlayerFromCharacter(parent);
-		if (!player) return;
-
-		this.claim(player);
+	private onTellerInteracted(player: Player): void {
+		if (!this.owner) return;
+		if (player !== this.owner.instance) return;
+		this.currencyService.addCurrency(
+			this.owner.instance,
+			"Silver",
+			this.bank.Silver,
+		);
+		this.bank.Silver = 0;
+		this.instance.Teller.SurfaceGui.TextLabel.Text = `0`;
 	}
 
-	public claim(player: Player): void {
+	private onClaimDoorInteracted(player: Player): void {
 		if (this.owner !== undefined) return;
 		this.owner = this.components.getComponent<PlayerServer>(player);
 		if (!this.owner) return;
 
 		print(`${this.instance} claimed by ${this.owner.instance.Name}`);
 
-		this.claimTouchedConnection?.Disconnect();
-		this.claimTouchedConnection = undefined;
+		this.claimDoor.disable();
 
 		this.instance.ClaimDoor.Transparency = 1;
 		this.refreshPads();
@@ -122,12 +112,10 @@ export class Plot
 	public refreshPads(): void {
 		if (!this.owner) return;
 		for (const [assetName, pad] of this.pads) {
-			const asset = pad.getAsset();
-			if (!asset) continue;
-			if (asset.attributes.bought) continue;
-			if (!asset.hasPrerequisites(this.owner)) continue;
-
+			if (pad.getAsset().isBought()) continue;
+			if (!this.owner.hasAssetPrerequisites(assetName)) continue;
 			pad.show();
+			pad.enable();
 		}
 	}
 }

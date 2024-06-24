@@ -3,10 +3,10 @@ import { Timer, TimerState } from "@rbxts/timer";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Toggleable } from "shared/toggleable";
 import { DROPPERS, PRODUCTS } from "server/configs/tycoon";
-import { PlotAsset } from "./plot-asset";
 import { OnStart } from "@flamework/core";
 import { ModelComponent } from "shared/components/model";
 import { Product } from "./product";
+import { Inject } from "shared/inject";
 
 type DropperInstance = Model & {
 	Faucet: BasePart & {
@@ -25,12 +25,8 @@ export class Dropper
 	private _isEnabled = false;
 	private timer = new Timer(1 / this.config.dropsPerSecond);
 
-	constructor(
-		private plotAsset: PlotAsset,
-		private components: Components,
-	) {
-		super();
-	}
+	@Inject
+	private components!: Components;
 
 	public onStart(): void {
 		if (!this.config)
@@ -38,12 +34,13 @@ export class Dropper
 
 		this.trove.connect(this.timer.completed, () => this.onTimerCompleted());
 
-		this.trove.add(
-			this.plotAsset.onAttributeChanged("enabled", (newValue) =>
-				newValue ? this.enable() : this.disable(),
-			),
-		);
-		this.plotAsset.attributes.enabled ? this.enable() : this.disable();
+		// this.trove.add(
+		// 	this.plotAsset.onAttributeChanged("enabled", (newValue) =>
+		// 		newValue ? this.enable() : this.disable(),
+		// 	),
+		// );
+		// this.plotAsset.attributes.enabled ? this.enable() : this.disable();
+		this.enable();
 	}
 
 	public setDropsPerSecond(newValue: number): void {
@@ -66,7 +63,7 @@ export class Dropper
 
 	private onTimerCompleted(): void {
 		this.drop();
-		if (this.plotAsset.attributes.enabled) this.timer.start();
+		// if (this.plotAsset.attributes.enabled) this.timer.start();
 	}
 
 	private drop(): void {
@@ -78,9 +75,9 @@ export class Dropper
 			this.components
 				.waitForComponent<ModelComponent>(clone)
 				.andThen((model) => {
-					model.setNetworkOwner(
-						this.plotAsset.getPlot().getOwner()?.instance,
-					);
+					// model.setNetworkOwner(
+					// 	this.plotAsset.getPlot().getOwner()?.instance,
+					// );
 					clone.PivotTo(this.instance.Faucet.Spout.WorldCFrame);
 				});
 

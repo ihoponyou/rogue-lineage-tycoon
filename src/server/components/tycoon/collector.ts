@@ -1,5 +1,4 @@
 import { Component, Components } from "@flamework/components";
-import { PlotAsset } from "./plot-asset";
 import { OnStart } from "@flamework/core";
 import { Product } from "./product";
 import { DisposableComponent } from "shared/components/disposable-component";
@@ -23,7 +22,7 @@ export class Collector
 
 	constructor(
 		private model: ModelComponent,
-		private plotAsset: PlotAsset,
+		// private plotAsset: PlotAsset,
 		private components: Components,
 	) {
 		super();
@@ -32,10 +31,11 @@ export class Collector
 	public onStart(): void {
 		this.model.setCollisionGroup("Collector");
 
-		this.plotAsset.onAttributeChanged("enabled", (newValue) =>
-			newValue ? this.enable() : this.disable(),
-		);
-		this.plotAsset.attributes.enabled ? this.enable() : this.disable();
+		// this.plotAsset.onAttributeChanged("enabled", (newValue) =>
+		// 	newValue ? this.enable() : this.disable(),
+		// );
+		// this.plotAsset.attributes.enabled ? this.enable() : this.disable();
+		this.enable();
 
 		this.trove.connect(this.instance.Collider.Touched, (otherPart) =>
 			this.onTouched(otherPart),
@@ -82,8 +82,8 @@ export class Collector
 		product.attributes.isProcessed = true;
 
 		const calculatedValue = product.attributes.value * this.multiplier;
-		this.plotAsset
-			.getPlot()
-			.deposit(product.attributes.currency, calculatedValue);
+		// this.plotAsset
+		// 	.getPlot()
+		// 	.deposit(product.attributes.currency, calculatedValue);
 	}
 }
