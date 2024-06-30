@@ -15,8 +15,8 @@ Cmdr.RegisterHook("BeforeRun", (context) => {
 });
 Cmdr.RegisterDefaultCommands();
 
-Flamework.addPaths("src/shared/components");
 Flamework.addPaths("src/server/services");
+Flamework.addPaths("src/shared/components");
 Flamework.addPaths("src/server/components");
 
 Modding.registerDependency<Logger>((ctor) => {

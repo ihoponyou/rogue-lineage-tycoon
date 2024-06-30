@@ -1,7 +1,7 @@
 import { ReplicatedStorage } from "@rbxts/services";
 import { Currency } from "../../../types/currency";
 
-interface AssetConfig {
+export interface AssetConfig {
 	cost: number;
 	currency: Currency;
 	prerequisites: Array<string>;
@@ -40,6 +40,11 @@ export const ASSETS: { [name: string]: AssetConfig } = {
 		cost: 0,
 		currency: "Silver",
 		prerequisites: [],
+	},
+	Mana: {
+		cost: 10,
+		currency: "Silver",
+		prerequisites: ["Door"],
 	},
 };
 

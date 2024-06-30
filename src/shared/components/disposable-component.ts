@@ -4,7 +4,10 @@ import { Trove } from "@rbxts/trove";
 import { Reflect } from "@flamework/core";
 
 @Component()
-export abstract class DisposableComponent<A extends {}, I extends Instance>
+export abstract class DisposableComponent<
+		A extends {} = {},
+		I extends Instance = Instance,
+	>
 	extends BaseComponent<A, I>
 	implements OnRemoved
 {
