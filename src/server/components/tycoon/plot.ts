@@ -1,14 +1,11 @@
 import { Component, Components } from "@flamework/components";
-import { Dependency, OnStart } from "@flamework/core";
+import { OnStart } from "@flamework/core";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { ClickInteractable } from "../interactable/click-interactable";
 import { CurrencyService } from "server/services/currency-service";
 import { Currency } from "../../../../types/currency";
 import { PlayerServer } from "../player-server";
 import { Inject } from "shared/inject";
-import { Players } from "@rbxts/services";
-import { Pad } from "./pad";
-import { AssetPad } from "./pad/asset-pad";
 import { TouchablePart } from "../interactable/touchable/touchable-part";
 
 type PlotInstance = Model & {
@@ -26,7 +23,6 @@ export class Plot
 	private static totalPlots = 0;
 
 	private id = -1;
-	private pads = new Map<string, AssetPad>();
 	private bank: { [currency in Currency]: number } = {
 		Silver: 0,
 		Insight: 0,
@@ -47,8 +43,6 @@ export class Plot
 	public onStart(): void {
 		this.id = ++Plot.totalPlots;
 
-		this.instance.GetChildren().forEach((value) => this.initChild(value));
-
 		this.teller = this.components.getComponent<ClickInteractable>(
 			this.instance.Teller,
 		)!;
@@ -63,16 +57,6 @@ export class Plot
 			this.onClaimDoorInteracted(player),
 		);
 		this.claimDoor.enable();
-	}
-
-	private initChild(instance: Instance) {
-		const pad = this.components.getComponent<AssetPad>(instance);
-		if (!pad) return;
-		if (this.pads.has(pad.instance.Name)) {
-			warn(`duplicate pad @ ${instance.GetFullName()}`);
-		}
-
-		pad.hide();
 	}
 
 	private onTellerInteracted(player: Player): void {
@@ -97,7 +81,6 @@ export class Plot
 		this.claimDoor.disable();
 
 		this.instance.ClaimDoor.Transparency = 1;
-		this.refreshPads();
 	}
 
 	public getOwner(): PlayerServer | undefined {
@@ -107,15 +90,5 @@ export class Plot
 	public deposit(currency: Currency, value: number): void {
 		this.bank[currency] += value;
 		this.instance.Teller.SurfaceGui.TextLabel.Text = `${this.bank[currency]}`;
-	}
-
-	public refreshPads(): void {
-		if (!this.owner) return;
-		for (const [assetName, pad] of this.pads) {
-			if (pad.getAsset().isBought()) continue;
-			if (!this.owner.hasAssetPrerequisites(assetName)) continue;
-			pad.show();
-			pad.enable();
-		}
 	}
 }

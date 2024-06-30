@@ -1,10 +1,7 @@
 import { Component, Components } from "@flamework/components";
-import { OnStart } from "@flamework/core";
 import { ModelComponent } from "shared/components/model";
-import { Toggleable } from "shared/toggleable";
 import { Hideable } from "shared/hideable";
 import { TouchableModel } from "server/components/interactable/touchable/touchable-model";
-import { Inject } from "shared/inject";
 
 export type PadInstance = Model & {
 	Collider: Part & {
@@ -16,11 +13,10 @@ export type PadInstance = Model & {
 	};
 };
 
-@Component()
-export abstract class Pad<
-		A extends {} = {},
-		I extends PadInstance = PadInstance,
-	>
+@Component({
+	tag: "Pad",
+})
+export class Pad<A extends {} = {}, I extends PadInstance = PadInstance>
 	extends TouchableModel<A, I>
 	implements Hideable
 {
@@ -31,14 +27,10 @@ export abstract class Pad<
 	public override onStart(): void {
 		super.onStart();
 
-		this.instance.Collider.BillboardGui.Frame.TextLabel.Text = "Pad";
+		const assetName = this.instance.Name.sub(0, -4);
+		this.instance.Collider.BillboardGui.Frame.TextLabel.Text = assetName;
 
-		this.onInteracted((player) => this.handleInteracted(player));
-	}
-
-	protected handleInteracted(player: Player): void {
-		this.hide();
-		this.disable();
+		this.enable();
 	}
 
 	public hide(): void {
