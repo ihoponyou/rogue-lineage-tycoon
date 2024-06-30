@@ -6,9 +6,6 @@ interface ServerStorage extends Instance {
 		Model: Configuration;
 	};
 	Source: Folder & {
-		commands: Folder & {
-			givemoney: ModuleScript;
-		};
 		services: Folder & {
 			["daylight-service"]: ModuleScript;
 			["data-service"]: ModuleScript;
@@ -19,6 +16,15 @@ interface ServerStorage extends Instance {
 			["player-service"]: ModuleScript;
 			["mana-service"]: ModuleScript;
 			["identity-service"]: ModuleScript;
+		};
+		cmdr: Folder & {
+			types: Folder & {
+				currency: ModuleScript;
+			};
+			commands: Folder & {
+				giveMoneyServer: ModuleScript;
+				giveMoney: ModuleScript;
+			};
 		};
 		configs: Folder & {
 			armors: ModuleScript;
