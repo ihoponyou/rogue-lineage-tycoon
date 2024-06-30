@@ -50,15 +50,12 @@ export class Collector
 
 	private onTouched(otherPart: BasePart): void {
 		if (otherPart.HasTag("Product")) {
-			print("a");
 			return;
 		}
 		if (!otherPart.Parent) {
-			print("b");
 			return;
 		}
 		if (otherPart.Parent.ClassName !== "Model") {
-			print("C");
 			return;
 		}
 		this.components

@@ -39,7 +39,7 @@ export class Dropper
 		this.trove.connect(this.timer.completed, () => this.onTimerCompleted());
 		this.trove.add(
 			this.toggleable.onToggled((bool) => {
-				print(bool, this.timer.getState());
+				// print(bool, this.timer.getState());
 				if (bool && this.timer.getState() === TimerState.NotRunning) {
 					this.timer.start();
 				} else if (
