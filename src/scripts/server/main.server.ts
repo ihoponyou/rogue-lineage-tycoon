@@ -1,19 +1,19 @@
 import { Flamework, Modding } from "@flamework/core";
-import { Cmdr } from "@rbxts/cmdr";
+import { Cmdr, CommandDefinition } from "@rbxts/cmdr";
 import Log, { Logger } from "@rbxts/log";
+import { RunService, ServerStorage } from "@rbxts/services";
 import { GROUP_ID, MINIMUM_ADMIN_RANK } from "server/configs/group";
 
 Log.SetLogger(Logger.configure().WriteTo(Log.RobloxOutput()).Create());
 
 Cmdr.RegisterHook("BeforeRun", (context) => {
-	if (
-		context.Group !== "DefaultAdmin" ||
-		context.Executor.GetRankInGroup(GROUP_ID) < MINIMUM_ADMIN_RANK
-	) {
-		return "not owner; not permission";
+	if (RunService.IsStudio()) return;
+	if (context.Executor.GetRankInGroup(GROUP_ID) < MINIMUM_ADMIN_RANK) {
+		return "lacking permissions";
 	}
 });
 Cmdr.RegisterDefaultCommands();
+Cmdr.RegisterCommandsIn(ServerStorage.Source.commands);
 
 Flamework.addPaths("src/server/services");
 Flamework.addPaths("src/shared/components");
