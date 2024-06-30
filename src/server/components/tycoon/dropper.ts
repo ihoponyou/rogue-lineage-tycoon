@@ -1,14 +1,15 @@
 import { Component, Components } from "@flamework/components";
 import { Timer, TimerState } from "@rbxts/timer";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { Toggleable } from "shared/toggleable";
 import { DROPPERS, PRODUCTS } from "server/configs/tycoon";
 import { OnStart } from "@flamework/core";
 import { ModelComponent } from "shared/components/model";
-import { Product } from "./product";
 import { Inject } from "shared/inject";
+import { Furniture, FurnitureInstance } from "./furniture";
+import { Debris } from "@rbxts/services";
+import { Toggleable } from "shared/components/toggleable";
 
-type DropperInstance = Model & {
+type DropperInstance = FurnitureInstance & {
 	Faucet: BasePart & {
 		Spout: Attachment;
 	};
@@ -19,51 +20,45 @@ type DropperInstance = Model & {
 })
 export class Dropper
 	extends DisposableComponent<{}, DropperInstance>
-	implements OnStart, Toggleable
+	implements OnStart
 {
 	private readonly config = DROPPERS[this.instance.Name];
-	private _isEnabled = false;
 	private timer = new Timer(1 / this.config.dropsPerSecond);
 
 	@Inject
 	private components!: Components;
+
+	constructor(private toggleable: Toggleable) {
+		super();
+	}
 
 	public onStart(): void {
 		if (!this.config)
 			error(`missing dropper config for ${this.instance.Name}`);
 
 		this.trove.connect(this.timer.completed, () => this.onTimerCompleted());
-
-		// this.trove.add(
-		// 	this.plotAsset.onAttributeChanged("enabled", (newValue) =>
-		// 		newValue ? this.enable() : this.disable(),
-		// 	),
-		// );
-		// this.plotAsset.attributes.enabled ? this.enable() : this.disable();
-		this.enable();
+		this.trove.add(
+			this.toggleable.onToggled((bool) => {
+				print(bool, this.timer.getState());
+				if (bool && this.timer.getState() === TimerState.NotRunning) {
+					this.timer.start();
+				} else if (
+					!bool &&
+					this.timer.getState() === TimerState.Running
+				) {
+					this.timer.stop();
+				}
+			}),
+		);
 	}
 
 	public setDropsPerSecond(newValue: number): void {
 		this.timer.setLength(1 / newValue);
 	}
 
-	public enable(): void {
-		this._isEnabled = true;
-		if (this.timer.getState() !== TimerState.Running) this.timer.start();
-	}
-
-	public disable(): void {
-		this._isEnabled = false;
-		if (this.timer.getState() === TimerState.Running) this.timer.stop();
-	}
-
-	public isEnabled(): boolean {
-		return this._isEnabled;
-	}
-
 	private onTimerCompleted(): void {
 		this.drop();
-		// if (this.plotAsset.attributes.enabled) this.timer.start();
+		if (this.toggleable.isEnabled()) this.timer.start();
 	}
 
 	private drop(): void {
@@ -83,6 +78,7 @@ export class Dropper
 
 			clone.AddTag("Model");
 			clone.AddTag("Product");
+			Debris.AddItem(clone);
 		}
 	}
 }
