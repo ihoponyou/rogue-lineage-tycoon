@@ -12,7 +12,6 @@ export class AbilityUnlock extends AssetUnlock {
 	private manaService!: ManaService;
 
 	public unlock(player: PlayerServer): void {
-		print(this.config);
 		switch (this.attributes.assetName) {
 			case "Mana":
 				this.manaService.toggleManaObtained(player.instance, true);

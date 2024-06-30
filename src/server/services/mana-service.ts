@@ -15,6 +15,8 @@ interface PlayerData {
 	DecayRate: number;
 }
 
+// TODO: make this a component
+
 @Service()
 export class ManaService
 	implements OnStart, OnTick, OnPlayerRemoving, OnCharacterAdded
@@ -39,9 +41,7 @@ export class ManaService
 
 	onCharacterAdded(character: StarterCharacter): void {
 		const player = Players.GetPlayerFromCharacter(character) as Player;
-		const data = this.dataService.getProfile(player).Data;
-		data.ManaObtained = true;
-		if (data.ManaObtained) this.onManaObtained(player);
+		// this.toggleManaObtained(player, true);
 	}
 
 	onPlayerRemoving(player: Player): void {
