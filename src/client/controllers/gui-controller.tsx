@@ -2,7 +2,7 @@ import { Controller, OnStart } from "@flamework/core";
 import React, { StrictMode } from "@rbxts/react";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
 import { Players, SoundService } from "@rbxts/services";
-import { App } from "client/gui/components/app";
+import { App } from "client/components/gui/app";
 import { ReflexProvider } from "@rbxts/react-reflex";
 import { producer } from "client/gui/producer";
 import { Events, Functions } from "client/networking";
@@ -14,7 +14,7 @@ export class GuiController implements OnStart {
 	private playerGui = Players.LocalPlayer.WaitForChild("PlayerGui");
 	private root = createRoot(new Instance("Folder"));
 
-	onStart() {
+	public onStart() {
 		Promise.retry(
 			() =>
 				Functions.currency
@@ -36,6 +36,11 @@ export class GuiController implements OnStart {
 				},
 			);
 		});
+
+		Events.mana.obtained.connect(() => producer.setEnabled(true));
+		Events.mana.disabled.connect(() => producer.setEnabled(false));
+		Events.mana.changed.connect((value) => producer.setManaAmount(value));
+		Events.mana.colorChanged.connect((color) => producer.setColor(color));
 
 		this.root.render(
 			<StrictMode>

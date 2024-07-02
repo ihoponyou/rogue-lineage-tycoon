@@ -41,11 +41,6 @@ export class HudController implements OnStart, OnLocalCharacterAdded {
 		"PlayerGui",
 	) as PlayerGui;
 	private characterTrove = new Trove();
-	private manaTrove = this.characterTrove.extend();
-
-	private manaGui?: ManaGui;
-	private manaSlider?: ManaSlider;
-	private manaTweenTimeStep = 0;
 
 	private statGui?: StatGui;
 	private healthSlider?: HealthSlider;
@@ -60,14 +55,7 @@ export class HudController implements OnStart, OnLocalCharacterAdded {
 
 	private nameLabel?: TextLabel;
 
-	constructor(private manaController: ManaController) {}
-
 	onStart(): void {
-		Events.mana.obtained.connect(() => this.toggleManaBar(true));
-		Events.mana.disabled.connect(() => this.toggleManaBar(false));
-		Events.mana.colorChanged.connect((color) =>
-			this.onManaColorChanged(color),
-		);
 		Events.character.firstNameChanged.connect((name) =>
 			this.onFirstNameChanged(name),
 		);
@@ -75,13 +63,7 @@ export class HudController implements OnStart, OnLocalCharacterAdded {
 
 	onLocalCharacterAdded(character: Model): void {
 		this.characterTrove.attachToInstance(character);
-		this.manaTrove = this.characterTrove.extend();
-
-		this.manaGui = this.characterTrove.clone(
-			UI.ManaGui,
-		) as unknown as ManaGui;
-		this.manaGui.Parent = this.playerGui;
-		this.manaSlider = this.manaGui.LeftContainer.ManaBar.ManaSlider;
+		// this.manaTrove = this.characterTrove.extend();
 
 		this.statGui = this.characterTrove.clone(
 			UI.StatGui,
@@ -103,7 +85,6 @@ export class HudController implements OnStart, OnLocalCharacterAdded {
 
 		this.nameLabel = this.statGui.Container.CharacterName;
 
-		this.manaGui.Enabled = true;
 		this.statGui.Enabled = true;
 
 		const components = Dependency<Components>();
@@ -128,46 +109,9 @@ export class HudController implements OnStart, OnLocalCharacterAdded {
 			});
 	}
 
-	// onLocalCharacterRemoving(character: Model): void {
-	// 	this.characterTrove.clean();
-	// }
-
-	onManaColorChanged(color: Color3): void {
-		while (!this.manaSlider) task.wait();
-		this.manaSlider.BackgroundColor3 = color;
-	}
-
 	onFirstNameChanged(name: string): void {
 		while (!this.nameLabel) task.wait();
 		this.nameLabel.Text = name.upper(); // TODO: + house name
-	}
-
-	toggleManaBar(bool: boolean): void {
-		while (!this.manaGui) task.wait();
-		this.manaGui.Enabled = bool;
-		if (bool) {
-			this.manaTrove = this.characterTrove.extend();
-			this.manaTrove.bindToRenderStep(
-				"update_mana",
-				Enum.RenderPriority.Last.Value,
-				(deltaTime) => this.updateMana(deltaTime),
-			);
-		} else {
-			this.manaTrove.clean();
-		}
-	}
-
-	updateMana(deltaTime: number): void {
-		if (!this.manaSlider) return;
-
-		this.manaTweenTimeStep += deltaTime;
-		if (this.manaTweenTimeStep <= 0.1) return;
-
-		TweenService.Create(this.manaSlider, MANA_TWEEN_INFO, {
-			Size: UDim2.fromScale(1, this.manaController.mana / 100),
-		}).Play();
-
-		this.manaTweenTimeStep = 0;
 	}
 
 	updateHealth(health: number, maxHealth: number): void {

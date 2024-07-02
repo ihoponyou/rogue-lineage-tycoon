@@ -41,7 +41,7 @@ export class ManaService
 
 	onCharacterAdded(character: StarterCharacter): void {
 		const player = Players.GetPlayerFromCharacter(character) as Player;
-		// this.toggleManaObtained(player, true);
+		this.toggleManaObtained(player, true);
 	}
 
 	onPlayerRemoving(player: Player): void {
