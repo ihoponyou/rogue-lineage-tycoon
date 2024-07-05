@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { RootState } from "client/gui/producer";
+import { selectDays, selectLives } from "client/gui/producer";
 import { getDigit } from "shared/get-digit";
 
 const DIGIT_FONT = new Font("rbxasset://fonts/families/HighwayGothic.json");
@@ -39,8 +39,8 @@ export function Digit(props: DigitProps) {
 }
 
 export function Counters() {
-	const days = useSelector((state: RootState) => state.stats.days);
-	const lives = useSelector((state: RootState) => state.stats.lives);
+	const days = useSelector(selectDays);
+	const lives = useSelector(selectLives);
 
 	return (
 		<imagelabel

@@ -1,11 +1,11 @@
-import { InferState, combineProducers, createProducer } from "@rbxts/reflex";
+import { InferState, combineProducers } from "@rbxts/reflex";
 import { currenciesSlice } from "./currencies";
-import { statsSlice } from "./stats";
-import { manaSlice } from "./mana";
 import { healthSlice } from "./health";
+import { manaSlice } from "./mana";
+import { statsSlice } from "./stats";
 import { stomachSlice } from "./stomach";
-import { toxicitySlice } from "./toxicity";
 import { temperatureSlice } from "./temperature";
+import { toxicitySlice } from "./toxicity";
 
 export type RootProducer = typeof producer;
 
@@ -20,3 +20,11 @@ export const producer = combineProducers({
 	toxicity: toxicitySlice,
 	temperature: temperatureSlice,
 });
+
+export function selectLives(state: RootState) {
+	return state.stats.lives;
+}
+
+export function selectDays(state: RootState) {
+	return state.stats.days;
+}
