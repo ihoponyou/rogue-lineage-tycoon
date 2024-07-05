@@ -1,9 +1,9 @@
 import { Controller, OnStart } from "@flamework/core";
 import React, { StrictMode } from "@rbxts/react";
+import { ReflexProvider } from "@rbxts/react-reflex";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
 import { Players, SoundService } from "@rbxts/services";
 import { App } from "client/components/gui/app";
-import { ReflexProvider } from "@rbxts/react-reflex";
 import { producer } from "client/gui/producer";
 import { Events, Functions } from "client/networking";
 

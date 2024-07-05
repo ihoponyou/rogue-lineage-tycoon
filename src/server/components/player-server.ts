@@ -4,6 +4,10 @@ import { AbstractPlayer } from "shared/components/player";
 
 @Component({
 	tag: "Player",
+	defaults: {
+		lives: 0,
+		days: 0,
+	},
 })
 export class PlayerServer extends AbstractPlayer {
 	private assets = new Array<string>();
