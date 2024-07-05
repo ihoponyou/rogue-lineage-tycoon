@@ -37,10 +37,12 @@ export class GuiController implements OnStart {
 			);
 		});
 
-		Events.mana.obtained.connect(() => producer.setEnabled(true));
-		Events.mana.disabled.connect(() => producer.setEnabled(false));
+		Events.mana.obtained.connect(() => producer.setManaEnabled(true));
+		Events.mana.disabled.connect(() => producer.setManaEnabled(false));
 		Events.mana.changed.connect((value) => producer.setManaAmount(value));
-		Events.mana.colorChanged.connect((color) => producer.setColor(color));
+		Events.mana.colorChanged.connect((color) =>
+			producer.setManaColor(color),
+		);
 
 		this.root.render(
 			<StrictMode>

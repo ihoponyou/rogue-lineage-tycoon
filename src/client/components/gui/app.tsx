@@ -4,6 +4,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { RootState } from "../../gui/producer";
 import { ManaBar } from "./mana-bar";
 import { SilverLogo } from "./silver-logo";
+import { Stats } from "./stats";
 
 export function App() {
 	const manaEnabled = useSelector((state: RootState) => state.mana.enabled);
@@ -12,6 +13,7 @@ export function App() {
 		<Layer>
 			<SilverLogo />
 			{manaEnabled && <ManaBar />}
+			<Stats />
 		</Layer>
 	);
 }

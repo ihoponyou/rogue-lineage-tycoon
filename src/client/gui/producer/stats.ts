@@ -6,13 +6,17 @@ export interface StatsState {
 }
 
 const initialState: StatsState = {
-	lives: -1,
-	days: -1,
+	lives: 9,
+	days: 123,
 };
 
 export const statsSlice = createProducer(initialState, {
 	setLives: (state, value: number) => ({
 		...state,
 		lives: value,
+	}),
+	setDays: (state, value: number) => ({
+		...state,
+		days: value,
 	}),
 });

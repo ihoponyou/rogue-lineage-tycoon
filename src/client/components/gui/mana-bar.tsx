@@ -4,17 +4,19 @@ import React, { useEffect } from "@rbxts/react";
 import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 
 export function ManaBar() {
-	const amount = useSelector((state: RootState) => state.mana.amount);
-	const color = useSelector((state: RootState) => state.mana.color);
-	const [percent, setPercent] = useMotor(amount);
+	const manaAmount = useSelector((state: RootState) => state.mana.amount);
+	const manaColor = useSelector((state: RootState) => state.mana.color);
+	const [percent, setPercent] = useMotor(manaAmount);
 
-	useEffect(() => {
-		setPercent(
-			new Spring(amount / 100, {
-				frequency: 25,
-			}),
-		);
-	}, [amount]);
+	useEffect(
+		() =>
+			setPercent(
+				new Spring(manaAmount / 100, {
+					frequency: 25,
+				}),
+			),
+		[manaAmount],
+	);
 
 	return (
 		<frame
@@ -39,7 +41,7 @@ export function ManaBar() {
 				<frame
 					key="ManaSlider"
 					AnchorPoint={new Vector2(0, 1)}
-					BackgroundColor3={color}
+					BackgroundColor3={manaColor}
 					BorderSizePixel={0}
 					Position={new UDim2(0, 0, 1, 0)}
 					Size={percent.map((percent) => new UDim2(1, 0, percent, 0))}

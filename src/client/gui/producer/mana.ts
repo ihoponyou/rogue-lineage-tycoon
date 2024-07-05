@@ -17,11 +17,11 @@ export const manaSlice = createProducer(initialState, {
 		...state,
 		amount: value,
 	}),
-	setEnabled: (state, enabled: boolean) => ({
+	setManaEnabled: (state, enabled: boolean) => ({
 		...state,
 		enabled: enabled,
 	}),
-	setColor: (state, color: Color3) => ({
+	setManaColor: (state, color: Color3) => ({
 		...state,
 		color: color,
 	}),
