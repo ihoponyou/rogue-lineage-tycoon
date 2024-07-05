@@ -3,6 +3,23 @@ import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { RootState } from "client/gui/producer";
 
+// updateTemperature(temperature: number): void {
+// 		if (!this.temperatureSlider) return;
+
+// 		const percentTemperature = math.clamp(
+// 			temperature / MAX_TEMPERATURE,
+// 			0,
+// 			1,
+// 		);
+// 		this.temperatureSlider.TweenPosition(
+// 			UDim2.fromScale(percentTemperature, 0),
+// 			Enum.EasingDirection.Out,
+// 			Enum.EasingStyle.Quad,
+// 			0.2,
+// 			true,
+// 		);
+// 	}
+
 export function TemperatureBar() {
 	const currentTemperature = useSelector(
 		(state: RootState) => state.temperature.value,

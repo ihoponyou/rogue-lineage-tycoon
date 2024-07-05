@@ -1,7 +1,30 @@
+import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { RootState } from "client/gui/producer";
-import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
+
+// const WHITE_STOMACH_RACES = [
+// 	"Gaian",
+// 	"Cameo",
+// 	"Dullahan",
+// 	"Metascroom",
+// 	"Lich",
+// 	"Seraph",
+// 	"Florian",
+// ];
+
+// updateStomach(stomach: number): void {
+// 		if (!this.stomachSlider) return;
+
+// 		const percentStomach = math.clamp(stomach / MAX_STOMACH, 0, 1);
+// 		this.stomachSlider.TweenSize(
+// 			new UDim2(percentStomach, 0, 0, 6),
+// 			Enum.EasingDirection.Out,
+// 			Enum.EasingStyle.Quad,
+// 			0.25,
+// 			true,
+// 		);
+// 	}
 
 export function StomachBar() {
 	const stomachAmount = useSelector(

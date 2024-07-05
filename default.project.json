@@ -19,7 +19,7 @@
 			},
 			"Source": {
 				"$className": "Folder",
-				"Modules": {
+				"Shared": {
 					"$path": "out/shared"
 				},
 				"Client": {
