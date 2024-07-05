@@ -1,7 +1,26 @@
+import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
+import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { RootState } from "../../gui/producer";
-import React, { useEffect } from "@rbxts/react";
-import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
+
+// const MANA_TWEEN_INFO = new TweenInfo(
+// 	0.1,
+// 	Enum.EasingStyle.Sine,
+// 	Enum.EasingDirection.Out,
+// );
+
+// updateMana(deltaTime: number): void {
+// 		if (!this.manaSlider) return;
+
+// 		this.manaTweenTimeStep += deltaTime;
+// 		if (this.manaTweenTimeStep <= 0.1) return;
+
+// 		TweenService.Create(this.manaSlider, MANA_TWEEN_INFO, {
+// 			Size: UDim2.fromScale(1, this.manaController.mana / 100),
+// 		}).Play();
+
+// 		this.manaTweenTimeStep = 0;
+// 	}
 
 export function ManaBar() {
 	const manaAmount = useSelector((state: RootState) => state.mana.amount);

@@ -1,7 +1,20 @@
+import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { RootState } from "client/gui/producer";
-import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
+
+// updateToxicity(toxicity: number): void {
+// 		if (!this.toxicitySlider) return;
+
+// 		const percentToxicity = math.clamp(toxicity / MAX_TOXICITY, 0, 1);
+// 		this.toxicitySlider.TweenSize(
+// 			new UDim2(percentToxicity, 0, 0, 6),
+// 			Enum.EasingDirection.Out,
+// 			Enum.EasingStyle.Quad,
+// 			0.25,
+// 			true,
+// 		);
+// 	}
 
 export function ToxicityBar() {
 	const amount = useSelector((state: RootState) => state.toxicity.amount);

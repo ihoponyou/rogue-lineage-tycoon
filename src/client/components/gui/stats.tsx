@@ -1,10 +1,11 @@
 import React from "@rbxts/react";
+import { DayCounter } from "./day-counter";
 import { HealthBar } from "./health-bar";
-import { StomachBar } from "./stomach-bar";
-import { ToxicityBar } from "./toxicity-bar";
-import { TemperatureBar } from "./temperature-bar";
+import { LifeCounter } from "./life-counter";
 import { NamePlate } from "./name-plate";
-import { Counters } from "./counters";
+import { StomachBar } from "./stomach-bar";
+import { TemperatureBar } from "./temperature-bar";
+import { ToxicityBar } from "./toxicity-bar";
 
 export function Stats() {
 	return (
@@ -62,7 +63,27 @@ export function Stats() {
 				</imagelabel>
 				<HealthBar />
 				<TemperatureBar />
-				<Counters />
+				<imagelabel
+					key="Counters"
+					AnchorPoint={new Vector2(1, 0)}
+					BackgroundTransparency={1}
+					Image="rbxassetid://2573615198"
+					ImageColor3={Color3.fromRGB(254, 186, 120)}
+					Position={new UDim2(1, -15, 1, 4)}
+					Size={new UDim2(0, 77, 0, 20)}
+					ZIndex={4}
+				>
+					<frame
+						key="Back"
+						BackgroundColor3={Color3.fromRGB(255, 243, 226)}
+						BorderSizePixel={0}
+						Position={new UDim2(0, 10, 0, 0)}
+						Size={new UDim2(0, 57, 1, -3)}
+						ZIndex={3}
+					/>
+					<LifeCounter position={new UDim2(0, 10, 0, 0)} />
+					<DayCounter />
+				</imagelabel>
 			</frame>
 			<NamePlate />
 		</frame>
