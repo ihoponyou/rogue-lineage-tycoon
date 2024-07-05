@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 
 interface LayerProps extends React.PropsWithChildren {
-	name: string;
+	name?: string;
 }
 
 export function Layer(props: LayerProps) {

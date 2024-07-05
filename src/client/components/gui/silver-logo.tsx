@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { CurrenciesState } from "../producer/currencies";
-import { RootState } from "../producer";
+import { CurrenciesState } from "../../gui/producer/currencies";
+import { RootState } from "../../gui/producer";
 
 export function SilverLogo() {
 	const amount = useSelector((state: RootState) => state.currencies.silver);

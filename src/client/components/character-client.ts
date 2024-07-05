@@ -5,11 +5,10 @@ import {
 	CharacterInstance,
 } from "shared/components/character";
 import { Events } from "../networking";
-import { CollectionService, Workspace } from "@rbxts/services";
-import { HudController } from "../controllers/hud-controller";
-import { Dependency } from "@flamework/core";
+import { Workspace } from "@rbxts/services";
 import { CharacterStateMachine } from "./character-state-machine";
 import { Inject } from "shared/inject";
+import { producer } from "client/gui/producer";
 
 const events = Events.character;
 
@@ -21,10 +20,6 @@ export class CharacterClient extends Character<
 	@Inject
 	private components!: Components;
 
-	constructor(private hudController: HudController) {
-		super();
-	}
-
 	override onStart(): void {
 		super.onStart();
 
@@ -34,13 +29,20 @@ export class CharacterClient extends Character<
 			this.components.addComponent<CharacterStateMachine>(this.instance);
 
 		this.trove.add(stateMachine);
+
+		this.onAttributeChanged("stomach", (value) =>
+			producer.setStomachAmount(value),
+		);
+		this.onAttributeChanged("toxicity", (value) =>
+			producer.setToxicityAmount(value),
+		);
+		this.onAttributeChanged("temperature", (value) =>
+			producer.setTemperature(value),
+		);
 	}
 
 	override onHealthChanged(health: number): void {
-		this.hudController.updateHealth(
-			health,
-			this.instance.Humanoid.MaxHealth,
-		);
+		producer.setHealthAmount(health);
 	}
 
 	override onRemoved(): void {
