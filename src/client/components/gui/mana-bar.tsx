@@ -8,15 +8,7 @@ export function ManaBar() {
 	const manaColor = useSelector((state: RootState) => state.mana.color);
 	const [percent, setPercent] = useMotor(manaAmount);
 
-	useEffect(
-		() =>
-			setPercent(
-				new Spring(manaAmount / 100, {
-					frequency: 25,
-				}),
-			),
-		[manaAmount],
-	);
+	useEffect(() => setPercent(new Spring(manaAmount / 100)), [manaAmount]);
 
 	return (
 		<frame

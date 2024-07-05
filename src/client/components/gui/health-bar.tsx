@@ -10,7 +10,10 @@ export function HealthBar() {
 
 	const [percent, setPercent] = useMotor(healthAmount);
 	useEffect(
-		() => setPercent(new Spring(healthAmount / maxHealthAmount)),
+		() =>
+			setPercent(
+				new Spring(healthAmount / maxHealthAmount, { frequency: 2 }),
+			),
 		[healthAmount, maxHealthAmount],
 	);
 

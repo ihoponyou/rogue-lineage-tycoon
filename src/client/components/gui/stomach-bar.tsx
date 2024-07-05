@@ -14,12 +14,7 @@ export function StomachBar() {
 
 	const [percent, setPercent] = useMotor(stomachAmount);
 	useEffect(
-		() =>
-			setPercent(
-				new Spring(stomachAmount / maxStomachAmount, {
-					frequency: 20,
-				}),
-			),
+		() => setPercent(new Spring(stomachAmount / maxStomachAmount)),
 		[stomachAmount, maxStomachAmount],
 	);
 

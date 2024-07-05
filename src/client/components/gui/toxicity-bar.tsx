@@ -9,15 +9,7 @@ export function ToxicityBar() {
 	const color = useSelector((state: RootState) => state.toxicity.color);
 
 	const [percent, setPercent] = useMotor(amount);
-	useEffect(
-		() =>
-			setPercent(
-				new Spring(amount / max, {
-					frequency: 40,
-				}),
-			),
-		[amount, max],
-	);
+	useEffect(() => setPercent(new Spring(amount / max)), [amount, max]);
 
 	return (
 		<frame
