@@ -1,13 +1,18 @@
 import React from "@rbxts/react";
-import { DayCounter } from "./day-counter";
+import { useSelector } from "@rbxts/react-reflex";
+import { selectDays, selectLives } from "client/gui/producer";
+import { getDigit } from "shared/get-digit";
+import { Digit } from "./digit";
 import { HealthBar } from "./health-bar";
-import { LifeCounter } from "./life-counter";
 import { NamePlate } from "./name-plate";
 import { StomachBar } from "./stomach-bar";
 import { TemperatureBar } from "./temperature-bar";
 import { ToxicityBar } from "./toxicity-bar";
 
 export function Stats() {
+	const days = useSelector(selectDays);
+	const lives = useSelector(selectLives);
+
 	return (
 		<frame
 			key="Stats"
@@ -81,8 +86,26 @@ export function Stats() {
 						Size={new UDim2(0, 57, 1, -3)}
 						ZIndex={3}
 					/>
-					<LifeCounter position={new UDim2(0, 10, 0, 0)} />
-					<DayCounter />
+					<Digit
+						key="Lives"
+						value={lives}
+						position={new UDim2(0, 10, 0, 0)}
+					/>
+					<Digit
+						key="DayHundreds"
+						value={getDigit(days, 3)}
+						position={new UDim2(0, 29, 0, 0)}
+					/>
+					<Digit
+						key="DayTens"
+						value={getDigit(days, 2)}
+						position={new UDim2(0, 42, 0, 0)}
+					/>
+					<Digit
+						key="DayOnes"
+						value={getDigit(days, 1)}
+						position={new UDim2(0, 55, 0, 0)}
+					/>
 				</imagelabel>
 			</frame>
 			<NamePlate />

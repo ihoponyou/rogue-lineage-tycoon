@@ -16,6 +16,8 @@ import { RootState } from "client/gui/producer";
 // 		);
 // 	}
 
+// TODO: make an abstract bar component; current amount, max amount, color, percent
+
 export function HealthBar() {
 	const healthAmount = useSelector((state: RootState) => state.health.amount);
 	const maxHealthAmount = useSelector((state: RootState) => state.health.max);
