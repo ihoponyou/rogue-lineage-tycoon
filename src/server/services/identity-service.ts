@@ -1,23 +1,23 @@
-import { Service, OnInit, Dependency } from "@flamework/core";
-import { Players, ReplicatedStorage, Workspace } from "@rbxts/services";
+import { Components } from "@flamework/components";
+import { Dependency, OnInit, Service } from "@flamework/core";
 import { Logger } from "@rbxts/log";
+import Object from "@rbxts/object-utils";
+import { Players, Workspace } from "@rbxts/services";
+import { CharacterServer } from "server/components/character-server";
+import { ARMORS, getRandomStarterArmor } from "server/configs/armors";
+import { getRandomFirstName } from "server/configs/names";
 import {
 	RACES,
 	RaceGlossary,
 	getRandomPhenotype,
 	getRandomRollable,
 } from "server/configs/races";
-import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
-import { DataService } from "./data-service";
-import { getRandomFirstName } from "server/configs/names";
-import { ARMORS, getRandomStarterArmor } from "server/configs/armors";
-import Object from "@rbxts/object-utils";
-import { Components } from "@flamework/components";
-import { CharacterServer } from "server/components/character-server";
 import { Events } from "server/networking";
 import { APPEARANCE } from "shared/constants";
+import { Sex } from "shared/store/slices/players/types";
+import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
+import { DataService } from "./data-service";
 
-export type Sex = "Male" | "Female";
 const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
 
 @Service()

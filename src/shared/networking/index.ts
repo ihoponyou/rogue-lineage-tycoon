@@ -1,42 +1,35 @@
 import { Networking } from "@flamework/networking";
-import {
-	ManaClientToServerEvents,
-	ManaServerToClientEvents,
-} from "./mana-events";
-import {
-	CharacterClientToServerEvents,
-	CharacterServerToClientEvents,
-} from "./character-events";
-import {
-	CurrencyClientToServerFunctions,
-	CurrencyServerToClientEvents,
-} from "./currency";
+import { CharacterClientEvents } from "./character";
+import { CurrencyClientEvents, CurrencyServerFunctions } from "./currency";
+import { ManaClientEvents, ManaServerEvents } from "./mana";
+import { ReflexClientEvents, ReflexServerEvents } from "./reflex";
 
-interface ServerToClientEvents {
+interface ClientEvents {
 	kicked(): void;
-	mana: ManaServerToClientEvents;
-	character: CharacterServerToClientEvents;
-	currency: CurrencyServerToClientEvents;
+	mana: ManaClientEvents;
+	character: CharacterClientEvents;
+	currency: CurrencyClientEvents;
+	reflex: ReflexClientEvents;
 }
 
-interface ClientToServerEvents {
+interface ServerEvents {
 	reset(): void;
-	mana: ManaClientToServerEvents;
-	character: CharacterClientToServerEvents;
+	mana: ManaServerEvents;
+	reflex: ReflexServerEvents;
 }
 
-interface ServerToClientFunctions {}
+interface ClientFunctions {}
 
-interface ClientToServerFunctions {
-	currency: CurrencyClientToServerFunctions;
+interface ServerFunctions {
+	currency: CurrencyServerFunctions;
 }
 
 export const GlobalEvents = Networking.createEvent<
-	ClientToServerEvents,
-	ServerToClientEvents
+	ServerEvents,
+	ClientEvents
 >();
 
 export const GlobalFunctions = Networking.createFunction<
-	ClientToServerFunctions,
-	ServerToClientFunctions
+	ServerFunctions,
+	ClientFunctions
 >();

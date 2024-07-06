@@ -1,11 +1,11 @@
 import { Component, Components } from "@flamework/components";
-import { DisposableComponent } from "shared/components/disposable-component";
-import { Pad } from "../pad";
 import { OnStart } from "@flamework/core";
 import { ASSETS } from "server/configs/tycoon";
-import { PlayerServer } from "../../player-server";
 import { CurrencyService } from "server/services/currency-service";
+import { DisposableComponent } from "shared/components/disposable-component";
 import { Inject } from "shared/inject";
+import { PlayerServer } from "../../player-server";
+import { Pad } from "../pad";
 
 export interface UnlockAttributes {
 	assetName: string;
@@ -48,7 +48,7 @@ export abstract class AssetUnlock<
 			player,
 			this.config.currency,
 		);
-		if (currencyData.Amount < this.config.cost) {
+		if (currencyData.amount < this.config.cost) {
 			print(playerServer.Name, "error = broke");
 			return;
 		}

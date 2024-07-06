@@ -1,20 +1,21 @@
 import { OnStart, Service } from "@flamework/core";
-import { CurrencyData, DataService } from "./data-service";
 import { Events, Functions } from "server/networking";
+import { store } from "server/store";
+import { CurrencyData } from "shared/store/slices/players/types";
 import { Currency } from "../../../types/currency";
 
 @Service()
 export class CurrencyService implements OnStart {
-	constructor(private dataService: DataService) {}
-
 	public onStart(): void {
 		Functions.currency.getSilver.setCallback(
-			(player) => this.getCurrencyData(player, "Silver").Amount,
+			(player) => this.getCurrencyData(player, "Silver").amount,
 		);
 	}
 
 	public getCurrencyData(player: Player, currency: Currency): CurrencyData {
-		return this.dataService.getProfile(player).Data[currency];
+		const data = store.getState().players.currency[player.UserId];
+		if (!data) error(`could not get ${currency} for ${player.Name}`);
+		return data[currency];
 	}
 
 	public addCurrency(
@@ -22,11 +23,9 @@ export class CurrencyService implements OnStart {
 		currency: Currency,
 		amount: number,
 	): void {
-		const playerData = this.dataService.getProfile(player).Data;
-		const currencyData = playerData[currency];
-
-		currencyData.Amount += amount * currencyData.Multiplier;
-		Events.currency.changed(player, currency, currencyData.Amount);
+		const oldAmount = this.getCurrencyData(player, currency).amount;
+		store.setCurrencyAmount(player.UserId, currency, oldAmount + amount);
+		Events.currency.changed(player, currency, oldAmount + amount);
 	}
 
 	public subtractCurrency(
@@ -34,10 +33,8 @@ export class CurrencyService implements OnStart {
 		currency: Currency,
 		amount: number,
 	): void {
-		const playerData = this.dataService.getProfile(player).Data;
-		const currencyData = playerData[currency];
-
-		currencyData.Amount -= amount;
-		Events.currency.changed(player, currency, currencyData.Amount);
+		const oldAmount = this.getCurrencyData(player, currency).amount;
+		store.setCurrencyAmount(player.UserId, currency, oldAmount - amount);
+		Events.currency.changed(player, currency, oldAmount - amount);
 	}
 }

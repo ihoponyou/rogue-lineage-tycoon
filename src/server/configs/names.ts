@@ -1,5 +1,4 @@
-import Object from "@rbxts/object-utils";
-import { Sex } from "../services/identity-service";
+import { Sex } from "shared/store/slices/players/types";
 import { RaceGlossary } from "./races";
 
 export const NAMES: { [category: string]: Array<string> } = {
