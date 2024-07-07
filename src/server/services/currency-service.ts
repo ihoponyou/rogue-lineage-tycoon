@@ -1,21 +1,13 @@
-import { OnStart, Service } from "@flamework/core";
-import { CurrencyData, DataService } from "./data-service";
-import { Events, Functions } from "server/networking";
+import { Service } from "@flamework/core";
+import { Events } from "server/networking";
 import { Currency } from "../../../types/currency";
+import { DataService } from "./data-service";
+
+// TODO: make these producer actions
 
 @Service()
-export class CurrencyService implements OnStart {
+export class CurrencyService {
 	constructor(private dataService: DataService) {}
-
-	public onStart(): void {
-		Functions.currency.getSilver.setCallback(
-			(player) => this.getCurrencyData(player, "Silver").Amount,
-		);
-	}
-
-	public getCurrencyData(player: Player, currency: Currency): CurrencyData {
-		return this.dataService.getProfile(player).Data[currency];
-	}
 
 	public addCurrency(
 		player: Player,

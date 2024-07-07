@@ -1,8 +1,9 @@
 import { OnStart, OnTick, Service } from "@flamework/core";
+import { Players } from "@rbxts/services";
+import { Events } from "server/networking";
+import { store } from "server/store";
 import { OnCharacterAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 import { DataService } from "./data-service";
-import { Events } from "server/networking";
-import { Players } from "@rbxts/services";
 
 const BASE_MANA_CHARGE_RATE = 100 / 3.5;
 const BASE_MANA_DECAY_RATE = 100 / 2.5;
@@ -58,7 +59,7 @@ export class ManaService
 	}
 
 	onManaObtained(player: Player): void {
-		const race = this.dataService.getProfile(player).Data.RaceName;
+		const race = store.getState().players.identity[player.UserId]?.race;
 
 		let boost = 0;
 		if (race === "Azael") boost = 10;
@@ -81,7 +82,7 @@ export class ManaService
 	}
 
 	toggleManaObtained(player: Player, bool: boolean): void {
-		this.dataService.getProfile(player).Data.ManaObtained = bool;
+		store.setManaEnabled(player.UserId, bool);
 		bool ? this.onManaObtained(player) : this.onManaDisabled(player);
 	}
 

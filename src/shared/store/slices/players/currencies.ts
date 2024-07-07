@@ -1,14 +1,21 @@
 import { createProducer } from "@rbxts/reflex";
 import { Currency } from "../../../../../types/currency";
-import { PlayerCurrencyData, PlayerData } from "./types";
+import { PlayerData } from "./player-data";
 
-export interface CurrencyState {
-	readonly [playerId: number]: PlayerCurrencyData | undefined;
+export interface CurrencyData {
+	readonly amount: number;
+	readonly multiplier: number;
 }
 
-const initialState: CurrencyState = {};
+export type Currencies = Record<Currency, CurrencyData>;
 
-export const currencySlice = createProducer(initialState, {
+export interface CurrenciesState {
+	readonly [playerId: number]: Currencies | undefined;
+}
+
+const initialState: CurrenciesState = {};
+
+export const currenciesSlice = createProducer(initialState, {
 	loadPlayerData: (state, playerId: number, data: PlayerData) => ({
 		...state,
 		[playerId]: data.currency,

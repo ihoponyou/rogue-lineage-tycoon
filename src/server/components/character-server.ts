@@ -1,19 +1,17 @@
-import { BaseComponent, Component } from "@flamework/components";
-import { OnStart, OnTick } from "@flamework/core";
+import { Component } from "@flamework/components";
+import { OnTick } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
-import {
-	DataService,
-	PlayerProfile,
-} from "server/services/data-service";
-import { RagdollServer } from "./ragdoll-server";
-import { OnRemoved } from "../../../types/lifecycles";
+import { DataService } from "server/services/data-service";
+import { store } from "server/store";
 import {
 	Character,
 	CharacterAttributes,
 	CharacterInstance,
 } from "shared/components/character";
+import { OnRemoved } from "../../../types/lifecycles";
 import { Events } from "../networking";
+import { RagdollServer } from "./ragdoll-server";
 
 const FF_DURATION = 15;
 const PROTECTED_DISTANCE = 5;
@@ -21,10 +19,6 @@ const BASE_REGEN_RATE = 0.5;
 const MINIMUM_TEMPERATURE = 0;
 const MAXIMUM_TEMPERATURE = 100;
 const KNOCK_PERCENT_THRESHOLD = 0.15;
-
-// all rates are per second
-const BASE_STOMACH_DECAY_RATE = 0.1;
-const BASE_TOXICITY_DECAY_RATE = 0.05;
 
 const EVENTS = Events.character;
 
@@ -44,27 +38,24 @@ export class CharacterServer
 	extends Character<CharacterAttributes, CharacterInstance>
 	implements OnTick, OnRemoved
 {
-	private stats = {
-		stomachDecayRate: BASE_STOMACH_DECAY_RATE,
-		toxicityDecayRate: BASE_TOXICITY_DECAY_RATE,
-	};
-	private profile: PlayerProfile;
-
 	constructor(
 		private dataService: DataService,
 		private ragdoll: RagdollServer,
 	) {
 		super();
-		this.profile = this.dataService.getProfile(this.getPlayer());
 	}
 
-	override onStart(): void {
+	public override onStart(): void {
 		super.onStart();
-		let savedHealth = this.profile.Data.Health;
+
+		let savedHealth =
+			store.getState().players.resources[this.getPlayer().UserId]!.health;
 		if (savedHealth < 1) savedHealth = 100;
 		this.instance.Humanoid.Health = savedHealth;
 
-		for (const condition of this.profile.Data.Conditions) {
+		for (const condition of store.getState().players.conditions[
+			this.getPlayer().UserId
+		]!) {
 			this.instance.AddTag(condition);
 		}
 
@@ -74,8 +65,8 @@ export class CharacterServer
 	onTick(dt: number): void {
 		if (!this.attributes.isAlive) return;
 
-		this.decayStomach(dt);
-		this.decayToxicity(dt);
+		store.decayStomach(this.getPlayer().UserId, dt);
+		store.decayToxicity(this.getPlayer().UserId, dt);
 
 		const humanoid = this.instance.Humanoid;
 		if (humanoid.Health >= humanoid.MaxHealth) return;
@@ -129,13 +120,7 @@ export class CharacterServer
 		this.instance.Humanoid.Health = 0;
 		this.breakJoints();
 
-		const profile = this.dataService.getProfile(this.getPlayer());
-		profile.Data.Lives -= 1;
-		if (profile.Data.Lives > 0) {
-			this.dataService.resetLifeValues(profile.Data);
-		} else {
-			this.dataService.resetCharacterValues(profile.Data);
-		}
+		store.subtractLife(this.getPlayer().UserId);
 
 		EVENTS.killed.fire(this.getPlayer());
 
@@ -187,25 +172,5 @@ export class CharacterServer
 			this.instance.AddTag("Frostbite");
 		else if (newTemperature === MAXIMUM_TEMPERATURE)
 			this.instance.AddTag("BurnScar");
-	}
-
-	decayStomach(deltaTime: number): void {
-		const data = this.profile.Data;
-		if (data.Stomach <= 0) return;
-		data.Stomach -= math.min(
-			data.Stomach,
-			deltaTime * this.stats.stomachDecayRate,
-		);
-		this.attributes.stomach = data.Stomach;
-	}
-
-	decayToxicity(deltaTime: number): void {
-		const data = this.profile.Data;
-		if (data.Toxicity <= 0) return;
-		data.Toxicity -= math.min(
-			data.Toxicity,
-			deltaTime * this.stats.toxicityDecayRate,
-		);
-		this.attributes.toxicity = data.Toxicity;
 	}
 }
