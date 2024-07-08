@@ -2,14 +2,13 @@ import { Component } from "@flamework/components";
 import { OnTick } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
-import { DataService } from "server/services/data-service";
 import { store } from "server/store";
 import {
 	Character,
 	CharacterAttributes,
 	CharacterInstance,
 } from "shared/components/character";
-import { selectResources } from "shared/store/selectors/players";
+import { selectTemperature } from "shared/store/selectors/players";
 import { OnRemoved } from "../../../types/lifecycles";
 import { Events } from "../networking";
 import { RagdollServer } from "./ragdoll-server";
@@ -28,21 +27,13 @@ const EVENTS = Events.character;
 	defaults: {
 		isKnocked: false,
 		isAlive: true,
-		temperature: 50,
-		stomach: 100,
-		toxicity: 0,
-		armor: "",
-		manaColor: new Color3(1, 1, 1),
 	},
 })
 export class CharacterServer
 	extends Character<CharacterAttributes, CharacterInstance>
 	implements OnTick, OnRemoved
 {
-	constructor(
-		private dataService: DataService,
-		private ragdoll: RagdollServer,
-	) {
+	constructor(private ragdoll: RagdollServer) {
 		super();
 	}
 
@@ -63,7 +54,7 @@ export class CharacterServer
 		this.instance.AddTag("FallDamage");
 	}
 
-	onTick(dt: number): void {
+	public onTick(dt: number): void {
 		if (!this.attributes.isAlive) return;
 
 		store.decayStomach(this.getPlayer().UserId, dt);
@@ -77,16 +68,12 @@ export class CharacterServer
 		humanoid.TakeDamage(dt * -regenRate);
 	}
 
-	onRemoved(): void {
-		this.trove.destroy();
-	}
-
-	override onHealthChanged(health: number): void {
+	public override onHealthChanged(health: number): void {
 		store.setHealth(this.getPlayer().UserId, health);
 		const percentHealth = health / this.instance.Humanoid.MaxHealth;
 		if (this.attributes.isKnocked) {
 			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
-				if (this.instance.GetAttribute("isCarried")) return;
+				if (this.instance.GetAttribute("isCarried") === true) return;
 				this.attributes.isKnocked = false;
 				this.ragdoll.toggle(false);
 			}
@@ -98,13 +85,13 @@ export class CharacterServer
 		this.knock();
 	}
 
-	knock(): void {
+	public knock(): void {
 		if (this.attributes.isKnocked) return;
 		this.attributes.isKnocked = true;
 		this.ragdoll.toggle(true);
 	}
 
-	breakJoints(): void {
+	public breakJoints(): void {
 		this.instance.GetDescendants().forEach((value) => {
 			if (
 				value.IsA("BallSocketConstraint") ||
@@ -115,7 +102,7 @@ export class CharacterServer
 		});
 	}
 
-	kill(): void {
+	public kill(): void {
 		if (!this.attributes.isAlive) return;
 		this.attributes.isAlive = false;
 
@@ -129,7 +116,7 @@ export class CharacterServer
 		task.delay(Players.RespawnTime, () => this.getPlayer().LoadCharacter());
 	}
 
-	snipe(): void {
+	public snipe(): void {
 		const particleAttachment = this.getHead().ParticleAttachment;
 		if (!particleAttachment) return;
 
@@ -138,7 +125,7 @@ export class CharacterServer
 		particleAttachment.Crit.Emit(1);
 	}
 
-	giveForceField(): void {
+	public giveForceField(): void {
 		const ffTrove = this.trove.extend();
 		const startPos = (this.instance as StarterCharacter).HumanoidRootPart
 			.Position;
@@ -160,18 +147,17 @@ export class CharacterServer
 		);
 	}
 
-	adjustTemperature(amount: number) {
+	public adjustTemperature(amount: number) {
 		const player = this.getPlayer();
-		const data = store.getState(selectResources(player.UserId));
-		if (!data) error("no data");
+		const temperature = store.getState(selectTemperature(player.UserId));
+		if (temperature === undefined) error("no data");
 
 		const newTemperature = math.clamp(
-			data.temperature + amount,
+			temperature + amount,
 			MINIMUM_TEMPERATURE,
 			MAXIMUM_TEMPERATURE,
 		);
 		store.setTemperature(player.UserId, newTemperature);
-		this.attributes.temperature = newTemperature;
 
 		if (newTemperature === MINIMUM_TEMPERATURE)
 			this.instance.AddTag("Frostbite");

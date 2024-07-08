@@ -1,9 +1,11 @@
 import { Component } from "@flamework/components";
 import { OnTick } from "@flamework/core";
-import { DataService } from "server/services/data-service";
 import { store } from "server/store";
 import { APPEARANCE } from "shared/constants";
-import { selectResources } from "shared/store/selectors/players";
+import {
+	selectResources,
+	selectTemperature,
+} from "shared/store/selectors/players";
 import { BaseInjury } from ".";
 import { CharacterServer } from "../character-server";
 
@@ -15,11 +17,8 @@ const LOWER_TEMPERATURE_THRESHOLD = 95;
 export class BurnScar extends BaseInjury implements OnTick {
 	readonly name = "BurnScar";
 
-	constructor(
-		protected character: CharacterServer,
-		protected dataService: DataService,
-	) {
-		super(character, dataService);
+	constructor(protected character: CharacterServer) {
+		super(character);
 	}
 
 	onStart(): void {
@@ -38,8 +37,11 @@ export class BurnScar extends BaseInjury implements OnTick {
 	}
 
 	onTick(dt: number): void {
-		if (this.character.attributes.temperature < LOWER_TEMPERATURE_THRESHOLD)
-			return;
+		const characterTemperature = store.getState(
+			selectTemperature(this.character.getPlayer().UserId),
+		);
+		if (characterTemperature === undefined) return;
+		if (characterTemperature < LOWER_TEMPERATURE_THRESHOLD) return;
 		if (this.instance.HasTag("Burning")) return;
 
 		this.instance.AddTag("Burning");

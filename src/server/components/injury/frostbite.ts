@@ -2,10 +2,12 @@ import { Component } from "@flamework/components";
 import { OnTick } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import { Workspace } from "@rbxts/services";
-import { DataService } from "server/services/data-service";
 import { IdentityService } from "server/services/identity-service";
 import { store } from "server/store";
-import { selectResources } from "shared/store/selectors/players";
+import {
+	selectResources,
+	selectTemperature,
+} from "shared/store/selectors/players";
 import { BaseInjury } from ".";
 import { CharacterServer } from "../character-server";
 
@@ -20,15 +22,14 @@ export class Frostbite extends BaseInjury implements OnTick {
 	readonly name = "Frostbite";
 
 	constructor(
+		character: CharacterServer,
 		private logger: Logger,
 		private identityService: IdentityService,
-		protected character: CharacterServer,
-		protected dataService: DataService,
 	) {
-		super(character, dataService);
+		super(character);
 	}
 
-	onStart(): void {
+	public onStart(): void {
 		this.inflict();
 
 		const player = this.character.getPlayer();
@@ -47,13 +48,16 @@ export class Frostbite extends BaseInjury implements OnTick {
 		);
 	}
 
-	onTick(dt: number): void {
-		if (this.character.attributes.temperature > UPPER_TEMPERATURE_THRESHOLD)
-			return;
+	public onTick(dt: number): void {
+		if (!this.character.attributes.isAlive) return;
+		const characterTemperature = store.getState(
+			selectTemperature(this.character.getPlayer().UserId),
+		);
+		if (characterTemperature === undefined) return;
+		if (characterTemperature > UPPER_TEMPERATURE_THRESHOLD) return;
 
 		const humanoid = this.character.instance.Humanoid;
 		humanoid.TakeDamage(this.calculateTickDamage(humanoid, dt));
-
 		if (humanoid.Health > 0) return;
 
 		this.character.instance.GetChildren().forEach((value) => {
@@ -68,7 +72,7 @@ export class Frostbite extends BaseInjury implements OnTick {
 	}
 
 	calculateTickDamage(humanoid: Humanoid, deltaTime: number): number {
-		return math.min(humanoid.Health, (humanoid.MaxHealth / 5) * deltaTime);
+		return math.min(humanoid.Health, (humanoid.MaxHealth * deltaTime) / 5);
 	}
 
 	freezePart(part: BasePart): void {

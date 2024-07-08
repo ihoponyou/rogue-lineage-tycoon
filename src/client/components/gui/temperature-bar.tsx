@@ -9,9 +9,9 @@ export function TemperatureBar() {
 		selectTemperature(LOCAL_PLAYER.UserId),
 	);
 
-	const [percent, setPercent] = useMotor(currentTemperature ?? -1);
+	const [percent, setPercent] = useMotor((currentTemperature ?? -100) / 100);
 	useEffect(
-		() => setPercent(new Spring(currentTemperature ?? -1 / 100)),
+		() => setPercent(new Spring((currentTemperature ?? -100) / 100)),
 		[currentTemperature],
 	);
 

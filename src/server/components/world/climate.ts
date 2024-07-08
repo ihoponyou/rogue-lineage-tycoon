@@ -1,6 +1,8 @@
 import { BaseComponent, Component, Components } from "@flamework/components";
 import { Dependency, OnStart, OnTick } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
+import { store } from "server/store";
+import { selectTemperature } from "shared/store/selectors/players";
 import { OnCharacterAdded } from "../../../../types/lifecycles";
 import { CharacterServer } from "../character-server";
 
@@ -48,19 +50,21 @@ export class Climate
 
 			const characterComponent =
 				this.components.getComponent<CharacterServer>(character);
-			if (characterComponent) {
-				const characterTemperature =
-					characterComponent.attributes.temperature;
-				const climateTemperature = this.attributes.temperature;
+			if (!characterComponent) continue;
 
-				let deltaTemperature = 0;
-				if (climateTemperature < 50) {
-					deltaTemperature = -dt * SECONDS_TO_FROSTBITE;
-				} else if (characterTemperature < climateTemperature) {
-					deltaTemperature = dt * SECONDS_TO_OVERHEAT;
-				}
-				characterComponent.adjustTemperature(deltaTemperature);
+			const characterTemperature = store.getState(
+				selectTemperature(player.UserId),
+			);
+			if (characterTemperature === undefined) continue;
+			const climateTemperature = this.attributes.temperature;
+
+			let deltaTemperature = 0;
+			if (climateTemperature < 50) {
+				deltaTemperature = -dt * SECONDS_TO_FROSTBITE;
+			} else if (characterTemperature < climateTemperature) {
+				deltaTemperature = dt * SECONDS_TO_OVERHEAT;
 			}
+			characterComponent.adjustTemperature(deltaTemperature);
 		}
 	}
 }
