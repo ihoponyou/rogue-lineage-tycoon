@@ -27,9 +27,9 @@ export function StomachBar() {
 		setStomachColor(WHITE_STOMACH_COLOR);
 	}, [raceName]);
 
-	const [percent, setPercent] = useMotor(stomachAmount ?? -1);
+	const [percent, setPercent] = useMotor((stomachAmount ?? -100) / 100);
 	useEffect(
-		() => setPercent(new Spring(stomachAmount ?? -1 / 100)),
+		() => setPercent(new Spring((stomachAmount ?? -1) / 100)),
 		[stomachAmount],
 	);
 
