@@ -1,6 +1,7 @@
 import { CommandContext } from "@rbxts/cmdr";
+import { store } from "server/store";
 
 export = function (context: CommandContext, player: Player, days: number) {
-	player.SetAttribute("days", days);
+	store.setDays(player.UserId, days);
 	return `Set ${player.Name}'s days to ${days}`;
 };
