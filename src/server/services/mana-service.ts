@@ -59,7 +59,7 @@ export class ManaService
 	}
 
 	onManaObtained(player: Player): void {
-		const race = store.getState().players.identity[player.UserId]?.race;
+		const race = store.getState().players.identity[player.UserId]?.raceName;
 
 		let boost = 0;
 		if (race === "Azael") boost = 10;

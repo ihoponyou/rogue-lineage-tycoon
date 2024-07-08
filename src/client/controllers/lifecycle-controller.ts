@@ -1,14 +1,12 @@
-import { Controller, OnStart, Modding, Dependency } from "@flamework/core";
-import { Players } from "@rbxts/services";
 import { Components } from "@flamework/components";
+import { Controller, Modding, OnStart } from "@flamework/core";
+import { LOCAL_PLAYER } from "client/constants";
+import { Inject } from "shared/inject";
 import {
 	OnLocalCharacterAdded,
 	OnLocalCharacterRemoving,
 	OnRemoved,
 } from "../../../types/lifecycles";
-import { Inject } from "shared/inject";
-
-export const LOCAL_PLAYER = Players.LocalPlayer;
 
 @Controller()
 export class LifecycleController implements OnStart {

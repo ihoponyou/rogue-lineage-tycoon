@@ -1,10 +1,10 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { CurrenciesState } from "../../gui/producer/currencies";
-import { RootState } from "../../gui/producer";
+import { LOCAL_PLAYER } from "client/constants";
+import { selectCurrency } from "shared/store/selectors/players";
 
 export function SilverLogo() {
-	const amount = useSelector((state: RootState) => state.currencies.silver);
+	const silver = useSelector(selectCurrency(LOCAL_PLAYER.UserId, "Silver"));
 
 	return (
 		<imagelabel
@@ -34,7 +34,7 @@ export function SilverLogo() {
 				}
 				Position={new UDim2(1, 5, 0, -1)}
 				Size={new UDim2(0, 0, 0, 20)}
-				Text={`${amount}`}
+				Text={`${silver?.amount}`}
 				TextColor3={Color3.fromRGB(255, 255, 255)}
 				TextSize={18}
 				TextStrokeColor3={Color3.fromRGB(74, 74, 74)}

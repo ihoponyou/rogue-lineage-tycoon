@@ -1,10 +1,11 @@
 import { Component } from "@flamework/components";
+import { OnTick } from "@flamework/core";
+import { DataService } from "server/services/data-service";
+import { store } from "server/store";
+import { APPEARANCE } from "shared/constants";
+import { selectResources } from "shared/store/selectors/players";
 import { BaseInjury } from ".";
 import { CharacterServer } from "../character-server";
-import { ReplicatedStorage } from "@rbxts/services";
-import { DataService } from "server/services/data-service";
-import { OnTick } from "@flamework/core";
-import { APPEARANCE } from "shared/constants";
 
 const LOWER_TEMPERATURE_THRESHOLD = 95;
 
@@ -24,12 +25,12 @@ export class BurnScar extends BaseInjury implements OnTick {
 	onStart(): void {
 		this.inflict();
 
-		const data = this.dataService.getProfile(
-			this.character.getPlayer(),
-		).Data;
+		const player = this.character.getPlayer();
+		const data = store.getState(selectResources(player.UserId));
+		if (!data) error("no data");
 
-		if (data.Temperature === 100) {
-			data.Temperature = 70;
+		if (data.temperature === 100) {
+			store.setTemperature(player.UserId, 70);
 		}
 
 		APPEARANCE.FacialExtras.Scars.BurnScar.Clone().Parent =

@@ -9,6 +9,7 @@ import {
 	CharacterAttributes,
 	CharacterInstance,
 } from "shared/components/character";
+import { selectResources } from "shared/store/selectors/players";
 import { OnRemoved } from "../../../types/lifecycles";
 import { Events } from "../networking";
 import { RagdollServer } from "./ragdoll-server";
@@ -159,13 +160,16 @@ export class CharacterServer
 	}
 
 	adjustTemperature(amount: number) {
-		const profile = this.dataService.getProfile(this.getPlayer());
+		const player = this.getPlayer();
+		const data = store.getState(selectResources(player.UserId));
+		if (!data) error("no data");
+
 		const newTemperature = math.clamp(
-			profile.Data.Temperature + amount,
+			data.temperature + amount,
 			MINIMUM_TEMPERATURE,
 			MAXIMUM_TEMPERATURE,
 		);
-		profile.Data.Temperature = newTemperature;
+		store.setTemperature(player.UserId, newTemperature);
 		this.attributes.temperature = newTemperature;
 
 		if (newTemperature === MINIMUM_TEMPERATURE)

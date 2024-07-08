@@ -1,12 +1,12 @@
 import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
+import { store } from "server/store";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { ClickInteractable } from "../interactable/click-interactable";
-import { CurrencyService } from "server/services/currency-service";
-import { Currency } from "../../../../types/currency";
-import { PlayerServer } from "../player-server";
 import { Inject } from "shared/inject";
+import { Currency } from "../../../../types/currency";
+import { ClickInteractable } from "../interactable/click-interactable";
 import { TouchablePart } from "../interactable/touchable/touchable-part";
+import { PlayerServer } from "../player-server";
 
 type PlotInstance = Model & {
 	Teller: Teller;
@@ -36,10 +36,6 @@ export class Plot
 	@Inject
 	private components!: Components;
 
-	constructor(private currencyService: CurrencyService) {
-		super();
-	}
-
 	public onStart(): void {
 		this.id = ++Plot.totalPlots;
 
@@ -62,8 +58,8 @@ export class Plot
 	private onTellerInteracted(player: Player): void {
 		if (!this.owner) return;
 		if (player !== this.owner.instance) return;
-		this.currencyService.addCurrency(
-			this.owner.instance,
+		store.addCurrency(
+			this.owner.instance.UserId,
 			"Silver",
 			this.bank.Silver,
 		);

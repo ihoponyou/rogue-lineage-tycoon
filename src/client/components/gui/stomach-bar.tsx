@@ -1,44 +1,36 @@
 import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
-import React, { useEffect } from "@rbxts/react";
+import React, { useBinding, useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { RootState } from "client/gui/producer";
+import { LOCAL_PLAYER } from "client/constants";
+import { selectRace, selectStomach } from "shared/store/selectors/players";
 
-// const WHITE_STOMACH_RACES = [
-// 	"Gaian",
-// 	"Cameo",
-// 	"Dullahan",
-// 	"Metascroom",
-// 	"Lich",
-// 	"Seraph",
-// 	"Florian",
-// ];
+const WHITE_STOMACH_RACES = [
+	"Gaian",
+	"Cameo",
+	"Dullahan",
+	"Metascroom",
+	"Lich",
+	"Seraph",
+	"Florian",
+];
 
-// updateStomach(stomach: number): void {
-// 		if (!this.stomachSlider) return;
-
-// 		const percentStomach = math.clamp(stomach / MAX_STOMACH, 0, 1);
-// 		this.stomachSlider.TweenSize(
-// 			new UDim2(percentStomach, 0, 0, 6),
-// 			Enum.EasingDirection.Out,
-// 			Enum.EasingStyle.Quad,
-// 			0.25,
-// 			true,
-// 		);
-// 	}
+const DEFAULT_STOMACH_COLOR = Color3.fromRGB(240, 208, 26);
+const WHITE_STOMACH_COLOR = Color3.fromRGB(229, 229, 204);
 
 export function StomachBar() {
-	const stomachAmount = useSelector(
-		(state: RootState) => state.stomach.amount,
-	);
-	const maxStomachAmount = useSelector(
-		(state: RootState) => state.stomach.max,
-	);
-	const stomachColor = useSelector((state: RootState) => state.stomach.color);
+	const stomachAmount = useSelector(selectStomach(LOCAL_PLAYER.UserId));
 
-	const [percent, setPercent] = useMotor(stomachAmount);
+	const [stomachColor, setStomachColor] = useBinding();
+	const raceName = useSelector(selectRace(LOCAL_PLAYER.UserId));
+	useEffect(() => {
+		if (!WHITE_STOMACH_RACES.includes(raceName ?? "")) return;
+		setStomachColor;
+	}, [raceName]);
+
+	const [percent, setPercent] = useMotor(stomachAmount ?? -1);
 	useEffect(
-		() => setPercent(new Spring(stomachAmount / maxStomachAmount)),
-		[stomachAmount, maxStomachAmount],
+		() => setPercent(new Spring(stomachAmount ?? -1 / 100)),
+		[stomachAmount],
 	);
 
 	return (

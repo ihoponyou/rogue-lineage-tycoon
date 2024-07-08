@@ -1,3 +1,4 @@
+import { Sex } from "shared/store/slices/players/identity";
 import { RaceGlossary } from "./races";
 
 export const NAMES: { [category: string]: Array<string> } = {

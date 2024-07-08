@@ -1,7 +1,6 @@
 import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { ASSETS } from "server/configs/tycoon";
-import { CurrencyService } from "server/services/currency-service";
 import { store } from "server/store";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Inject } from "shared/inject";
@@ -27,7 +26,6 @@ export abstract class AssetUnlock<
 
 	constructor(
 		private pad: Pad,
-		private currencyService: CurrencyService,
 		// protected components: Components,
 	) {
 		super();
@@ -53,10 +51,10 @@ export abstract class AssetUnlock<
 			print(playerServer.Name, "error = broke");
 			return;
 		}
-		this.currencyService.subtractCurrency(
-			player,
+		store.addCurrency(
+			player.UserId,
 			this.config.currency,
-			this.config.cost,
+			-this.config.cost,
 		);
 
 		print(`unlocked ${this.attributes.assetName}`);

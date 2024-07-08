@@ -5,12 +5,12 @@ import { RunService } from "@rbxts/services";
 import { store } from "server/store";
 import { onThisPlayerRemoving } from "shared/on-player-removing";
 import {
-	selectAllPlayerCurrencies,
-	selectPlayerData,
+    selectCurrencies,
+    selectPlayerData,
 } from "shared/store/selectors/players";
 import {
-	DEFAULT_PLAYER_DATA,
-	PlayerData,
+    DEFAULT_PLAYER_DATA,
+    PlayerData,
 } from "shared/store/slices/players/player-data";
 import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 
@@ -96,7 +96,7 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 		onThisPlayerRemoving(
 			player,
 			store.subscribe(
-				selectAllPlayerCurrencies(player.UserId),
+				selectCurrencies(player.UserId),
 				(data) => {
 					silver.Value = data?.Silver.amount ?? 0;
 					valu.Value = data?.Valu.amount ?? 0;

@@ -1,7 +1,8 @@
 import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { RootState } from "client/gui/producer";
+import { LOCAL_PLAYER } from "client/constants";
+import { selectToxicity } from "shared/store/selectors/players";
 
 // updateToxicity(toxicity: number): void {
 // 		if (!this.toxicitySlider) return;
@@ -17,17 +18,15 @@ import { RootState } from "client/gui/producer";
 // 	}
 
 export function ToxicityBar() {
-	const amount = useSelector((state: RootState) => state.toxicity.amount);
-	const max = useSelector((state: RootState) => state.toxicity.max);
-	const color = useSelector((state: RootState) => state.toxicity.color);
+	const toxicity = useSelector(selectToxicity(LOCAL_PLAYER.UserId));
 
-	const [percent, setPercent] = useMotor(amount);
-	useEffect(() => setPercent(new Spring(amount / max)), [amount, max]);
+	const [percent, setPercent] = useMotor(toxicity ?? -1);
+	useEffect(() => setPercent(new Spring(toxicity ?? -1 / 100)), [toxicity]);
 
 	return (
 		<frame
 			key="ToxicitySlider"
-			BackgroundColor3={color}
+			BackgroundColor3={Color3.fromRGB(89, 186, 78)}
 			BorderSizePixel={0}
 			Position={new UDim2(0, 0, 0, 9)}
 			Size={percent.map((value) => new UDim2(value, 0, 0, 6))}

@@ -18,7 +18,7 @@ const initialState: CurrenciesState = {};
 export const currenciesSlice = createProducer(initialState, {
 	loadPlayerData: (state, playerId: number, data: PlayerData) => ({
 		...state,
-		[playerId]: data.currency,
+		[playerId]: data.currencies,
 	}),
 
 	releasePlayerData: (state, playerId: number) => ({
@@ -65,6 +65,28 @@ export const currenciesSlice = createProducer(initialState, {
 				[currency]: {
 					...currencyData,
 					multiplier: multiplier,
+				},
+			},
+		};
+	},
+
+	addCurrency: (
+		state,
+		playerId: number,
+		currency: Currency,
+		amount: number,
+	) => {
+		const playerData = state[playerId];
+		if (!playerData) return state;
+		const currencyData = playerData[currency];
+
+		return {
+			...state,
+			[playerId]: playerData && {
+				...playerData,
+				[currency]: {
+					...currencyData,
+					amount: currencyData.amount + amount,
 				},
 			},
 		};

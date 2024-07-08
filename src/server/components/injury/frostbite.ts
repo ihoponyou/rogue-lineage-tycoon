@@ -1,11 +1,13 @@
 import { Component } from "@flamework/components";
-import { BaseInjury } from ".";
-import { IdentityService } from "server/services/identity-service";
-import { CharacterServer } from "../character-server";
-import { DataService } from "server/services/data-service";
 import { OnTick } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import { Workspace } from "@rbxts/services";
+import { DataService } from "server/services/data-service";
+import { IdentityService } from "server/services/identity-service";
+import { store } from "server/store";
+import { selectResources } from "shared/store/selectors/players";
+import { BaseInjury } from ".";
+import { CharacterServer } from "../character-server";
 
 const UPPER_TEMPERATURE_THRESHOLD = 5;
 const DEATH_MESSAGE_TEMPLATE = "{Character} froze to death innit";
@@ -29,11 +31,11 @@ export class Frostbite extends BaseInjury implements OnTick {
 	onStart(): void {
 		this.inflict();
 
-		const data = this.dataService.getProfile(
-			this.character.getPlayer(),
-		).Data;
-		if (data.Temperature === 0) {
-			data.Temperature = 15;
+		const player = this.character.getPlayer();
+		const data = store.getState(selectResources(player.UserId));
+		if (!data) error("no data");
+		if (data.temperature === 0) {
+			store.setTemperature(player.UserId, 15);
 		}
 
 		const skinColor = this.character.instance.GetAttribute("SkinColor");

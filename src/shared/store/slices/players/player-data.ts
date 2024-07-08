@@ -19,7 +19,7 @@ export interface SerializedColor3 {
 
 export type PlayerData = {
 	stats: Stats;
-	currency: Currencies;
+	currencies: Currencies;
 	resources: Resources;
 	mana: ManaData;
 	conditions: Array<Condition>;
@@ -31,7 +31,7 @@ export const DEFAULT_PLAYER_DATA: PlayerData = {
 		lives: 9,
 		days: 123,
 	},
-	currency: {
+	currencies: {
 		Silver: {
 			amount: 0,
 			multiplier: 1,
@@ -61,15 +61,17 @@ export const DEFAULT_PLAYER_DATA: PlayerData = {
 	},
 	conditions: [],
 	identity: {
-		race: "",
+		raceName: "",
 		personality: "",
-		phenotype: "",
+		phenotypeName: "",
 		sex: "Male",
 		manaColor: {
 			R: 255,
 			G: 255,
 			B: 255,
 		},
+		armorName: "",
+		firstName: "",
 	},
 	// player
 	// IsBanned: false,

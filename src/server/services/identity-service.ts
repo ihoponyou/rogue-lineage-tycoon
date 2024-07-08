@@ -13,7 +13,10 @@ import {
 	getRandomRollable,
 } from "server/configs/races";
 import { Events } from "server/networking";
+import { store } from "server/store";
 import { APPEARANCE } from "shared/constants";
+import { selectIdentity } from "shared/store/selectors/players";
+import { Sex } from "shared/store/slices/players/identity";
 import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
 import { DataService } from "./data-service";
 
@@ -62,47 +65,48 @@ export class IdentityService
 		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
 		if (!humanoid) error(`Humanoid not found in ${character.Name}`);
 
-		const profile = this.dataService.getProfile(player);
+		const data = store.getState(selectIdentity(player.UserId));
+		if (!data) error("missing data");
 
-		let raceName = profile.Data.RaceName;
+		let raceName = data.raceName;
 		if (raceName === "") {
 			raceName = getRandomRollable();
-			profile.Data.RaceName = raceName;
+			store.setRace(player.UserId, raceName);
 		}
 		const race = RACES[raceName];
 
 		if (!race.HasCustomHead) {
-			let personality = profile.Data.Personality;
+			let personality = data.personality;
 			if (personality === "") {
 				personality = this.getRandomPersonality(raceName);
-				profile.Data.Personality = personality;
+				store.setPersonality(player.UserId, personality);
 			}
 			this.setFace(character, raceName, personality);
 		} else {
 			this.cleanCharacterFace(character);
 		}
 
-		let phenotypeName = profile.Data.PhenotypeName;
+		let phenotypeName = data.phenotypeName;
 		if (phenotypeName === "") {
 			phenotypeName = getRandomPhenotype(raceName);
-			profile.Data.PhenotypeName = phenotypeName;
+			store.setPhenotype(player.UserId, phenotypeName);
 		}
 		this.setPhenotype(character, raceName, phenotypeName);
 
-		let sex = profile.Data.Sex;
+		let sex = data.sex;
 		if (sex === "") {
 			sex = this.getRandomSex();
-			profile.Data.Sex = sex;
+			store.setSex(player.UserId, sex);
 		}
 		this.setSex(character, sex);
 
-		let firstName = profile.Data.FirstName;
+		let firstName = data.firstName;
 		if (firstName === "") {
 			firstName = getRandomFirstName(raceName, sex);
 		}
 		this.setFirstName(player, firstName);
 
-		let armorName = profile.Data.ArmorName;
+		let armorName = data.armorName;
 		if (armorName === "") {
 			switch (raceName) {
 				case "Gaian":
@@ -115,11 +119,11 @@ export class IdentityService
 				default:
 					armorName = getRandomStarterArmor();
 			}
-			profile.Data.ArmorName = armorName;
+			store.setArmor(player.UserId, armorName);
 		}
 		this.setArmor(character, armorName);
 
-		const serializedColor = profile.Data.ManaColor;
+		const serializedColor = data.manaColor;
 		let newColor;
 		if (
 			serializedColor.R === 0 &&
@@ -297,14 +301,11 @@ export class IdentityService
 	}
 
 	setArmor(character: Model, armorName: string) {
-		const data = this.dataService.getProfile(
-			Players.GetPlayerFromCharacter(character) as Player,
-		).Data;
-		const armor = ARMORS[armorName];
-		let variation = armor.Variations[data.Sex];
-		if (!variation) variation = armor.Variations.Male;
+		const player = Players.GetPlayerFromCharacter(character) as Player;
+		const data = store.getState().players.identity[player.UserId];
+		if (!data) error("no data");
 
-		const oldArmorName = data.ArmorName;
+		const oldArmorName = data.armorName;
 		if (oldArmorName !== "") {
 			for (const instance of character.GetChildren()) {
 				if (instance.IsA("Clothing")) instance.Destroy();
@@ -315,21 +316,21 @@ export class IdentityService
 				},
 			);
 		}
+
+		const armor = ARMORS[armorName];
 		Object.entries(armor.StatChanges).forEach((entry) => {
 			// TODO: add new armor's stats
 		});
 
+		const variation = armor.Variations[data.sex] ?? armor.Variations.Male;
 		variation.Shirt.Clone().Parent = character;
 		variation.Pants.Clone().Parent = character;
 
-		data.ArmorName = armorName;
+		store.setArmor(player.UserId, armorName);
 	}
 
 	setManaColor(player: Player, color: Color3) {
-		const data = this.dataService.getProfile(player).Data;
-		data.ManaColor.R = color.R;
-		data.ManaColor.G = color.G;
-		data.ManaColor.B = color.B;
+		store.setManaColor(player.UserId, color);
 		Events.mana.colorChanged(player, color);
 	}
 
