@@ -82,6 +82,7 @@ export class CharacterServer
 	}
 
 	override onHealthChanged(health: number): void {
+		store.setHealth(this.getPlayer().UserId, health);
 		const percentHealth = health / this.instance.Humanoid.MaxHealth;
 		if (this.attributes.isKnocked) {
 			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {

@@ -1,5 +1,5 @@
 import { Components } from "@flamework/components";
-import { Dependency, OnInit, Service } from "@flamework/core";
+import { Dependency, OnStart, Service } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import Object from "@rbxts/object-utils";
 import { Players, Workspace } from "@rbxts/services";
@@ -12,7 +12,6 @@ import {
 	getRandomPhenotype,
 	getRandomRollable,
 } from "server/configs/races";
-import { Events } from "server/networking";
 import { store } from "server/store";
 import { APPEARANCE } from "shared/constants";
 import { selectIdentity } from "shared/store/selectors/players";
@@ -24,7 +23,7 @@ const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
 
 @Service()
 export class IdentityService
-	implements OnInit, OnPlayerAdded, OnCharacterAdded
+	implements OnStart, OnPlayerAdded, OnCharacterAdded
 {
 	private playerDescriptions: { [playerId: number]: HumanoidDescription } =
 		{};
@@ -35,7 +34,7 @@ export class IdentityService
 		private dataService: DataService,
 	) {}
 
-	onInit() {
+	onStart() {
 		this.defaultDescription.HatAccessory = "48474313";
 
 		const BLACK = Color3.fromRGB(17, 17, 17);
@@ -124,26 +123,21 @@ export class IdentityService
 		this.setArmor(character, armorName);
 
 		const serializedColor = data.manaColor;
-		let newColor;
-		if (
-			serializedColor.R === 0 &&
-			serializedColor.G === 0 &&
-			serializedColor.B === 0
-		)
-			newColor = this.getRandomManaColor();
-		else
-			newColor = new Color3(
-				serializedColor.R,
-				serializedColor.G,
-				serializedColor.B,
-			);
-		this.setManaColor(player, newColor);
+		const newColor =
+			serializedColor.R === -1 &&
+			serializedColor.G === -1 &&
+			serializedColor.B === -1
+				? this.getRandomManaColor()
+				: new Color3(
+						serializedColor.R,
+						serializedColor.G,
+						serializedColor.B,
+					);
 
 		while (!character.IsDescendantOf(Workspace))
 			character.AncestryChanged.Wait();
 		humanoid.ApplyDescription(this.playerDescriptions[player.UserId]);
-		// player:SetAttribute("IdentityLoaded", true)
-		// IdentityService.Client.IdentityLoaded:Fire(player)
+
 		const components = Dependency<Components>();
 		components
 			.waitForComponent<CharacterServer>(character)
@@ -329,11 +323,6 @@ export class IdentityService
 		store.setArmor(player.UserId, armorName);
 	}
 
-	setManaColor(player: Player, color: Color3) {
-		store.setManaColor(player.UserId, color);
-		Events.mana.colorChanged(player, color);
-	}
-
 	setFirstName(player: Player, name: string) {
 		if (player.Character) {
 			const humanoid =
@@ -341,7 +330,7 @@ export class IdentityService
 			if (humanoid) humanoid.DisplayName = name;
 		}
 
-		Events.character.firstNameChanged(player, name);
+		store.setFirstName(player.UserId, name);
 	}
 
 	addCustomHead(

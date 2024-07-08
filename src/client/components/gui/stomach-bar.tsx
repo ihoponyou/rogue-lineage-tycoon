@@ -1,5 +1,5 @@
 import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
-import React, { useBinding, useEffect } from "@rbxts/react";
+import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
 import { selectRace, selectStomach } from "shared/store/selectors/players";
@@ -20,11 +20,11 @@ const WHITE_STOMACH_COLOR = Color3.fromRGB(229, 229, 204);
 export function StomachBar() {
 	const stomachAmount = useSelector(selectStomach(LOCAL_PLAYER.UserId));
 
-	const [stomachColor, setStomachColor] = useBinding();
+	const [stomachColor, setStomachColor] = useState(DEFAULT_STOMACH_COLOR);
 	const raceName = useSelector(selectRace(LOCAL_PLAYER.UserId));
 	useEffect(() => {
 		if (!WHITE_STOMACH_RACES.includes(raceName ?? "")) return;
-		setStomachColor;
+		setStomachColor(WHITE_STOMACH_COLOR);
 	}, [raceName]);
 
 	const [percent, setPercent] = useMotor(stomachAmount ?? -1);

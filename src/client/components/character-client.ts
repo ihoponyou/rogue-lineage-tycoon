@@ -1,14 +1,13 @@
 import { Component, Components } from "@flamework/components";
+import { Workspace } from "@rbxts/services";
 import {
 	Character,
 	CharacterAttributes,
 	CharacterInstance,
 } from "shared/components/character";
-import { Events } from "../networking";
-import { Workspace } from "@rbxts/services";
-import { CharacterStateMachine } from "./character-state-machine";
 import { Inject } from "shared/inject";
-import { producer } from "client/gui/producer";
+import { Events } from "../networking";
+import { CharacterStateMachine } from "./character-state-machine";
 
 const events = Events.character;
 
@@ -29,20 +28,10 @@ export class CharacterClient extends Character<
 			this.components.addComponent<CharacterStateMachine>(this.instance);
 
 		this.trove.add(stateMachine);
-
-		this.onAttributeChanged("stomach", (value) =>
-			producer.setStomachAmount(value),
-		);
-		this.onAttributeChanged("toxicity", (value) =>
-			producer.setToxicityAmount(value),
-		);
-		this.onAttributeChanged("temperature", (value) =>
-			producer.setTemperature(value),
-		);
 	}
 
 	override onHealthChanged(health: number): void {
-		producer.setHealthAmount(health);
+		// producer.setHealthAmount(health);
 	}
 
 	override onRemoved(): void {

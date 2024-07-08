@@ -21,6 +21,15 @@ export function selectResources(playerId: number) {
 	return (state: SharedState) => state.players.resources[playerId];
 }
 
+// type ResourcesSelector = (state: SharedState) => Resources | undefined;
+// export function createResourceSelector() {}
+
+export function selectHealth(playerId: number) {
+	return createSelector(selectResources(playerId), (resources) => {
+		return resources && resources.health;
+	});
+}
+
 export function selectToxicity(playerId: number) {
 	return createSelector(selectResources(playerId), (resources) => {
 		return resources && resources.toxicity;
@@ -43,6 +52,12 @@ export function selectMana(playerId: number) {
 	return (state: SharedState) => state.players.mana[playerId];
 }
 
+export function selectManaAmount(playerId: number) {
+	return createSelector(selectMana(playerId), (manaData) => {
+		return manaData && manaData.amount;
+	});
+}
+
 export function selectManaEnabled(playerId: number) {
 	return createSelector(selectMana(playerId), (manaData) => {
 		return manaData && manaData.enabled;
@@ -55,6 +70,12 @@ export function selectConditions(playerId: number) {
 
 export function selectIdentity(playerId: number) {
 	return (state: SharedState) => state.players.identity[playerId];
+}
+
+export function selectManaColor(playerId: number) {
+	return createSelector(selectIdentity(playerId), (identity) => {
+		return identity && identity.manaColor;
+	});
 }
 
 export function selectRace(playerId: number) {

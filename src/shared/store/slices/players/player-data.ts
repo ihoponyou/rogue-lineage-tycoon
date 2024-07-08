@@ -17,6 +17,22 @@ export interface SerializedColor3 {
 	readonly B: number;
 }
 
+export function deserializeColor3(serializedColor: SerializedColor3): Color3 {
+	return Color3.fromRGB(
+		serializedColor.R,
+		serializedColor.G,
+		serializedColor.B,
+	);
+}
+
+export function serializeColor3(color: Color3): SerializedColor3 {
+	return {
+		R: color.R,
+		G: color.G,
+		B: color.B,
+	};
+}
+
 export type PlayerData = {
 	stats: Stats;
 	currencies: Currencies;
@@ -66,9 +82,9 @@ export const DEFAULT_PLAYER_DATA: PlayerData = {
 		phenotypeName: "",
 		sex: "Male",
 		manaColor: {
-			R: 255,
-			G: 255,
-			B: 255,
+			R: -1,
+			G: -1,
+			B: -1,
 		},
 		armorName: "",
 		firstName: "",
