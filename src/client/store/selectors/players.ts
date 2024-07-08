@@ -1,6 +1,6 @@
-import { Players } from "@rbxts/services";
+import { LOCAL_PLAYER } from "client/constants";
 import { selectPlayerData } from "shared/store/selectors/players";
 
 export function selectLocalPlayerData() {
-	return selectPlayerData(Players.LocalPlayer.UserId);
+	return selectPlayerData(LOCAL_PLAYER.UserId);
 }
