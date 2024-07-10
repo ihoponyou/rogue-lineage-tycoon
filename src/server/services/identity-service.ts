@@ -16,6 +16,7 @@ import { store } from "server/store";
 import { APPEARANCE } from "shared/constants";
 import { selectIdentity } from "shared/store/selectors/players";
 import { Sex } from "shared/store/slices/players/identity";
+import { deserializeColor3 } from "shared/store/slices/players/player-data";
 import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
 import { DataService } from "./data-service";
 
@@ -128,11 +129,8 @@ export class IdentityService
 			serializedColor.G === -1 &&
 			serializedColor.B === -1
 				? this.getRandomManaColor()
-				: new Color3(
-						serializedColor.R,
-						serializedColor.G,
-						serializedColor.B,
-					);
+				: deserializeColor3(serializedColor);
+		store.setManaColor(player.UserId, newColor);
 
 		while (!character.IsDescendantOf(Workspace))
 			character.AncestryChanged.Wait();

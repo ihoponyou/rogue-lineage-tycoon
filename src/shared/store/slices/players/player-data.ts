@@ -18,11 +18,7 @@ export interface SerializedColor3 {
 }
 
 export function deserializeColor3(serializedColor: SerializedColor3): Color3 {
-	return Color3.fromRGB(
-		serializedColor.R,
-		serializedColor.G,
-		serializedColor.B,
-	);
+	return new Color3(serializedColor.R, serializedColor.G, serializedColor.B);
 }
 
 export function serializeColor3(color: Color3): SerializedColor3 {

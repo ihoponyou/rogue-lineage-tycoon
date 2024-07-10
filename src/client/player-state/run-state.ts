@@ -1,13 +1,16 @@
-import { CharacterState } from "./character-state";
+import { LOCAL_PLAYER } from "client/constants";
+import { store } from "client/store";
+import { VFX } from "shared/constants";
 import { StateMachine } from "shared/state-machine";
+import { selectManaColor } from "shared/store/selectors/players";
+import { deserializeColor3 } from "shared/store/slices/players/player-data";
 import { CharacterClient } from "../components/character-client";
-import { InputController } from "../controllers/input-controller";
-import { ReplicatedStorage, UserInputService } from "@rbxts/services";
 import { AnimationController } from "../controllers/animation-controller";
+import { InputController } from "../controllers/input-controller";
+import { KeybindController } from "../controllers/keybind-controller";
 import { ManaController } from "../controllers/mana-controller";
 import { Events } from "../networking";
-import { KeybindController } from "../controllers/keybind-controller";
-import { VFX } from "shared/constants";
+import { CharacterState } from "./character-state";
 
 export class RunState extends CharacterState {
 	readonly name = "Run";
@@ -31,9 +34,13 @@ export class RunState extends CharacterState {
 	}
 
 	public override initialize(): void {
-		Events.mana.colorChanged.connect((color) => {
-			this.manaTrail.Color = new ColorSequence(color);
-		});
+		store.subscribe(
+			selectManaColor(LOCAL_PLAYER.UserId),
+			(serializedColor) =>
+				(this.manaTrail.Color = new ColorSequence(
+					deserializeColor3(serializedColor ?? new Color3()),
+				)),
+		);
 	}
 
 	override enter(): void {

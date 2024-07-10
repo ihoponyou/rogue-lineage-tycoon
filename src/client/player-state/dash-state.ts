@@ -1,13 +1,16 @@
-import { ReplicatedStorage, Workspace } from "@rbxts/services";
-import { CharacterState } from "./character-state";
+import { Workspace } from "@rbxts/services";
+import { LOCAL_PLAYER } from "client/constants";
+import { store } from "client/store";
+import { SFX, VFX } from "shared/constants";
 import { StateMachine } from "shared/state-machine";
+import { selectManaColor } from "shared/store/selectors/players";
+import { deserializeColor3 } from "shared/store/slices/players/player-data";
 import { CharacterClient } from "../components/character-client";
-import { Events } from "../networking";
-import { KeybindController } from "../controllers/keybind-controller";
-import { ManaController } from "../controllers/mana-controller";
 import { AnimationController } from "../controllers/animation-controller";
 import { Direction } from "../controllers/input-controller";
-import { SFX, VFX } from "shared/constants";
+import { KeybindController } from "../controllers/keybind-controller";
+import { ManaController } from "../controllers/mana-controller";
+import { CharacterState } from "./character-state";
 
 const DIRECTION_TO_ANGLE: { [direction: string]: number } = {
 	forward: 0,
@@ -41,9 +44,13 @@ export class DashState extends CharacterState {
 	}
 
 	public override initialize(): void {
-		Events.mana.colorChanged.connect((color) => {
-			this.manaParticles.Color = new ColorSequence(color);
-		});
+		store.subscribe(
+			selectManaColor(LOCAL_PLAYER.UserId),
+			(serializedColor) =>
+				(this.manaParticles.Color = new ColorSequence(
+					deserializeColor3(serializedColor ?? new Color3()),
+				)),
+		);
 	}
 
 	// TODO: direction does not need to be an arg

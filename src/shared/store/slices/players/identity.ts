@@ -1,5 +1,5 @@
 import { createProducer } from "@rbxts/reflex";
-import { PlayerData, SerializedColor3 } from "./player-data";
+import { PlayerData, serializeColor3, SerializedColor3 } from "./player-data";
 
 export type Sex = "Male" | "Female";
 export interface Identity {
@@ -41,16 +41,11 @@ export const identitySlice = createProducer({} as IdentityState, {
 
 	setManaColor: (state, playerId: number, color: Color3) => {
 		const identity = state[playerId];
-
 		return {
 			...state,
 			[playerId]: identity && {
 				...identity,
-				manaColor: {
-					R: color.R,
-					G: color.G,
-					B: color.B,
-				},
+				manaColor: serializeColor3(color),
 			},
 		};
 	},
