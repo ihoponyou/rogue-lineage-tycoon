@@ -102,6 +102,7 @@ export class ManaService
 			EVENTS.emptied(player);
 		}
 
+		store.setManaAmount(player.UserId, data.Mana);
 		EVENTS.changed.fire(player, data.Mana);
 	}
 
@@ -118,6 +119,7 @@ export class ManaService
 			EVENTS.charge(player, false);
 		}
 
+		store.setManaAmount(player.UserId, data.Mana);
 		EVENTS.changed.fire(player, data.Mana);
 	}
 }
