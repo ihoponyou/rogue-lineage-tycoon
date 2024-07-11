@@ -1,20 +1,15 @@
 import { BaseComponent, Component } from "@flamework/components";
-import { OnRemoved } from "../../../types/lifecycles";
 import { Trove } from "@rbxts/trove";
-import { Reflect } from "@flamework/core";
 
 @Component()
 export abstract class DisposableComponent<
-		A extends {} = {},
-		I extends Instance = Instance,
-	>
-	extends BaseComponent<A, I>
-	implements OnRemoved
-{
+	A extends {} = {},
+	I extends Instance = Instance,
+> extends BaseComponent<A, I> {
 	protected trove = new Trove();
 
-	onRemoved(): void {
-		// print(Reflect.getMetadata(this, "identifier"));
+	override destroy(): void {
 		this.trove.destroy();
+		super.destroy();
 	}
 }

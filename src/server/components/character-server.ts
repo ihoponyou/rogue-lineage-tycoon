@@ -9,7 +9,6 @@ import {
 	CharacterInstance,
 } from "shared/components/character";
 import { selectTemperature } from "shared/store/selectors/players";
-import { OnRemoved } from "../../../types/lifecycles";
 import { Events } from "../networking";
 import { RagdollServer } from "./ragdoll-server";
 
@@ -31,7 +30,7 @@ const EVENTS = Events.character;
 })
 export class CharacterServer
 	extends Character<CharacterAttributes, CharacterInstance>
-	implements OnTick, OnRemoved
+	implements OnTick
 {
 	constructor(private ragdoll: RagdollServer) {
 		super();
@@ -109,7 +108,9 @@ export class CharacterServer
 		this.instance.Humanoid.Health = 0;
 		this.breakJoints();
 
-		store.subtractLife(this.getPlayer().UserId);
+		const playerId = this.getPlayer().UserId;
+		const state = store.subtractLife(playerId);
+		const stats = state.players.stats[playerId];
 
 		EVENTS.killed.fire(this.getPlayer());
 

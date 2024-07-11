@@ -19,7 +19,7 @@ export class CharacterClient extends Character<
 	@Inject
 	private components!: Components;
 
-	override onStart(): void {
+	public override onStart(): void {
 		super.onStart();
 
 		this.trove.add(events.killed.connect(() => this.onKilled()));
@@ -30,16 +30,16 @@ export class CharacterClient extends Character<
 		this.trove.add(stateMachine);
 	}
 
-	override onHealthChanged(health: number): void {
+	protected override onHealthChanged(health: number): void {
 		// producer.setHealthAmount(health);
 	}
 
-	override onRemoved(): void {
-		super.onRemoved();
+	public override destroy(): void {
 		this.components.removeComponent<CharacterStateMachine>(this.instance);
+		super.destroy();
 	}
 
-	onKilled(): void {
+	private onKilled(): void {
 		const camera = Workspace.CurrentCamera;
 		if (!camera) return;
 		camera.CameraSubject = this.instance.Head;
