@@ -33,8 +33,9 @@ export function ManaBar() {
 		selectManaColor(LOCAL_PLAYER.UserId),
 	);
 	const manaColor =
-		(serializedManaColor && deserializeColor3(serializedManaColor)) ??
-		new Color3(1, 1, 1);
+		serializedManaColor !== undefined
+			? deserializeColor3(serializedManaColor)
+			: new Color3(1, 1, 1);
 
 	const [percent, setPercent] = useMotor(manaAmount);
 
