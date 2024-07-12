@@ -1,5 +1,5 @@
 export = {
-	Name: "giveMoney",
+	Name: "give_money",
 	Description: "Adds currency to the given player's current balance",
 	Group: "Admin",
 	Args: [
