@@ -36,7 +36,7 @@ export const statsSlice = createProducer(initialState, {
 		};
 	},
 
-	subtractLife: (state, playerId: string) => {
+	subtractLife: (state, playerId: string | number) => {
 		const id = tostring(playerId);
 		const stats = state[id];
 
@@ -49,7 +49,7 @@ export const statsSlice = createProducer(initialState, {
 		};
 	},
 
-	setDays: (state, playerId: string, value: number) => {
+	setDays: (state, playerId: string | number, value: number) => {
 		const id = tostring(playerId);
 		const stats = state[id];
 
