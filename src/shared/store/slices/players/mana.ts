@@ -7,38 +7,40 @@ export interface ManaData {
 }
 
 export interface ManaState {
-	readonly [playerId: number]: ManaData | undefined;
+	readonly [playerId: string]: ManaData | undefined;
 }
 
 export const manaSlice = createProducer({} as ManaState, {
-	loadPlayerData: (state, playerId: number, data: PlayerData) => ({
+	loadPlayerData: (state, playerId: string | number, data: PlayerData) => ({
 		...state,
-		[playerId]: data.mana,
+		[tostring(playerId)]: data.mana,
 	}),
 
-	releasePlayerData: (state, playerId: number) => ({
+	releasePlayerData: (state, playerId: string | number) => ({
 		...state,
-		[playerId]: undefined,
+		[tostring(playerId)]: undefined,
 	}),
 
-	setManaAmount: (state, playerId: number, value: number) => {
-		const mana = state[playerId];
+	setManaAmount: (state, playerId: string | number, value: number) => {
+		const id = tostring(playerId);
+		const mana = state[id];
 
 		return {
 			...state,
-			[playerId]: mana && {
+			[id]: mana && {
 				...mana,
 				amount: value,
 			},
 		};
 	},
 
-	setManaEnabled: (state, playerId: number, enabled: boolean) => {
-		const mana = state[playerId];
+	setManaEnabled: (state, playerId: string | number, enabled: boolean) => {
+		const id = tostring(playerId);
+		const mana = state[id];
 
 		return {
 			...state,
-			[playerId]: mana && {
+			[id]: mana && {
 				...mana,
 				enabled: enabled,
 			},

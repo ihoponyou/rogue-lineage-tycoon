@@ -12,50 +12,53 @@ export interface Resources {
 }
 
 export interface ResourcesState {
-	readonly [playerId: number]: Resources | undefined;
+	readonly [playerId: string]: Resources | undefined;
 }
 
 export const resourcesSlice = createProducer({} as ResourcesState, {
-	loadPlayerData: (state, playerId: number, data: PlayerData) => ({
+	loadPlayerData: (state, playerId: string | number, data: PlayerData) => ({
 		...state,
-		[playerId]: data.resources,
+		[tostring(playerId)]: data.resources,
 	}),
 
-	releasePlayerData: (state, playerId: number) => ({
+	releasePlayerData: (state, playerId: string | number) => ({
 		...state,
-		[playerId]: undefined,
+		[tostring(playerId)]: undefined,
 	}),
 
-	setHealth: (state, playerId: number, value: number) => {
-		const resources = state[playerId];
+	setHealth: (state, playerId: string | number, value: number) => {
+		const id = tostring(playerId);
+		const resources = state[id];
 
 		return {
 			...state,
-			[playerId]: resources && {
+			[id]: resources && {
 				...resources,
 				health: value,
 			},
 		};
 	},
 
-	setStomach: (state, playerId: number, value: number) => {
-		const resources = state[playerId];
+	setStomach: (state, playerId: string | number, value: number) => {
+		const id = tostring(playerId);
+		const resources = state[id];
 
 		return {
 			...state,
-			[playerId]: resources && {
+			[id]: resources && {
 				...resources,
 				stomach: value,
 			},
 		};
 	},
 
-	decayStomach: (state, playerId: number, deltaTime: number) => {
-		const resources = state[playerId];
+	decayStomach: (state, playerId: string | number, deltaTime: number) => {
+		const id = tostring(playerId);
+		const resources = state[id];
 
 		return {
 			...state,
-			[playerId]: resources && {
+			[id]: resources && {
 				...resources,
 				stomach: math.max(
 					0,
@@ -65,36 +68,39 @@ export const resourcesSlice = createProducer({} as ResourcesState, {
 		};
 	},
 
-	setTemperature: (state, playerId: number, value: number) => {
-		const resources = state[playerId];
+	setTemperature: (state, playerId: string | number, value: number) => {
+		const id = tostring(playerId);
+		const resources = state[id];
 
 		return {
 			...state,
-			[playerId]: resources && {
+			[id]: resources && {
 				...resources,
 				temperature: value,
 			},
 		};
 	},
 
-	setToxicity: (state, playerId: number, value: number) => {
-		const resources = state[playerId];
+	setToxicity: (state, playerId: string | number, value: number) => {
+		const id = tostring(playerId);
+		const resources = state[id];
 
 		return {
 			...state,
-			[playerId]: resources && {
+			[id]: resources && {
 				...resources,
 				toxicity: value,
 			},
 		};
 	},
 
-	decayToxicity: (state, playerId: number, deltaTime: number) => {
-		const resources = state[playerId];
+	decayToxicity: (state, playerId: string | number, deltaTime: number) => {
+		const id = tostring(playerId);
+		const resources = state[id];
 
 		return {
 			...state,
-			[playerId]: resources && {
+			[id]: resources && {
 				...resources,
 				toxicity: math.max(
 					0,

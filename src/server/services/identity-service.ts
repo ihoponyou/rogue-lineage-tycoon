@@ -294,10 +294,10 @@ export class IdentityService
 
 	setArmor(character: Model, armorName: string) {
 		const player = Players.GetPlayerFromCharacter(character) as Player;
-		const data = store.getState().players.identity[player.UserId];
-		if (!data) error("no data");
+		const identity = store.getState(selectIdentity(player.UserId));
+		if (identity === undefined) error("no data");
 
-		const oldArmorName = data.armorName;
+		const oldArmorName = identity.armorName;
 		if (oldArmorName !== "") {
 			for (const instance of character.GetChildren()) {
 				if (instance.IsA("Clothing")) instance.Destroy();
@@ -314,7 +314,8 @@ export class IdentityService
 			// TODO: add new armor's stats
 		});
 
-		const variation = armor.Variations[data.sex] ?? armor.Variations.Male;
+		const variation =
+			armor.Variations[identity.sex] ?? armor.Variations.Male;
 		variation.Shirt.Clone().Parent = character;
 		variation.Pants.Clone().Parent = character;
 

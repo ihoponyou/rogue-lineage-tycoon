@@ -8,7 +8,11 @@ import {
 	CharacterAttributes,
 	CharacterInstance,
 } from "shared/components/character";
-import { selectTemperature } from "shared/store/selectors/players";
+import {
+	selectConditions,
+	selectHealth,
+	selectTemperature,
+} from "shared/store/selectors/players";
 import { Events } from "../networking";
 import { RagdollServer } from "./ragdoll-server";
 
@@ -39,14 +43,16 @@ export class CharacterServer
 	public override onStart(): void {
 		super.onStart();
 
-		let savedHealth =
-			store.getState().players.resources[this.getPlayer().UserId]!.health;
+		const playerId = this.getPlayer().UserId;
+
+		let savedHealth = store.getState(selectHealth(playerId));
+		if (savedHealth === undefined) error("health not found");
 		if (savedHealth < 1) savedHealth = 100;
 		this.instance.Humanoid.Health = savedHealth;
 
-		for (const condition of store.getState().players.conditions[
-			this.getPlayer().UserId
-		]!) {
+		const conditions = store.getState(selectConditions(playerId));
+		if (conditions === undefined) error("conditions not found");
+		for (const condition of conditions) {
 			this.instance.AddTag(condition);
 		}
 
@@ -109,7 +115,7 @@ export class CharacterServer
 		this.breakJoints();
 
 		const playerId = this.getPlayer().UserId;
-		const state = store.subtractLife(playerId);
+		const state = store.subtractLife(tostring(playerId));
 		const stats = state.players.stats[playerId];
 
 		EVENTS.killed.fire(this.getPlayer());
@@ -158,7 +164,7 @@ export class CharacterServer
 			MINIMUM_TEMPERATURE,
 			MAXIMUM_TEMPERATURE,
 		);
-		store.setTemperature(player.UserId, newTemperature);
+		store.setTemperature(tostring(player.UserId), newTemperature);
 
 		if (newTemperature === MINIMUM_TEMPERATURE)
 			this.instance.AddTag("Frostbite");

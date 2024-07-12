@@ -28,7 +28,6 @@ import { deserializeColor3 } from "shared/store/slices/players/player-data";
 // 	}
 
 export function ManaBar() {
-	const manaAmount = useSelector(selectManaAmount(LOCAL_PLAYER.UserId)) ?? -1;
 	const serializedManaColor = useSelector(
 		selectManaColor(LOCAL_PLAYER.UserId),
 	);
@@ -37,8 +36,8 @@ export function ManaBar() {
 			? deserializeColor3(serializedManaColor)
 			: new Color3(1, 1, 1);
 
+	const manaAmount = useSelector(selectManaAmount(LOCAL_PLAYER.UserId)) ?? -1;
 	const [percent, setPercent] = useMotor(manaAmount);
-
 	useEffect(() => setPercent(new Spring(manaAmount / 100)), [manaAmount]);
 
 	return (

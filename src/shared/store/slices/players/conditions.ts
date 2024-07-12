@@ -3,39 +3,45 @@ import { Condition } from "shared/configs/conditions";
 import { PlayerData } from "./player-data";
 
 export interface ConditionsState {
-	readonly [playerId: number]: Array<Condition> | undefined;
+	readonly [playerId: string]: Array<Condition> | undefined;
 }
 
 export const conditionsSlice = createProducer({} as ConditionsState, {
-	loadPlayerData: (state, playerId: number, data: PlayerData) => ({
+	loadPlayerData: (state, playerId: string | number, data: PlayerData) => ({
 		...state,
-		[playerId]: data.conditions,
+		[tostring(playerId)]: data.conditions,
 	}),
 
-	releasePlayerData: (state, playerId: number) => ({
+	releasePlayerData: (state, playerId: string | number) => ({
 		...state,
-		[playerId]: undefined,
+		[tostring(playerId)]: undefined,
 	}),
 
-	addCondition: (state, playerId: number, condition: Condition) => {
-		const conditions = state[playerId];
+	addCondition: (state, playerId: string | number, condition: Condition) => {
+		const id = tostring(playerId);
+		const conditions = state[id];
 		if (!conditions) return state;
 		if (conditions.includes(condition)) return state;
 
 		return {
 			...state,
-			[playerId]: [...conditions, condition],
+			[id]: [...conditions, condition],
 		};
 	},
 
-	removeCondition: (state, playerId: number, condition: Condition) => {
-		const conditions = state[playerId];
+	removeCondition: (
+		state,
+		playerId: string | number,
+		condition: Condition,
+	) => {
+		const id = tostring(playerId);
+		const conditions = state[id];
 		if (!conditions) return state;
 		if (!conditions.includes(condition)) return state;
 
 		return {
 			...state,
-			[playerId]: conditions.filter((c) => c !== condition),
+			[id]: conditions.filter((c) => c !== condition),
 		};
 	},
 });

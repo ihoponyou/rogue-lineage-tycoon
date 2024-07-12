@@ -7,52 +7,55 @@ export interface Stats {
 }
 
 export interface StatsState {
-	readonly [playerId: number]: Stats | undefined;
+	readonly [playerId: string]: Stats | undefined;
 }
 
 const initialState: StatsState = {};
 
 export const statsSlice = createProducer(initialState, {
-	loadPlayerData: (state, playerId: number, data: PlayerData) => ({
+	loadPlayerData: (state, playerId: string | number, data: PlayerData) => ({
 		...state,
-		[playerId]: data.stats,
+		[tostring(playerId)]: data.stats,
 	}),
 
-	releasePlayerData: (state, playerId: number) => ({
+	releasePlayerData: (state, playerId: string | number) => ({
 		...state,
-		[playerId]: undefined,
+		[tostring(playerId)]: undefined,
 	}),
 
-	setLives: (state, playerId: number, value: number) => {
-		const stats = state[playerId];
+	setLives: (state, playerId: string | number, value: number) => {
+		const id = tostring(playerId);
+		const stats = state[id];
 
 		return {
 			...state,
-			[playerId]: stats && {
+			[id]: stats && {
 				...stats,
 				lives: value,
 			},
 		};
 	},
 
-	subtractLife: (state, playerId: number) => {
-		const stats = state[playerId];
+	subtractLife: (state, playerId: string) => {
+		const id = tostring(playerId);
+		const stats = state[id];
 
 		return {
 			...state,
-			[playerId]: stats && {
+			[id]: stats && {
 				...stats,
 				lives: math.max(0, stats.lives - 1),
 			},
 		};
 	},
 
-	setDays: (state, playerId: number, value: number) => {
-		const stats = state[playerId];
+	setDays: (state, playerId: string, value: number) => {
+		const id = tostring(playerId);
+		const stats = state[id];
 
 		return {
 			...state,
-			[playerId]: stats && {
+			[id]: stats && {
 				...stats,
 				days: value,
 			},

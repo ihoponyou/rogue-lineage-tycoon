@@ -33,10 +33,12 @@ export class ManaService
 	}
 
 	onTick(dt: number): void {
-		this.sessionData.forEach((value, key) => {
-			value.ChargingMana
-				? this.chargeMana(key, dt)
-				: this.decayMana(key, dt);
+		this.sessionData.forEach((data, player) => {
+			data.ChargingMana
+				? this.chargeMana(player, dt)
+				: this.decayMana(player, dt);
+			store.setManaAmount(player.UserId, data.Mana);
+			EVENTS.changed.fire(player, data.Mana);
 		});
 	}
 
@@ -101,9 +103,6 @@ export class ManaService
 		if (data.Mana === 0) {
 			EVENTS.emptied(player);
 		}
-
-		store.setManaAmount(player.UserId, data.Mana);
-		EVENTS.changed.fire(player, data.Mana);
 	}
 
 	chargeMana(player: Player, deltaTime: number): void {
@@ -111,15 +110,12 @@ export class ManaService
 		if (!data) return;
 		if (data.Mana === 100) return;
 
-		data.Mana = math.clamp(data.Mana + data.ChargeRate * deltaTime, 0, 100);
+		data.Mana = math.min(data.Mana + data.ChargeRate * deltaTime, 100);
 
 		if (data.Mana === 100) {
 			data.ChargingMana = false;
 			EVENTS.filled(player);
 			EVENTS.charge(player, false);
 		}
-
-		store.setManaAmount(player.UserId, data.Mana);
-		EVENTS.changed.fire(player, data.Mana);
 	}
 }

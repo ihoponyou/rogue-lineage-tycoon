@@ -10,35 +10,36 @@ export interface CurrencyData {
 export type Currencies = Record<Currency, CurrencyData>;
 
 export interface CurrenciesState {
-	readonly [playerId: number]: Currencies | undefined;
+	readonly [playerId: string]: Currencies | undefined;
 }
 
 const initialState: CurrenciesState = {};
 
 export const currenciesSlice = createProducer(initialState, {
-	loadPlayerData: (state, playerId: number, data: PlayerData) => ({
+	loadPlayerData: (state, playerId: string | number, data: PlayerData) => ({
 		...state,
-		[playerId]: data.currencies,
+		[tostring(playerId)]: data.currencies,
 	}),
 
-	releasePlayerData: (state, playerId: number) => ({
+	releasePlayerData: (state, playerId: string | number) => ({
 		...state,
-		[playerId]: undefined,
+		[tostring(playerId)]: undefined,
 	}),
 
 	setCurrencyAmount: (
 		state,
-		playerId: number,
+		playerId: string | number,
 		currency: Currency,
 		amount: number,
 	) => {
-		const playerData = state[playerId];
+		const id = tostring(playerId);
+		const playerData = state[id];
 		if (!playerData) return state;
 		const currencyData = playerData[currency];
 
 		return {
 			...state,
-			[playerId]: playerData && {
+			[id]: playerData && {
 				...playerData,
 				[currency]: {
 					...currencyData,
@@ -50,17 +51,18 @@ export const currenciesSlice = createProducer(initialState, {
 
 	setCurrencyMultiplier: (
 		state,
-		playerId: number,
+		playerId: string | number,
 		currency: Currency,
 		multiplier: number,
 	) => {
-		const playerData = state[playerId];
+		const id = tostring(playerId);
+		const playerData = state[id];
 		if (!playerData) return state;
 		const currencyData = playerData[currency];
 
 		return {
 			...state,
-			[playerId]: playerData && {
+			[id]: playerData && {
 				...playerData,
 				[currency]: {
 					...currencyData,
@@ -72,17 +74,18 @@ export const currenciesSlice = createProducer(initialState, {
 
 	addCurrency: (
 		state,
-		playerId: number,
+		playerId: string | number,
 		currency: Currency,
 		amount: number,
 	) => {
-		const playerData = state[playerId];
+		const id = tostring(playerId);
+		const playerData = state[id];
 		if (!playerData) return state;
 		const currencyData = playerData[currency];
 
 		return {
 			...state,
-			[playerId]: playerData && {
+			[id]: playerData && {
 				...playerData,
 				[currency]: {
 					...currencyData,
