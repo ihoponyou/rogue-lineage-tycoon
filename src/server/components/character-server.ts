@@ -8,11 +8,12 @@ import {
 	CharacterAttributes,
 	CharacterInstance,
 } from "shared/components/character";
+import { selectConditions } from "shared/store/slices/players/slices/conditions/selectors";
 import {
-	selectConditions,
 	selectHealth,
 	selectTemperature,
-} from "shared/store/selectors/players";
+} from "shared/store/slices/players/slices/resources/selectors";
+import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
 import { Events } from "../networking";
 import { RagdollServer } from "./ragdoll-server";
 
@@ -115,8 +116,11 @@ export class CharacterServer
 		this.breakJoints();
 
 		const playerId = this.getPlayer().UserId;
-		const state = store.subtractLife(tostring(playerId));
-		const stats = state.players.stats[playerId];
+		store.subtractLife(playerId);
+		const lives = store.getState(selectLives(playerId));
+		if (lives !== undefined && lives <= 0) {
+			print("wipe");
+		}
 
 		EVENTS.killed.fire(this.getPlayer());
 
@@ -130,6 +134,8 @@ export class CharacterServer
 		particleAttachment.Critted.Play();
 		particleAttachment.Sniped.Play();
 		particleAttachment.Crit.Emit(1);
+
+		this.kill();
 	}
 
 	public giveForceField(): void {

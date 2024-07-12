@@ -1,5 +1,5 @@
 import { createProducer } from "@rbxts/reflex";
-import { PlayerData, serializeColor3, SerializedColor3 } from "./player-data";
+import { PlayerData, serializeColor3, SerializedColor3 } from "../player-data";
 
 export type Sex = "Male" | "Female";
 export interface Identity {

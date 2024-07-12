@@ -2,7 +2,7 @@ import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
-import { selectToxicity } from "shared/store/selectors/players";
+import { selectToxicity } from "shared/store/slices/players/slices/resources/selectors";
 
 // updateToxicity(toxicity: number): void {
 // 		if (!this.toxicitySlider) return;

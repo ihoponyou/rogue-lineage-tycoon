@@ -2,7 +2,7 @@ import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
-import { selectHealth } from "shared/store/selectors/players";
+import { selectHealth } from "shared/store/slices/players/slices/resources/selectors";
 
 // updateHealth(health: number, maxHealth: number): void {
 // 		if (!this.healthSlider) return;

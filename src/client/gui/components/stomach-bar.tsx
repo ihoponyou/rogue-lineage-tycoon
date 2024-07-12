@@ -2,7 +2,8 @@ import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
-import { selectRace, selectStomach } from "shared/store/selectors/players";
+import { selectRace } from "shared/store/slices/players/slices/identity/selectors";
+import { selectStomach } from "shared/store/slices/players/slices/resources/selectors";
 
 const WHITE_STOMACH_RACES = [
 	"Gaian",

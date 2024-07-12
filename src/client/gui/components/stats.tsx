@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
 import { getDigit } from "shared/get-digit";
-import { selectStats } from "shared/store/selectors/players";
+import { selectStats } from "shared/store/slices/players/slices/stats/selectors";
 import { Digit } from "./digit";
 import { HealthBar } from "./health-bar";
 import { NamePlate } from "./name-plate";

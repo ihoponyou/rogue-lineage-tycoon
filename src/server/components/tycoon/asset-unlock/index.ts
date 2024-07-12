@@ -4,7 +4,7 @@ import { ASSETS } from "server/configs/tycoon";
 import { store } from "server/store";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Inject } from "shared/inject";
-import { selectCurrency } from "shared/store/selectors/players";
+import { selectCurrency } from "shared/store/slices/players/slices/currencies/selectors";
 import { PlayerServer } from "../../player-server";
 import { Pad } from "../pad";
 

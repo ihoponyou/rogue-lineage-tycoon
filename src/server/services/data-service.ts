@@ -4,14 +4,12 @@ import { Profile } from "@rbxts/profileservice/globals";
 import { RunService } from "@rbxts/services";
 import { store } from "server/store";
 import { onThisPlayerRemoving } from "shared/on-player-removing";
-import {
-	selectCurrencies,
-	selectPlayerData,
-} from "shared/store/selectors/players";
+import { selectPlayerData } from "shared/store/slices/players/selectors";
+import { selectCurrencies } from "shared/store/slices/players/slices/currencies/selectors";
 import {
 	DEFAULT_PLAYER_DATA,
 	PlayerData,
-} from "shared/store/slices/players/player-data";
+} from "shared/store/slices/players/slices/player-data";
 import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 
 const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Production" : "Testing";

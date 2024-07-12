@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
-import { selectCurrency } from "shared/store/selectors/players";
+import { selectCurrency } from "shared/store/slices/players/slices/currencies/selectors";
 
 export function SilverLogo() {
 	const silver = useSelector(selectCurrency(LOCAL_PLAYER.UserId, "Silver"));

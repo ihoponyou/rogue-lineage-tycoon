@@ -7,7 +7,7 @@ import { store } from "server/store";
 import {
 	selectResources,
 	selectTemperature,
-} from "shared/store/selectors/players";
+} from "shared/store/slices/players/slices/resources/selectors";
 import { BaseInjury } from ".";
 import { CharacterServer } from "../character-server";
 

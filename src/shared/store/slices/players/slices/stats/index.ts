@@ -1,5 +1,5 @@
 import { createProducer } from "@rbxts/reflex";
-import { PlayerData } from "./player-data";
+import { PlayerData } from "../player-data";
 
 export interface Stats {
 	readonly lives: number;

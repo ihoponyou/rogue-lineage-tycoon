@@ -3,12 +3,10 @@ import React, { StrictMode } from "@rbxts/react";
 import { ReflexProvider } from "@rbxts/react-reflex";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
 import { SoundService } from "@rbxts/services";
-import { App } from "client/components/gui/app";
 import { LOCAL_PLAYER } from "client/constants";
+import { App } from "client/gui/components/app";
 import { store } from "client/store";
-import { selectCurrencies } from "shared/store/selectors/players";
-
-const MAX_FETCH_RETRIES = 10;
+import { selectCurrencies } from "shared/store/slices/players/slices/currencies/selectors";
 
 @Controller()
 export class GuiController implements OnStart {

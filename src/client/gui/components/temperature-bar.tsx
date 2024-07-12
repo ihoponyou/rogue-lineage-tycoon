@@ -2,7 +2,7 @@ import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
-import { selectTemperature } from "shared/store/selectors/players";
+import { selectTemperature } from "shared/store/slices/players/slices/resources/selectors";
 
 export function TemperatureBar() {
 	const currentTemperature = useSelector(

@@ -1,6 +1,6 @@
 import { createProducer } from "@rbxts/reflex";
 import { Condition } from "shared/configs/conditions";
-import { PlayerData } from "./player-data";
+import { PlayerData } from "../player-data";
 
 export interface ConditionsState {
 	readonly [playerId: string]: Array<Condition> | undefined;

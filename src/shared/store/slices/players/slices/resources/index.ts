@@ -1,5 +1,5 @@
 import { createProducer } from "@rbxts/reflex";
-import { PlayerData } from "./player-data";
+import { PlayerData } from "../player-data";
 
 const BASE_STOMACH_DECAY_RATE = 0.1;
 const BASE_TOXICITY_DECAY_RATE = 0.05;
