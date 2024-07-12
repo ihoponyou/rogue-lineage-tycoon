@@ -10,6 +10,11 @@ export interface StatsState {
 	readonly [playerId: string]: Stats | undefined;
 }
 
+export const DEFAULT_STATS = {
+	lives: 9,
+	days: 123,
+};
+
 const initialState: StatsState = {};
 
 export const statsSlice = createProducer(initialState, {

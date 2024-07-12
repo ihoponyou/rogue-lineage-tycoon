@@ -13,6 +13,25 @@ export interface CurrenciesState {
 	readonly [playerId: string]: Currencies | undefined;
 }
 
+export const DEFAULT_CURRENCY_DATA = {
+	Silver: {
+		amount: 0,
+		multiplier: 1,
+	},
+	Valu: {
+		amount: 0,
+		multiplier: 1,
+	},
+	Insight: {
+		amount: 0,
+		multiplier: 1,
+	},
+	Alignment: {
+		amount: 0,
+		multiplier: 1,
+	},
+};
+
 const initialState: CurrenciesState = {};
 
 export const currenciesSlice = createProducer(initialState, {

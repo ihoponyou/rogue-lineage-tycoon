@@ -10,6 +10,11 @@ export interface ManaState {
 	readonly [playerId: string]: ManaData | undefined;
 }
 
+export const DEFAULT_MANA_DATA = {
+	amount: 0,
+	enabled: false,
+};
+
 export const manaSlice = createProducer({} as ManaState, {
 	loadPlayerData: (state, playerId: string | number, data: PlayerData) => ({
 		...state,

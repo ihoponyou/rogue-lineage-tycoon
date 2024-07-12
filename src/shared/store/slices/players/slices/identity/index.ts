@@ -1,7 +1,9 @@
 import { createProducer } from "@rbxts/reflex";
-import { PlayerData, serializeColor3, SerializedColor3 } from "../player-data";
+import { serializeColor3, SerializedColor3 } from "shared/serialized-color3";
+import { PlayerData } from "../player-data";
 
 export type Sex = "Male" | "Female";
+
 export interface Identity {
 	raceName: string;
 	manaColor: SerializedColor3;
@@ -15,6 +17,20 @@ export interface Identity {
 export interface IdentityState {
 	readonly [playerId: string]: Identity | undefined;
 }
+
+export const DEFAULT_IDENTITY: Identity = {
+	raceName: "",
+	personality: "",
+	phenotypeName: "",
+	sex: "Male",
+	manaColor: {
+		R: -1,
+		G: -1,
+		B: -1,
+	},
+	armorName: "",
+	firstName: "",
+};
 
 export const identitySlice = createProducer({} as IdentityState, {
 	loadPlayerData: (state, playerId: string | number, data: PlayerData) => ({

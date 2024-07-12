@@ -15,6 +15,13 @@ export interface ResourcesState {
 	readonly [playerId: string]: Resources | undefined;
 }
 
+export const DEFAULT_RESOURCES = {
+	health: 100,
+	stomach: 100,
+	toxicity: 0,
+	temperature: 50,
+};
+
 export const resourcesSlice = createProducer({} as ResourcesState, {
 	loadPlayerData: (state, playerId: string | number, data: PlayerData) => ({
 		...state,

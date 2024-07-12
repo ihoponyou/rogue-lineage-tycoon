@@ -1,33 +1,9 @@
 import { Condition } from "shared/configs/conditions";
-import { Currencies } from "./currencies";
-import { Identity } from "./identity";
-import { ManaData } from "./mana";
-import { Resources } from "./resources";
-import { Stats } from "./stats";
-
-export interface SerializedVector {
-	readonly X: number;
-	readonly Y: number;
-	readonly Z: number;
-}
-
-export interface SerializedColor3 {
-	readonly R: number;
-	readonly G: number;
-	readonly B: number;
-}
-
-export function deserializeColor3(serializedColor: SerializedColor3): Color3 {
-	return new Color3(serializedColor.R, serializedColor.G, serializedColor.B);
-}
-
-export function serializeColor3(color: Color3): SerializedColor3 {
-	return {
-		R: color.R,
-		G: color.G,
-		B: color.B,
-	};
-}
+import { Currencies, DEFAULT_CURRENCY_DATA } from "./currencies";
+import { DEFAULT_IDENTITY, Identity } from "./identity";
+import { DEFAULT_MANA_DATA, ManaData } from "./mana";
+import { DEFAULT_RESOURCES, Resources } from "./resources";
+import { DEFAULT_STATS, Stats } from "./stats";
 
 export type PlayerData = {
 	stats: Stats;
@@ -39,52 +15,12 @@ export type PlayerData = {
 };
 
 export const DEFAULT_PLAYER_DATA: PlayerData = {
-	stats: {
-		lives: 9,
-		days: 123,
-	},
-	currencies: {
-		Silver: {
-			amount: 0,
-			multiplier: 1,
-		},
-		Valu: {
-			amount: 0,
-			multiplier: 1,
-		},
-		Insight: {
-			amount: 0,
-			multiplier: 1,
-		},
-		Alignment: {
-			amount: 0,
-			multiplier: 1,
-		},
-	},
-	resources: {
-		health: 100,
-		stomach: 100,
-		toxicity: 0,
-		temperature: 50,
-	},
-	mana: {
-		amount: 0,
-		enabled: false,
-	},
+	stats: DEFAULT_STATS,
+	currencies: DEFAULT_CURRENCY_DATA,
+	resources: DEFAULT_RESOURCES,
+	mana: DEFAULT_MANA_DATA,
 	conditions: [],
-	identity: {
-		raceName: "",
-		personality: "",
-		phenotypeName: "",
-		sex: "Male",
-		manaColor: {
-			R: -1,
-			G: -1,
-			B: -1,
-		},
-		armorName: "",
-		firstName: "",
-	},
+	identity: DEFAULT_IDENTITY,
 	// player
 	// IsBanned: false,
 	// Rebirths: 0,

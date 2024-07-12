@@ -14,9 +14,9 @@ import {
 } from "server/configs/races";
 import { store } from "server/store";
 import { APPEARANCE } from "shared/constants";
+import { deserializeColor3 } from "shared/serialized-color3";
 import { Sex } from "shared/store/slices/players/slices/identity";
 import { selectIdentity } from "shared/store/slices/players/slices/identity/selectors";
-import { deserializeColor3 } from "shared/store/slices/players/slices/player-data";
 import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
 import { DataService } from "./data-service";
 

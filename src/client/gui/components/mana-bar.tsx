@@ -2,9 +2,9 @@ import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
+import { deserializeColor3 } from "shared/serialized-color3";
 import { selectManaAmount } from "shared/store/slices/players/selectors";
 import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
-import { deserializeColor3 } from "shared/store/slices/players/slices/player-data";
 
 // const MANA_TWEEN_INFO = new TweenInfo(
 // 	0.1,
