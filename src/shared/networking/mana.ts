@@ -1,4 +1,4 @@
-export interface ManaServerToClientEvents {
+export interface ManaClientEvents {
 	obtained(): void;
 	emptied(): void;
 	filled(): void;
@@ -8,6 +8,6 @@ export interface ManaServerToClientEvents {
 	charge(bool: boolean): void;
 }
 
-export interface ManaClientToServerEvents {
+export interface ManaServerEvents {
 	charge(bool: boolean): void;
 }

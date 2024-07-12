@@ -1,28 +1,30 @@
-import { Service, OnInit, Dependency } from "@flamework/core";
-import { Players, ReplicatedStorage, Workspace } from "@rbxts/services";
+import { Components } from "@flamework/components";
+import { Dependency, OnStart, Service } from "@flamework/core";
 import { Logger } from "@rbxts/log";
+import Object from "@rbxts/object-utils";
+import { Players, Workspace } from "@rbxts/services";
+import { CharacterServer } from "server/components/character-server";
+import { ARMORS, getRandomStarterArmor } from "server/configs/armors";
+import { getRandomFirstName } from "server/configs/names";
 import {
 	RACES,
 	RaceGlossary,
 	getRandomPhenotype,
 	getRandomRollable,
 } from "server/configs/races";
+import { store } from "server/store";
+import { APPEARANCE } from "shared/constants";
+import { selectIdentity } from "shared/store/selectors/players";
+import { Sex } from "shared/store/slices/players/identity";
+import { deserializeColor3 } from "shared/store/slices/players/player-data";
 import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
 import { DataService } from "./data-service";
-import { getRandomFirstName } from "server/configs/names";
-import { ARMORS, getRandomStarterArmor } from "server/configs/armors";
-import Object from "@rbxts/object-utils";
-import { Components } from "@flamework/components";
-import { CharacterServer } from "server/components/character-server";
-import { Events } from "server/networking";
-import { APPEARANCE } from "shared/constants";
 
-export type Sex = "Male" | "Female";
 const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
 
 @Service()
 export class IdentityService
-	implements OnInit, OnPlayerAdded, OnCharacterAdded
+	implements OnStart, OnPlayerAdded, OnCharacterAdded
 {
 	private playerDescriptions: { [playerId: number]: HumanoidDescription } =
 		{};
@@ -33,7 +35,7 @@ export class IdentityService
 		private dataService: DataService,
 	) {}
 
-	onInit() {
+	onStart() {
 		this.defaultDescription.HatAccessory = "48474313";
 
 		const BLACK = Color3.fromRGB(17, 17, 17);
@@ -63,47 +65,48 @@ export class IdentityService
 		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
 		if (!humanoid) error(`Humanoid not found in ${character.Name}`);
 
-		const profile = this.dataService.getProfile(player);
+		const data = store.getState(selectIdentity(player.UserId));
+		if (!data) error("missing data");
 
-		let raceName = profile.Data.RaceName;
+		let raceName = data.raceName;
 		if (raceName === "") {
 			raceName = getRandomRollable();
-			profile.Data.RaceName = raceName;
+			store.setRace(player.UserId, raceName);
 		}
 		const race = RACES[raceName];
 
 		if (!race.HasCustomHead) {
-			let personality = profile.Data.Personality;
+			let personality = data.personality;
 			if (personality === "") {
 				personality = this.getRandomPersonality(raceName);
-				profile.Data.Personality = personality;
+				store.setPersonality(player.UserId, personality);
 			}
 			this.setFace(character, raceName, personality);
 		} else {
 			this.cleanCharacterFace(character);
 		}
 
-		let phenotypeName = profile.Data.PhenotypeName;
+		let phenotypeName = data.phenotypeName;
 		if (phenotypeName === "") {
 			phenotypeName = getRandomPhenotype(raceName);
-			profile.Data.PhenotypeName = phenotypeName;
+			store.setPhenotype(player.UserId, phenotypeName);
 		}
 		this.setPhenotype(character, raceName, phenotypeName);
 
-		let sex = profile.Data.Sex;
+		let sex = data.sex;
 		if (sex === "") {
 			sex = this.getRandomSex();
-			profile.Data.Sex = sex;
+			store.setSex(player.UserId, sex);
 		}
 		this.setSex(character, sex);
 
-		let firstName = profile.Data.FirstName;
+		let firstName = data.firstName;
 		if (firstName === "") {
 			firstName = getRandomFirstName(raceName, sex);
 		}
 		this.setFirstName(player, firstName);
 
-		let armorName = profile.Data.ArmorName;
+		let armorName = data.armorName;
 		if (armorName === "") {
 			switch (raceName) {
 				case "Gaian":
@@ -116,31 +119,23 @@ export class IdentityService
 				default:
 					armorName = getRandomStarterArmor();
 			}
-			profile.Data.ArmorName = armorName;
+			store.setArmor(player.UserId, armorName);
 		}
 		this.setArmor(character, armorName);
 
-		const serializedColor = profile.Data.ManaColor;
-		let newColor;
-		if (
-			serializedColor.R === 0 &&
-			serializedColor.G === 0 &&
-			serializedColor.B === 0
-		)
-			newColor = this.getRandomManaColor();
-		else
-			newColor = new Color3(
-				serializedColor.R,
-				serializedColor.G,
-				serializedColor.B,
-			);
-		this.setManaColor(player, newColor);
+		const serializedColor = data.manaColor;
+		const newColor =
+			serializedColor.R === -1 &&
+			serializedColor.G === -1 &&
+			serializedColor.B === -1
+				? this.getRandomManaColor()
+				: deserializeColor3(serializedColor);
+		store.setManaColor(player.UserId, newColor);
 
 		while (!character.IsDescendantOf(Workspace))
 			character.AncestryChanged.Wait();
 		humanoid.ApplyDescription(this.playerDescriptions[player.UserId]);
-		// player:SetAttribute("IdentityLoaded", true)
-		// IdentityService.Client.IdentityLoaded:Fire(player)
+
 		const components = Dependency<Components>();
 		components
 			.waitForComponent<CharacterServer>(character)
@@ -298,14 +293,11 @@ export class IdentityService
 	}
 
 	setArmor(character: Model, armorName: string) {
-		const data = this.dataService.getProfile(
-			Players.GetPlayerFromCharacter(character) as Player,
-		).Data;
-		const armor = ARMORS[armorName];
-		let variation = armor.Variations[data.Sex];
-		if (!variation) variation = armor.Variations.Male;
+		const player = Players.GetPlayerFromCharacter(character) as Player;
+		const identity = store.getState(selectIdentity(player.UserId));
+		if (identity === undefined) error("no data");
 
-		const oldArmorName = data.ArmorName;
+		const oldArmorName = identity.armorName;
 		if (oldArmorName !== "") {
 			for (const instance of character.GetChildren()) {
 				if (instance.IsA("Clothing")) instance.Destroy();
@@ -316,22 +308,18 @@ export class IdentityService
 				},
 			);
 		}
+
+		const armor = ARMORS[armorName];
 		Object.entries(armor.StatChanges).forEach((entry) => {
 			// TODO: add new armor's stats
 		});
 
+		const variation =
+			armor.Variations[identity.sex] ?? armor.Variations.Male;
 		variation.Shirt.Clone().Parent = character;
 		variation.Pants.Clone().Parent = character;
 
-		data.ArmorName = armorName;
-	}
-
-	setManaColor(player: Player, color: Color3) {
-		const data = this.dataService.getProfile(player).Data;
-		data.ManaColor.R = color.R;
-		data.ManaColor.G = color.G;
-		data.ManaColor.B = color.B;
-		Events.mana.colorChanged(player, color);
+		store.setArmor(player.UserId, armorName);
 	}
 
 	setFirstName(player: Player, name: string) {
@@ -341,7 +329,7 @@ export class IdentityService
 			if (humanoid) humanoid.DisplayName = name;
 		}
 
-		Events.character.firstNameChanged(player, name);
+		store.setFirstName(player.UserId, name);
 	}
 
 	addCustomHead(

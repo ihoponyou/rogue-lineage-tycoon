@@ -1,10 +1,9 @@
-import { BaseComponent, Component } from "@flamework/components";
+import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { setInterval } from "@rbxts/set-timeout";
-import { CharacterServer } from "../character-server";
 import { Players, TweenService } from "@rbxts/services";
-import { OnRemoved } from "../../../../types/lifecycles";
+import { setInterval } from "@rbxts/set-timeout";
 import { DisposableComponent } from "shared/components/disposable-component";
+import { CharacterServer } from "../character-server";
 
 const HEAT_AMOUNT = 1.5;
 const BURN_DAMAGE = 6;
@@ -14,17 +13,14 @@ const TICKS_TO_DIE = 8;
 @Component({
 	tag: "Burning",
 })
-export class Burning
-	extends DisposableComponent<{}, Model>
-	implements OnStart, OnRemoved
-{
+export class Burning extends DisposableComponent<{}, Model> implements OnStart {
 	private killTicks = 0;
 
 	constructor(private character: CharacterServer) {
 		super();
 	}
 
-	onStart(): void {
+	public onStart(): void {
 		const torso = this.character.getTorso();
 		torso.OrangeFire.Enabled = true;
 		torso.Burning.Play();
@@ -32,12 +28,12 @@ export class Burning
 		this.trove.add(setInterval(() => this.burn(), BURN_INTERVAL));
 	}
 
-	override onRemoved(): void {
-		super.onRemoved();
+	public override destroy(): void {
 		this.extinguish();
+		super.destroy();
 	}
 
-	burn(): void {
+	private burn(): void {
 		if (this.character.attributes.isKnocked) this.killTicks++;
 		else this.killTicks = 0;
 
@@ -60,7 +56,7 @@ export class Burning
 		}
 	}
 
-	extinguish(): void {
+	private extinguish(): void {
 		const torso = this.character.getTorso();
 		if (torso) {
 			torso.OrangeFire.Enabled = false;
@@ -69,7 +65,7 @@ export class Burning
 		}
 	}
 
-	incineratePart(part: BasePart): void {
+	private incineratePart(part: BasePart): void {
 		part.Material = Enum.Material.Slate;
 		TweenService.Create(
 			part,

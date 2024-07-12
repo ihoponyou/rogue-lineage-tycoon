@@ -1,11 +1,15 @@
 import { Component } from "@flamework/components";
-import { BaseInjury } from ".";
-import { IdentityService } from "server/services/identity-service";
-import { CharacterServer } from "../character-server";
-import { DataService } from "server/services/data-service";
 import { OnTick } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import { Workspace } from "@rbxts/services";
+import { IdentityService } from "server/services/identity-service";
+import { store } from "server/store";
+import {
+	selectResources,
+	selectTemperature,
+} from "shared/store/selectors/players";
+import { BaseInjury } from ".";
+import { CharacterServer } from "../character-server";
 
 const UPPER_TEMPERATURE_THRESHOLD = 5;
 const DEATH_MESSAGE_TEMPLATE = "{Character} froze to death innit";
@@ -18,26 +22,25 @@ export class Frostbite extends BaseInjury implements OnTick {
 	readonly name = "Frostbite";
 
 	constructor(
+		character: CharacterServer,
 		private logger: Logger,
 		private identityService: IdentityService,
-		protected character: CharacterServer,
-		protected dataService: DataService,
 	) {
-		super(character, dataService);
+		super(character);
 	}
 
-	onStart(): void {
+	public onStart(): void {
 		this.inflict();
 
-		const data = this.dataService.getProfile(
-			this.character.getPlayer(),
-		).Data;
-		if (data.Temperature === 0) {
-			data.Temperature = 15;
+		const player = this.character.getPlayer();
+		const data = store.getState(selectResources(player.UserId));
+		if (!data) error("no data");
+		if (data.temperature === 0) {
+			store.setTemperature(player.UserId, 15);
 		}
 
 		const skinColor = this.character.instance.GetAttribute("SkinColor");
-		if (!skinColor) return;
+		if (skinColor === undefined) return;
 		const [h, s, v] = (skinColor as Color3).ToHSV();
 		this.identityService.setCharacterSkinColor(
 			this.character.instance,
@@ -45,13 +48,16 @@ export class Frostbite extends BaseInjury implements OnTick {
 		);
 	}
 
-	onTick(dt: number): void {
-		if (this.character.attributes.temperature > UPPER_TEMPERATURE_THRESHOLD)
-			return;
+	public onTick(dt: number): void {
+		if (!this.character.attributes.isAlive) return;
+		const characterTemperature = store.getState(
+			selectTemperature(this.character.getPlayer().UserId),
+		);
+		if (characterTemperature === undefined) return;
+		if (characterTemperature > UPPER_TEMPERATURE_THRESHOLD) return;
 
 		const humanoid = this.character.instance.Humanoid;
 		humanoid.TakeDamage(this.calculateTickDamage(humanoid, dt));
-
 		if (humanoid.Health > 0) return;
 
 		this.character.instance.GetChildren().forEach((value) => {
@@ -66,7 +72,7 @@ export class Frostbite extends BaseInjury implements OnTick {
 	}
 
 	calculateTickDamage(humanoid: Humanoid, deltaTime: number): number {
-		return math.min(humanoid.Health, (humanoid.MaxHealth / 5) * deltaTime);
+		return math.min(humanoid.Health, (humanoid.MaxHealth * deltaTime) / 5);
 	}
 
 	freezePart(part: BasePart): void {

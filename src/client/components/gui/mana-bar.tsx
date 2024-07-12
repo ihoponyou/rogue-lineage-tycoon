@@ -1,7 +1,12 @@
 import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { RootState } from "../../gui/producer";
+import { LOCAL_PLAYER } from "client/constants";
+import {
+	selectManaAmount,
+	selectManaColor,
+} from "shared/store/selectors/players";
+import { deserializeColor3 } from "shared/store/slices/players/player-data";
 
 // const MANA_TWEEN_INFO = new TweenInfo(
 // 	0.1,
@@ -23,10 +28,16 @@ import { RootState } from "../../gui/producer";
 // 	}
 
 export function ManaBar() {
-	const manaAmount = useSelector((state: RootState) => state.mana.amount);
-	const manaColor = useSelector((state: RootState) => state.mana.color);
-	const [percent, setPercent] = useMotor(manaAmount);
+	const serializedManaColor = useSelector(
+		selectManaColor(LOCAL_PLAYER.UserId),
+	);
+	const manaColor =
+		serializedManaColor !== undefined
+			? deserializeColor3(serializedManaColor)
+			: new Color3(1, 1, 1);
 
+	const manaAmount = useSelector(selectManaAmount(LOCAL_PLAYER.UserId)) ?? -1;
+	const [percent, setPercent] = useMotor(manaAmount);
 	useEffect(() => setPercent(new Spring(manaAmount / 100)), [manaAmount]);
 
 	return (

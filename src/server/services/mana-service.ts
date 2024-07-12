@@ -1,8 +1,9 @@
 import { OnStart, OnTick, Service } from "@flamework/core";
+import { Players } from "@rbxts/services";
+import { Events } from "server/networking";
+import { store } from "server/store";
 import { OnCharacterAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 import { DataService } from "./data-service";
-import { Events } from "server/networking";
-import { Players } from "@rbxts/services";
 
 const BASE_MANA_CHARGE_RATE = 100 / 3.5;
 const BASE_MANA_DECAY_RATE = 100 / 2.5;
@@ -32,10 +33,12 @@ export class ManaService
 	}
 
 	onTick(dt: number): void {
-		this.sessionData.forEach((value, key) => {
-			value.ChargingMana
-				? this.chargeMana(key, dt)
-				: this.decayMana(key, dt);
+		this.sessionData.forEach((data, player) => {
+			data.ChargingMana
+				? this.chargeMana(player, dt)
+				: this.decayMana(player, dt);
+			store.setManaAmount(player.UserId, data.Mana);
+			EVENTS.changed.fire(player, data.Mana);
 		});
 	}
 
@@ -58,7 +61,7 @@ export class ManaService
 	}
 
 	onManaObtained(player: Player): void {
-		const race = this.dataService.getProfile(player).Data.RaceName;
+		const race = store.getState().players.identity[player.UserId]?.raceName;
 
 		let boost = 0;
 		if (race === "Azael") boost = 10;
@@ -81,7 +84,7 @@ export class ManaService
 	}
 
 	toggleManaObtained(player: Player, bool: boolean): void {
-		this.dataService.getProfile(player).Data.ManaObtained = bool;
+		store.setManaEnabled(player.UserId, bool);
 		bool ? this.onManaObtained(player) : this.onManaDisabled(player);
 	}
 
@@ -100,8 +103,6 @@ export class ManaService
 		if (data.Mana === 0) {
 			EVENTS.emptied(player);
 		}
-
-		EVENTS.changed.fire(player, data.Mana);
 	}
 
 	chargeMana(player: Player, deltaTime: number): void {
@@ -109,14 +110,12 @@ export class ManaService
 		if (!data) return;
 		if (data.Mana === 100) return;
 
-		data.Mana = math.clamp(data.Mana + data.ChargeRate * deltaTime, 0, 100);
+		data.Mana = math.min(data.Mana + data.ChargeRate * deltaTime, 100);
 
 		if (data.Mana === 100) {
 			data.ChargingMana = false;
 			EVENTS.filled(player);
 			EVENTS.charge(player, false);
 		}
-
-		EVENTS.changed.fire(player, data.Mana);
 	}
 }

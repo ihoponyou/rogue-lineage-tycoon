@@ -1,10 +1,13 @@
 import { Component } from "@flamework/components";
+import { OnTick } from "@flamework/core";
+import { store } from "server/store";
+import { APPEARANCE } from "shared/constants";
+import {
+	selectResources,
+	selectTemperature,
+} from "shared/store/selectors/players";
 import { BaseInjury } from ".";
 import { CharacterServer } from "../character-server";
-import { ReplicatedStorage } from "@rbxts/services";
-import { DataService } from "server/services/data-service";
-import { OnTick } from "@flamework/core";
-import { APPEARANCE } from "shared/constants";
 
 const LOWER_TEMPERATURE_THRESHOLD = 95;
 
@@ -14,22 +17,19 @@ const LOWER_TEMPERATURE_THRESHOLD = 95;
 export class BurnScar extends BaseInjury implements OnTick {
 	readonly name = "BurnScar";
 
-	constructor(
-		protected character: CharacterServer,
-		protected dataService: DataService,
-	) {
-		super(character, dataService);
+	constructor(protected character: CharacterServer) {
+		super(character);
 	}
 
 	onStart(): void {
 		this.inflict();
 
-		const data = this.dataService.getProfile(
-			this.character.getPlayer(),
-		).Data;
+		const player = this.character.getPlayer();
+		const data = store.getState(selectResources(player.UserId));
+		if (!data) error("no data");
 
-		if (data.Temperature === 100) {
-			data.Temperature = 70;
+		if (data.temperature === 100) {
+			store.setTemperature(player.UserId, 70);
 		}
 
 		APPEARANCE.FacialExtras.Scars.BurnScar.Clone().Parent =
@@ -37,8 +37,11 @@ export class BurnScar extends BaseInjury implements OnTick {
 	}
 
 	onTick(dt: number): void {
-		if (this.character.attributes.temperature < LOWER_TEMPERATURE_THRESHOLD)
-			return;
+		const characterTemperature = store.getState(
+			selectTemperature(this.character.getPlayer().UserId),
+		);
+		if (characterTemperature === undefined) return;
+		if (characterTemperature < LOWER_TEMPERATURE_THRESHOLD) return;
 		if (this.instance.HasTag("Burning")) return;
 
 		this.instance.AddTag("Burning");

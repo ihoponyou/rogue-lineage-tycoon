@@ -1,10 +1,10 @@
 import {
 	useProducer,
-	useSelector,
 	UseProducerHook,
+	useSelector,
 	UseSelectorHook,
 } from "@rbxts/react-reflex";
-import { RootProducer } from "../producer";
+import { RootStore } from "client/store";
 
-export const useRootProducer: UseProducerHook<RootProducer> = useProducer;
-export const useRootSelector: UseSelectorHook<RootProducer> = useSelector;
+export const useRootProducer: UseProducerHook<RootStore> = useProducer;
+export const useRootSelector: UseSelectorHook<RootStore> = useSelector;

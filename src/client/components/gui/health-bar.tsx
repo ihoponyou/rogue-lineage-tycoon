@@ -1,7 +1,8 @@
 import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
-import React, { useEffect } from "@rbxts/react";
+import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { RootState } from "client/gui/producer";
+import { LOCAL_PLAYER } from "client/constants";
+import { selectHealth } from "shared/store/selectors/players";
 
 // updateHealth(health: number, maxHealth: number): void {
 // 		if (!this.healthSlider) return;
@@ -18,18 +19,16 @@ import { RootState } from "client/gui/producer";
 
 // TODO: make an abstract bar component; current amount, max amount, color, percent
 
+const DEFAULT_HEALTH_COLOR = Color3.fromRGB(206, 61, 48);
+
 export function HealthBar() {
-	const healthAmount = useSelector((state: RootState) => state.health.amount);
-	const maxHealthAmount = useSelector((state: RootState) => state.health.max);
-	const healthColor = useSelector((state: RootState) => state.health.color);
+	const healthAmount = useSelector(selectHealth(LOCAL_PLAYER.UserId)) ?? -1;
+	const [healthColor, setHealthColor] = useState(DEFAULT_HEALTH_COLOR);
 
 	const [percent, setPercent] = useMotor(healthAmount);
 	useEffect(
-		() =>
-			setPercent(
-				new Spring(healthAmount / maxHealthAmount, { frequency: 2 }),
-			),
-		[healthAmount, maxHealthAmount],
+		() => setPercent(new Spring(healthAmount / 100, { frequency: 2 })),
+		[healthAmount],
 	);
 
 	return (

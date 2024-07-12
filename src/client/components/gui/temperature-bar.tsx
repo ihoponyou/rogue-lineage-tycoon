@@ -1,33 +1,17 @@
 import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { RootState } from "client/gui/producer";
-
-// updateTemperature(temperature: number): void {
-// 		if (!this.temperatureSlider) return;
-
-// 		const percentTemperature = math.clamp(
-// 			temperature / MAX_TEMPERATURE,
-// 			0,
-// 			1,
-// 		);
-// 		this.temperatureSlider.TweenPosition(
-// 			UDim2.fromScale(percentTemperature, 0),
-// 			Enum.EasingDirection.Out,
-// 			Enum.EasingStyle.Quad,
-// 			0.2,
-// 			true,
-// 		);
-// 	}
+import { LOCAL_PLAYER } from "client/constants";
+import { selectTemperature } from "shared/store/selectors/players";
 
 export function TemperatureBar() {
 	const currentTemperature = useSelector(
-		(state: RootState) => state.temperature.value,
+		selectTemperature(LOCAL_PLAYER.UserId),
 	);
 
-	const [percent, setPercent] = useMotor(currentTemperature);
+	const [percent, setPercent] = useMotor((currentTemperature ?? -100) / 100);
 	useEffect(
-		() => setPercent(new Spring(currentTemperature / 100)),
+		() => setPercent(new Spring((currentTemperature ?? -100) / 100)),
 		[currentTemperature],
 	);
 

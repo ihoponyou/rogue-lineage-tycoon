@@ -1,7 +1,7 @@
 import { Component } from "@flamework/components";
-import { DisposableComponent } from "./disposable-component";
-import { Players } from "@rbxts/services";
 import { OnStart } from "@flamework/core";
+import { Players } from "@rbxts/services";
+import { DisposableComponent } from "./disposable-component";
 import { RagdollAttributes } from "./ragdoll";
 
 export interface CharacterInstance extends StarterCharacter {
@@ -11,11 +11,6 @@ export interface CharacterInstance extends StarterCharacter {
 export interface CharacterAttributes extends RagdollAttributes {
 	isKnocked: boolean;
 	isAlive: boolean;
-	temperature: number;
-	stomach: number;
-	toxicity: number;
-	armor: string;
-	manaColor: Color3;
 }
 
 @Component()

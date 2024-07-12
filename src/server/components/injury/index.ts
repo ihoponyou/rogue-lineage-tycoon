@@ -1,40 +1,30 @@
 import { BaseComponent, Component } from "@flamework/components";
-import { CharacterServer } from "../character-server";
 import { OnStart } from "@flamework/core";
-import { DataService } from "server/services/data-service";
+import { store } from "server/store";
+import { Condition } from "shared/configs/conditions";
+import { CharacterServer } from "../character-server";
 
 @Component()
 export abstract class BaseInjury
 	extends BaseComponent<{}, Model>
 	implements OnStart
 {
-	abstract readonly name: string;
+	abstract readonly name: Condition;
 
-	constructor(
-		protected character: CharacterServer,
-		protected dataService: DataService,
-	) {
+	constructor(protected character: CharacterServer) {
 		super();
 	}
 
 	abstract onStart(): void;
 
 	inflict(): void {
-		const data = this.dataService.getProfile(
-			this.character.getPlayer(),
-		).Data;
-		if (data.Conditions.includes(this.name)) return;
-		data.Conditions.push(this.name);
+		store.addCondition(this.character.getPlayer().UserId, this.name);
 
 		this.playInjuryEffects();
 	}
 
 	heal(): void {
-		const data = this.dataService.getProfile(
-			this.character.getPlayer(),
-		).Data;
-		const conditions = data.Conditions;
-		conditions.remove(conditions.findIndex((value) => value === this.name));
+		store.removeCondition(this.character.getPlayer().UserId, this.name);
 
 		this.instance.RemoveTag(this.name);
 	}

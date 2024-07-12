@@ -1,19 +1,20 @@
-import { BaseComponent, Component } from "@flamework/components";
-import { OnStart, OnTick } from "@flamework/core";
+import { Component } from "@flamework/components";
+import { OnTick } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
-import {
-	DataService,
-	PlayerProfile,
-} from "server/services/data-service";
-import { RagdollServer } from "./ragdoll-server";
-import { OnRemoved } from "../../../types/lifecycles";
+import { store } from "server/store";
 import {
 	Character,
 	CharacterAttributes,
 	CharacterInstance,
 } from "shared/components/character";
+import {
+	selectConditions,
+	selectHealth,
+	selectTemperature,
+} from "shared/store/selectors/players";
 import { Events } from "../networking";
+import { RagdollServer } from "./ragdoll-server";
 
 const FF_DURATION = 15;
 const PROTECTED_DISTANCE = 5;
@@ -22,10 +23,6 @@ const MINIMUM_TEMPERATURE = 0;
 const MAXIMUM_TEMPERATURE = 100;
 const KNOCK_PERCENT_THRESHOLD = 0.15;
 
-// all rates are per second
-const BASE_STOMACH_DECAY_RATE = 0.1;
-const BASE_TOXICITY_DECAY_RATE = 0.05;
-
 const EVENTS = Events.character;
 
 @Component({
@@ -33,49 +30,40 @@ const EVENTS = Events.character;
 	defaults: {
 		isKnocked: false,
 		isAlive: true,
-		temperature: 50,
-		stomach: 100,
-		toxicity: 0,
-		armor: "",
-		manaColor: new Color3(1, 1, 1),
 	},
 })
 export class CharacterServer
 	extends Character<CharacterAttributes, CharacterInstance>
-	implements OnTick, OnRemoved
+	implements OnTick
 {
-	private stats = {
-		stomachDecayRate: BASE_STOMACH_DECAY_RATE,
-		toxicityDecayRate: BASE_TOXICITY_DECAY_RATE,
-	};
-	private profile: PlayerProfile;
-
-	constructor(
-		private dataService: DataService,
-		private ragdoll: RagdollServer,
-	) {
+	constructor(private ragdoll: RagdollServer) {
 		super();
-		this.profile = this.dataService.getProfile(this.getPlayer());
 	}
 
-	override onStart(): void {
+	public override onStart(): void {
 		super.onStart();
-		let savedHealth = this.profile.Data.Health;
+
+		const playerId = this.getPlayer().UserId;
+
+		let savedHealth = store.getState(selectHealth(playerId));
+		if (savedHealth === undefined) error("health not found");
 		if (savedHealth < 1) savedHealth = 100;
 		this.instance.Humanoid.Health = savedHealth;
 
-		for (const condition of this.profile.Data.Conditions) {
+		const conditions = store.getState(selectConditions(playerId));
+		if (conditions === undefined) error("conditions not found");
+		for (const condition of conditions) {
 			this.instance.AddTag(condition);
 		}
 
 		this.instance.AddTag("FallDamage");
 	}
 
-	onTick(dt: number): void {
+	public onTick(dt: number): void {
 		if (!this.attributes.isAlive) return;
 
-		this.decayStomach(dt);
-		this.decayToxicity(dt);
+		store.decayStomach(this.getPlayer().UserId, dt);
+		store.decayToxicity(this.getPlayer().UserId, dt);
 
 		const humanoid = this.instance.Humanoid;
 		if (humanoid.Health >= humanoid.MaxHealth) return;
@@ -85,15 +73,12 @@ export class CharacterServer
 		humanoid.TakeDamage(dt * -regenRate);
 	}
 
-	onRemoved(): void {
-		this.trove.destroy();
-	}
-
-	override onHealthChanged(health: number): void {
+	public override onHealthChanged(health: number): void {
+		store.setHealth(this.getPlayer().UserId, health);
 		const percentHealth = health / this.instance.Humanoid.MaxHealth;
 		if (this.attributes.isKnocked) {
 			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
-				if (this.instance.GetAttribute("isCarried")) return;
+				if (this.instance.GetAttribute("isCarried") === true) return;
 				this.attributes.isKnocked = false;
 				this.ragdoll.toggle(false);
 			}
@@ -105,13 +90,13 @@ export class CharacterServer
 		this.knock();
 	}
 
-	knock(): void {
+	public knock(): void {
 		if (this.attributes.isKnocked) return;
 		this.attributes.isKnocked = true;
 		this.ragdoll.toggle(true);
 	}
 
-	breakJoints(): void {
+	public breakJoints(): void {
 		this.instance.GetDescendants().forEach((value) => {
 			if (
 				value.IsA("BallSocketConstraint") ||
@@ -122,27 +107,23 @@ export class CharacterServer
 		});
 	}
 
-	kill(): void {
+	public kill(): void {
 		if (!this.attributes.isAlive) return;
 		this.attributes.isAlive = false;
 
 		this.instance.Humanoid.Health = 0;
 		this.breakJoints();
 
-		const profile = this.dataService.getProfile(this.getPlayer());
-		profile.Data.Lives -= 1;
-		if (profile.Data.Lives > 0) {
-			this.dataService.resetLifeValues(profile.Data);
-		} else {
-			this.dataService.resetCharacterValues(profile.Data);
-		}
+		const playerId = this.getPlayer().UserId;
+		const state = store.subtractLife(tostring(playerId));
+		const stats = state.players.stats[playerId];
 
 		EVENTS.killed.fire(this.getPlayer());
 
 		task.delay(Players.RespawnTime, () => this.getPlayer().LoadCharacter());
 	}
 
-	snipe(): void {
+	public snipe(): void {
 		const particleAttachment = this.getHead().ParticleAttachment;
 		if (!particleAttachment) return;
 
@@ -151,7 +132,7 @@ export class CharacterServer
 		particleAttachment.Crit.Emit(1);
 	}
 
-	giveForceField(): void {
+	public giveForceField(): void {
 		const ffTrove = this.trove.extend();
 		const startPos = (this.instance as StarterCharacter).HumanoidRootPart
 			.Position;
@@ -173,39 +154,21 @@ export class CharacterServer
 		);
 	}
 
-	adjustTemperature(amount: number) {
-		const profile = this.dataService.getProfile(this.getPlayer());
+	public adjustTemperature(amount: number) {
+		const player = this.getPlayer();
+		const temperature = store.getState(selectTemperature(player.UserId));
+		if (temperature === undefined) error("no data");
+
 		const newTemperature = math.clamp(
-			profile.Data.Temperature + amount,
+			temperature + amount,
 			MINIMUM_TEMPERATURE,
 			MAXIMUM_TEMPERATURE,
 		);
-		profile.Data.Temperature = newTemperature;
-		this.attributes.temperature = newTemperature;
+		store.setTemperature(tostring(player.UserId), newTemperature);
 
 		if (newTemperature === MINIMUM_TEMPERATURE)
 			this.instance.AddTag("Frostbite");
 		else if (newTemperature === MAXIMUM_TEMPERATURE)
 			this.instance.AddTag("BurnScar");
-	}
-
-	decayStomach(deltaTime: number): void {
-		const data = this.profile.Data;
-		if (data.Stomach <= 0) return;
-		data.Stomach -= math.min(
-			data.Stomach,
-			deltaTime * this.stats.stomachDecayRate,
-		);
-		this.attributes.stomach = data.Stomach;
-	}
-
-	decayToxicity(deltaTime: number): void {
-		const data = this.profile.Data;
-		if (data.Toxicity <= 0) return;
-		data.Toxicity -= math.min(
-			data.Toxicity,
-			deltaTime * this.stats.toxicityDecayRate,
-		);
-		this.attributes.toxicity = data.Toxicity;
 	}
 }

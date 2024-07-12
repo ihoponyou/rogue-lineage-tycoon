@@ -1,7 +1,8 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { selectDays, selectLives } from "client/gui/producer";
+import { LOCAL_PLAYER } from "client/constants";
 import { getDigit } from "shared/get-digit";
+import { selectStats } from "shared/store/selectors/players";
 import { Digit } from "./digit";
 import { HealthBar } from "./health-bar";
 import { NamePlate } from "./name-plate";
@@ -10,8 +11,7 @@ import { TemperatureBar } from "./temperature-bar";
 import { ToxicityBar } from "./toxicity-bar";
 
 export function Stats() {
-	const days = useSelector(selectDays);
-	const lives = useSelector(selectLives);
+	const stats = useSelector(selectStats(LOCAL_PLAYER.UserId));
 
 	return (
 		<frame
@@ -88,22 +88,22 @@ export function Stats() {
 					/>
 					<Digit
 						key="Lives"
-						value={lives}
+						value={stats?.lives ?? -1}
 						position={new UDim2(0, 10, 0, 0)}
 					/>
 					<Digit
 						key="DayHundreds"
-						value={getDigit(days, 3)}
+						value={getDigit(stats?.days ?? 0, 3)}
 						position={new UDim2(0, 29, 0, 0)}
 					/>
 					<Digit
 						key="DayTens"
-						value={getDigit(days, 2)}
+						value={getDigit(stats?.days ?? 0, 2)}
 						position={new UDim2(0, 42, 0, 0)}
 					/>
 					<Digit
 						key="DayOnes"
-						value={getDigit(days, 1)}
+						value={getDigit(stats?.days ?? 0, 1)}
 						position={new UDim2(0, 55, 0, 0)}
 					/>
 				</imagelabel>
