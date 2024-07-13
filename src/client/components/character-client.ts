@@ -11,7 +11,12 @@ import { CharacterStateMachine } from "./character-state-machine";
 
 const events = Events.character;
 
-@Component()
+@Component({
+	defaults: {
+		isKnocked: false,
+		isAlive: true,
+	},
+})
 export class CharacterClient extends Character<
 	CharacterAttributes,
 	CharacterInstance
