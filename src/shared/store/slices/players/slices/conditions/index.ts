@@ -17,6 +17,13 @@ export const conditionsSlice = createProducer({} as ConditionsState, {
 		[tostring(playerId)]: undefined,
 	}),
 
+	resetLifeValues: (state, playerId: string | number) => {
+		return {
+			...state,
+			[tostring(playerId)]: [],
+		};
+	},
+
 	addCondition: (state, playerId: string | number, condition: Condition) => {
 		const id = tostring(playerId);
 		const conditions = state[id];

@@ -2,6 +2,7 @@ import { Component } from "@flamework/components";
 import { OnTick } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
+import { DataService } from "server/services/data-service";
 import { store } from "server/store";
 import {
 	Character,
@@ -37,7 +38,10 @@ export class CharacterServer
 	extends Character<CharacterAttributes, CharacterInstance>
 	implements OnTick
 {
-	constructor(private ragdoll: RagdollServer) {
+	constructor(
+		private ragdoll: RagdollServer,
+		private dataService: DataService,
+	) {
 		super();
 	}
 
@@ -115,16 +119,35 @@ export class CharacterServer
 		this.instance.Humanoid.Health = 0;
 		this.breakJoints();
 
-		const playerId = this.getPlayer().UserId;
+		const player = this.getPlayer();
+		const playerId = player.UserId;
+
 		store.subtractLife(playerId);
 		const lives = store.getState(selectLives(playerId));
 		if (lives !== undefined && lives <= 0) {
 			print("wipe");
 		}
 
-		EVENTS.killed.fire(this.getPlayer());
+		EVENTS.killed.fire(player);
 
-		task.delay(Players.RespawnTime, () => this.getPlayer().LoadCharacter());
+		const onLeave = this.dataService.connectToPreRelease(
+			player,
+			(profile) => this.dataService.resetLifeValues(player),
+		);
+
+		// delayed to prevent player from seeing resources refill while still dead
+		// TODO: consider doing this in less ridiculous way?
+		task.delay(Players.RespawnTime, () => {
+			try {
+				store.resetLifeValues(playerId);
+				// errors if player has left
+				player.LoadCharacter();
+			} catch (e) {
+				warn(e);
+			} finally {
+				onLeave();
+			}
+		});
 	}
 
 	public snipe(): void {

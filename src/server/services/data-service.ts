@@ -10,6 +10,7 @@ import {
 	DEFAULT_PLAYER_DATA,
 	PlayerData,
 } from "shared/store/slices/players/slices/player-data";
+import { DEFAULT_RESOURCES } from "shared/store/slices/players/slices/resources";
 import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 
 const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Production" : "Testing";
@@ -18,6 +19,10 @@ const PROFILE_KEY_TEMPLATE = "Player%d";
 @Service()
 export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 	private profiles = new Map<number, Profile<PlayerData>>();
+	private preReleaseListeners = new Map<
+		Player,
+		Array<(profile: Profile<PlayerData>) => void>
+	>();
 	private profileStore = GetProfileStore(
 		PROFILE_STORE_INDEX,
 		DEFAULT_PLAYER_DATA,
@@ -32,7 +37,31 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 	public onPlayerRemoving(player: Player): void {
 		const profile = this.profiles.get(player.UserId);
 		if (!profile) return;
+		const listeners = this.preReleaseListeners.get(player);
+		if (listeners !== undefined && listeners.size() > 0) {
+			for (const listener of listeners) {
+				listener(profile);
+			}
+		}
 		profile.Release();
+	}
+
+	/**
+	 * @throws if no listener array is found
+	 * @return A function that removes the callback from the player's listeners
+	 */
+	public connectToPreRelease(
+		player: Player,
+		callback: (profile: Profile<PlayerData>) => void,
+	): () => void {
+		const listeners = this.preReleaseListeners.get(player);
+		if (listeners === undefined)
+			error(`no listener arr found for ${player}`);
+		listeners.push(callback);
+		return () =>
+			listeners.remove(
+				listeners.findIndex((value) => value === callback),
+			);
 	}
 
 	public getProfile(player: Player): Profile<PlayerData> {
@@ -44,7 +73,7 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 	private setupProfile(player: Player): void {
 		const key = PROFILE_KEY_TEMPLATE.format(player.UserId);
 
-		this.profileStore.WipeProfileAsync(key);
+		// this.profileStore.WipeProfileAsync(key);
 
 		const profile = this.profileStore.LoadProfileAsync(key);
 		if (!profile) {
@@ -57,21 +86,32 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 
 		const onRelease = profile.ListenToRelease(() => {
 			this.profiles.delete(player.UserId);
+			this.preReleaseListeners.delete(player);
 			player.Kick("get released");
 			onRelease.Disconnect();
 		});
 
 		this.profiles.set(player.UserId, profile);
 		store.loadPlayerData(player.UserId, profile.Data);
-		this.joinTicks.set(player, math.round(tick()));
 		this.giveLeaderStatsFolder(player);
 
-		onThisPlayerRemoving(
-			player,
-			store.subscribe(selectPlayerData(player.UserId), (data) => {
+		this.joinTicks.set(player, math.round(tick()));
+		this.preReleaseListeners.set(player, []);
+
+		const unsubscribe = store.subscribe(
+			selectPlayerData(player.UserId),
+			(data) => {
 				if (data) profile.Data = data;
-			}),
+			},
 		);
+
+		onThisPlayerRemoving(player, unsubscribe);
+	}
+
+	public resetLifeValues(player: Player): void {
+		const profile = this.getProfile(player);
+		profile.Data.conditions = [];
+		profile.Data.resources = DEFAULT_RESOURCES;
 	}
 
 	private giveLeaderStatsFolder(player: Player) {

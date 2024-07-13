@@ -33,6 +33,13 @@ export const resourcesSlice = createProducer({} as ResourcesState, {
 		[tostring(playerId)]: undefined,
 	}),
 
+	resetLifeValues: (state, playerId: string | number) => {
+		return {
+			...state,
+			[tostring(playerId)]: DEFAULT_RESOURCES,
+		};
+	},
+
 	setHealth: (state, playerId: string | number, value: number) => {
 		const id = tostring(playerId);
 		const resources = state[id];
