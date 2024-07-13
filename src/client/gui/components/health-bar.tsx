@@ -25,9 +25,9 @@ export function HealthBar() {
 	const healthAmount = useSelector(selectHealth(LOCAL_PLAYER.UserId)) ?? -1;
 	const [healthColor, setHealthColor] = useState(DEFAULT_HEALTH_COLOR);
 
-	const [percent, setPercent] = useMotor(healthAmount);
+	const [percent, setPercent] = useMotor(healthAmount / 100);
 	useEffect(
-		() => setPercent(new Spring(healthAmount / 100, { frequency: 2 })),
+		() => setPercent(new Spring(percent.getValue(), { frequency: 2 })),
 		[healthAmount],
 	);
 
