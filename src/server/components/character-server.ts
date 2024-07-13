@@ -1,6 +1,5 @@
 import { Component } from "@flamework/components";
 import { OnTick } from "@flamework/core";
-import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { DataService } from "server/services/data-service";
 import { store } from "server/store";
@@ -8,7 +7,7 @@ import {
 	Character,
 	CharacterAttributes,
 	CharacterInstance,
-} from "shared/components/character";
+} from "shared/components/abstract-character";
 import { selectConditions } from "shared/store/slices/players/slices/conditions/selectors";
 import {
 	selectHealth,
@@ -129,25 +128,6 @@ export class CharacterServer
 		}
 
 		EVENTS.killed.fire(player);
-
-		const onLeave = this.dataService.connectToPreRelease(
-			player,
-			(profile) => this.dataService.resetLifeValues(player),
-		);
-
-		// delayed to prevent player from seeing resources refill while still dead
-		// TODO: consider doing this in less ridiculous way?
-		task.delay(Players.RespawnTime, () => {
-			try {
-				store.resetLifeValues(playerId);
-				// errors if player has left
-				player.LoadCharacter();
-			} catch (e) {
-				warn(e);
-			} finally {
-				onLeave();
-			}
-		});
 	}
 
 	public snipe(): void {

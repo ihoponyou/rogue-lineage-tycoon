@@ -4,7 +4,7 @@ import {
 	Character,
 	CharacterAttributes,
 	CharacterInstance,
-} from "shared/components/character";
+} from "shared/components/abstract-character";
 import { Inject } from "shared/inject";
 import { Events } from "../networking";
 import { CharacterStateMachine } from "./character-state-machine";

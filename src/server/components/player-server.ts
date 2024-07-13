@@ -1,36 +1,17 @@
-import { Component } from "@flamework/components";
-import { OnStart } from "@flamework/core";
+import { Component, Components } from "@flamework/components";
 import { ASSETS } from "server/configs/tycoon";
-import { store } from "server/store";
-import { AbstractPlayer } from "shared/components/player";
-import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
+import { AbstractPlayer } from "shared/components/abstract-player";
+import { Inject } from "shared/inject";
+import { CharacterServer } from "./character-server";
 
 @Component({
 	tag: "Player",
-	defaults: {
-		lives: 0,
-		days: 0,
-	},
 })
-export class PlayerServer extends AbstractPlayer implements OnStart {
+export class PlayerServer extends AbstractPlayer {
 	private assets = new Array<string>();
 
-	public onStart(): void {
-		this.trove.add(
-			store.subscribe(
-				selectLives(this.instance.UserId),
-				(lives, previousLives) => {
-					if (lives === undefined || previousLives === undefined)
-						return;
-					this.onLivesChanged(lives, previousLives);
-				},
-			),
-		);
-	}
-
-	private onLivesChanged(lives: number, previousLives: number): void {
-		// print(lives);
-	}
+	@Inject
+	private components!: Components;
 
 	public hasAsset(assetName: string): boolean {
 		// print(`looking for ${assetName} in`, this.assets);
@@ -47,5 +28,19 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 	public addAsset(assetName: string) {
 		if (!ASSETS[assetName]) error(`asset "${assetName}" does not exist`);
 		this.assets.push(assetName);
+	}
+
+	public async loadCharacter(): Promise<CharacterServer> {
+		return new Promise((resolve, reject, onCancel) => {
+			this.instance.LoadCharacter();
+			while (this.instance.Character === undefined)
+				this.instance.CharacterAdded.Wait();
+			this.components
+				.waitForComponent<CharacterServer>(this.instance.Character)
+				.andThen(
+					(component) => resolve(component),
+					(reason) => reject(reason),
+				);
+		});
 	}
 }

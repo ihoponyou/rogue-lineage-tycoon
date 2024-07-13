@@ -1,7 +1,7 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 
-import { AbstractPlayer } from "shared/components/player";
+import { AbstractPlayer } from "shared/components/abstract-player";
 
 @Component({
 	tag: "Player",
