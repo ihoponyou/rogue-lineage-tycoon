@@ -1,8 +1,8 @@
 import { Service } from "@flamework/core";
-import { OnPlayerAdded } from "../../../types/lifecycles";
-import { GROUP_ID, MINIMUM_JOIN_RANK } from "server/configs/group";
-import { Events } from "server/networking";
 import { RunService } from "@rbxts/services";
+import { Events } from "server/networking";
+import { GROUP_ID, MINIMUM_JOIN_RANK } from "shared/configs/group";
+import { OnPlayerAdded } from "../../../types/lifecycles";
 
 @Service()
 export class GroupService implements OnPlayerAdded {
