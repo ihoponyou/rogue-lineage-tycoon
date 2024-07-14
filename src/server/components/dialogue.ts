@@ -15,9 +15,11 @@ export class Dialogue extends DisposableComponent implements OnStart {
 	public onStart(): void {
 		this.clickable.enable();
 		this.clickable.onInteracted((player) => {
-			Events.openDialogue(player, "Hello... world?");
+			Events.dialogue.open(player, "Hello... world?");
 			task.wait(3);
-			Events.openDialogue(player, "Aye, want some meat?");
+			Events.dialogue.open(player, "Aye, want some meat?");
+			task.wait(3);
+			Events.dialogue.close(player);
 		});
 	}
 }

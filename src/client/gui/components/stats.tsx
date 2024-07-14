@@ -3,12 +3,12 @@ import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
 import { getDigit } from "shared/get-digit";
 import { selectStats } from "shared/store/slices/players/slices/stats/selectors";
+import { HealthBar } from "./bar/health-bar";
+import { StomachBar } from "./bar/stomach-bar";
+import { TemperatureBar } from "./bar/temperature-bar";
+import { ToxicityBar } from "./bar/toxicity-bar";
 import { Digit } from "./digit";
-import { HealthBar } from "./health-bar";
 import { NamePlate } from "./name-plate";
-import { StomachBar } from "./stomach-bar";
-import { TemperatureBar } from "./temperature-bar";
-import { ToxicityBar } from "./toxicity-bar";
 
 export function Stats() {
 	const stats = useSelector(selectStats(LOCAL_PLAYER.UserId));

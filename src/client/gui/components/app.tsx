@@ -2,9 +2,9 @@ import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
 import { selectManaEnabled } from "shared/store/slices/players/selectors";
+import { ManaBar } from "./bar/mana-bar";
 import { Dialogue } from "./dialogue";
 import { Layer } from "./layer";
-import { ManaBar } from "./mana-bar";
 import { SilverLogo } from "./silver-logo";
 import { Stats } from "./stats";
 

@@ -1,75 +1,35 @@
-import React, { useEffect, useRef, useState } from "@rbxts/react";
+import React, { useEffect, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { TextService, TweenService } from "@rbxts/services";
 import { selectDialogue } from "client/store/slices/gui/selectors";
+import { CharLabel } from "./char-label";
 
-const MAGIC_VECTOR = new Vector2(100, 100);
-
-interface CharData {
-	char: string;
-	size: Vector2;
-	font: Enum.Font;
-}
-
-interface CharLabelProps {
-	char: string;
-	font: Enum.Font;
-	positionX: number;
-	positionY: number;
-	size: Vector2;
-	parent: Frame;
-}
-
-export function CharLabel(props: CharLabelProps): TextLabel {
-	const label = new Instance("TextLabel");
-	label.Text = props.char;
-	label.Font = Enum.Font.SourceSans;
-	label.BackgroundTransparency = 1;
-	label.TextTransparency = 0.6;
-	label.ZIndex = 8;
-	label.Visible = false;
-	label.Position = UDim2.fromOffset(props.positionX, props.positionY);
-	label.Size = UDim2.fromOffset(props.size.X, props.size.Y + 8);
-	label.TextColor3 = new Color3(1, 1, 1);
-	label.TextXAlignment = Enum.TextXAlignment.Left;
-	label.Parent = props.parent;
-
-	return label;
-}
+const FRAME_SIZE = new Vector2(100, 100);
 
 function containsWhitespace(str: string): boolean {
 	return string.match(str, "%s")[0] !== undefined;
 }
 
 export function Dialogue() {
-	const [currentText, setCurrentText] = useState("");
 	const text = useSelector(selectDialogue);
 
-	const labelContainer = useRef<Frame>();
+	const characterContainer = useRef<Frame>();
 	useEffect(() => {
 		if (text === undefined) return;
 
-		setCurrentText(text);
 		let lastWait = 0.1;
 		let [positionX, positionY] = [0, 0];
-		const labels = new Array<TextLabel>();
-		let lastChar = "";
 
 		const textLength = text.size();
 
-		labelContainer.current?.ClearAllChildren();
+		characterContainer.current?.ClearAllChildren();
 
 		for (let i = 1; i <= textLength; i++) {
 			let waitTime = 0;
 
 			const char = text.sub(i, i);
 			const font = Enum.Font.SourceSans;
-			const size = TextService.GetTextSize(
-				char,
-				20,
-				font,
-				new Vector2(100, 100),
-			);
+			const size = TextService.GetTextSize(char, 20, font, FRAME_SIZE);
 			const currentCharIsWhitespace = containsWhitespace(char);
 
 			if (positionX + size.X > 450) {
@@ -85,9 +45,8 @@ export function Dialogue() {
 					positionX: positionX,
 					positionY: positionY,
 					size: size,
-					parent: labelContainer.current!,
+					parent: characterContainer.current!,
 				});
-				labels.push(label);
 
 				task.delay(lastWait, () => {
 					label.Visible = true;
@@ -126,7 +85,6 @@ export function Dialogue() {
 				}
 			}
 
-			lastChar = char;
 			lastWait = waitTime;
 			task.wait(waitTime);
 		}
@@ -190,7 +148,7 @@ export function Dialogue() {
 				/>
 			</textlabel>
 			<frame
-				key="Choices"
+				key="Options"
 				BackgroundTransparency={1}
 				Position={new UDim2(0, 0, 1, -5)}
 				Size={new UDim2(1, 0, 0, 40)}
@@ -228,8 +186,8 @@ export function Dialogue() {
 				ZIndex={8}
 			/>
 			<frame
-				key="LabelContainer"
-				ref={labelContainer}
+				key="Characters"
+				ref={characterContainer}
 				AnchorPoint={new Vector2(0.5, 0.5)}
 				BackgroundTransparency={1}
 				Position={new UDim2(0.5, 0, 0.5, 0)}
