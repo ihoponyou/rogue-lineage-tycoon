@@ -5,6 +5,7 @@ import { createPortal, createRoot } from "@rbxts/react-roblox";
 import { SoundService } from "@rbxts/services";
 import { LOCAL_PLAYER } from "client/constants";
 import { App } from "client/gui/components/app";
+import { Events } from "client/networking";
 import { store } from "client/store";
 import { selectCurrencies } from "shared/store/slices/players/slices/currencies/selectors";
 
@@ -21,6 +22,8 @@ export class GuiController implements OnStart {
 					SoundService.PlayLocalSound(SoundService.SilverChange);
 			},
 		);
+
+		Events.openDialogue.connect((text) => store.setDialogue(text));
 
 		this.root.render(
 			<StrictMode>

@@ -1,7 +1,7 @@
 import { Networking } from "@flamework/networking";
-import { ManaServerEvents, ManaClientEvents } from "./mana";
-import { CurrencyServerFunctions, CurrencyClientEvents } from "./currency";
 import { CharacterClientEvents } from "./character";
+import { CurrencyClientEvents, CurrencyServerFunctions } from "./currency";
+import { ManaClientEvents, ManaServerEvents } from "./mana";
 import { ReflexClientEvents, ReflexServerEvents } from "./reflex";
 
 interface ServerEvents {
@@ -12,6 +12,7 @@ interface ServerEvents {
 
 interface ClientEvents {
 	kicked(): void;
+	openDialogue(text: string): void;
 	mana: ManaClientEvents;
 	character: CharacterClientEvents;
 	currency: CurrencyClientEvents;

@@ -2,9 +2,9 @@ import { Component } from "@flamework/components";
 import { InputBasedInteractable } from "./input-based-interactable";
 
 @Component({
-	tag: "ClickInteractable",
+	tag: "Clickable",
 })
-export class ClickInteractable extends InputBasedInteractable {
+export class Clickable extends InputBasedInteractable {
 	protected inputInstance = new Instance("ClickDetector");
 
 	override onStart(): void {
