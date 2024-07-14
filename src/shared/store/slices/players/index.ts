@@ -5,6 +5,7 @@ import { identitySlice } from "./slices/identity";
 import { manaSlice } from "./slices/mana";
 import { resourcesSlice } from "./slices/resources";
 import { statsSlice } from "./slices/stats";
+import { transformSlice } from "./slices/transform";
 
 export const playersSlice = combineProducers({
 	stats: statsSlice,
@@ -13,4 +14,5 @@ export const playersSlice = combineProducers({
 	mana: manaSlice,
 	conditions: conditionsSlice,
 	identity: identitySlice,
+	transform: transformSlice,
 });

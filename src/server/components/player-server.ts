@@ -1,7 +1,11 @@
 import { Component, Components } from "@flamework/components";
+import { Workspace } from "@rbxts/services";
 import { ASSETS } from "server/configs/tycoon";
+import { store } from "server/store";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { Inject } from "shared/inject";
+import { selectHealth } from "shared/store/slices/players/slices/resources/selectors";
+import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
 import { CharacterServer } from "./character-server";
 
 @Component({
@@ -25,20 +29,43 @@ export class PlayerServer extends AbstractPlayer {
 		return true;
 	}
 
-	public addAsset(assetName: string) {
+	public addAsset(assetName: string): void {
 		if (!ASSETS[assetName]) error(`asset "${assetName}" does not exist`);
 		this.assets.push(assetName);
 	}
 
 	public async loadCharacter(): Promise<CharacterServer> {
 		return new Promise((resolve, reject, onCancel) => {
+			if (this.instance.Parent === undefined) {
+				reject("player has already left");
+				return;
+			}
 			this.instance.LoadCharacter();
+
 			while (this.instance.Character === undefined)
 				this.instance.CharacterAdded.Wait();
+
+			const health = store.getState(selectHealth(this.UserId));
+			if (health !== undefined && health <= 0) {
+				store.resetLifeValues(this.UserId);
+			}
+
+			const lives = store.getState(selectLives(this.UserId));
+			if (lives !== undefined && lives <= 0) {
+				const purgatorySpawn = Workspace.HouseOfPurgatory.Spawn;
+				store.setPosition(this.UserId, purgatorySpawn.Position);
+				store.setRotation(this.UserId, 0);
+			}
+
 			this.components
 				.waitForComponent<CharacterServer>(this.instance.Character)
 				.andThen(
-					(component) => resolve(component),
+					(component) => {
+						component.loadHealth();
+						component.loadConditions();
+						component.loadTransform();
+						resolve(component);
+					},
 					(reason) => reject(reason),
 				);
 		});

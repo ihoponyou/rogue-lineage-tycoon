@@ -1,5 +1,6 @@
-import { Component } from "@flamework/components";
+import { Component, Components } from "@flamework/components";
 import { OnTick } from "@flamework/core";
+import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { DataService } from "server/services/data-service";
 import { store } from "server/store";
@@ -8,13 +9,19 @@ import {
 	CharacterAttributes,
 	CharacterInstance,
 } from "shared/components/abstract-character";
+import { Inject } from "shared/inject";
+import {
+	deserializeVector3,
+	serializeVector3,
+} from "shared/serialized-vector3";
 import { selectConditions } from "shared/store/slices/players/slices/conditions/selectors";
 import {
 	selectHealth,
 	selectTemperature,
 } from "shared/store/slices/players/slices/resources/selectors";
-import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
+import { selectTransform } from "shared/store/slices/players/slices/transform/selectors";
 import { Events } from "../networking";
+import { PlayerServer } from "./player-server";
 import { RagdollServer } from "./ragdoll-server";
 
 const FF_DURATION = 15;
@@ -37,37 +44,73 @@ export class CharacterServer
 	extends Character<CharacterAttributes, CharacterInstance>
 	implements OnTick
 {
-	constructor(
-		private ragdoll: RagdollServer,
-		private dataService: DataService,
-	) {
+	private disconnectReleaseListener?: () => void;
+
+	@Inject
+	private components!: Components;
+
+	@Inject
+	private dataService!: DataService;
+
+	constructor(private ragdoll: RagdollServer) {
 		super();
 	}
 
 	public override onStart(): void {
 		super.onStart();
 
-		const playerId = this.getPlayer().UserId;
+		this.instance.AddTag("FallDamage");
 
-		let savedHealth = store.getState(selectHealth(playerId));
+		const player = this.getPlayer();
+		this.disconnectReleaseListener = this.dataService.connectToPreRelease(
+			player,
+			(profile) => {
+				const pivot = this.instance.GetPivot();
+				const yRotation = pivot.ToEulerAnglesXYZ()[1];
+				profile.Data.transform.position = serializeVector3(
+					pivot.Position,
+				);
+				profile.Data.transform.yRotation = yRotation;
+			},
+		);
+	}
+
+	public loadHealth(): void {
+		let savedHealth = store.getState(selectHealth(this.getPlayer().UserId));
 		if (savedHealth === undefined) error("health not found");
 		if (savedHealth < 1) savedHealth = 100;
 		this.instance.Humanoid.Health = savedHealth;
+	}
 
-		const conditions = store.getState(selectConditions(playerId));
+	public loadConditions(): void {
+		const conditions = store.getState(
+			selectConditions(this.getPlayer().UserId),
+		);
 		if (conditions === undefined) error("conditions not found");
 		for (const condition of conditions) {
 			this.instance.AddTag(condition);
 		}
+	}
 
-		this.instance.AddTag("FallDamage");
+	public loadTransform(): void {
+		const savedTransform = store.getState(
+			selectTransform(this.getPlayer().UserId),
+		);
+		if (savedTransform === undefined) error("transform not found");
+		this.instance.PivotTo(
+			new CFrame(deserializeVector3(savedTransform.position)).mul(
+				CFrame.fromOrientation(0, savedTransform.yRotation, 0),
+			),
+		);
 	}
 
 	public onTick(dt: number): void {
 		if (!this.attributes.isAlive) return;
 
-		store.decayStomach(this.getPlayer().UserId, dt);
-		store.decayToxicity(this.getPlayer().UserId, dt);
+		const player = this.getPlayer();
+
+		store.decayStomach(player.UserId, dt);
+		store.decayToxicity(player.UserId, dt);
 
 		const humanoid = this.instance.Humanoid;
 		if (humanoid.Health >= humanoid.MaxHealth) return;
@@ -122,12 +165,15 @@ export class CharacterServer
 		const playerId = player.UserId;
 
 		store.subtractLife(playerId);
-		const lives = store.getState(selectLives(playerId));
-		if (lives !== undefined && lives <= 0) {
-			print("wipe");
-		}
 
 		EVENTS.killed.fire(player);
+
+		this.components
+			.waitForComponent<PlayerServer>(this.getPlayer())
+			.andThen((playerServer) => {
+				task.wait(Players.RespawnTime);
+				playerServer.loadCharacter().catch(warn);
+			});
 	}
 
 	public snipe(): void {

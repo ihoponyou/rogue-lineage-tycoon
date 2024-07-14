@@ -4,6 +4,7 @@ import { DEFAULT_IDENTITY, Identity } from "./identity";
 import { DEFAULT_MANA_DATA, ManaData } from "./mana";
 import { DEFAULT_RESOURCES, Resources } from "./resources";
 import { DEFAULT_STATS, Stats } from "./stats";
+import { DEFAULT_TRANSFORM_DATA, TransformData } from "./transform";
 
 export type PlayerData = {
 	stats: Stats;
@@ -12,6 +13,7 @@ export type PlayerData = {
 	mana: ManaData;
 	conditions: Array<Condition>;
 	identity: Identity;
+	transform: TransformData;
 };
 
 export const DEFAULT_PLAYER_DATA: PlayerData = {
@@ -21,6 +23,7 @@ export const DEFAULT_PLAYER_DATA: PlayerData = {
 	mana: DEFAULT_MANA_DATA,
 	conditions: [],
 	identity: DEFAULT_IDENTITY,
+	transform: DEFAULT_TRANSFORM_DATA,
 	// player
 	// IsBanned: false,
 	// Rebirths: 0,

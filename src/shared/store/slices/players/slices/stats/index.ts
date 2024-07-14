@@ -11,8 +11,8 @@ export interface StatsState {
 }
 
 export const DEFAULT_STATS = {
-	lives: 9,
-	days: 123,
+	lives: 3,
+	days: 0,
 };
 
 const initialState: StatsState = {};
@@ -26,6 +26,11 @@ export const statsSlice = createProducer(initialState, {
 	releasePlayerData: (state, playerId: string | number) => ({
 		...state,
 		[tostring(playerId)]: undefined,
+	}),
+
+	resetLineageValues: (state, playerId: string | number) => ({
+		...state,
+		[tostring(playerId)]: DEFAULT_STATS,
 	}),
 
 	setLives: (state, playerId: string | number, value: number) => {

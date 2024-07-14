@@ -1,8 +1,11 @@
+import { Components } from "@flamework/components";
 import { Service } from "@flamework/core";
 import { GetProfileStore } from "@rbxts/profileservice";
 import { Profile } from "@rbxts/profileservice/globals";
 import { RunService } from "@rbxts/services";
+import { PlayerServer } from "server/components/player-server";
 import { store } from "server/store";
+import { Inject } from "shared/inject";
 import { onThisPlayerRemoving } from "shared/on-player-removing";
 import { selectPlayerData } from "shared/store/slices/players/selectors";
 import { selectCurrencies } from "shared/store/slices/players/slices/currencies/selectors";
@@ -13,58 +16,62 @@ import {
 import { DEFAULT_RESOURCES } from "shared/store/slices/players/slices/resources";
 import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 
-const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Production" : "Testing";
+const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Testing" : "Production";
 const PROFILE_KEY_TEMPLATE = "Player%d";
+
+type PlayerProfile = Profile<PlayerData>;
 
 @Service()
 export class DataService implements OnPlayerAdded, OnPlayerRemoving {
-	private profiles = new Map<number, Profile<PlayerData>>();
-	private preReleaseListeners = new Map<
-		Player,
-		Array<(profile: Profile<PlayerData>) => void>
-	>();
+	private profiles = new Map<number, PlayerProfile>();
 	private profileStore = GetProfileStore(
 		PROFILE_STORE_INDEX,
 		DEFAULT_PLAYER_DATA,
 	);
 	private joinTicks = new Map<Player, number>();
+	private preReleaseListeners = new Map<
+		Player,
+		Array<(profile: Profile<PlayerData>) => void>
+	>();
+
+	@Inject
+	private components!: Components;
 
 	public onPlayerAdded(player: Player): void {
 		this.setupProfile(player);
-		player.LoadCharacter();
+		this.components
+			.waitForComponent<PlayerServer>(player)
+			.andThen((playerServer) => {
+				playerServer.loadCharacter();
+			});
 	}
 
 	public onPlayerRemoving(player: Player): void {
 		const profile = this.profiles.get(player.UserId);
 		if (!profile) return;
 		const listeners = this.preReleaseListeners.get(player);
-		if (listeners !== undefined && listeners.size() > 0) {
-			for (const listener of listeners) {
-				listener(profile);
-			}
-		}
+		listeners?.forEach((listener) => listener(profile));
 		profile.Release();
 	}
 
 	/**
-	 * @throws if no listener array is found
-	 * @return A function that removes the callback from the player's listeners
+	 * @return A function that disconnects the given listener
 	 */
 	public connectToPreRelease(
 		player: Player,
-		callback: (profile: Profile<PlayerData>) => void,
+		listener: (profile: Profile<PlayerData>) => void,
 	): () => void {
 		const listeners = this.preReleaseListeners.get(player);
 		if (listeners === undefined)
 			error(`no listener arr found for ${player}`);
-		listeners.push(callback);
+		listeners.push(listener);
 		return () =>
 			listeners.remove(
-				listeners.findIndex((value) => value === callback),
+				listeners.findIndex((value) => value === listener),
 			);
 	}
 
-	public getProfile(player: Player): Profile<PlayerData> {
+	public getProfile(player: Player): PlayerProfile {
 		const profile = this.profiles.get(player.UserId);
 		if (!profile) error(`could not fetch profile for ${player.Name}`);
 		return profile;
@@ -92,11 +99,11 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 		});
 
 		this.profiles.set(player.UserId, profile);
+		this.preReleaseListeners.set(player, []);
 		store.loadPlayerData(player.UserId, profile.Data);
 		this.giveLeaderStatsFolder(player);
 
 		this.joinTicks.set(player, math.round(tick()));
-		this.preReleaseListeners.set(player, []);
 
 		const unsubscribe = store.subscribe(
 			selectPlayerData(player.UserId),

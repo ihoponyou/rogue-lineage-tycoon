@@ -43,6 +43,11 @@ export const identitySlice = createProducer({} as IdentityState, {
 		[tostring(playerId)]: undefined,
 	}),
 
+	resetLineageValues: (state, playerId: string | number) => ({
+		...state,
+		[tostring(playerId)]: DEFAULT_IDENTITY,
+	}),
+
 	setRace: (state, playerId: string | number, raceName: string) => {
 		const id = tostring(playerId);
 		const identity = state[id];

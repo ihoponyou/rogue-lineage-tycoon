@@ -21,6 +21,7 @@ const WHITE_STOMACH_COLOR = Color3.fromRGB(229, 229, 204);
 export function StomachBar() {
 	const stomachAmount = useSelector(selectStomach(LOCAL_PLAYER.UserId));
 
+	// TODO: white stomach stays when wiping from white-stomached race to a non white-stomached race
 	const [stomachColor, setStomachColor] = useState(DEFAULT_STOMACH_COLOR);
 	const raceName = useSelector(selectRace(LOCAL_PLAYER.UserId));
 	useEffect(() => {

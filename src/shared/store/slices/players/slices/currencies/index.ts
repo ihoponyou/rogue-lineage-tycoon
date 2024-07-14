@@ -45,6 +45,20 @@ export const currenciesSlice = createProducer(initialState, {
 		[tostring(playerId)]: undefined,
 	}),
 
+	resetLineageValues: (state, playerId: string | number) => {
+		const id = tostring(playerId);
+		const playerData = state[id];
+		const insight = playerData?.Insight;
+
+		return {
+			...state,
+			[id]: {
+				...DEFAULT_CURRENCY_DATA,
+				Insight: insight ?? DEFAULT_CURRENCY_DATA.Insight,
+			},
+		};
+	},
+
 	setCurrencyAmount: (
 		state,
 		playerId: string | number,

@@ -6,6 +6,7 @@ import { selectIdentity } from "./slices/identity/selectors";
 import { DEFAULT_PLAYER_DATA, PlayerData } from "./slices/player-data";
 import { selectResources } from "./slices/resources/selectors";
 import { selectStats } from "./slices/stats/selectors";
+import { selectTransform } from "./slices/transform/selectors";
 
 export function selectMana(playerId: number | string) {
 	return (state: SharedState) => state.players.mana[tostring(playerId)];
@@ -32,7 +33,16 @@ export function selectPlayerData(playerId: number | string) {
 		selectMana(id),
 		selectConditions(id),
 		selectIdentity(id),
-		(stats, currencies, resources, mana, conditions, identity) => {
+		selectTransform(id),
+		(
+			stats,
+			currencies,
+			resources,
+			mana,
+			conditions,
+			identity,
+			transform,
+		) => {
 			return {
 				stats: stats ?? DEFAULT_PLAYER_DATA.stats,
 				currencies: currencies ?? DEFAULT_PLAYER_DATA.currencies,
@@ -40,6 +50,7 @@ export function selectPlayerData(playerId: number | string) {
 				mana: mana ?? DEFAULT_PLAYER_DATA.mana,
 				conditions: conditions ?? DEFAULT_PLAYER_DATA.conditions,
 				identity: identity ?? DEFAULT_PLAYER_DATA.identity,
+				transform: transform ?? DEFAULT_PLAYER_DATA.transform,
 			} as PlayerData;
 		},
 	);
