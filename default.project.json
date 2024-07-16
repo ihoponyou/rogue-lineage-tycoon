@@ -17,25 +17,25 @@
 					}
 				}
 			},
-			"Source": {
+			"src": {
 				"$className": "Folder",
-				"Shared": {
+				"shared": {
 					"$path": "out/shared"
 				},
-				"Client": {
+				"client": {
 					"$path": "out/client"
 				}
 			}
 		},
 		"ServerScriptService": {
 			"$className": "ServerScriptService",
-			"Source": {
+			"src": {
 				"$path": "out/scripts/server"
 			}
 		},
 		"ServerStorage": {
 			"$className": "ServerStorage",
-			"Source": {
+			"src": {
 				"$path": "out/server"
 			}
 		},
@@ -43,13 +43,13 @@
 			"$className": "StarterPlayer",
 			"StarterCharacterScripts": {
 				"$className": "StarterCharacterScripts",
-				"Source": {
+				"src": {
 					"$path": "out/scripts/character"
 				}
 			},
 			"StarterPlayerScripts": {
 				"$className": "StarterPlayerScripts",
-				"Source": {
+				"src": {
 					"$path": "out/scripts/player"
 				}
 			}

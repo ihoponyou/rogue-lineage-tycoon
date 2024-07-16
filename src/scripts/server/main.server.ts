@@ -6,10 +6,10 @@ import { beforeRun } from "shared/cmdr/hooks/before-run";
 
 Log.SetLogger(Logger.configure().WriteTo(Log.RobloxOutput()).Create());
 
-Cmdr.RegisterTypesIn(ServerStorage.Source.cmdr.types);
+Cmdr.RegisterTypesIn(ServerStorage.src.cmdr.types);
 Cmdr.RegisterHook("BeforeRun", beforeRun);
 Cmdr.RegisterDefaultCommands();
-Cmdr.RegisterCommandsIn(ServerStorage.Source.cmdr.commands);
+Cmdr.RegisterCommandsIn(ServerStorage.src.cmdr.commands);
 
 Flamework.addPaths("src/server/services");
 Flamework.addPaths("src/shared/components");

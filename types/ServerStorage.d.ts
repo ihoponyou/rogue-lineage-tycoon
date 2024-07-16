@@ -1,48 +1,44 @@
 interface ServerStorage extends Instance {
 	TagList: Folder & {
-		Lava: Configuration;
-		ArmorPortal: Configuration;
 		Plot: Configuration;
+		ArmorPortal: Configuration;
+		Clickable: Configuration;
 		Model: Configuration;
+		Lava: Configuration;
 	};
-	Source: Folder & {
+	src: Folder & {
+		store: ModuleScript & {
+			middleware: Folder & {
+				broadcaster: ModuleScript;
+			};
+		};
+		networking: ModuleScript;
 		services: Folder & {
-			["daylight-service"]: ModuleScript;
-			["data-service"]: ModuleScript;
-			["reset-service"]: ModuleScript;
-			["currency-service"]: ModuleScript;
 			["group-service"]: ModuleScript;
-			["lifecycle-service"]: ModuleScript;
+			["daylight-service"]: ModuleScript;
 			["player-service"]: ModuleScript;
 			["mana-service"]: ModuleScript;
+			["lifecycle-service"]: ModuleScript;
+			["data-service"]: ModuleScript;
+			["reset-service"]: ModuleScript;
 			["identity-service"]: ModuleScript;
-		};
-		cmdr: Folder & {
-			types: Folder & {
-				currency: ModuleScript;
-			};
-			commands: Folder & {
-				giveMoneyServer: ModuleScript;
-				giveMoney: ModuleScript;
-			};
 		};
 		configs: Folder & {
 			armors: ModuleScript;
-			races: ModuleScript;
-			group: ModuleScript;
 			tycoon: ModuleScript;
+			races: ModuleScript;
 			names: ModuleScript;
 		};
 		components: Folder & {
 			carriable: ModuleScript;
 			interactable: ModuleScript & {
-				["click-interactable"]: ModuleScript;
-				["input-based-interactable"]: ModuleScript;
-				["key-interactable"]: ModuleScript;
 				touchable: ModuleScript & {
 					["touchable-part"]: ModuleScript;
 					["touchable-model"]: ModuleScript;
 				};
+				["input-based-interactable"]: ModuleScript;
+				clickable: ModuleScript;
+				["key-interactable"]: ModuleScript;
 			};
 			injury: ModuleScript & {
 				frostbite: ModuleScript;
@@ -51,13 +47,12 @@ interface ServerStorage extends Instance {
 			};
 			["player-server"]: ModuleScript;
 			["fall-damage"]: ModuleScript;
-			grippable: ModuleScript;
 			world: Folder & {
 				["armor-portal"]: ModuleScript;
 				climate: ModuleScript;
 				lava: ModuleScript;
 			};
-			["character-server"]: ModuleScript;
+			grippable: ModuleScript;
 			tycoon: Folder & {
 				pad: ModuleScript;
 				furniture: ModuleScript;
@@ -71,9 +66,25 @@ interface ServerStorage extends Instance {
 				collector: ModuleScript;
 				dropper: ModuleScript;
 			};
+			["character-server"]: ModuleScript;
+			dialogue: ModuleScript;
 			["ragdoll-server"]: ModuleScript;
 		};
-		networking: ModuleScript;
+		cmdr: Folder & {
+			types: Folder & {
+				currency: ModuleScript;
+			};
+			commands: Folder & {
+				give_money: ModuleScript;
+				snipeServer: ModuleScript;
+				set_lives: ModuleScript;
+				set_days: ModuleScript;
+				snipe: ModuleScript;
+				give_moneyServer: ModuleScript;
+				set_daysServer: ModuleScript;
+				set_livesServer: ModuleScript;
+			};
+		};
 	};
 	__Rojo_SessionLock: ObjectValue;
 	["ROGUE ASSETS"]: Folder & {

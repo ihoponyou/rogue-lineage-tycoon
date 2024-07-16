@@ -4,22 +4,22 @@
   "terminals": [
     {
       "name": "compiler",
-      "description": "compiles source code into lua with rbxtsc",
+      "description": "compiles source ts into lua with rbxtsc",
       "focus": true,
       "commands": [
+        "if (Test-Path flamework.build) { Remove-Item flamework.build }",
         "if (Test-Path out) { Remove-Item -Recurse out }",
         "npm run watch"
       ]
     },
     {
       "name": "io-serve",
-      "description": "necessary for rbxts-object-to-tree",
+      "description": "for rbxts-object-to-tree",
       "split": "compiler",
       "command": "npx io-serve"
     },
     {
       "name": "rojo",
-      "description": "you know",
       "split": "compiler",
       "commands": [
         "Start-Sleep -Seconds 20",
