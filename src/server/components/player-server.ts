@@ -34,7 +34,9 @@ export class PlayerServer extends AbstractPlayer {
 		this.assets.push(assetName);
 	}
 
-	public async loadCharacter(): Promise<CharacterServer> {
+	public async loadCharacter(
+		leavingPurgatory: boolean = false,
+	): Promise<CharacterServer> {
 		return new Promise((resolve, reject, onCancel) => {
 			if (this.instance.Parent === undefined) {
 				reject("player has already left");
@@ -50,11 +52,21 @@ export class PlayerServer extends AbstractPlayer {
 				store.resetLifeValues(this.UserId);
 			}
 
-			const lives = store.getState(selectLives(this.UserId));
-			if (lives !== undefined && lives <= 0) {
-				const purgatorySpawn = Workspace.HouseOfPurgatory.Spawn;
-				store.setPosition(this.UserId, purgatorySpawn.Position);
+			if (leavingPurgatory) {
+				store.setLives(this.instance.UserId, 3);
+				// TODO: choose random town spawn
+				store.setPosition(this.UserId, Vector3.zero);
 				store.setRotation(this.UserId, 0);
+			} else {
+				const lives = store.getState(selectLives(this.UserId));
+				if (lives !== undefined && lives <= 0) {
+					const purgatorySpawn = Workspace.HouseOfPurgatory.Spawn;
+					store.setPosition(this.UserId, purgatorySpawn.Position);
+					store.setRotation(
+						this.UserId,
+						purgatorySpawn.CFrame.ToEulerAnglesXYZ()[1],
+					);
+				}
 			}
 
 			this.components

@@ -23,13 +23,15 @@ export class GuiController implements OnStart {
 			},
 		);
 
-		Events.dialogue.open.connect((text, options) => {
+		Events.dialogue.open.connect((speakerName, text, options) => {
 			store.setDialogueText(text);
 			store.setDialogueOptions(options);
+			store.setSpeakerName(speakerName);
 		});
 		Events.dialogue.close.connect(() => {
 			store.setDialogueText("");
 			store.setDialogueOptions([]);
+			store.setSpeakerName("");
 		});
 
 		this.root.render(

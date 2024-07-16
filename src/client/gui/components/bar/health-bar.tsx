@@ -18,6 +18,7 @@ import { selectHealth } from "shared/store/slices/players/slices/resources/selec
 // 	}
 
 // TODO: make an abstract bar component; current amount, max amount, color, percent
+// TODO: fix health bar not updating
 
 const DEFAULT_HEALTH_COLOR = Color3.fromRGB(206, 61, 48);
 

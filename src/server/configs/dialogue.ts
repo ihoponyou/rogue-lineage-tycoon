@@ -1,4 +1,7 @@
+import { Components } from "@flamework/components";
+import { Dependency } from "@flamework/core";
 import { Dialogue } from "server/components/dialogue";
+import { PlayerServer } from "server/components/player-server";
 
 export interface DialogueConfig {
 	speech: string;
@@ -7,27 +10,29 @@ export interface DialogueConfig {
 
 interface DialogueOptionConfig {
 	label: string;
-	onClick: (component: Dialogue, player: Player) => void;
+	onClick: (dialogue: Dialogue, player: Player) => void;
 }
+
+const closeDialogue = (dialogue: Dialogue, player: Player) => {
+	dialogue.close(player);
+};
 
 export const DIALOGUE: {
 	[speaker: string]: { [topic: string]: DialogueConfig };
 } = {
-	WipeBook: {
+	Ferryman: {
 		Open: {
 			speech: "keep yourself safe?",
 			options: [
 				{
 					label: "Kill me.",
-					onClick: (component: Dialogue, player: Player) => {
-						component.speak(player, "Confirm");
+					onClick: (dialogue: Dialogue, player: Player) => {
+						dialogue.speak(player, "Confirm");
 					},
 				},
 				{
 					label: "Bye.",
-					onClick: (component: Dialogue, player: Player) => {
-						component.close(player);
-					},
+					onClick: closeDialogue,
 				},
 			],
 		},
@@ -36,17 +41,21 @@ export const DIALOGUE: {
 			options: [
 				{
 					label: "K̶̪͚͍̱͚̳͔̤̪̦͋̂̓̊̈͊̈́̂̌͑̕̕͜͝I̸̛͈̬͍̼̐̿͗͗̚͝L̷̡̡̬͍̺͈͕͚̻̰̯̦̙̇̌̋̇̑́͑͑͗̏͊̋͜L̷͈̹̻͔͔̹̝̣̖̗̑̏̈̃͒̔̈́̒̉̉̾̏̕͘͜ͅ ̶̛̩̠̇̽͗̓͋̈́̀͋̎̾͘͠M̷̧̧̧͈̲̼̞̳̖̼̳̮̺͖̌̾͗̉Ę̴̢̧̗̙̹̩̳͎̫͇̰̝͓͙͊̓̏̋̽͌̆͐̚͜",
-					onClick: (component: Dialogue, player: Player) => {
-						component.speak(player, "Goodbye");
+					onClick: (dialogue: Dialogue, player: Player) => {
+						dialogue.speak(player, "Goodbye");
 						task.wait(1);
-						component.close(player);
+						dialogue.close(player);
+						const components = Dependency<Components>();
+						components
+							.waitForComponent<PlayerServer>(player)
+							.andThen((playerServer) =>
+								playerServer.loadCharacter(true),
+							);
 					},
 				},
 				{
 					label: "Let me think.",
-					onClick: (component: Dialogue, player: Player) => {
-						component.close(player);
-					},
+					onClick: closeDialogue,
 				},
 			],
 		},

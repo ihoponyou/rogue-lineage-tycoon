@@ -5,6 +5,7 @@ import { TextService, TweenService } from "@rbxts/services";
 import {
 	selectDialogueOptions,
 	selectDialogueText,
+	selectSpeakerName,
 } from "client/store/slices/dialogue/selectors";
 import { CharLabel } from "./char-label";
 
@@ -113,6 +114,8 @@ export function DialogueBox() {
 		};
 	}, [options]);
 
+	const speakerName = useSelector(selectSpeakerName);
+
 	return (
 		<imagelabel
 			AnchorPoint={new Vector2(0.5, 0.5)}
@@ -139,7 +142,7 @@ export function DialogueBox() {
 				}
 				Position={new UDim2(0, 25, 0, -4)}
 				Size={new UDim2(1, -40, 0, 22)}
-				Text="[name]"
+				Text={speakerName ?? "[name]"}
 				TextColor3={Color3.fromRGB(255, 255, 255)}
 				TextSize={22}
 				TextStrokeTransparency={0.8}

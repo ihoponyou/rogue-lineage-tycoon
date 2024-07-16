@@ -1,4 +1,4 @@
 export interface DialogueClientEvents {
-	open(text: string, options: Array<ImageLabel>): void;
+	open(name: string, text: string, options: Array<ImageLabel>): void;
 	close(): void;
 }

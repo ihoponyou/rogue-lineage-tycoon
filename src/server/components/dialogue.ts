@@ -85,6 +85,12 @@ export class Dialogue extends DisposableComponent implements OnStart {
 				),
 			);
 		});
-		Events.dialogue.open(player, topicConfig.speech, options);
+
+		Events.dialogue.open(
+			player,
+			this.instance.Name,
+			topicConfig.speech,
+			options,
+		);
 	}
 }
