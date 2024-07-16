@@ -23,8 +23,11 @@ export class GuiController implements OnStart {
 			},
 		);
 
-		Events.dialogue.open.connect((text) => store.setDialogue(text));
-		Events.dialogue.close.connect(() => store.setDialogue(""));
+		Events.dialogue.open.connect((text, options) => {
+			store.setDialogueText(text);
+			store.setDialogueOptions(options);
+		});
+		Events.dialogue.close.connect(() => store.setDialogueText(""));
 
 		this.root.render(
 			<StrictMode>

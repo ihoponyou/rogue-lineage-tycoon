@@ -3,7 +3,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
 import { selectManaEnabled } from "shared/store/slices/players/selectors";
 import { ManaBar } from "./bar/mana-bar";
-import { Dialogue } from "./dialogue";
+import { DialogueBox } from "./dialogue-box";
 import { Layer } from "./layer";
 import { SilverLogo } from "./silver-logo";
 import { Stats } from "./stats";
@@ -12,15 +12,11 @@ export function App() {
 	const manaEnabled = useSelector(selectManaEnabled(LOCAL_PLAYER.UserId));
 
 	return (
-		<React.Fragment>
-			<Layer>
-				<SilverLogo />
-				{manaEnabled && <ManaBar />}
-				<Stats />
-			</Layer>
-			<Layer>
-				<Dialogue />
-			</Layer>
-		</React.Fragment>
+		<Layer>
+			<SilverLogo />
+			{manaEnabled && <ManaBar />}
+			<Stats />
+			<DialogueBox />
+		</Layer>
 	);
 }

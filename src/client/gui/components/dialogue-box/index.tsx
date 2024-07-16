@@ -1,20 +1,26 @@
+import { useAsyncEffect } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { TextService, TweenService } from "@rbxts/services";
-import { selectDialogue } from "client/store/slices/gui/selectors";
+import {
+	selectDialogueOptions,
+	selectDialogueText,
+} from "client/store/slices/dialogue/selectors";
 import { CharLabel } from "./char-label";
 
 const FRAME_SIZE = new Vector2(100, 100);
+const CHARACTER_FONT_SIZE = 20;
+const CHARACTER_FONT = Enum.Font.SourceSans;
+const CHARACTER_TWEEN_INFO = new TweenInfo(0.15);
 
 function containsWhitespace(str: string): boolean {
 	return string.match(str, "%s")[0] !== undefined;
 }
 
-export function Dialogue() {
-	const text = useSelector(selectDialogue);
-
+export function DialogueBox() {
+	const text = useSelector(selectDialogueText);
 	const characterContainer = useRef<Frame>();
-	useEffect(() => {
+	useAsyncEffect(async () => {
 		if (text === undefined) return;
 
 		let lastWait = 0.1;
@@ -28,8 +34,12 @@ export function Dialogue() {
 			let waitTime = 0;
 
 			const char = text.sub(i, i);
-			const font = Enum.Font.SourceSans;
-			const size = TextService.GetTextSize(char, 20, font, FRAME_SIZE);
+			const size = TextService.GetTextSize(
+				char,
+				CHARACTER_FONT_SIZE,
+				CHARACTER_FONT,
+				FRAME_SIZE,
+			);
 			const currentCharIsWhitespace = containsWhitespace(char);
 
 			if (positionX + size.X > 450) {
@@ -41,7 +51,7 @@ export function Dialogue() {
 			if (!currentCharIsWhitespace) {
 				const label = CharLabel({
 					char: char,
-					font: font,
+					font: CHARACTER_FONT,
 					positionX: positionX,
 					positionY: positionY,
 					size: size,
@@ -51,20 +61,14 @@ export function Dialogue() {
 				task.delay(lastWait, () => {
 					label.Visible = true;
 					label.TextSize = 28;
-					TweenService.Create(label, new TweenInfo(0.15), {
-						TextSize: 20,
+					TweenService.Create(label, CHARACTER_TWEEN_INFO, {
+						TextSize: CHARACTER_FONT_SIZE,
 						TextTransparency: 0,
 					}).Play();
 				});
 			}
 
-			if (positionX === 0) {
-				if (!currentCharIsWhitespace) {
-					positionX += size.X;
-				}
-			} else {
-				positionX += size.X;
-			}
+			positionX += size.X;
 
 			if (currentCharIsWhitespace) {
 				waitTime += 0.01;
@@ -88,11 +92,29 @@ export function Dialogue() {
 			lastWait = waitTime;
 			task.wait(waitTime);
 		}
+
+		return () => {
+			characterContainer.current?.ClearAllChildren();
+		};
 	}, [text]);
+
+	const options = useSelector(selectDialogueOptions);
+	const optionContainer = useRef<Frame>();
+	useEffect(() => {
+		let cancel = false;
+		options.forEach((option) => {
+			if (cancel) return;
+			if (option.Parent === undefined) return;
+			option.Parent = optionContainer.current;
+		});
+
+		return () => {
+			cancel = true;
+		};
+	}, [options]);
 
 	return (
 		<imagelabel
-			key="MainFrame"
 			AnchorPoint={new Vector2(0.5, 0.5)}
 			BackgroundTransparency={1}
 			Image="rbxassetid://1327087642"
@@ -149,42 +171,18 @@ export function Dialogue() {
 			</textlabel>
 			<frame
 				key="Options"
+				ref={optionContainer}
 				BackgroundTransparency={1}
 				Position={new UDim2(0, 0, 1, -5)}
 				Size={new UDim2(1, 0, 0, 40)}
 			>
 				<uigridlayout
-					CellSize={new UDim2(1, -5, 1, 0)}
+					CellSize={new UDim2(1 / options.size(), -5, 1, 0)}
 					HorizontalAlignment={Enum.HorizontalAlignment.Center}
 					SortOrder={Enum.SortOrder.LayoutOrder}
 					VerticalAlignment={Enum.VerticalAlignment.Center}
 				/>
 			</frame>
-			<textlabel
-				key="Words"
-				AnchorPoint={new Vector2(0.5, 0.5)}
-				BackgroundTransparency={1}
-				Font={Enum.Font.SourceSans}
-				FontFace={
-					new Font(
-						"rbxasset://fonts/families/SourceSansPro.json",
-						Enum.FontWeight.Regular,
-						Enum.FontStyle.Normal,
-					)
-				}
-				Position={new UDim2(0.5, 0, 0.5, 0)}
-				RichText={true}
-				Size={new UDim2(1, -40, 1, -40)}
-				Text="[dialogue]"
-				TextColor3={Color3.fromRGB(255, 255, 255)}
-				TextSize={18}
-				TextStrokeTransparency={0.8}
-				TextWrapped={true}
-				TextXAlignment={Enum.TextXAlignment.Left}
-				TextYAlignment={Enum.TextYAlignment.Top}
-				Visible={false}
-				ZIndex={8}
-			/>
 			<frame
 				key="Characters"
 				ref={characterContainer}
