@@ -11,7 +11,7 @@ const OPTION_TEMPLATE = ReplicatedStorage.Assets.UI.Dialogue.OptionTemplate;
 	tag: "Dialogue",
 })
 export class Dialogue extends DisposableComponent implements OnStart {
-	private openDialogues = new Map<Player, Array<ImageLabel>>();
+	private static openDialogues = new Map<Player, Array<ImageLabel>>();
 
 	constructor(private clickable: Clickable) {
 		super();
@@ -31,15 +31,15 @@ export class Dialogue extends DisposableComponent implements OnStart {
 			this.closeDialogue(player);
 		});
 
-		this.openDialogues.get(player)?.push(option);
+		Dialogue.openDialogues.get(player)?.push(option);
 
 		return option;
 	}
 
 	private openDialogue(player: Player): void {
-		if (this.openDialogues.has(player)) return; //error("player already in dialogue");
+		if (Dialogue.openDialogues.has(player)) return; //error("player already in dialogue");
 
-		this.openDialogues.set(player, []);
+		Dialogue.openDialogues.set(player, []);
 
 		Events.dialogue.open(player, "Aye, want some meat?", [
 			this.addOption(player, "Yes"),
@@ -48,8 +48,10 @@ export class Dialogue extends DisposableComponent implements OnStart {
 	}
 
 	private closeDialogue(player: Player): void {
-		this.openDialogues.get(player)?.forEach((option) => option.Destroy());
-		this.openDialogues.delete(player);
+		Dialogue.openDialogues
+			.get(player)
+			?.forEach((option) => option.Destroy());
+		Dialogue.openDialogues.delete(player);
 		Events.dialogue.close(player);
 	}
 }
