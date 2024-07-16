@@ -2,7 +2,7 @@ import { BaseComponent, Component, Components } from "@flamework/components";
 import { Dependency, OnStart, OnTick } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
 import { store } from "server/store";
-import { selectTemperature } from "shared/store/selectors/players";
+import { selectTemperature } from "shared/store/slices/players/slices/resources/selectors";
 import { OnCharacterAdded } from "../../../../types/lifecycles";
 import { CharacterServer } from "../character-server";
 

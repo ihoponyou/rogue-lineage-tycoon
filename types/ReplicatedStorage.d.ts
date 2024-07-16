@@ -1,7 +1,4 @@
 interface ReplicatedStorage extends Instance {
-	libs: Folder & {
-		ProfileService: ModuleScript;
-	};
 	Assets: Folder & {
 		Models: Folder & {
 			ParticleBack: Part & {
@@ -1106,19 +1103,25 @@ interface ReplicatedStorage extends Instance {
 				};
 				AreaMusic: Sound;
 			};
-			Dialogue: ScreenGui & {
-				Handla: LocalScript & {
-					Sound: Sound;
+			Dialogue: Folder & {
+				Dialogue: ScreenGui & {
+					Handla: LocalScript & {
+						Sound: Sound;
+					};
+					MainFrame: ImageLabel & {
+						NameText: TextLabel & {
+							Shadow: TextLabel;
+						};
+						DialogueText: TextLabel;
+						Options: Frame & {
+							UIGridLayout: UIGridLayout;
+						};
+						Container: Frame;
+					};
 				};
-				MainFrame: ImageLabel & {
-					NameText: TextLabel & {
-						Shadow: TextLabel;
-					};
-					DialogueText: TextLabel;
-					Options: Frame & {
-						UIGridLayout: UIGridLayout;
-					};
-					Container: Frame;
+				OptionTemplate: ImageLabel & {
+					OptionText: TextLabel;
+					OptionButton: TextButton;
 				};
 			};
 			LeaderboardGui: ScreenGui & {
@@ -1131,34 +1134,6 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 			};
-			Currency: Folder & {
-				SilverGui: ScreenGui & {
-					SilverLogo: ImageButton & {
-						DropFrame: Frame & {
-							DropButton: TextButton & {
-								Border: ImageLabel;
-							};
-							Amount: TextBox & {
-								Border: ImageLabel;
-							};
-						};
-						Amount: TextLabel;
-					};
-				};
-				InsightGui: ScreenGui & {
-					InsightLogo: ImageButton & {
-						DropFrame: Frame & {
-							DropButton: TextButton & {
-								Border: ImageLabel;
-							};
-							Amount: TextBox & {
-								Border: ImageLabel;
-							};
-						};
-						Amount: TextLabel;
-					};
-				};
-			};
 			ManaGui: ScreenGui & {
 				LeftContainer: Frame & {
 					ManaBar: Frame & {
@@ -1167,26 +1142,6 @@ interface ReplicatedStorage extends Instance {
 						};
 						Overlay: ImageLabel;
 					};
-				};
-			};
-			DebugInfo: ScreenGui & {
-				HumanoidStateUpdate: LocalScript;
-				TopLeftFrame: Frame & {
-					DiagonalInBoolean: TextLabel;
-					DiagonalInLabel: TextLabel;
-					CenterForwardNormal: TextLabel;
-					DiagonalInDistance: TextLabel;
-					DiagonalOutLabel: TextLabel;
-					DiagonalOutDistance: TextLabel;
-					CenterForwardDistance: TextLabel;
-					DiagonalOutBoolean: TextLabel;
-					CenterForwardLabel: TextLabel;
-					CenterForwardBoolean: TextLabel;
-				};
-				BottomLeftFrame: Frame & {
-					HumanoidState: TextLabel;
-					SeesTop: TextLabel;
-					ForceLabel: TextLabel;
 				};
 			};
 			StatGui: ScreenGui & {
@@ -1232,6 +1187,54 @@ interface ReplicatedStorage extends Instance {
 					CharacterName: TextLabel & {
 						LocalScript: LocalScript;
 						Shadow: TextLabel;
+					};
+				};
+			};
+			DebugInfo: ScreenGui & {
+				HumanoidStateUpdate: LocalScript;
+				TopLeftFrame: Frame & {
+					DiagonalInBoolean: TextLabel;
+					DiagonalInLabel: TextLabel;
+					CenterForwardNormal: TextLabel;
+					DiagonalInDistance: TextLabel;
+					DiagonalOutLabel: TextLabel;
+					DiagonalOutDistance: TextLabel;
+					CenterForwardDistance: TextLabel;
+					DiagonalOutBoolean: TextLabel;
+					CenterForwardLabel: TextLabel;
+					CenterForwardBoolean: TextLabel;
+				};
+				BottomLeftFrame: Frame & {
+					HumanoidState: TextLabel;
+					SeesTop: TextLabel;
+					ForceLabel: TextLabel;
+				};
+			};
+			Currency: Folder & {
+				SilverGui: ScreenGui & {
+					SilverLogo: ImageButton & {
+						DropFrame: Frame & {
+							DropButton: TextButton & {
+								Border: ImageLabel;
+							};
+							Amount: TextBox & {
+								Border: ImageLabel;
+							};
+						};
+						Amount: TextLabel;
+					};
+				};
+				InsightGui: ScreenGui & {
+					InsightLogo: ImageButton & {
+						DropFrame: Frame & {
+							DropButton: TextButton & {
+								Border: ImageLabel;
+							};
+							Amount: TextBox & {
+								Border: ImageLabel;
+							};
+						};
+						Amount: TextLabel;
 					};
 				};
 			};
@@ -1402,89 +1405,135 @@ interface ReplicatedStorage extends Instance {
 		};
 	};
 	Source: Folder & {
-		Modules: Folder & {
-			RaycastUtil: ModuleScript;
+		Shared: Folder & {
+			["serialized-vector3"]: ModuleScript;
+			["serialized-color3"]: ModuleScript;
 			networking: ModuleScript & {
-				["character-events"]: ModuleScript;
+				character: ModuleScript;
+				dialogue: ModuleScript;
+				mana: ModuleScript;
 				currency: ModuleScript;
-				["mana-events"]: ModuleScript;
-				["silver-events"]: ModuleScript;
+				reflex: ModuleScript;
 			};
 			charAt: ModuleScript;
-			MathFunctions: ModuleScript;
+			configs: Folder & {
+				group: ModuleScript;
+				conditions: ModuleScript;
+			};
 			constants: ModuleScript;
-			ModelUtil: ModuleScript;
 			getCharacterFromBodyPart: ModuleScript;
-			OffsetManager: ModuleScript;
-			CastVisualizer: ModuleScript;
 			toggleable: ModuleScript;
 			graph: ModuleScript & {
 				node: ModuleScript;
 			};
 			hideable: ModuleScript;
-			HitboxManager: ModuleScript;
 			["line-of-sight"]: ModuleScript;
-			NumberLerp: ModuleScript;
 			["get-digit"]: ModuleScript;
-			TableFunctions: ModuleScript;
-			Find: ModuleScript;
-			AnimationManager: ModuleScript;
-			VectorMath: ModuleScript;
 			inject: ModuleScript;
-			libs: Folder & {
-				ProfileService: ModuleScript;
+			["on-player-removing"]: ModuleScript;
+			cmdr: Folder & {
+				hooks: Folder & {
+					["before-run"]: ModuleScript;
+				};
 			};
+			["cast-visualizer"]: ModuleScript;
 			["state-machine"]: ModuleScript & {
 				state: ModuleScript;
 			};
-			components: Folder & {
-				character: ModuleScript;
-				["disposable-component"]: ModuleScript;
-				ragdoll: ModuleScript;
-				player: ModuleScript;
-				model: ModuleScript;
+			store: ModuleScript & {
+				slices: Folder & {
+					players: ModuleScript & {
+						slices: Folder & {
+							transform: ModuleScript & {
+								selectors: ModuleScript;
+							};
+							stats: ModuleScript & {
+								selectors: ModuleScript;
+							};
+							resources: ModuleScript & {
+								selectors: ModuleScript;
+							};
+							conditions: ModuleScript & {
+								selectors: ModuleScript;
+							};
+							currencies: ModuleScript & {
+								selectors: ModuleScript;
+							};
+							mana: ModuleScript;
+							identity: ModuleScript & {
+								selectors: ModuleScript;
+							};
+							["player-data"]: ModuleScript;
+						};
+						selectors: ModuleScript;
+					};
+				};
 			};
-			["cast-visualizer"]: ModuleScript;
+			components: Folder & {
+				toggleable: ModuleScript;
+				ragdoll: ModuleScript;
+				model: ModuleScript;
+				["abstract-player"]: ModuleScript;
+				["abstract-character"]: ModuleScript;
+				["disposable-component"]: ModuleScript;
+			};
 		};
 		Client: Folder & {
+			constants: ModuleScript;
 			["player-state"]: Folder & {
 				["character-state"]: ModuleScript;
 				["climb-state"]: ModuleScript;
-				["charge-mana-state"]: ModuleScript;
-				["dash-state"]: ModuleScript;
 				["run-state"]: ModuleScript;
 				["idle-state"]: ModuleScript;
+				["dash-state"]: ModuleScript;
+				["charge-mana-state"]: ModuleScript;
 			};
 			networking: ModuleScript;
-			gui: Folder & {
-				hooks: Folder & {
-					["reflex-hooks"]: ModuleScript;
+			store: ModuleScript & {
+				slices: Folder & {
+					gui: ModuleScript & {
+						selectors: ModuleScript;
+					};
 				};
-				components: Folder & {
-					["silver-logo"]: ModuleScript;
-					app: ModuleScript;
-					layer: ModuleScript;
+				middleware: Folder & {
+					receiver: ModuleScript;
 				};
-				producer: ModuleScript & {
-					currencies: ModuleScript;
-					stats: ModuleScript;
-				};
-			};
-			components: Folder & {
-				["player-client"]: ModuleScript;
-				["character-client"]: ModuleScript;
-				["ragdoll-client"]: ModuleScript;
-				["character-state-machine"]: ModuleScript;
+				selectors: ModuleScript;
 			};
 			controllers: Folder & {
-				["component-controller"]: ModuleScript;
 				["mana-controller"]: ModuleScript;
-				["hud-controller"]: ModuleScript;
+				["lifecycle-controller"]: ModuleScript;
 				["keybind-controller"]: ModuleScript;
 				["animation-controller"]: ModuleScript;
 				["input-controller"]: ModuleScript;
-				["lifecycle-controller"]: ModuleScript;
+				["component-controller"]: ModuleScript;
 				["gui-controller"]: ModuleScript;
+			};
+			components: Folder & {
+				["character-client"]: ModuleScript;
+				["player-client"]: ModuleScript;
+				["ragdoll-client"]: ModuleScript;
+				["character-state-machine"]: ModuleScript;
+			};
+			gui: Folder & {
+				hooks: Folder & {
+					["use-motion"]: ModuleScript;
+					["reflex-hooks"]: ModuleScript;
+				};
+				components: Folder & {
+					stats: ModuleScript;
+					["health-bar"]: ModuleScript;
+					layer: ModuleScript;
+					["temperature-bar"]: ModuleScript;
+					["mana-bar"]: ModuleScript;
+					["name-plate"]: ModuleScript;
+					dialogue: ModuleScript;
+					["toxicity-bar"]: ModuleScript;
+					["silver-logo"]: ModuleScript;
+					digit: ModuleScript;
+					app: ModuleScript;
+					["stomach-bar"]: ModuleScript;
+				};
 			};
 		};
 	};
@@ -1513,8 +1562,14 @@ interface ReplicatedStorage extends Instance {
 						Logger: ModuleScript;
 					};
 				};
+				react: ModuleScript & {
+					tags: ModuleScript;
+				};
 				profileservice: Folder & {
 					src: ModuleScript;
+				};
+				dumpster: Folder & {
+					Dumpster: ModuleScript;
 				};
 				["shared-components-flamework"]: Folder & {
 					LICENSE: StringValue;
@@ -1577,8 +1632,29 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 				["object-utils"]: ModuleScript;
-				react: ModuleScript & {
-					tags: ModuleScript;
+				ripple: ModuleScript & {
+					["createMotion.spec"]: ModuleScript;
+					config: ModuleScript;
+					solvers: Folder & {
+						tween: ModuleScript;
+						["linear.spec"]: ModuleScript;
+						["immediate.spec"]: ModuleScript;
+						["tween.spec"]: ModuleScript;
+						["spring.spec"]: ModuleScript;
+						spring: ModuleScript;
+						linear: ModuleScript;
+						immediate: ModuleScript;
+					};
+					utils: Folder & {
+						graph: ModuleScript;
+						assign: ModuleScript;
+						spy: ModuleScript;
+						snapshot: ModuleScript;
+						intermediate: ModuleScript;
+						merge: ModuleScript;
+					};
+					createMotion: ModuleScript;
+					types: ModuleScript;
 				};
 				flipper: Folder & {
 					typings: Folder;
@@ -2345,8 +2421,100 @@ interface ReplicatedStorage extends Instance {
 						None: ModuleScript;
 					};
 				};
-				dumpster: Folder & {
-					Dumpster: ModuleScript;
+				cmdr: Folder & {
+					Cmdr: ModuleScript & {
+						CreateGui: ModuleScript;
+						Shared: Folder & {
+							Registry: ModuleScript;
+							Dispatcher: ModuleScript;
+							Command: ModuleScript;
+							Argument: ModuleScript;
+							Util: ModuleScript;
+						};
+						BuiltInTypes: Folder & {
+							PlayerId: ModuleScript;
+							URL: ModuleScript;
+							Duration: ModuleScript;
+							StoredKey: ModuleScript;
+							Primitives: ModuleScript;
+							Vector: ModuleScript;
+							Command: ModuleScript;
+							ConditionFunction: ModuleScript;
+							JSON: ModuleScript;
+							Type: ModuleScript;
+							UserInput: ModuleScript;
+							Player: ModuleScript;
+							Color3: ModuleScript;
+							Team: ModuleScript;
+							BindableResource: ModuleScript;
+							MathOperator: ModuleScript;
+							BrickColor: ModuleScript;
+						};
+						BuiltInCommands: Folder & {
+							help: ModuleScript;
+							Admin: Folder & {
+								gotoPlaceServer: ModuleScript;
+								kill: ModuleScript;
+								teleport: ModuleScript;
+								kickServer: ModuleScript;
+								killServer: ModuleScript;
+								respawn: ModuleScript;
+								respawnServer: ModuleScript;
+								gotoPlace: ModuleScript;
+								kick: ModuleScript;
+								teleportServer: ModuleScript;
+								announce: ModuleScript;
+								announceServer: ModuleScript;
+							};
+							Debug: Folder & {
+								getPlayerPlaceInstance: ModuleScript;
+								version: ModuleScript;
+								thru: ModuleScript;
+								blink: ModuleScript;
+								uptime: ModuleScript;
+								position: ModuleScript;
+								fetchServer: ModuleScript;
+								uptimeServer: ModuleScript;
+								getPlayerPlaceInstanceServer: ModuleScript;
+								fetch: ModuleScript;
+							};
+							Utility: Folder & {
+								rand: ModuleScript;
+								jsonArrayEncode: ModuleScript;
+								pick: ModuleScript;
+								echo: ModuleScript;
+								bind: ModuleScript;
+								["var"]: ModuleScript;
+								math: ModuleScript;
+								alias: ModuleScript;
+								clear: ModuleScript;
+								varSetServer: ModuleScript;
+								varServer: ModuleScript;
+								jsonArrayDecode: ModuleScript;
+								varSet: ModuleScript;
+								unbind: ModuleScript;
+								run: ModuleScript;
+								runLines: ModuleScript;
+								runif: ModuleScript;
+								history: ModuleScript;
+								hover: ModuleScript;
+								replace: ModuleScript;
+								len: ModuleScript;
+								resolve: ModuleScript;
+								convertTimestamp: ModuleScript;
+								edit: ModuleScript;
+							};
+						};
+						CmdrClient: ModuleScript & {
+							CmdrInterface: ModuleScript & {
+								AutoComplete: ModuleScript;
+								Window: ModuleScript;
+							};
+							DefaultEventHandlers: ModuleScript;
+						};
+						Initialize: ModuleScript;
+					};
+					TS: ModuleScript;
 				};
 				signal: ModuleScript;
 			};

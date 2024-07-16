@@ -1,9 +1,9 @@
 import { LOCAL_PLAYER } from "client/constants";
 import { store } from "client/store";
 import { VFX } from "shared/constants";
+import { deserializeColor3 } from "shared/serialized-color3";
 import { StateMachine } from "shared/state-machine";
-import { selectManaColor } from "shared/store/selectors/players";
-import { deserializeColor3 } from "shared/store/slices/players/player-data";
+import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
 import { CharacterClient } from "../components/character-client";
 import { AnimationController } from "../controllers/animation-controller";
 import { InputController } from "../controllers/input-controller";

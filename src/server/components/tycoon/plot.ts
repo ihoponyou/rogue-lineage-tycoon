@@ -4,7 +4,7 @@ import { store } from "server/store";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Inject } from "shared/inject";
 import { Currency } from "../../../../types/currency";
-import { ClickInteractable } from "../interactable/click-interactable";
+import { Clickable } from "../interactable/clickable";
 import { TouchablePart } from "../interactable/touchable/touchable-part";
 import { PlayerServer } from "../player-server";
 
@@ -30,7 +30,7 @@ export class Plot
 		Alignment: 0,
 	};
 	private owner?: PlayerServer;
-	private teller!: ClickInteractable;
+	private teller!: Clickable;
 	private claimDoor!: TouchablePart;
 
 	@Inject
@@ -39,7 +39,7 @@ export class Plot
 	public onStart(): void {
 		this.id = ++Plot.totalPlots;
 
-		this.teller = this.components.getComponent<ClickInteractable>(
+		this.teller = this.components.getComponent<Clickable>(
 			this.instance.Teller,
 		)!;
 		if (!this.teller) error("teller is not clickable");

@@ -4,6 +4,7 @@ import { ASSETS } from "server/configs/tycoon";
 import { store } from "server/store";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Inject } from "shared/inject";
+import { selectCurrency } from "shared/store/slices/players/slices/currencies/selectors";
 import { PlayerServer } from "../../player-server";
 import { Pad } from "../pad";
 
@@ -43,10 +44,10 @@ export abstract class AssetUnlock<
 			return;
 		}
 
-		const currencyData =
-			store.getState().players.currencies[player.UserId]![
-				this.config.currency
-			];
+		const currencyData = store.getState(
+			selectCurrency(player.UserId, this.config.currency),
+		);
+		if (currencyData === undefined) return;
 		if (currencyData.amount < this.config.cost) {
 			print(playerServer.Name, "error = broke");
 			return;

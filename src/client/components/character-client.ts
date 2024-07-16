@@ -4,14 +4,19 @@ import {
 	Character,
 	CharacterAttributes,
 	CharacterInstance,
-} from "shared/components/character";
+} from "shared/components/abstract-character";
 import { Inject } from "shared/inject";
 import { Events } from "../networking";
 import { CharacterStateMachine } from "./character-state-machine";
 
 const events = Events.character;
 
-@Component()
+@Component({
+	defaults: {
+		isKnocked: false,
+		isAlive: true,
+	},
+})
 export class CharacterClient extends Character<
 	CharacterAttributes,
 	CharacterInstance

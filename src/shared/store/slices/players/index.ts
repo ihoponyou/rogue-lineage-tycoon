@@ -1,10 +1,11 @@
 import { combineProducers } from "@rbxts/reflex";
-import { conditionsSlice } from "./conditions";
-import { currenciesSlice } from "./currencies";
-import { identitySlice } from "./identity";
-import { manaSlice } from "./mana";
-import { resourcesSlice } from "./resources";
-import { statsSlice } from "./stats";
+import { conditionsSlice } from "./slices/conditions";
+import { currenciesSlice } from "./slices/currencies";
+import { identitySlice } from "./slices/identity";
+import { manaSlice } from "./slices/mana";
+import { resourcesSlice } from "./slices/resources";
+import { statsSlice } from "./slices/stats";
+import { transformSlice } from "./slices/transform";
 
 export const playersSlice = combineProducers({
 	stats: statsSlice,
@@ -13,4 +14,5 @@ export const playersSlice = combineProducers({
 	mana: manaSlice,
 	conditions: conditionsSlice,
 	identity: identitySlice,
+	transform: transformSlice,
 });
