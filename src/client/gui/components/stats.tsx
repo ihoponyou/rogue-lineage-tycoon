@@ -2,16 +2,21 @@ import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
 import { getDigit } from "shared/get-digit";
+import {
+	selectHealth,
+	selectToxicity,
+} from "shared/store/slices/players/slices/resources/selectors";
 import { selectStats } from "shared/store/slices/players/slices/stats/selectors";
-import { HealthBar } from "./bar/health-bar";
-import { StomachBar } from "./bar/stomach-bar";
-import { TemperatureBar } from "./bar/temperature-bar";
-import { ToxicityBar } from "./bar/toxicity-bar";
 import { Digit } from "./digit";
+import { FillBar } from "./fill-bar";
+import { StomachBar } from "./fill-bar/stomach-bar";
+import { TemperatureBar } from "./fill-bar/temperature-bar";
 import { NamePlate } from "./name-plate";
 
 export function Stats() {
 	const stats = useSelector(selectStats(LOCAL_PLAYER.UserId));
+	const healthAmount = useSelector(selectHealth(LOCAL_PLAYER.UserId)) ?? -1;
+	const toxicity = useSelector(selectToxicity(LOCAL_PLAYER.UserId)) ?? 0;
 
 	return (
 		<frame
@@ -63,10 +68,35 @@ export function Stats() {
 						ZIndex={2}
 					>
 						<StomachBar />
-						<ToxicityBar />
+						<FillBar
+							name="Toxicity"
+							amount={toxicity}
+							maxAmount={100}
+							barSizeFn={(value) => new UDim2(value, 0, 0, 6)}
+							barAnchorPoint={new Vector2()}
+							barColor={Color3.fromRGB(89, 186, 78)}
+							barPosition={UDim2.fromOffset(0, 9)}
+							dividerColor={Color3.fromRGB(97, 25, 25)}
+							dividerPosition={UDim2.fromScale(1)}
+							dividerSize={new UDim2(0, 1, 1, 0)}
+							zIndex={3}
+						/>
 					</frame>
 				</imagelabel>
-				<HealthBar />
+				<FillBar
+					name="Health"
+					amount={healthAmount}
+					maxAmount={100}
+					springFrequency={2}
+					barColor={Color3.fromRGB(206, 61, 48)}
+					barSizeFn={(percent) => UDim2.fromScale(percent, 1)}
+					barAnchorPoint={Vector2.zero}
+					barPosition={new UDim2()}
+					dividerColor={Color3.fromRGB(97, 25, 25)}
+					dividerPosition={UDim2.fromScale(1)}
+					dividerSize={new UDim2(0, 1, 1, 0)}
+					zIndex={4}
+				/>
 				<TemperatureBar />
 				<imagelabel
 					key="Counters"

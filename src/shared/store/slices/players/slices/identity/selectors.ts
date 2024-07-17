@@ -23,3 +23,10 @@ export function selectArmorName(playerId: number | string) {
 		(identity) => identity && identity.armorName,
 	);
 }
+
+export function selectFirstName(playerId: number | string) {
+	return createSelector(
+		selectIdentity(tostring(playerId)),
+		(identity) => identity && identity.firstName,
+	);
+}

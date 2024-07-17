@@ -5,13 +5,12 @@ import { LOCAL_PLAYER } from "client/constants";
 import { selectTemperature } from "shared/store/slices/players/slices/resources/selectors";
 
 export function TemperatureBar() {
-	const currentTemperature = useSelector(
-		selectTemperature(LOCAL_PLAYER.UserId),
-	);
+	const currentTemperature =
+		useSelector(selectTemperature(LOCAL_PLAYER.UserId)) ?? 0;
 
-	const [percent, setPercent] = useMotor((currentTemperature ?? -100) / 100);
+	const [percent, setPercent] = useMotor(currentTemperature / 100);
 	useEffect(
-		() => setPercent(new Spring((currentTemperature ?? -100) / 100)),
+		() => setPercent(new Spring(currentTemperature / 100)),
 		[currentTemperature],
 	);
 

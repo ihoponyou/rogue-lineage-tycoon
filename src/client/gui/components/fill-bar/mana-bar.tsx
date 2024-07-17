@@ -1,10 +1,10 @@
-import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
-import React, { useEffect } from "@rbxts/react";
+import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
 import { deserializeColor3 } from "shared/serialized-color3";
 import { selectManaAmount } from "shared/store/slices/players/selectors";
 import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
+import { FillBar } from ".";
 
 // const MANA_TWEEN_INFO = new TweenInfo(
 // 	0.1,
@@ -25,6 +25,8 @@ import { selectManaColor } from "shared/store/slices/players/slices/identity/sel
 // 		this.manaTweenTimeStep = 0;
 // 	}
 
+// TODO: use useMotion to mimic original tween properties
+
 export function ManaBar() {
 	const serializedManaColor = useSelector(
 		selectManaColor(LOCAL_PLAYER.UserId),
@@ -35,8 +37,6 @@ export function ManaBar() {
 			: new Color3(1, 1, 1);
 
 	const manaAmount = useSelector(selectManaAmount(LOCAL_PLAYER.UserId)) ?? -1;
-	const [percent, setPercent] = useMotor(manaAmount);
-	useEffect(() => setPercent(new Spring(manaAmount / 100)), [manaAmount]);
 
 	return (
 		<frame
@@ -58,23 +58,19 @@ export function ManaBar() {
 				Size={new UDim2(0, 28, 1, 0)}
 				ZIndex={4}
 			>
-				<frame
-					key="ManaSlider"
-					AnchorPoint={new Vector2(0, 1)}
-					BackgroundColor3={manaColor}
-					BorderSizePixel={0}
-					Position={new UDim2(0, 0, 1, 0)}
-					Size={percent.map((percent) => new UDim2(1, 0, percent, 0))}
-					ZIndex={4}
-				>
-					<frame
-						key="Divider"
-						BackgroundColor3={Color3.fromRGB(88, 69, 78)}
-						BorderSizePixel={0}
-						Position={new UDim2(0, 0, 0, -1)}
-						Size={new UDim2(1, 0, 0, 1)}
-					/>
-				</frame>
+				<FillBar
+					name="ManaSlider"
+					amount={manaAmount}
+					maxAmount={100}
+					barColor={manaColor}
+					barSizeFn={(percent) => new UDim2(1, 0, percent, 0)}
+					barAnchorPoint={Vector2.yAxis}
+					barPosition={UDim2.fromScale(0, 1)}
+					dividerColor={Color3.fromRGB(88, 69, 78)}
+					dividerPosition={new UDim2(0, 0, 0, -1)}
+					dividerSize={new UDim2(1, 0, 0, 1)}
+					zIndex={4}
+				/>
 				<imagelabel
 					key="Overlay"
 					AnchorPoint={new Vector2(0.5, 0)}
