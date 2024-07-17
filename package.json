@@ -33,6 +33,7 @@
     "@rbxts/object-utils": "^1.0.4",
     "@rbxts/pretty-react-hooks": "^0.5.0",
     "@rbxts/profileservice": "^1.4.2",
+    "@rbxts/promise-character": "^1.0.3",
     "@rbxts/react": "^0.3.6",
     "@rbxts/react-reflex": "^0.3.4",
     "@rbxts/react-roblox": "^0.3.6",

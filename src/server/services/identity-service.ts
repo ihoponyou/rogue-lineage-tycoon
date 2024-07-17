@@ -2,7 +2,8 @@ import { Components } from "@flamework/components";
 import { Dependency, OnStart, Service } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import Object from "@rbxts/object-utils";
-import { Players, Workspace } from "@rbxts/services";
+import { promiseR6 } from "@rbxts/promise-character";
+import { Players } from "@rbxts/services";
 import { CharacterServer } from "server/components/character-server";
 import { ARMORS, getRandomStarterArmor } from "server/configs/armors";
 import { getRandomFirstName } from "server/configs/names";
@@ -18,7 +19,6 @@ import { deserializeColor3 } from "shared/serialized-color3";
 import { Sex } from "shared/store/slices/players/slices/identity";
 import { selectIdentity } from "shared/store/slices/players/slices/identity/selectors";
 import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
-import { DataService } from "./data-service";
 
 const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
 
@@ -30,10 +30,7 @@ export class IdentityService
 		{};
 	private defaultDescription = new Instance("HumanoidDescription");
 
-	public constructor(
-		private readonly logger: Logger,
-		private dataService: DataService,
-	) {}
+	public constructor(private readonly logger: Logger) {}
 
 	onStart() {
 		this.defaultDescription.HatAccessory = "48474313";
@@ -54,16 +51,14 @@ export class IdentityService
 		this.cleanPlayerDescription(this.playerDescriptions[player.UserId]);
 	}
 
-	onCharacterAdded(character: Model) {
+	public async onCharacterAdded(model: Model) {
+		const character = await promiseR6(model);
 		const player = Players.GetPlayerFromCharacter(character);
 		if (!player) error(`Player not found for ${character.Name}`);
 
 		this.playerDescriptions[player.UserId] =
 			this.getPlayerAvatarDescription(player.UserId);
 		this.cleanPlayerDescription(this.playerDescriptions[player.UserId]);
-
-		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
-		if (!humanoid) error(`Humanoid not found in ${character.Name}`);
 
 		const data = store.getState(selectIdentity(player.UserId));
 		if (!data) error("missing data");
@@ -132,9 +127,9 @@ export class IdentityService
 				: deserializeColor3(serializedColor);
 		store.setManaColor(player.UserId, newColor);
 
-		while (!character.IsDescendantOf(Workspace))
-			character.AncestryChanged.Wait();
-		humanoid.ApplyDescription(this.playerDescriptions[player.UserId]);
+		character.Humanoid.ApplyDescription(
+			this.playerDescriptions[player.UserId],
+		);
 
 		const components = Dependency<Components>();
 		components
@@ -177,16 +172,9 @@ export class IdentityService
 		description.FaceAccessory = "";
 	}
 
-	private getHead(character: Model): Part | undefined {
-		return character.FindFirstChild("Head") as Part;
-	}
-
-	cleanCharacterFace(character: Model) {
-		const head = this.getHead(character);
-		if (!head) {
-			return;
-		}
-		const face = head.FindFirstChild("face");
+	private async cleanCharacterFace(model: Model) {
+		const character = await promiseR6(model);
+		const face = character.Head.FindFirstChild("face");
 		if (face) {
 			face.Destroy();
 		}
@@ -238,16 +226,17 @@ export class IdentityService
 		}
 	}
 
-	setEyeColor(character: Model, color: Color3) {
-		const head = this.getHead(character);
-		const face = head?.FindFirstChild("face") as Decal;
+	public async setEyeColor(model: Model, color: Color3) {
+		const character = await promiseR6(model);
+		const face = character.Head.FindFirstChild("face") as Decal;
 		if (!face) error(`Face not find in character ${character}`);
 
 		face.Color3 = color;
 	}
 
-	setFace(character: Model, raceName: string, personality: string) {
-		this.cleanCharacterFace(character);
+	public async setFace(model: Model, raceName: string, personality: string) {
+		const character = await promiseR6(model);
+		this.cleanCharacterFace(model);
 
 		const race = RACES[raceName];
 		if (raceName === "Fischeran") {
@@ -269,7 +258,7 @@ export class IdentityService
 		}
 
 		const clone = face.Clone();
-		clone.Parent = this.getHead(character);
+		clone.Parent = character.Head;
 		clone.Name = "face";
 	}
 
@@ -332,14 +321,14 @@ export class IdentityService
 		store.setFirstName(player.UserId, name);
 	}
 
-	addCustomHead(
-		character: Model,
+	public async addCustomHead(
+		model: Model,
 		raceName: keyof RaceGlossary,
 		phenotypeName: string,
 	) {
-		const head = this.getHead(character);
-		if (head) head.Size = new Vector3(0.8, 1.4, 0.8);
-		const mesh = head?.FindFirstChild("Mesh");
+		const character = await promiseR6(model);
+		character.Head.Size = new Vector3(0.8, 1.4, 0.8);
+		const mesh = character.Head.FindFirstChild("Mesh");
 		if (mesh) mesh.Destroy();
 
 		let customHead = APPEARANCE.CustomHeads.FindFirstChild(raceName);
