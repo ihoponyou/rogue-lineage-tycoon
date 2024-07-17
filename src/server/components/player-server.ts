@@ -6,6 +6,7 @@ import { AbstractPlayer } from "shared/components/abstract-player";
 import { Inject } from "shared/inject";
 import { selectHealth } from "shared/store/slices/players/slices/resources/selectors";
 import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
+import { selectTransform } from "shared/store/slices/players/slices/transform/selectors";
 import { CharacterServer } from "./character-server";
 
 @Component({
@@ -67,6 +68,15 @@ export class PlayerServer extends AbstractPlayer {
 						purgatorySpawn.CFrame.ToEulerAnglesXYZ()[1],
 					);
 				}
+			}
+
+			const transform = store.getState(selectTransform(this.UserId));
+			if (
+				transform !== undefined &&
+				transform.position.Y <= Workspace.FallenPartsDestroyHeight
+			) {
+				store.setPosition(this.UserId, Vector3.zero);
+				store.setRotation(this.UserId, 0);
 			}
 
 			this.components
