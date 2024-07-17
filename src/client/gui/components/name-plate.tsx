@@ -1,14 +1,12 @@
-import { useEventListener } from "@rbxts/pretty-react-hooks";
+import { useSelector } from "@rbxts/react-reflex";
+import { LOCAL_PLAYER } from "client/constants";
+import { selectFirstName } from "shared/store/slices/players/slices/identity/selectors";
 import React = require("@rbxts/react");
-import { Events } from "client/networking";
 
 const NAME_FONT = new Font("rbxasset://fonts/families/RomanAntique.json");
 
 export function NamePlate() {
-	const [text, setText] = React.useBinding("");
-	useEventListener(Events.character.firstNameChanged, (name) =>
-		setText(name.upper()),
-	);
+	const firstName = useSelector(selectFirstName(LOCAL_PLAYER.UserId));
 
 	return (
 		<textlabel
@@ -19,7 +17,7 @@ export function NamePlate() {
 			FontFace={NAME_FONT}
 			Position={new UDim2(0, 3, 1, -26)}
 			Size={new UDim2(1, -32, 0, 20)}
-			Text={text}
+			Text={firstName?.upper()}
 			TextColor3={Color3.fromRGB(255, 255, 255)}
 			TextSize={20}
 			TextStrokeColor3={Color3.fromRGB(112, 95, 67)}
@@ -34,7 +32,7 @@ export function NamePlate() {
 				FontFace={NAME_FONT}
 				Position={new UDim2(0, 2, 0, 1)}
 				Size={new UDim2(1, 0, 1, 0)}
-				Text={text}
+				Text={firstName?.upper()}
 				TextColor3={Color3.fromRGB(0, 0, 0)}
 				TextSize={20}
 				TextTransparency={0.75}
