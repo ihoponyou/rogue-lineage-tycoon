@@ -1,9 +1,9 @@
-import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
 import { selectRace } from "shared/store/slices/players/slices/identity/selectors";
 import { selectStomach } from "shared/store/slices/players/slices/resources/selectors";
+import { FillBar } from ".";
 
 const WHITE_STOMACH_RACES = [
 	"Gaian",
@@ -19,7 +19,7 @@ const DEFAULT_STOMACH_COLOR = Color3.fromRGB(240, 208, 26);
 const WHITE_STOMACH_COLOR = Color3.fromRGB(229, 229, 204);
 
 export function StomachBar() {
-	const stomachAmount = useSelector(selectStomach(LOCAL_PLAYER.UserId));
+	const stomachAmount = useSelector(selectStomach(LOCAL_PLAYER.UserId)) ?? 0;
 
 	// TODO: white stomach stays when wiping from white-stomached race to a non white-stomached race
 	const [stomachColor, setStomachColor] = useState(DEFAULT_STOMACH_COLOR);
@@ -29,28 +29,19 @@ export function StomachBar() {
 		setStomachColor(WHITE_STOMACH_COLOR);
 	}, [raceName]);
 
-	const [percent, setPercent] = useMotor((stomachAmount ?? -100) / 100);
-	useEffect(
-		() => setPercent(new Spring((stomachAmount ?? -1) / 100)),
-		[stomachAmount],
-	);
-
 	return (
-		<frame
-			key="Stomach"
-			BackgroundColor3={stomachColor}
-			BorderSizePixel={0}
-			Size={percent.map((value) => new UDim2(value, 0, 0, 6))}
-			ZIndex={3}
-		>
-			<frame
-				key="Divider"
-				BackgroundColor3={Color3.fromRGB(97, 25, 25)}
-				BorderSizePixel={0}
-				Position={UDim2.fromScale(1)}
-				Size={new UDim2(0, 1, 1, 0)}
-				ZIndex={3}
-			/>
-		</frame>
+		<FillBar
+			name="Stomach"
+			amount={stomachAmount}
+			maxAmount={100}
+			barSizeFn={(percent) => new UDim2(percent, 0, 0, 6)}
+			barColor={stomachColor}
+			barAnchorPoint={Vector2.zero}
+			barPosition={new UDim2()}
+			dividerColor={Color3.fromRGB(97, 25, 25)}
+			dividerPosition={UDim2.fromScale(1)}
+			dividerSize={new UDim2(0, 1, 1, 0)}
+			zIndex={3}
+		/>
 	);
 }
