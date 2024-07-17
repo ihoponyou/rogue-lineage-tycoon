@@ -1,15 +1,15 @@
 import { State } from "./state";
 
 class NullState extends State {
-	name = "null/nil/undefined";
+	name = "Null";
 }
 
 export class StateMachine {
-	private states = new Map<string, State>();
-	private currentState = new NullState(this);
 	private initialized = false;
+	private currentState = new NullState(this);
+	private states = new Map<string, State>([["null", this.currentState]]);
 
-	initialize(initialState: State) {
+	public initialize(initialState: State) {
 		if (this.initialized) return;
 
 		this.currentState = initialState;
@@ -18,25 +18,25 @@ export class StateMachine {
 		this.initialized = true;
 	}
 
-	getCurrentState(): State {
+	public getCurrentState(): State {
 		return this.currentState;
 	}
 
-	addState(state: State): void {
+	public addState(state: State): void {
 		this.states.set(state.name.lower(), state);
 		state.initialize();
 	}
 
-	addStates(states: Array<State>): void {
+	public addStates(states: Array<State>): void {
 		states.forEach((value) => this.addState(value));
 	}
 
-	update(deltaTime: number): void {
+	public update(deltaTime: number): void {
 		// print("updating sm", this.currentState.name);
 		this.currentState.update(deltaTime);
 	}
 
-	transitionTo(newStateName: string, ...args: Array<unknown>) {
+	public transitionTo(newStateName: string, ...args: Array<unknown>) {
 		const newState = this.states.get(newStateName.lower());
 		if (!newState) {
 			warn(`no ${newStateName}`);
@@ -50,5 +50,9 @@ export class StateMachine {
 		newState.enter(...args);
 
 		// print(`${oldStateName} -> ${newState.name}`);
+	}
+
+	public destroy(): void {
+		this.transitionTo("Null");
 	}
 }
