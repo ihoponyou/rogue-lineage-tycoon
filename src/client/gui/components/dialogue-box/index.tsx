@@ -24,79 +24,78 @@ export function DialogueBox() {
 	useAsyncEffect(async () => {
 		if (text === undefined) return;
 
-		let lastWait = 0.1;
-		let [positionX, positionY] = [0, 0];
+		return new Promise((resolve, reject, onCancel) => {
+			let lastWait = 0.1;
+			let [positionX, positionY] = [0, 0];
 
-		const textLength = text.size();
+			const textLength = text.size();
 
-		characterContainer.current?.ClearAllChildren();
-
-		for (let i = 1; i <= textLength; i++) {
-			let waitTime = 0;
-
-			const char = text.sub(i, i);
-			const size = TextService.GetTextSize(
-				char,
-				CHARACTER_FONT_SIZE,
-				CHARACTER_FONT,
-				FRAME_SIZE,
-			);
-			const currentCharIsWhitespace = containsWhitespace(char);
-
-			if (positionX + size.X > 450) {
-				waitTime += 0.1;
-				positionX = 0;
-				positionY += size.Y;
-			}
-
-			if (!currentCharIsWhitespace) {
-				const label = CharLabel({
-					char: char,
-					font: CHARACTER_FONT,
-					positionX: positionX,
-					positionY: positionY,
-					size: size,
-					parent: characterContainer.current!,
-				});
-
-				task.delay(lastWait, () => {
-					label.Visible = true;
-					label.TextSize = 28;
-					TweenService.Create(label, CHARACTER_TWEEN_INFO, {
-						TextSize: CHARACTER_FONT_SIZE,
-						TextTransparency: 0,
-					}).Play();
-				});
-			}
-
-			positionX += size.X;
-
-			if (currentCharIsWhitespace) {
-				waitTime += 0.01;
-			} else {
-				switch (char) {
-					case "?":
-					case "!":
-						waitTime += 0.1;
-						break;
-					case ",":
-						waitTime += 0.2;
-						break;
-					case ".":
-						waitTime += 0.3;
-						break;
-					default:
-						waitTime += 0.03;
-				}
-			}
-
-			lastWait = waitTime;
-			task.wait(waitTime);
-		}
-
-		return () => {
 			characterContainer.current?.ClearAllChildren();
-		};
+
+			for (let i = 1; i <= textLength; i++) {
+				if (onCancel()) break;
+				let waitTime = 0;
+
+				const char = text.sub(i, i);
+				const size = TextService.GetTextSize(
+					char,
+					CHARACTER_FONT_SIZE,
+					CHARACTER_FONT,
+					FRAME_SIZE,
+				);
+				const currentCharIsWhitespace = containsWhitespace(char);
+
+				if (positionX + size.X > 450) {
+					waitTime += 0.1;
+					positionX = 0;
+					positionY += size.Y;
+				}
+
+				if (!currentCharIsWhitespace) {
+					const label = CharLabel({
+						char: char,
+						font: CHARACTER_FONT,
+						positionX: positionX,
+						positionY: positionY,
+						size: size,
+						parent: characterContainer.current!,
+					});
+
+					task.delay(lastWait, () => {
+						label.Visible = true;
+						label.TextSize = 28;
+						TweenService.Create(label, CHARACTER_TWEEN_INFO, {
+							TextSize: CHARACTER_FONT_SIZE,
+							TextTransparency: 0,
+						}).Play();
+					});
+				}
+
+				positionX += size.X;
+
+				if (currentCharIsWhitespace) {
+					waitTime += 0.01;
+				} else {
+					switch (char) {
+						case "?":
+						case "!":
+							waitTime += 0.1;
+							break;
+						case ",":
+							waitTime += 0.2;
+							break;
+						case ".":
+							waitTime += 0.3;
+							break;
+						default:
+							waitTime += 0.03;
+					}
+				}
+
+				lastWait = waitTime;
+				task.wait(waitTime);
+			}
+		});
 	}, [text]);
 
 	const options = useSelector(selectDialogueOptions);
