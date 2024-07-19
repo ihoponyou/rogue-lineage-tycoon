@@ -25,7 +25,7 @@ export const DIALOGUE: {
 			speech: "keep yourself safe?",
 			options: [
 				{
-					label: "Kill me.",
+					label: "Make it so.",
 					onClick: (dialogue: Dialogue, player: Player) => {
 						dialogue.speak(player, "Confirm");
 					},
@@ -37,10 +37,10 @@ export const DIALOGUE: {
 			],
 		},
 		Confirm: {
-			speech: "are you sure?",
+			speech: "Are you sure?",
 			options: [
 				{
-					label: "K̶̪͚͍̱͚̳͔̤̪̦͋̂̓̊̈͊̈́̂̌͑̕̕͜͝I̸̛͈̬͍̼̐̿͗͗̚͝L̷̡̡̬͍̺͈͕͚̻̰̯̦̙̇̌̋̇̑́͑͑͗̏͊̋͜L̷͈̹̻͔͔̹̝̣̖̗̑̏̈̃͒̔̈́̒̉̉̾̏̕͘͜ͅ ̶̛̩̠̇̽͗̓͋̈́̀͋̎̾͘͠M̷̧̧̧͈̲̼̞̳̖̼̳̮̺͖̌̾͗̉Ę̴̢̧̗̙̹̩̳͎̫͇̰̝͓͙͊̓̏̋̽͌̆͐̚͜",
+					label: "Kill me.",
 					onClick: (dialogue: Dialogue, player: Player) => {
 						dialogue.speak(player, "Goodbye");
 						task.wait(1);

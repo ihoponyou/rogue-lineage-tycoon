@@ -13,6 +13,7 @@ interface ServerEvents {
 
 interface ClientEvents {
 	kicked(): void;
+	greeted(player: Player): void;
 	mana: ManaClientEvents;
 	character: CharacterClientEvents;
 	currency: CurrencyClientEvents;
