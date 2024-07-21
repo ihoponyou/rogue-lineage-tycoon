@@ -14,10 +14,6 @@ interface DialogueOptionConfig {
 	onClick: (dialogue: Dialogue, player: Player) => void;
 }
 
-const closeDialogue = (dialogue: Dialogue, player: Player) => {
-	dialogue.close(player);
-};
-
 export const DIALOGUE: {
 	[speaker: string]: { [topic: string]: DialogueConfig };
 } = {
@@ -33,7 +29,7 @@ export const DIALOGUE: {
 				},
 				{
 					label: "Bye.",
-					onClick: closeDialogue,
+					onClick: (dialogue, player) => dialogue.close(player),
 				},
 			],
 		},
@@ -56,7 +52,7 @@ export const DIALOGUE: {
 				},
 				{
 					label: "Let me think.",
-					onClick: closeDialogue,
+					onClick: (dialogue, player) => dialogue.close(player),
 				},
 			],
 		},
@@ -74,14 +70,14 @@ export const DIALOGUE: {
 					onClick: (dialogue, player) => {
 						const plotInstance = dialogue.instance.Parent;
 						if (plotInstance === undefined) {
-							closeDialogue(dialogue, player);
+							dialogue.close(player);
 							return;
 						}
 						const components = Dependency<Components>();
 						const plot =
 							components.getComponent<Plot>(plotInstance);
 						if (plot === undefined) {
-							closeDialogue(dialogue, player);
+							dialogue.close(player);
 							return;
 						}
 						plot.claim(player);
@@ -90,7 +86,7 @@ export const DIALOGUE: {
 				},
 				{
 					label: "No.",
-					onClick: closeDialogue,
+					onClick: (dialogue, player) => dialogue.close(player),
 				},
 			],
 		},
@@ -99,7 +95,13 @@ export const DIALOGUE: {
 			options: [
 				{
 					label: "Thanks?",
-					onClick: closeDialogue,
+					onClick: (dialogue, player) => {
+						const dorgenModel = dialogue.instance as Model;
+						dorgenModel.PivotTo(
+							dorgenModel.GetPivot().sub(Vector3.yAxis.mul(50)),
+						);
+						dialogue.close(player);
+					},
 				},
 			],
 		},
