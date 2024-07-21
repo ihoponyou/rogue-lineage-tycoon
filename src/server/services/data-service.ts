@@ -18,6 +18,7 @@ import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 
 const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Testing" : "Production";
 const PROFILE_KEY_TEMPLATE = "Player%d";
+const WIPE_DATA_ON_JOIN = false;
 
 type PlayerProfile = Profile<PlayerData>;
 
@@ -80,7 +81,7 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 	private setupProfile(player: Player): void {
 		const key = PROFILE_KEY_TEMPLATE.format(player.UserId);
 
-		// this.profileStore.WipeProfileAsync(key);
+		if (WIPE_DATA_ON_JOIN) this.profileStore.WipeProfileAsync(key);
 
 		const profile = this.profileStore.LoadProfileAsync(key);
 		if (!profile) {

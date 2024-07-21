@@ -162,7 +162,7 @@ export function DialogueBox() {
 					}
 					Position={new UDim2(0, 2, 0, 2)}
 					Size={new UDim2(1, 0, 1, 0)}
-					Text="[name]"
+					Text={speakerName ?? "[name]"}
 					TextColor3={Color3.fromRGB(0, 0, 0)}
 					TextSize={22}
 					TextTransparency={0.7}

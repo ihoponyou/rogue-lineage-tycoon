@@ -363,7 +363,7 @@ export const RACES: RaceGlossary = {
 				HairColor: Color3.fromRGB(165, 139, 121),
 				SkinColor: Color3.fromRGB(113, 145, 79),
 			},
-			Black: {
+			Purple: {
 				EyeColor: Color3.fromRGB(95, 238, 155),
 				HairColor: Color3.fromRGB(221, 210, 193),
 				SkinColor: Color3.fromRGB(114, 88, 127),
@@ -373,7 +373,7 @@ export const RACES: RaceGlossary = {
 				HairColor: Color3.fromRGB(165, 139, 121),
 				SkinColor: Color3.fromRGB(163, 75, 75),
 			},
-			White: {
+			Albino: {
 				EyeColor: Color3.fromRGB(248, 121, 155),
 				HairColor: Color3.fromRGB(165, 139, 156),
 				SkinColor: Color3.fromRGB(255, 243, 250),
