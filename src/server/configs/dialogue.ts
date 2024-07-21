@@ -2,6 +2,7 @@ import { Components } from "@flamework/components";
 import { Dependency } from "@flamework/core";
 import { Dialogue } from "server/components/dialogue";
 import { PlayerServer } from "server/components/player-server";
+import { Plot } from "server/components/tycoon/plot";
 
 export interface DialogueConfig {
 	speech: string;
@@ -26,7 +27,7 @@ export const DIALOGUE: {
 			options: [
 				{
 					label: "Make it so.",
-					onClick: (dialogue: Dialogue, player: Player) => {
+					onClick: (dialogue, player) => {
 						dialogue.speak(player, "Confirm");
 					},
 				},
@@ -41,7 +42,7 @@ export const DIALOGUE: {
 			options: [
 				{
 					label: "Kill me.",
-					onClick: (dialogue: Dialogue, player: Player) => {
+					onClick: (dialogue, player) => {
 						dialogue.speak(player, "Goodbye");
 						task.wait(1);
 						dialogue.close(player);
@@ -61,6 +62,49 @@ export const DIALOGUE: {
 		},
 		Goodbye: {
 			speech: "good riddance!",
+			options: [],
+		},
+	},
+	Dorgen: {
+		Open: {
+			speech: "You there! Might I interest you in this here plot of land? I hear there's plenty of potential for profit around these parts.",
+			options: [
+				{
+					label: "Sure.",
+					onClick: (dialogue, player) => {
+						const plotInstance = dialogue.instance.Parent;
+						if (plotInstance === undefined) {
+							closeDialogue(dialogue, player);
+							return;
+						}
+						const components = Dependency<Components>();
+						const plot =
+							components.getComponent<Plot>(plotInstance);
+						if (plot === undefined) {
+							closeDialogue(dialogue, player);
+							return;
+						}
+						plot.claim(player);
+						dialogue.speak(player, "Congratulate");
+					},
+				},
+				{
+					label: "No.",
+					onClick: closeDialogue,
+				},
+			],
+		},
+		Congratulate: {
+			speech: "Good... good! It's all yours!",
+			options: [
+				{
+					label: "Thanks?",
+					onClick: closeDialogue,
+				},
+			],
+		},
+		Goodbye: {
+			speech: "Maybe another time...",
 			options: [],
 		},
 	},
