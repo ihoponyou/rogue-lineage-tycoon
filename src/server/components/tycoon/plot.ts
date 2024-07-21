@@ -47,6 +47,7 @@ export class Plot
 				this.components.getComponent<ModelComponent>(instance);
 			if (model === undefined) return;
 			this.assets.set(instance.Name, model);
+			if (instance.HasTag("HideOnUnlock")) return;
 			model.hide();
 		});
 	}
@@ -65,12 +66,9 @@ export class Plot
 		if (playerServer === undefined) return;
 		if (this.owner !== undefined) return;
 		if (Plot.plotOwners.get(player) !== undefined) return;
+
 		Plot.plotOwners.set(player, this);
 		this.owner = playerServer;
-
-		for (const [name, model] of this.assets) {
-			model.show();
-		}
 
 		print(`${this.instance} claimed by ${this.owner.instance.Name}`);
 	}

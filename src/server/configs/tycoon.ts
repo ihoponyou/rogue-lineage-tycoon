@@ -20,6 +20,12 @@ interface ProductConfig {
 
 const PRODUCT_MODELS = ReplicatedStorage.Assets.Tycoon.Products;
 
+export function getAssetConfig(assetName: string): AssetConfig {
+	const asset = ASSETS[assetName];
+	if (asset === undefined) error(`Asset "${assetName}" does not exist`);
+	return asset;
+}
+
 export const ASSETS: { [name: string]: AssetConfig } = {
 	Door: {
 		cost: 0,
@@ -45,6 +51,11 @@ export const ASSETS: { [name: string]: AssetConfig } = {
 		cost: 10,
 		currency: "Silver",
 		prerequisites: ["Door"],
+	},
+	BreakRocks: {
+		cost: 0,
+		currency: "Silver",
+		prerequisites: [],
 	},
 };
 

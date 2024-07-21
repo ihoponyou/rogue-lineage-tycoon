@@ -16,6 +16,7 @@ export abstract class Touchable<
 		if (!character) return;
 		const player = Players.GetPlayerFromCharacter(character);
 		if (!player) return;
+		if (!this.isPlayerAllowed(player)) return;
 		this.interact(player);
 	}
 }

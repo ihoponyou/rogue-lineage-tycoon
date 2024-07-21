@@ -35,4 +35,8 @@ export abstract class Interactable<
 	public disable(): void {
 		this._isEnabled = false;
 	}
+
+	public isPlayerAllowed(player: Player): boolean {
+		return true;
+	}
 }

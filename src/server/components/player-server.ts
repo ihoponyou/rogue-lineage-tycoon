@@ -1,6 +1,6 @@
 import { Component, Components } from "@flamework/components";
 import { Workspace } from "@rbxts/services";
-import { ASSETS } from "server/configs/tycoon";
+import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { Inject } from "shared/inject";
@@ -19,19 +19,20 @@ export class PlayerServer extends AbstractPlayer {
 	private components!: Components;
 
 	public hasAsset(assetName: string): boolean {
-		// print(`looking for ${assetName} in`, this.assets);
+		getAssetConfig(assetName);
 		return this.assets.includes(assetName);
 	}
 
 	public hasAssetPrerequisites(assetName: string): boolean {
-		for (const reqName of ASSETS[assetName].prerequisites) {
+		const assetConfig = getAssetConfig(assetName);
+		for (const reqName of assetConfig.prerequisites) {
 			if (!this.hasAsset(reqName)) return false;
 		}
 		return true;
 	}
 
 	public addAsset(assetName: string): void {
-		if (!ASSETS[assetName]) error(`asset "${assetName}" does not exist`);
+		getAssetConfig(assetName);
 		this.assets.push(assetName);
 	}
 
