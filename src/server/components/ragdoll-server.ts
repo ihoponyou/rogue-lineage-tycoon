@@ -96,7 +96,6 @@ export class RagdollServer extends Ragdoll implements OnStart {
 		socket.LimitsEnabled = true;
 		socket.MaxFrictionTorque = 100;
 		socket.Restitution = 0.25;
-		print(socketType);
 		socket.UpperAngle = SOCKET_ANGLES[socketType].UpperAngle;
 		socket.TwistLimitsEnabled = socketType !== "Shoulder";
 		if (socket.TwistLimitsEnabled) {

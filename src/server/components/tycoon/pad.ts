@@ -1,7 +1,7 @@
 import { Component, Components } from "@flamework/components";
 import Signal from "@rbxts/signal";
 import { TouchableModel } from "server/components/interactable/touchable/touchable-model";
-import { ASSETS } from "server/configs/tycoon";
+import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { ModelComponent } from "shared/components/model";
 import { Hideable } from "shared/hideable";
@@ -32,7 +32,7 @@ export class Pad
 	implements Hideable
 {
 	private plot!: Plot;
-	private assetConfig = ASSETS[this.attributes.assetName];
+	private assetConfig = getAssetConfig(this.attributes.assetName);
 	private purchased = new Signal<PurchaseCallback>();
 
 	@Inject

@@ -50,12 +50,32 @@ export const ASSETS: { [name: string]: AssetConfig } = {
 	Mana: {
 		cost: 10,
 		currency: "Silver",
-		prerequisites: ["Door"],
+		prerequisites: ["Walls"],
 	},
 	BreakRocks: {
 		cost: 0,
 		currency: "Silver",
 		prerequisites: [],
+	},
+	ScrollDropper: {
+		cost: 250,
+		currency: "Silver",
+		prerequisites: ["Mana"],
+	},
+	TrinketDropper: {
+		cost: 100,
+		currency: "Silver",
+		prerequisites: ["SilverDropper"],
+	},
+	Polisher: {
+		cost: 100,
+		currency: "Silver",
+		prerequisites: ["SilverDropper"],
+	},
+	Appraiser: {
+		cost: 100,
+		currency: "Silver",
+		prerequisites: ["Merchant"],
 	},
 };
 
