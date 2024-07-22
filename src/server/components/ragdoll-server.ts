@@ -30,6 +30,13 @@ const SOCKET_ANGLES: { [key: string]: SocketAngles } = {
 	},
 };
 
+function getSocketTypeFromMotorName(name: string): SocketType {
+	// eslint-disable-next-line roblox-ts/lua-truthiness
+	return (name.match("Hip")[0] ||
+		name.match("Shoulder")[0] ||
+		name.match("Neck")[0]) as SocketType;
+}
+
 @Component({
 	tag: "Ragdoll",
 	defaults: {
@@ -40,7 +47,7 @@ export class RagdollServer extends Ragdoll implements OnStart {
 	private trove = new Trove();
 	private joints = new Map<string, RagdollJoint>();
 
-	private newJoint(
+	private static newJoint(
 		motor: Motor6D,
 		socketType: SocketType,
 		jointName: string,
@@ -50,8 +57,8 @@ export class RagdollServer extends Ragdoll implements OnStart {
 		attachment0.Parent = motor.Part0;
 
 		const attachment1 = new Instance("Attachment");
-		attachment0.Name = jointName + "Attachment1";
-		attachment0.Parent = motor.Part0;
+		attachment1.Name = jointName + "Attachment1";
+		attachment1.Parent = motor.Part1;
 
 		if (socketType === "Hip") {
 			const c0Position = motor.C0.Position;
@@ -80,7 +87,7 @@ export class RagdollServer extends Ragdoll implements OnStart {
 		return { motor: motor, socket: socket };
 	}
 
-	private newSocket(
+	private static newSocket(
 		jointName: string,
 		socketType: SocketType,
 	): BallSocketConstraint {
@@ -89,6 +96,7 @@ export class RagdollServer extends Ragdoll implements OnStart {
 		socket.LimitsEnabled = true;
 		socket.MaxFrictionTorque = 100;
 		socket.Restitution = 0.25;
+		print(socketType);
 		socket.UpperAngle = SOCKET_ANGLES[socketType].UpperAngle;
 		socket.TwistLimitsEnabled = socketType !== "Shoulder";
 		if (socket.TwistLimitsEnabled) {
@@ -99,21 +107,23 @@ export class RagdollServer extends Ragdoll implements OnStart {
 		return socket;
 	}
 
-	onStart(): void {
+	public onStart(): void {
 		this.configureHumanoid();
 
 		for (const motor of this.instance.GetDescendants()) {
 			if (!motor.IsA("Motor6D")) continue;
 			if (motor.Name === "RootJoint") continue;
 
-			const socketType = (motor.Name.match("Hip")[0] ||
-				motor.Name.match("Shoulder")[0] ||
-				motor.Name.match("Neck")[0]) as SocketType;
+			const socketType = getSocketTypeFromMotorName(motor.Name);
 			if (!socketType)
-				error(`${motor.Name} does not contain Hip/Shoulder/Neck`);
+				error(`${motor.Name} does not contain "Hip"/"Shoulder"/"Neck"`);
 
 			const jointName = motor.Name.gsub(" ", "")[0];
-			const newJoint = this.newJoint(motor, socketType, jointName);
+			const newJoint = RagdollServer.newJoint(
+				motor,
+				socketType,
+				jointName,
+			);
 			this.joints.set(jointName, newJoint);
 
 			this.trove.connect(motor.GetPropertyChangedSignal("Parent"), () => {
@@ -125,9 +135,11 @@ export class RagdollServer extends Ragdoll implements OnStart {
 				this.joints.delete(jointName);
 			});
 		}
+
+		this.toggle(this.attributes.isRagdolled);
 	}
 
-	toggle(on: boolean): void {
+	public toggle(on: boolean): void {
 		this.attributes.isRagdolled = on;
 
 		this.humanoid.AutoRotate = !on;
