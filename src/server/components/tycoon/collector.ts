@@ -1,14 +1,11 @@
 import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { Product } from "./product";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { ModelComponent } from "shared/components/model";
 import { Toggleable } from "shared/components/toggleable";
-import { Furniture, FurnitureInstance } from "./furniture";
-import { bool } from "@rbxts/react/src/prop-types";
 import { Inject } from "shared/inject";
+import { Product } from "./product";
 
-type CollectorInstance = FurnitureInstance & {
+type CollectorInstance = Model & {
 	Collider: Part;
 };
 

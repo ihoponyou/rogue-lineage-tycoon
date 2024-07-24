@@ -1,15 +1,14 @@
 import { Component, Components } from "@flamework/components";
-import { Timer, TimerState } from "@rbxts/timer";
-import { DisposableComponent } from "shared/components/disposable-component";
-import { DROPPERS, PRODUCTS } from "server/configs/tycoon";
 import { OnStart } from "@flamework/core";
-import { ModelComponent } from "shared/components/model";
-import { Inject } from "shared/inject";
-import { Furniture, FurnitureInstance } from "./furniture";
 import { Debris } from "@rbxts/services";
+import { Timer, TimerState } from "@rbxts/timer";
+import { DROPPERS } from "server/configs/tycoon";
+import { DisposableComponent } from "shared/components/disposable-component";
+import { ModelComponent } from "shared/components/model";
 import { Toggleable } from "shared/components/toggleable";
+import { Inject } from "shared/inject";
 
-type DropperInstance = FurnitureInstance & {
+type DropperInstance = Model & {
 	Faucet: BasePart & {
 		Spout: Attachment;
 	};

@@ -4,7 +4,7 @@ import { Logger } from "@rbxts/log";
 import Object from "@rbxts/object-utils";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
-import { CharacterServer } from "server/components/character-server";
+import { CharacterServer } from "server/components/character/character-server";
 import { ARMORS, getRandomStarterArmor } from "server/configs/armors";
 import { getRandomFirstName } from "server/configs/names";
 import {

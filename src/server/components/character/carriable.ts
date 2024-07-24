@@ -1,11 +1,10 @@
 import { Component, Components } from "@flamework/components";
-import { DisposableComponent } from "shared/components/disposable-component";
-import { CharacterServer } from "./character-server";
-import { Dependency, OnStart } from "@flamework/core";
-import { RagdollServer } from "./ragdoll-server";
+import { OnStart } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
-import { KeyInteractable } from "./interactable/key-interactable";
 import { Inject } from "shared/inject";
+import { KeyInteractable } from "../interactable/key-interactable";
+import { CharacterServer } from "./character-server";
+import { RagdollServer } from "./ragdoll-server";
 
 interface Attributes {
 	isCarried: boolean;

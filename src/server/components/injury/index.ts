@@ -2,7 +2,7 @@ import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { store } from "server/store";
 import { Condition } from "shared/configs/conditions";
-import { CharacterServer } from "../character-server";
+import { CharacterServer } from "../character/character-server";
 
 @Component()
 export abstract class BaseInjury

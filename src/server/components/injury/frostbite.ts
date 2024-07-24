@@ -9,7 +9,7 @@ import {
 	selectTemperature,
 } from "shared/store/slices/players/slices/resources/selectors";
 import { BaseInjury } from ".";
-import { CharacterServer } from "../character-server";
+import { CharacterServer } from "../character/character-server";
 
 const UPPER_TEMPERATURE_THRESHOLD = 5;
 const DEATH_MESSAGE_TEMPLATE = "{Character} froze to death innit";
