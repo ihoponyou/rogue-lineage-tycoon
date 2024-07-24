@@ -70,12 +70,17 @@ export const ASSETS: { [name: string]: AssetConfig } = {
 	Polisher: {
 		cost: 100,
 		currency: "Silver",
-		prerequisites: ["SilverDropper"],
+		prerequisites: ["TrinketDropper"],
 	},
 	Appraiser: {
 		cost: 100,
 		currency: "Silver",
 		prerequisites: ["Merchant"],
+	},
+	Merchant: {
+		cost: 1000,
+		currency: "Silver",
+		prerequisites: ["SilverDropper"],
 	},
 };
 
