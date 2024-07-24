@@ -22,4 +22,8 @@ export class Toggleable extends BaseComponent {
 	public isEnabled(): boolean {
 		return this._isEnabled;
 	}
+
+	public override destroy(): void {
+		this.toggled.Destroy();
+	}
 }
