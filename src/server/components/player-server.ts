@@ -4,10 +4,13 @@ import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { Inject } from "shared/inject";
+import { deserializeVector3 } from "shared/serialized-vector3";
 import { selectHealth } from "shared/store/slices/players/slices/resources/selectors";
 import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
 import { selectTransform } from "shared/store/slices/players/slices/transform/selectors";
 import { CharacterServer } from "./character-server";
+
+const TYCOON_FOLDER = Workspace.Tycoons;
 
 @Component({
 	tag: "Player",
@@ -72,12 +75,17 @@ export class PlayerServer extends AbstractPlayer {
 			}
 
 			const transform = store.getState(selectTransform(this.UserId));
-			if (
-				transform !== undefined &&
-				transform.position.Y <= Workspace.FallenPartsDestroyHeight
-			) {
-				store.setPosition(this.UserId, Vector3.zero);
-				store.setRotation(this.UserId, 0);
+			if (transform !== undefined) {
+				const deserialedPos = deserializeVector3(transform.position);
+				if (
+					transform.position.Y <= Workspace.FallenPartsDestroyHeight
+				) {
+					store.setPosition(this.UserId, Vector3.zero);
+					store.setRotation(this.UserId, 0);
+				} else if (this.isInsideTycoon(deserialedPos)) {
+					store.setPosition(this.UserId, Vector3.zero);
+					store.setRotation(this.UserId, 0);
+				}
 			}
 
 			this.components
@@ -92,5 +100,29 @@ export class PlayerServer extends AbstractPlayer {
 					(reason) => reject(reason),
 				);
 		});
+	}
+
+	private isInsideTycoon(position: Vector3): boolean {
+		const character = this.instance.Character;
+		if (character === undefined) error("nil character");
+		for (const tycoon of TYCOON_FOLDER.GetChildren()) {
+			if (!tycoon.IsA("Model")) continue;
+			const [cframe, size] = tycoon.GetBoundingBox();
+			// i know its not technically a radius so SHUT UP!!!!!!
+			const xRadius = size.X / 2;
+			const withinX =
+				position.X >= cframe.Position.X - xRadius &&
+				position.X <= cframe.Position.X + xRadius;
+			const yRadius = size.Y / 2;
+			const withinY =
+				position.Y >= cframe.Position.Y - yRadius &&
+				position.Y <= cframe.Position.Y + yRadius;
+			const zRadius = size.Z / 2;
+			const withinZ =
+				position.Z >= cframe.Position.Z - zRadius &&
+				position.Z <= cframe.Position.Z + zRadius;
+			if (withinX && withinY && withinZ) return true;
+		}
+		return false;
 	}
 }
