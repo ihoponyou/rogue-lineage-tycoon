@@ -8,7 +8,7 @@ import { deserializeVector3 } from "shared/serialized-vector3";
 import { selectHealth } from "shared/store/slices/players/slices/resources/selectors";
 import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
 import { selectTransform } from "shared/store/slices/players/slices/transform/selectors";
-import { CharacterServer } from "./character-server";
+import { CharacterServer } from "./character/character-server";
 
 const TYCOON_FOLDER = Workspace.Tycoons;
 

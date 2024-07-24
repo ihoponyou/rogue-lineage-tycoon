@@ -2,6 +2,7 @@ import { Component, Components } from "@flamework/components";
 import { OnTick } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
+import { Events } from "server/networking";
 import { DataService } from "server/services/data-service";
 import { store } from "server/store";
 import {
@@ -20,8 +21,7 @@ import {
 	selectTemperature,
 } from "shared/store/slices/players/slices/resources/selectors";
 import { selectTransform } from "shared/store/slices/players/slices/transform/selectors";
-import { Events } from "../networking";
-import { PlayerServer } from "./player-server";
+import { PlayerServer } from "../player-server";
 import { RagdollServer } from "./ragdoll-server";
 
 const FF_DURATION = 15;
@@ -40,6 +40,7 @@ const EVENTS = Events.character;
 		isAlive: true,
 	},
 })
+// consider using server/client/shared namespaces to allow name overlap
 export class CharacterServer
 	extends Character<CharacterAttributes, CharacterInstance>
 	implements OnTick
