@@ -18,6 +18,10 @@ interface ProductConfig {
 	value: number;
 }
 
+interface UpgraderConfig {
+	multiplier: number;
+}
+
 const PRODUCT_MODELS = ReplicatedStorage.Assets.Tycoon.Products;
 
 export function getAssetConfig(assetName: string): AssetConfig {
@@ -27,15 +31,10 @@ export function getAssetConfig(assetName: string): AssetConfig {
 }
 
 export const ASSETS: { [name: string]: AssetConfig } = {
-	Door: {
+	Walls: {
 		cost: 0,
 		currency: "Silver",
-		prerequisites: [],
-	},
-	Walls: {
-		cost: 25000,
-		currency: "Silver",
-		prerequisites: ["Door"],
+		prerequisites: ["ManaRocks"],
 	},
 	SilverDropper: {
 		cost: 0,
@@ -47,12 +46,17 @@ export const ASSETS: { [name: string]: AssetConfig } = {
 		currency: "Silver",
 		prerequisites: [],
 	},
+	ManaRocks: {
+		cost: 0,
+		currency: "Silver",
+		prerequisites: ["TrinketDropper", "Polisher"],
+	},
 	Mana: {
 		cost: 10,
 		currency: "Silver",
-		prerequisites: ["Walls"],
+		prerequisites: ["Walls", "ManaRocks"],
 	},
-	BreakRocks: {
+	DoorRocks: {
 		cost: 0,
 		currency: "Silver",
 		prerequisites: [],
@@ -96,5 +100,14 @@ export const DROPPERS: { [name: string]: DropperConfig } = {
 		dropsPerSecond: 5,
 		productsPerDrop: 1,
 		productModel: PRODUCT_MODELS.shilling,
+	},
+};
+
+export const UPGRADERS: { [name: string]: UpgraderConfig } = {
+	Polisher: {
+		multiplier: 1.25,
+	},
+	Appraiser: {
+		multiplier: 1.5,
 	},
 };
