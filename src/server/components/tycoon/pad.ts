@@ -52,6 +52,10 @@ export class Pad
 		const assetName = this.instance.Name.sub(0, -4);
 		this.instance.Collider.BillboardGui.TextLabel.Text = assetName;
 
+		const label = this.instance.Collider.BillboardGui.TextLabel;
+		label.TextColor3 = Color3.fromRGB(255, 255, 255);
+		label.TextStrokeTransparency = 0;
+
 		this.enable();
 	}
 
