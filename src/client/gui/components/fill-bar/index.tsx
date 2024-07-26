@@ -16,6 +16,8 @@ interface FillBarProps {
 	zIndex?: number;
 }
 
+// TODO: use useMotion to mimic original tween properties
+
 export function FillBar(props: FillBarProps) {
 	const [percent, setPercent] = useMotor(props.amount / props.maxAmount);
 	useEffect(
