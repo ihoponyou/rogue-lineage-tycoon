@@ -119,22 +119,22 @@ export function Stats() {
 					<Digit
 						key="Lives"
 						value={stats?.lives ?? -1}
-						position={new UDim2(0, 10, 0, 0)}
+						position={new UDim2(0, 11, 0, 0)}
 					/>
 					<Digit
 						key="DayHundreds"
 						value={getDigit(stats?.days ?? 0, 3)}
-						position={new UDim2(0, 29, 0, 0)}
+						position={new UDim2(0, 30, 0, 0)}
 					/>
 					<Digit
 						key="DayTens"
 						value={getDigit(stats?.days ?? 0, 2)}
-						position={new UDim2(0, 42, 0, 0)}
+						position={new UDim2(0, 43, 0, 0)}
 					/>
 					<Digit
 						key="DayOnes"
 						value={getDigit(stats?.days ?? 0, 1)}
-						position={new UDim2(0, 55, 0, 0)}
+						position={new UDim2(0, 56, 0, 0)}
 					/>
 				</imagelabel>
 			</frame>

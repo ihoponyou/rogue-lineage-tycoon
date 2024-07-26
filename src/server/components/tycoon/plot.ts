@@ -7,10 +7,12 @@ import { Inject } from "shared/inject";
 import { Currency } from "../../../../types/currency";
 import { Clickable } from "../interactable/clickable";
 import { PlayerServer } from "../player-server";
+import { Pad } from "./pad";
 
 type PlotInstance = Model & {
 	Teller: Teller;
 	Assets: Folder;
+	Pads: Folder;
 };
 
 @Component({
@@ -50,6 +52,14 @@ export class Plot
 			if (instance.HasTag("HideOnUnlock")) return;
 			model.hide();
 		});
+
+		this.instance.Pads.GetChildren().forEach((instance) => {
+			const pad = this.components.getComponent<Pad>(instance);
+			if (pad === undefined) return;
+			pad.hide();
+			pad.disable();
+			pad.onPurchased(() => this.refreshPads());
+		});
 	}
 
 	public getOwner(): PlayerServer | undefined {
@@ -70,7 +80,23 @@ export class Plot
 		Plot.plotOwners.set(player, this);
 		this.owner = playerServer;
 
+		this.refreshPads();
+
 		print(`${this.instance} claimed by ${this.owner.instance.Name}`);
+	}
+
+	public refreshPads(): void {
+		const pads = this.instance.Pads.GetChildren();
+		for (const instance of pads) {
+			const pad = this.components.getComponent<Pad>(instance);
+			if (pad === undefined) continue;
+			if (this.owner === undefined) continue;
+			if (this.owner.hasAsset(pad.attributes.assetName)) continue;
+			if (!this.owner.hasAssetPrerequisites(pad.attributes.assetName))
+				continue;
+			pad.show();
+			pad.enable();
+		}
 	}
 
 	private onTellerInteracted(player: Player): void {

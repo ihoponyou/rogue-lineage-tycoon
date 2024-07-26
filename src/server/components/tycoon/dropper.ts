@@ -1,15 +1,14 @@
 import { Component, Components } from "@flamework/components";
-import { Timer, TimerState } from "@rbxts/timer";
-import { DisposableComponent } from "shared/components/disposable-component";
-import { DROPPERS, PRODUCTS } from "server/configs/tycoon";
 import { OnStart } from "@flamework/core";
-import { ModelComponent } from "shared/components/model";
-import { Inject } from "shared/inject";
-import { Furniture, FurnitureInstance } from "./furniture";
 import { Debris } from "@rbxts/services";
+import { Timer, TimerState } from "@rbxts/timer";
+import { DROPPERS } from "server/configs/tycoon";
+import { DisposableComponent } from "shared/components/disposable-component";
+import { ModelComponent } from "shared/components/model";
 import { Toggleable } from "shared/components/toggleable";
+import { Inject } from "shared/inject";
 
-type DropperInstance = FurnitureInstance & {
+type DropperInstance = Model & {
 	Faucet: BasePart & {
 		Spout: Attachment;
 	};
@@ -23,19 +22,19 @@ export class Dropper
 	implements OnStart
 {
 	private readonly config = DROPPERS[this.instance.Name];
-	private timer = new Timer(1 / this.config.dropsPerSecond);
+	private timer!: Timer;
 
 	@Inject
 	private components!: Components;
 
 	constructor(private toggleable: Toggleable) {
 		super();
+		if (!this.config)
+			error(`dropper "${this.instance.Name}" does not exist`);
+		this.timer = new Timer(1 / this.config.dropsPerSecond);
 	}
 
 	public onStart(): void {
-		if (!this.config)
-			error(`missing dropper config for ${this.instance.Name}`);
-
 		this.trove.connect(this.timer.completed, () => this.onTimerCompleted());
 		this.trove.add(
 			this.toggleable.onToggled((bool) => {
@@ -61,10 +60,16 @@ export class Dropper
 		if (this.toggleable.isEnabled()) this.timer.start();
 	}
 
+	private getRandomProduct(): Model {
+		return this.config.productModels[
+			math.random(0, this.config.productModels.size() - 1)
+		];
+	}
+
 	private drop(): void {
 		for (let _ = 0; _ < this.config.productsPerDrop; _++) {
 			// TODO: use a part cache, maybe move to client
-			const clone = this.trove.clone(this.config.productModel);
+			const clone = this.trove.clone(this.getRandomProduct());
 			clone.Parent = this.instance;
 
 			this.components

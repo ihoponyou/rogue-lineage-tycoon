@@ -74,4 +74,10 @@ export class ModelComponent
 			part.SetNetworkOwner(owner);
 		}
 	}
+
+	public setCanCollide(bool: boolean): void {
+		for (const part of this.parts) {
+			part.CanCollide = bool;
+		}
+	}
 }

@@ -1,0 +1,47 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+        {
+            "label": "runDevelopment",
+            "dependsOrder": "parallel",
+            "runOptions": {
+                "runOn": "folderOpen"
+            },
+            "dependsOn": [
+                "compile",
+                "start-rojo-server",
+                "start-io-server"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "start-rojo-server",
+            "type": "shell",
+            "command": "Start-Sleep -Seconds 15; rojo serve;",
+            "presentation": {
+                "panel": "dedicated",
+                "group": "main"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "start-io-server",
+            "type": "shell",
+            "command": "npx io-serve",
+            "presentation": {
+                "panel": "dedicated",
+                "group": "main"
+            }
+        },
+        {
+            "label": "compile",
+            "type": "shell",
+            "command": "if (Test-Path flamework.build) { Remove-Item flamework.build }; if (Test-Path out) { Remove-Item -Recurse out }; npm run watch;",
+            "presentation": {
+                "panel": "dedicated",
+                "group": "main"
+            },
+            "problemMatcher": []
+        }
+    ]
+  }

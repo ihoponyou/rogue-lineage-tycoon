@@ -1,14 +1,12 @@
 import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { Product } from "./product";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { ModelComponent } from "shared/components/model";
 import { Toggleable } from "shared/components/toggleable";
-import { Furniture, FurnitureInstance } from "./furniture";
-import { bool } from "@rbxts/react/src/prop-types";
 import { Inject } from "shared/inject";
+import { Plot } from "./plot";
+import { Product } from "./product";
 
-type CollectorInstance = FurnitureInstance & {
+type CollectorInstance = Model & {
 	Collider: Part;
 };
 
@@ -21,12 +19,16 @@ export class Collector
 {
 	private multiplier = 1;
 	private touchedConnection?: RBXScriptConnection;
+	private plot!: Plot;
 
 	@Inject
 	private components!: Components;
 
 	constructor(private toggleable: Toggleable) {
 		super();
+		const tycoon = this.instance.FindFirstAncestorOfClass("Model");
+		if (!tycoon) error("could not find parent tycoon");
+		this.plot = this.components.waitForComponent<Plot>(tycoon).expect();
 	}
 
 	public onStart(): void {
@@ -79,8 +81,7 @@ export class Collector
 		product.attributes.isProcessed = true;
 
 		const calculatedValue = product.attributes.value * this.multiplier;
-		// this.plotAsset
-		// 	.getPlot()
-		// 	.deposit(product.attributes.currency, calculatedValue);
+		this.plot.deposit(product.attributes.currency, calculatedValue);
+		// print(`+${calculatedValue}`);
 	}
 }

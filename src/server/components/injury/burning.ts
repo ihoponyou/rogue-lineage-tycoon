@@ -3,7 +3,7 @@ import { OnStart } from "@flamework/core";
 import { Players, TweenService } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { CharacterServer } from "../character-server";
+import { CharacterServer } from "../character/character-server";
 
 const HEAT_AMOUNT = 1.5;
 const BURN_DAMAGE = 6;

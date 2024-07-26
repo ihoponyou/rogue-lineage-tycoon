@@ -1144,6 +1144,11 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 			};
+			PadLabels: Frame & {
+				UIListLayout: UIListLayout;
+				AssetLabel: TextLabel;
+				CostLabel: TextLabel;
+			};
 			StatGui: ScreenGui & {
 				Health: LocalScript;
 				Container: Frame & {
@@ -1267,8 +1272,97 @@ interface ReplicatedStorage extends Instance {
 		};
 		Tycoon: Folder & {
 			Products: Folder & {
+				["Idol of the Forgotten"]: Model & {
+					Handle: UnionOperation;
+				};
 				shilling: Model & {
 					Part: Part;
+				};
+				Amulet: Model & {
+					Handle: MeshPart & {
+						ParticleEmitter: ParticleEmitter;
+						Attachment: Attachment & {
+							ParticleEmitter: ParticleEmitter;
+						};
+					};
+				};
+				Sapphire: Model & {
+					Handle: Part & {
+						Mesh: SpecialMesh;
+						ParticleEmitter: ParticleEmitter;
+					};
+				};
+				["Old Ring"]: Model & {
+					Handle: MeshPart & {
+						ParticleEmitter: ParticleEmitter;
+					};
+				};
+				Scroll: Model & {
+					Handle: Part & {
+						Paper: MeshPart & {
+							Weld: ManualWeld;
+						};
+						String: MeshPart & {
+							Weld: ManualWeld;
+						};
+						Metal: MeshPart & {
+							Weld: ManualWeld;
+						};
+					};
+				};
+				["???"]: Model & {
+					Handle: Part & {
+						PointLight: PointLight;
+						Mesh: SpecialMesh;
+						OrbParticle: ParticleEmitter;
+					};
+				};
+				Diamond: Model & {
+					Handle: Part & {
+						Mesh: SpecialMesh;
+					};
+				};
+				Ruby: Model & {
+					Handle: MeshPart & {
+						ParticleEmitter: ParticleEmitter;
+					};
+				};
+				Opal: Model & {
+					Handle: Part & {
+						Mesh: SpecialMesh;
+						ParticleEmitter: ParticleEmitter;
+					};
+				};
+				Goblet: Model & {
+					Handle: MeshPart & {
+						Attachment: Attachment & {
+							ParticleEmitter: ParticleEmitter;
+						};
+						Mesh: SpecialMesh;
+						ParticleEmitter: ParticleEmitter;
+					};
+				};
+				["Old Amulet"]: Model & {
+					Handle: MeshPart & {
+						ParticleEmitter: ParticleEmitter;
+						Attachment: Attachment & {
+							ParticleEmitter: ParticleEmitter;
+						};
+					};
+				};
+				Emerald: Model & {
+					Handle: Part & {
+						Mesh: SpecialMesh;
+						ParticleEmitter: ParticleEmitter;
+					};
+				};
+				Ring: Model & {
+					Handle: MeshPart;
+				};
+				Godscroll: Model & {
+					Handle: Part & {
+						Mesh: SpecialMesh;
+					};
 				};
 			};
 		};
@@ -1404,15 +1498,15 @@ interface ReplicatedStorage extends Instance {
 			};
 		};
 	};
-	Source: Folder & {
-		Shared: Folder & {
+	src: Folder & {
+		shared: Folder & {
 			["serialized-vector3"]: ModuleScript;
 			["serialized-color3"]: ModuleScript;
 			networking: ModuleScript & {
-				character: ModuleScript;
+				currency: ModuleScript;
 				dialogue: ModuleScript;
 				mana: ModuleScript;
-				currency: ModuleScript;
+				character: ModuleScript;
 				reflex: ModuleScript;
 			};
 			charAt: ModuleScript;
@@ -1431,15 +1525,6 @@ interface ReplicatedStorage extends Instance {
 			["get-digit"]: ModuleScript;
 			inject: ModuleScript;
 			["on-player-removing"]: ModuleScript;
-			cmdr: Folder & {
-				hooks: Folder & {
-					["before-run"]: ModuleScript;
-				};
-			};
-			["cast-visualizer"]: ModuleScript;
-			["state-machine"]: ModuleScript & {
-				state: ModuleScript;
-			};
 			store: ModuleScript & {
 				slices: Folder & {
 					players: ModuleScript & {
@@ -1469,29 +1554,28 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 			};
+			["cast-visualizer"]: ModuleScript;
+			["state-machine"]: ModuleScript & {
+				state: ModuleScript;
+			};
 			components: Folder & {
 				toggleable: ModuleScript;
-				ragdoll: ModuleScript;
-				model: ModuleScript;
 				["abstract-player"]: ModuleScript;
-				["abstract-character"]: ModuleScript;
 				["disposable-component"]: ModuleScript;
+				ragdoll: ModuleScript;
+				["abstract-character"]: ModuleScript;
+				model: ModuleScript;
+			};
+			cmdr: Folder & {
+				hooks: Folder & {
+					["before-run"]: ModuleScript;
+				};
 			};
 		};
-		Client: Folder & {
-			constants: ModuleScript;
-			["player-state"]: Folder & {
-				["character-state"]: ModuleScript;
-				["climb-state"]: ModuleScript;
-				["run-state"]: ModuleScript;
-				["idle-state"]: ModuleScript;
-				["dash-state"]: ModuleScript;
-				["charge-mana-state"]: ModuleScript;
-			};
-			networking: ModuleScript;
+		client: Folder & {
 			store: ModuleScript & {
 				slices: Folder & {
-					gui: ModuleScript & {
+					dialogue: ModuleScript & {
 						selectors: ModuleScript;
 					};
 				};
@@ -1500,41 +1584,55 @@ interface ReplicatedStorage extends Instance {
 				};
 				selectors: ModuleScript;
 			};
-			controllers: Folder & {
-				["mana-controller"]: ModuleScript;
-				["lifecycle-controller"]: ModuleScript;
-				["keybind-controller"]: ModuleScript;
-				["animation-controller"]: ModuleScript;
-				["input-controller"]: ModuleScript;
-				["component-controller"]: ModuleScript;
-				["gui-controller"]: ModuleScript;
+			["player-state"]: Folder & {
+				["character-state"]: ModuleScript;
+				["climb-state"]: ModuleScript;
+				["charge-mana-state"]: ModuleScript;
+				["dash-state"]: ModuleScript;
+				["run-state"]: ModuleScript;
+				["idle-state"]: ModuleScript;
 			};
-			components: Folder & {
-				["character-client"]: ModuleScript;
-				["player-client"]: ModuleScript;
-				["ragdoll-client"]: ModuleScript;
-				["character-state-machine"]: ModuleScript;
-			};
+			networking: ModuleScript;
 			gui: Folder & {
+				components: Folder & {
+					digit: ModuleScript;
+					app: ModuleScript;
+					["fill-bar"]: ModuleScript & {
+						["mana-bar"]: ModuleScript;
+						["temperature-bar"]: ModuleScript;
+						["stomach-bar"]: ModuleScript;
+					};
+					stats: ModuleScript;
+					["silver-logo"]: ModuleScript;
+					layer: ModuleScript;
+					["name-plate"]: ModuleScript;
+					["dialogue-box"]: ModuleScript & {
+						["dialogue-option"]: ModuleScript;
+						["char-label"]: ModuleScript;
+					};
+				};
 				hooks: Folder & {
 					["use-motion"]: ModuleScript;
 					["reflex-hooks"]: ModuleScript;
 				};
-				components: Folder & {
-					stats: ModuleScript;
-					["health-bar"]: ModuleScript;
-					layer: ModuleScript;
-					["temperature-bar"]: ModuleScript;
-					["mana-bar"]: ModuleScript;
-					["name-plate"]: ModuleScript;
-					dialogue: ModuleScript;
-					["toxicity-bar"]: ModuleScript;
-					["silver-logo"]: ModuleScript;
-					digit: ModuleScript;
-					app: ModuleScript;
-					["stomach-bar"]: ModuleScript;
-				};
 			};
+			controllers: Folder & {
+				["component-controller"]: ModuleScript;
+				["chat-controller"]: ModuleScript;
+				["mana-controller"]: ModuleScript;
+				["keybind-controller"]: ModuleScript;
+				["animation-controller"]: ModuleScript;
+				["input-controller"]: ModuleScript;
+				["lifecycle-controller"]: ModuleScript;
+				["gui-controller"]: ModuleScript;
+			};
+			components: Folder & {
+				["player-client"]: ModuleScript;
+				["character-client"]: ModuleScript;
+				["ragdoll-client"]: ModuleScript;
+				["character-state-machine"]: ModuleScript;
+			};
+			constants: ModuleScript;
 		};
 	};
 	rbxts_include: Folder & {
@@ -1560,36 +1658,6 @@ interface ReplicatedStorage extends Instance {
 						};
 						Configuration: ModuleScript;
 						Logger: ModuleScript;
-					};
-				};
-				react: ModuleScript & {
-					tags: ModuleScript;
-				};
-				profileservice: Folder & {
-					src: ModuleScript;
-				};
-				dumpster: Folder & {
-					Dumpster: ModuleScript;
-				};
-				["shared-components-flamework"]: Folder & {
-					LICENSE: StringValue;
-					out: ModuleScript & {
-						utilities: ModuleScript;
-						remotes: ModuleScript;
-						source: Folder & {
-							["shared-component-handler"]: ModuleScript;
-							decorators: Folder & {
-								["only-server"]: ModuleScript;
-								["only-client"]: ModuleScript;
-							};
-							pointer: ModuleScript;
-							["shared-component"]: ModuleScript;
-							network: ModuleScript & {
-								action: ModuleScript;
-								event: ModuleScript;
-							};
-						};
-						types: ModuleScript;
 					};
 				};
 				charm: ModuleScript & {
@@ -1631,6 +1699,27 @@ interface ReplicatedStorage extends Instance {
 						};
 					};
 				};
+				["shared-components-flamework"]: Folder & {
+					LICENSE: StringValue;
+					out: ModuleScript & {
+						utilities: ModuleScript;
+						remotes: ModuleScript;
+						source: Folder & {
+							["shared-component-handler"]: ModuleScript;
+							decorators: Folder & {
+								["only-server"]: ModuleScript;
+								["only-client"]: ModuleScript;
+							};
+							pointer: ModuleScript;
+							["shared-component"]: ModuleScript;
+							network: ModuleScript & {
+								action: ModuleScript;
+								event: ModuleScript;
+							};
+						};
+						types: ModuleScript;
+					};
+				};
 				["object-utils"]: ModuleScript;
 				ripple: ModuleScript & {
 					["createMotion.spec"]: ModuleScript;
@@ -1656,37 +1745,186 @@ interface ReplicatedStorage extends Instance {
 					createMotion: ModuleScript;
 					types: ModuleScript;
 				};
-				flipper: Folder & {
-					typings: Folder;
-					src: ModuleScript & {
-						isMotor: ModuleScript;
-						Spring: ModuleScript;
-						GroupMotor: ModuleScript;
-						Signal: ModuleScript;
-						SingleMotor: ModuleScript;
-						Instant: ModuleScript;
-						Linear: ModuleScript;
-						BaseMotor: ModuleScript;
+				["react-reflex"]: ModuleScript & {
+					React: ModuleScript;
+					hooks: Folder & {
+						useSelector: ModuleScript;
+						useSelectorCreator: ModuleScript;
+						useProducer: ModuleScript;
+					};
+					components: Folder & {
+						ReflexContext: ModuleScript;
+						ReflexProvider: ModuleScript;
+					};
+					Reflex: ModuleScript;
+				};
+				types: Folder & {
+					include: Folder & {
+						generated: Folder;
 					};
 				};
-				testez: Folder & {
-					src: ModuleScript & {
-						TestPlanner: ModuleScript;
-						TestResults: ModuleScript;
-						TestRunner: ModuleScript;
-						TestBootstrap: ModuleScript;
-						TestSession: ModuleScript;
-						LifecycleHooks: ModuleScript;
-						Reporters: Folder & {
-							TextReporter: ModuleScript;
-							TextReporterQuiet: ModuleScript;
-							TeamCityReporter: ModuleScript;
+				["pretty-react-hooks"]: Folder & {
+					out: ModuleScript & {
+						["use-latest"]: ModuleScript & {
+							["use-latest"]: ModuleScript;
 						};
-						TestPlan: ModuleScript;
-						TestEnum: ModuleScript;
-						ExpectationContext: ModuleScript;
-						Context: ModuleScript;
-						Expectation: ModuleScript;
+						utils: Folder & {
+							binding: ModuleScript;
+							hoarcekat: ModuleScript;
+							["shallow-equal"]: ModuleScript;
+							math: ModuleScript;
+							motor: ModuleScript;
+							testez: ModuleScript;
+						};
+						["use-binding-state"]: ModuleScript & {
+							["use-binding-state"]: ModuleScript;
+						};
+						["use-unmount-effect"]: ModuleScript & {
+							["use-unmount-effect"]: ModuleScript;
+						};
+						["use-update-effect"]: ModuleScript & {
+							["use-update-effect"]: ModuleScript;
+						};
+						["use-lifetime"]: ModuleScript & {
+							["use-lifetime"]: ModuleScript;
+						};
+						["use-interval"]: ModuleScript & {
+							["use-interval"]: ModuleScript;
+						};
+						["use-debounce-callback"]: ModuleScript & {
+							["use-debounce-callback"]: ModuleScript;
+						};
+						["use-defer-state"]: ModuleScript & {
+							["use-defer-state"]: ModuleScript;
+						};
+						["use-tagged"]: ModuleScript & {
+							["use-tagged"]: ModuleScript;
+						};
+						["use-key-press"]: ModuleScript & {
+							["use-key-press"]: ModuleScript;
+						};
+						["use-timeout"]: ModuleScript & {
+							["use-timeout"]: ModuleScript;
+						};
+						["use-composed-ref"]: ModuleScript & {
+							["use-composed-ref"]: ModuleScript;
+						};
+						["use-async-callback"]: ModuleScript & {
+							["use-async-callback"]: ModuleScript;
+						};
+						["use-throttle-state"]: ModuleScript & {
+							["use-throttle-state"]: ModuleScript;
+						};
+						["use-defer-callback"]: ModuleScript & {
+							["use-defer-callback"]: ModuleScript;
+						};
+						["use-latest-callback"]: ModuleScript & {
+							["use-latest-callback"]: ModuleScript;
+						};
+						["use-motor"]: ModuleScript & {
+							["use-motor"]: ModuleScript;
+						};
+						["use-throttle-callback"]: ModuleScript & {
+							["use-throttle-callback"]: ModuleScript;
+						};
+						["use-update"]: ModuleScript & {
+							["use-update"]: ModuleScript;
+						};
+						["use-async-effect"]: ModuleScript & {
+							["use-async-effect"]: ModuleScript;
+						};
+						["use-mount-effect"]: ModuleScript & {
+							["use-mount-effect"]: ModuleScript;
+						};
+						["use-binding-listener"]: ModuleScript & {
+							["use-binding-listener"]: ModuleScript;
+						};
+						["use-async"]: ModuleScript & {
+							["use-async"]: ModuleScript;
+						};
+						["use-throttle-effect"]: ModuleScript & {
+							["use-throttle-effect"]: ModuleScript;
+						};
+						["use-debounce-effect"]: ModuleScript & {
+							["use-debounce-effect"]: ModuleScript;
+						};
+						["use-viewport"]: ModuleScript & {
+							["use-viewport"]: ModuleScript;
+						};
+						["use-defer-effect"]: ModuleScript & {
+							["use-defer-effect"]: ModuleScript;
+						};
+						["use-debounce-state"]: ModuleScript & {
+							["use-debounce-state"]: ModuleScript;
+						};
+						["use-event-listener"]: ModuleScript & {
+							["use-event-listener"]: ModuleScript;
+						};
+						["use-previous"]: ModuleScript & {
+							["use-previous"]: ModuleScript;
+						};
+						["use-camera"]: ModuleScript & {
+							["use-camera"]: ModuleScript;
+						};
+						["use-timer"]: ModuleScript & {
+							["use-timer"]: ModuleScript;
+						};
+						["use-mouse"]: ModuleScript & {
+							["use-mouse"]: ModuleScript;
+						};
+					};
+				};
+				beacon: Folder & {
+					out: ModuleScript;
+				};
+				["set-timeout"]: Folder & {
+					out: ModuleScript & {
+						["set-countdown"]: ModuleScript;
+						["set-interval"]: ModuleScript;
+						["debounce.spec"]: ModuleScript;
+						["set-timeout"]: ModuleScript;
+						throttle: ModuleScript;
+						["set-timeout.spec"]: ModuleScript;
+						["throttle.spec"]: ModuleScript;
+						["set-interval.spec"]: ModuleScript;
+						["set-countdown.spec"]: ModuleScript;
+						debounce: ModuleScript;
+					};
+				};
+				["compiler-types"]: Folder & {
+					types: Folder;
+				};
+				["promise-character"]: ModuleScript & {
+					node_modules: Folder & {
+						["@rbxts"]: Folder & {
+							["compiler-types"]: Folder & {
+								types: Folder;
+							};
+						};
+					};
+				};
+				timer: Folder & {
+					out: ModuleScript & {
+						Interfaces: Folder;
+						Implementation: Folder & {
+							Timer: ModuleScript;
+						};
+						Data: Folder & {
+							Enums: ModuleScript;
+						};
+					};
+				};
+				["signals-tooling"]: Folder & {
+					out: ModuleScript & {
+						Interfaces: Folder;
+						Implementation: Folder & {
+							ConnectionManager: ModuleScript;
+							Signal: ModuleScript;
+						};
+						Functions: Folder & {
+							ListenOnce: ModuleScript;
+							WaitForFirstSignal: ModuleScript;
+						};
 					};
 				};
 				remo: Folder & {
@@ -1719,20 +1957,75 @@ interface ReplicatedStorage extends Instance {
 						container: Configuration;
 					};
 				};
-				["react-roblox"]: ModuleScript;
-				["react-reflex"]: ModuleScript & {
-					React: ModuleScript;
-					hooks: Folder & {
-						useSelector: ModuleScript;
-						useSelectorCreator: ModuleScript;
-						useProducer: ModuleScript;
+				services: ModuleScript;
+				reflex: Folder & {
+					src: ModuleScript & {
+						createProducer: ModuleScript;
+						broadcast: ModuleScript & {
+							createBroadcastReceiver: ModuleScript;
+							createBroadcaster: ModuleScript;
+							hydrate: ModuleScript;
+						};
+						Promise: ModuleScript;
+						createSelector: ModuleScript;
+						utils: Folder & {
+							shallowEqual: ModuleScript;
+							testSelector: ModuleScript;
+							createSelectArrayDiffs: ModuleScript;
+							setInterval: ModuleScript;
+						};
+						combineProducers: ModuleScript;
+						middleware: Folder & {
+							loggerMiddleware: ModuleScript;
+						};
+						applyMiddleware: ModuleScript;
+						types: ModuleScript;
 					};
-					components: Folder & {
-						ReflexContext: ModuleScript;
-						ReflexProvider: ModuleScript;
-					};
-					Reflex: ModuleScript;
 				};
+				testez: Folder & {
+					src: ModuleScript & {
+						TestPlanner: ModuleScript;
+						TestResults: ModuleScript;
+						TestRunner: ModuleScript;
+						TestBootstrap: ModuleScript;
+						TestSession: ModuleScript;
+						LifecycleHooks: ModuleScript;
+						Reporters: Folder & {
+							TextReporter: ModuleScript;
+							TextReporterQuiet: ModuleScript;
+							TeamCityReporter: ModuleScript;
+						};
+						TestPlan: ModuleScript;
+						TestEnum: ModuleScript;
+						ExpectationContext: ModuleScript;
+						Context: ModuleScript;
+						Expectation: ModuleScript;
+					};
+				};
+				["validate-tree"]: ModuleScript;
+				react: ModuleScript & {
+					tags: ModuleScript;
+				};
+				profileservice: Folder & {
+					src: ModuleScript;
+				};
+				dumpster: Folder & {
+					Dumpster: ModuleScript;
+				};
+				flipper: Folder & {
+					typings: Folder;
+					src: ModuleScript & {
+						isMotor: ModuleScript;
+						Spring: ModuleScript;
+						GroupMotor: ModuleScript;
+						Signal: ModuleScript;
+						SingleMotor: ModuleScript;
+						Instant: ModuleScript;
+						Linear: ModuleScript;
+						BaseMotor: ModuleScript;
+					};
+				};
+				["react-roblox"]: ModuleScript;
 				ReactLua: Folder & {
 					node_modules: Folder & {
 						["@jsdotlua"]: Folder & {
@@ -2186,148 +2479,8 @@ interface ReplicatedStorage extends Instance {
 					RoactCompat: ModuleScript;
 					ReactCache: ModuleScript;
 				};
-				types: Folder & {
-					include: Folder & {
-						generated: Folder;
-					};
-				};
 				janitor: Folder & {
 					src: ModuleScript;
-				};
-				["pretty-react-hooks"]: Folder & {
-					out: ModuleScript & {
-						["use-latest"]: ModuleScript & {
-							["use-latest"]: ModuleScript;
-						};
-						utils: Folder & {
-							binding: ModuleScript;
-							hoarcekat: ModuleScript;
-							["shallow-equal"]: ModuleScript;
-							math: ModuleScript;
-							motor: ModuleScript;
-							testez: ModuleScript;
-						};
-						["use-binding-state"]: ModuleScript & {
-							["use-binding-state"]: ModuleScript;
-						};
-						["use-unmount-effect"]: ModuleScript & {
-							["use-unmount-effect"]: ModuleScript;
-						};
-						["use-update-effect"]: ModuleScript & {
-							["use-update-effect"]: ModuleScript;
-						};
-						["use-lifetime"]: ModuleScript & {
-							["use-lifetime"]: ModuleScript;
-						};
-						["use-interval"]: ModuleScript & {
-							["use-interval"]: ModuleScript;
-						};
-						["use-debounce-callback"]: ModuleScript & {
-							["use-debounce-callback"]: ModuleScript;
-						};
-						["use-defer-state"]: ModuleScript & {
-							["use-defer-state"]: ModuleScript;
-						};
-						["use-tagged"]: ModuleScript & {
-							["use-tagged"]: ModuleScript;
-						};
-						["use-key-press"]: ModuleScript & {
-							["use-key-press"]: ModuleScript;
-						};
-						["use-timeout"]: ModuleScript & {
-							["use-timeout"]: ModuleScript;
-						};
-						["use-composed-ref"]: ModuleScript & {
-							["use-composed-ref"]: ModuleScript;
-						};
-						["use-async-callback"]: ModuleScript & {
-							["use-async-callback"]: ModuleScript;
-						};
-						["use-throttle-state"]: ModuleScript & {
-							["use-throttle-state"]: ModuleScript;
-						};
-						["use-defer-callback"]: ModuleScript & {
-							["use-defer-callback"]: ModuleScript;
-						};
-						["use-latest-callback"]: ModuleScript & {
-							["use-latest-callback"]: ModuleScript;
-						};
-						["use-motor"]: ModuleScript & {
-							["use-motor"]: ModuleScript;
-						};
-						["use-throttle-callback"]: ModuleScript & {
-							["use-throttle-callback"]: ModuleScript;
-						};
-						["use-update"]: ModuleScript & {
-							["use-update"]: ModuleScript;
-						};
-						["use-async-effect"]: ModuleScript & {
-							["use-async-effect"]: ModuleScript;
-						};
-						["use-mount-effect"]: ModuleScript & {
-							["use-mount-effect"]: ModuleScript;
-						};
-						["use-binding-listener"]: ModuleScript & {
-							["use-binding-listener"]: ModuleScript;
-						};
-						["use-async"]: ModuleScript & {
-							["use-async"]: ModuleScript;
-						};
-						["use-throttle-effect"]: ModuleScript & {
-							["use-throttle-effect"]: ModuleScript;
-						};
-						["use-debounce-effect"]: ModuleScript & {
-							["use-debounce-effect"]: ModuleScript;
-						};
-						["use-viewport"]: ModuleScript & {
-							["use-viewport"]: ModuleScript;
-						};
-						["use-defer-effect"]: ModuleScript & {
-							["use-defer-effect"]: ModuleScript;
-						};
-						["use-debounce-state"]: ModuleScript & {
-							["use-debounce-state"]: ModuleScript;
-						};
-						["use-event-listener"]: ModuleScript & {
-							["use-event-listener"]: ModuleScript;
-						};
-						["use-previous"]: ModuleScript & {
-							["use-previous"]: ModuleScript;
-						};
-						["use-camera"]: ModuleScript & {
-							["use-camera"]: ModuleScript;
-						};
-						["use-timer"]: ModuleScript & {
-							["use-timer"]: ModuleScript;
-						};
-						["use-mouse"]: ModuleScript & {
-							["use-mouse"]: ModuleScript;
-						};
-					};
-				};
-				reflex: Folder & {
-					src: ModuleScript & {
-						createProducer: ModuleScript;
-						broadcast: ModuleScript & {
-							createBroadcastReceiver: ModuleScript;
-							createBroadcaster: ModuleScript;
-							hydrate: ModuleScript;
-						};
-						Promise: ModuleScript;
-						createSelector: ModuleScript;
-						utils: Folder & {
-							shallowEqual: ModuleScript;
-							testSelector: ModuleScript;
-							createSelectArrayDiffs: ModuleScript;
-							setInterval: ModuleScript;
-						};
-						combineProducers: ModuleScript;
-						middleware: Folder & {
-							loggerMiddleware: ModuleScript;
-						};
-						applyMiddleware: ModuleScript;
-						types: ModuleScript;
-					};
 				};
 				["message-templates"]: Folder & {
 					out: ModuleScript & {
@@ -2339,61 +2492,16 @@ interface ReplicatedStorage extends Instance {
 						MessageTemplateParser: ModuleScript;
 					};
 				};
-				beacon: Folder & {
-					out: ModuleScript;
-				};
 				t: Folder & {
 					lib: Folder & {
 						ts: ModuleScript;
 					};
 				};
-				maid: Folder & {
-					Maid: ModuleScript;
-				};
-				["set-timeout"]: Folder & {
-					out: ModuleScript & {
-						["set-countdown"]: ModuleScript;
-						["set-interval"]: ModuleScript;
-						["debounce.spec"]: ModuleScript;
-						["set-timeout"]: ModuleScript;
-						throttle: ModuleScript;
-						["set-timeout.spec"]: ModuleScript;
-						["throttle.spec"]: ModuleScript;
-						["set-interval.spec"]: ModuleScript;
-						["set-countdown.spec"]: ModuleScript;
-						debounce: ModuleScript;
-					};
-				};
-				services: ModuleScript;
-				["signals-tooling"]: Folder & {
-					out: ModuleScript & {
-						Interfaces: Folder;
-						Implementation: Folder & {
-							ConnectionManager: ModuleScript;
-							Signal: ModuleScript;
-						};
-						Functions: Folder & {
-							ListenOnce: ModuleScript;
-							WaitForFirstSignal: ModuleScript;
-						};
-					};
-				};
-				["compiler-types"]: Folder & {
-					types: Folder;
-				};
 				trove: Folder & {
 					out: ModuleScript;
 				};
-				timer: Folder & {
-					out: ModuleScript & {
-						Interfaces: Folder;
-						Implementation: Folder & {
-							Timer: ModuleScript;
-						};
-						Data: Folder & {
-							Enums: ModuleScript;
-						};
-					};
+				maid: Folder & {
+					Maid: ModuleScript;
 				};
 				immut: Folder & {
 					src: ModuleScript & {

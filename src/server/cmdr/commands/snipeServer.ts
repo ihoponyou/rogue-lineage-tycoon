@@ -1,7 +1,7 @@
 import { Components } from "@flamework/components";
 import { Dependency } from "@flamework/core";
 import { CommandContext } from "@rbxts/cmdr";
-import { CharacterServer } from "server/components/character-server";
+import { CharacterServer } from "server/components/character/character-server";
 
 export = function (context: CommandContext, player: Player) {
 	const components = Dependency<Components>();

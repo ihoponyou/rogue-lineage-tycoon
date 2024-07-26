@@ -1,12 +1,11 @@
 import { Component, Components } from "@flamework/components";
-import { CharacterServer } from "./character-server";
-import { Dependency, OnStart } from "@flamework/core";
-import { RagdollServer } from "./ragdoll-server";
-import { ReplicatedStorage, Workspace } from "@rbxts/services";
-import { KeyInteractable } from "./interactable/key-interactable";
+import { OnStart } from "@flamework/core";
+import { Workspace } from "@rbxts/services";
 import { ANIMATIONS, SFX, VFX } from "shared/constants";
-import { DisposableComponent } from "shared/components/disposable-component";
 import { Inject } from "shared/inject";
+import { KeyInteractable } from "../interactable/key-interactable";
+import { CharacterServer } from "./character-server";
+import { RagdollServer } from "./ragdoll-server";
 
 interface Attributes {
 	gettingGripped: boolean;
