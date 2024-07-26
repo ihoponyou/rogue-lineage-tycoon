@@ -5,11 +5,10 @@ import { SFX, VFX } from "shared/constants";
 import { deserializeColor3 } from "shared/serialized-color3";
 import { StateMachine } from "shared/state-machine";
 import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
+import { selectManaAmount } from "shared/store/slices/players/slices/mana/selectors";
 import { CharacterClient } from "../components/character-client";
 import { AnimationController } from "../controllers/animation-controller";
 import { Direction } from "../controllers/input-controller";
-import { KeybindController } from "../controllers/keybind-controller";
-import { ManaController } from "../controllers/mana-controller";
 import { CharacterState } from "./character-state";
 
 const DIRECTION_TO_ANGLE: { [direction: string]: number } = {
@@ -33,8 +32,6 @@ export class DashState extends CharacterState {
 	constructor(
 		stateMachine: StateMachine,
 		character: CharacterClient,
-		private keybindController: KeybindController,
-		private manaController: ManaController,
 		private animationController: AnimationController,
 	) {
 		super(stateMachine, character);
@@ -59,7 +56,9 @@ export class DashState extends CharacterState {
 
 		this.dashAngle = DIRECTION_TO_ANGLE[direction];
 		const humanoidRootPart = this.character.getHumanoidRootPart();
-		const hasMana = this.manaController.hasMana();
+		const manaAmount =
+			store.getState(selectManaAmount(LOCAL_PLAYER.UserId)) ?? 0;
+		const hasMana = manaAmount > 0;
 
 		this.dashVelocity.Parent = humanoidRootPart;
 		this.dashVelocity.Velocity = humanoidRootPart.CFrame.mul(

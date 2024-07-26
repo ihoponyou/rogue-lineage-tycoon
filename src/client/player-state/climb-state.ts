@@ -1,17 +1,19 @@
-import { StateMachine } from "shared/state-machine";
-import { Direction, InputController } from "../controllers/input-controller";
-import { CharacterState } from "./character-state";
-import { CharacterClient } from "../components/character-client";
-import { AnimationController } from "../controllers/animation-controller";
 import {
 	ContextActionService,
 	TweenService,
 	UserInputService,
 	Workspace,
 } from "@rbxts/services";
-import { KeybindController } from "../controllers/keybind-controller";
-import { ManaController } from "../controllers/mana-controller";
+import { LOCAL_PLAYER } from "client/constants";
+import { store } from "client/store";
 import { hasLineOfSight } from "shared/line-of-sight";
+import { StateMachine } from "shared/state-machine";
+import { selectManaAmount } from "shared/store/slices/players/slices/mana/selectors";
+import { CharacterClient } from "../components/character-client";
+import { AnimationController } from "../controllers/animation-controller";
+import { Direction, InputController } from "../controllers/input-controller";
+import { KeybindController } from "../controllers/keybind-controller";
+import { CharacterState } from "./character-state";
 
 const BASE_CLIMB_SPEED = 10;
 const TRAINED_CLIMB_BONUS_DURATION = 10;
@@ -30,7 +32,6 @@ export class ClimbState extends CharacterState {
 		stateMachine: StateMachine,
 		character: CharacterClient,
 		private keybindController: KeybindController,
-		private manaController: ManaController,
 		private animationController: AnimationController,
 	) {
 		super(stateMachine, character);
@@ -86,7 +87,9 @@ export class ClimbState extends CharacterState {
 	}
 
 	public override update(deltaTime: number): void {
-		if (!this.manaController.hasMana()) {
+		const manaAmount =
+			store.getState(selectManaAmount(LOCAL_PLAYER.UserId)) ?? 0;
+		if (manaAmount <= 0) {
 			this.stateMachine.transitionTo("idle");
 			return;
 		}

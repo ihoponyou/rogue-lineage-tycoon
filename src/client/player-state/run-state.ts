@@ -4,11 +4,11 @@ import { VFX } from "shared/constants";
 import { deserializeColor3 } from "shared/serialized-color3";
 import { StateMachine } from "shared/state-machine";
 import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
+import { selectManaAmount } from "shared/store/slices/players/slices/mana/selectors";
 import { CharacterClient } from "../components/character-client";
 import { AnimationController } from "../controllers/animation-controller";
 import { InputController } from "../controllers/input-controller";
 import { KeybindController } from "../controllers/keybind-controller";
-import { ManaController } from "../controllers/mana-controller";
 import { Events } from "../networking";
 import { CharacterState } from "./character-state";
 
@@ -27,7 +27,6 @@ export class RunState extends CharacterState {
 
 		private keybindController: KeybindController,
 		private inputController: InputController,
-		private manaController: ManaController,
 		private animationController: AnimationController,
 	) {
 		super(stateMachine, character);
@@ -44,7 +43,9 @@ export class RunState extends CharacterState {
 	}
 
 	override enter(): void {
-		this.manaController.hasMana() ? this.manaRun() : this.run();
+		const manaAmount =
+			store.getState(selectManaAmount(LOCAL_PLAYER.UserId)) ?? 0;
+		manaAmount > 0 ? this.manaRun() : this.run();
 
 		this.dashConnection = this.inputController.dashTriggered.Connect(
 			(direction) => {
