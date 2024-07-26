@@ -1144,6 +1144,11 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 			};
+			PadLabels: Frame & {
+				UIListLayout: UIListLayout;
+				AssetLabel: TextLabel;
+				CostLabel: TextLabel;
+			};
 			StatGui: ScreenGui & {
 				Health: LocalScript;
 				Container: Frame & {
