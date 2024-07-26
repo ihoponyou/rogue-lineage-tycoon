@@ -86,6 +86,12 @@ export const ASSETS: { [name: string]: AssetConfig } = {
 		currency: "Silver",
 		prerequisites: ["ManaRocks"],
 	},
+	WeaponRack: {
+		displayName: "Weapon Rack",
+		cost: 500,
+		currency: "Silver",
+		prerequisites: ["ManaRocks"],
+	},
 	Mana: {
 		displayName: "Mana",
 		cost: 250,
