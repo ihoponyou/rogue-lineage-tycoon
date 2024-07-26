@@ -1,15 +1,17 @@
+import { Components } from "@flamework/components";
 import { Controller, Dependency, OnStart, OnTick } from "@flamework/core";
 import {
 	ContextActionService,
-	Players,
 	UserInputService,
 	Workspace,
 } from "@rbxts/services";
-import { KeybindController } from "./keybind-controller";
 import Signal from "@rbxts/signal";
+import { LOCAL_PLAYER } from "client/constants";
+import { store } from "client/store";
+import { selectManaEnabled } from "shared/store/slices/players/slices/mana/selectors";
 import { OnLocalCharacterAdded } from "../../../types/lifecycles";
 import { CharacterClient } from "../components/character-client";
-import { Components } from "@flamework/components";
+import { KeybindController } from "./keybind-controller";
 
 const BEGIN = Enum.UserInputState.Begin;
 const END = Enum.UserInputState.End;
@@ -175,9 +177,13 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	}
 
 	private handleManaInput(state: Enum.UserInputState) {
+		const manaEnabled = store.getState(
+			selectManaEnabled(LOCAL_PLAYER.UserId),
+		);
+		if (!manaEnabled) return Enum.ContextActionResult.Pass;
 		if (state === BEGIN || state === END) {
 			this.chargeManaTriggered.Fire(state === BEGIN);
 		}
-		return Enum.ContextActionResult.Pass;
+		return Enum.ContextActionResult.Sink;
 	}
 }
