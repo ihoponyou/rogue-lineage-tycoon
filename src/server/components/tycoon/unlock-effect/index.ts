@@ -3,7 +3,10 @@ import { OnStart } from "@flamework/core";
 import { Unlockable } from "../unlockable";
 
 @Component()
-export abstract class UnlockEffect extends BaseComponent implements OnStart {
+export abstract class UnlockEffect<A extends {} = {}>
+	extends BaseComponent<A>
+	implements OnStart
+{
 	private unlockedConn?: RBXScriptConnection;
 
 	public constructor(private unlockable: Unlockable) {
@@ -11,8 +14,8 @@ export abstract class UnlockEffect extends BaseComponent implements OnStart {
 	}
 
 	public onStart(): void {
-		this.unlockedConn = this.unlockable.onUnlocked((unlocked) => {
-			if (unlocked) this.onUnlocked();
+		this.unlockedConn = this.unlockable.onUnlocked((player, unlocked) => {
+			if (unlocked) this.onUnlocked(player);
 		});
 	}
 
@@ -20,5 +23,5 @@ export abstract class UnlockEffect extends BaseComponent implements OnStart {
 		this.unlockedConn?.Disconnect();
 	}
 
-	protected abstract onUnlocked(): void;
+	protected abstract onUnlocked(player: Player): void;
 }

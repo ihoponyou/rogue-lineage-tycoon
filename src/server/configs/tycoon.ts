@@ -1,4 +1,6 @@
+import { Dependency } from "@flamework/core";
 import { ReplicatedStorage } from "@rbxts/services";
+import { ManaService } from "server/services/mana-service";
 import { Currency } from "../../../types/currency";
 
 export interface AssetConfig {
@@ -21,6 +23,10 @@ interface ProductConfig {
 
 interface UpgraderConfig {
 	readonly multiplier: number;
+}
+
+interface SkillConfig {
+	readonly teach: (player: Player) => void;
 }
 
 const PRODUCT_MODELS = ReplicatedStorage.Assets.Tycoon.Products;
@@ -224,5 +230,29 @@ export const UPGRADERS: { [name: string]: UpgraderConfig } = {
 	},
 	Appraiser: {
 		multiplier: 1.5,
+	},
+};
+
+export const SKILLS: { [name: string]: SkillConfig } = {
+	Mana: {
+		teach: (player) => {
+			const manaService = Dependency<ManaService>();
+			manaService.toggleManaObtained(player, true);
+		},
+	},
+	ManaRun: {
+		teach: (player) => {
+			print(`${player} got mana run`);
+		},
+	},
+	ManaDash: {
+		teach: (player) => {
+			print(`${player} got mana dash`);
+		},
+	},
+	ManaClimb: {
+		teach: (player) => {
+			print(`${player} got mana climb`);
+		},
 	},
 };
