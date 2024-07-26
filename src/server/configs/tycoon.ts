@@ -2,6 +2,7 @@ import { ReplicatedStorage } from "@rbxts/services";
 import { Currency } from "../../../types/currency";
 
 export interface AssetConfig {
+	readonly displayName: string;
 	readonly cost: number;
 	readonly currency: Currency;
 	readonly prerequisites: Array<string>;
@@ -31,75 +32,89 @@ export function getAssetConfig(assetName: string): AssetConfig {
 }
 
 export const ASSETS: { [name: string]: AssetConfig } = {
-	Walls: {
+	DoorRocks: {
+		displayName: "Break Rocks",
 		cost: 0,
 		currency: "Silver",
-		prerequisites: ["ManaRocks"],
+		prerequisites: [],
+	},
+	Bag: {
+		displayName: "Mysterious Bag",
+		cost: 0,
+		currency: "Silver",
+		prerequisites: [],
 	},
 	SilverDropper: {
+		displayName: "Silver Dropper",
 		cost: 0,
 		currency: "Silver",
 		prerequisites: ["Bag"],
 	},
-	Bag: {
-		cost: 0,
-		currency: "Silver",
-		prerequisites: [],
-	},
-	ManaRocks: {
-		cost: 0,
-		currency: "Silver",
-		prerequisites: ["TrinketDropper", "Polisher"],
-	},
-	Mana: {
-		cost: 10,
-		currency: "Silver",
-		prerequisites: ["Walls", "ManaRocks"],
-	},
-	ManaRun: {
-		cost: 150,
-		currency: "Silver",
-		prerequisites: ["Mana"],
-	},
-	ManaDash: {
-		cost: 250,
-		currency: "Silver",
-		prerequisites: ["ManaRun"],
-	},
-	ManaClimb: {
-		cost: 500,
-		currency: "Silver",
-		prerequisites: ["ManaDash"],
-	},
-	DoorRocks: {
-		cost: 0,
-		currency: "Silver",
-		prerequisites: [],
-	},
-	ScrollDropper: {
-		cost: 250,
-		currency: "Silver",
-		prerequisites: ["Mana"],
-	},
 	TrinketDropper: {
+		displayName: "Trinket Dropper",
 		cost: 100,
 		currency: "Silver",
 		prerequisites: ["SilverDropper"],
 	},
 	Polisher: {
+		displayName: "Product Polisher 9000",
 		cost: 100,
 		currency: "Silver",
 		prerequisites: ["TrinketDropper"],
 	},
+	Merchant: {
+		displayName: "The Merchant",
+		cost: 500,
+		currency: "Silver",
+		prerequisites: ["SilverDropper"],
+	},
 	Appraiser: {
-		cost: 100,
+		displayName: "The Appraiser",
+		cost: 350,
 		currency: "Silver",
 		prerequisites: ["Merchant"],
 	},
-	Merchant: {
+	ManaRocks: {
+		displayName: "Break Rocks",
+		cost: 400,
+		currency: "Silver",
+		prerequisites: [],
+	},
+	Walls: {
+		displayName: "Build Walls",
+		cost: 500,
+		currency: "Silver",
+		prerequisites: ["ManaRocks"],
+	},
+	Mana: {
+		displayName: "Mana",
+		cost: 250,
+		currency: "Silver",
+		prerequisites: ["ManaRocks"],
+	},
+	ScrollDropper: {
+		displayName: "Scroll Dropper",
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["Mana"],
+	},
+	ManaRun: {
+		displayName: "Mana Run",
+		cost: 500,
+		currency: "Silver",
+		prerequisites: ["Mana"],
+	},
+	ManaDash: {
+		displayName: "Mana Dash",
+		cost: 750,
+		currency: "Silver",
+		prerequisites: ["ManaRun"],
+	},
+	ManaClimb: {
+		displayName: "Mana Climb",
 		cost: 1000,
 		currency: "Silver",
-		prerequisites: ["SilverDropper"],
+		prerequisites: ["ManaDash"],
 	},
 };
 

@@ -1,4 +1,5 @@
 import { Component, Components } from "@flamework/components";
+import { ReplicatedStorage } from "@rbxts/services";
 import Signal from "@rbxts/signal";
 import { TouchableModel } from "server/components/interactable/touchable/touchable-model";
 import { getAssetConfig } from "server/configs/tycoon";
@@ -16,9 +17,7 @@ export interface PadAttributes {
 
 export type PadInstance = Model & {
 	Collider: Part & {
-		BillboardGui: BillboardGui & {
-			TextLabel: TextLabel;
-		};
+		BillboardGui: BillboardGui;
 	};
 };
 
@@ -49,12 +48,8 @@ export class Pad
 			// this wont break :)
 			.waitForComponent<Plot>(this.instance.Parent!.Parent!)
 			.expect();
-		const assetName = this.instance.Name.sub(0, -4);
-		this.instance.Collider.BillboardGui.TextLabel.Text = assetName;
 
-		const label = this.instance.Collider.BillboardGui.TextLabel;
-		label.TextColor3 = Color3.fromRGB(255, 255, 255);
-		label.TextStrokeTransparency = 0;
+		this.setupBillboard();
 
 		this.enable();
 	}
@@ -106,5 +101,15 @@ export class Pad
 		this.disable();
 
 		this.purchased.Fire(playerServer);
+	}
+
+	private setupBillboard(): void {
+		const labelsFrame = ReplicatedStorage.Assets.UI.PadLabels.Clone();
+
+		labelsFrame.AssetLabel.Text = this.assetConfig.displayName;
+		const cost = this.assetConfig.cost;
+		labelsFrame.CostLabel.Text = cost <= 0 ? "FREE" : `$${cost}`;
+
+		labelsFrame.Parent = this.instance.Collider.BillboardGui;
 	}
 }
