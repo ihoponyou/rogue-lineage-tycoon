@@ -26,7 +26,7 @@ export class Asset extends BaseComponent<{}, AssetInstance> implements OnStart {
 		if (padInstance === undefined) error("unassigned pad object");
 		this.pad = this.components.waitForComponent<Pad>(padInstance).expect();
 		this.pad.onPurchased((player) => {
-			this.unlockable.unlock();
+			this.unlockable.unlock(player.instance);
 			// save asset?
 		});
 	}

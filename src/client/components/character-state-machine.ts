@@ -5,7 +5,6 @@ import { StateMachine } from "shared/state-machine";
 import { AnimationController } from "../controllers/animation-controller";
 import { InputController } from "../controllers/input-controller";
 import { KeybindController } from "../controllers/keybind-controller";
-import { ManaController } from "../controllers/mana-controller";
 import { ChargeManaState } from "../player-state/charge-mana-state";
 import { ClimbState } from "../player-state/climb-state";
 import { DashState } from "../player-state/dash-state";
@@ -29,7 +28,6 @@ export class CharacterStateMachine
 		private character: CharacterClient,
 		private inputController: InputController,
 		private keybindController: KeybindController,
-		private manaController: ManaController,
 		private animationController: AnimationController,
 	) {
 		super();
@@ -44,21 +42,17 @@ export class CharacterStateMachine
 			this.character,
 			this.keybindController,
 			this.inputController,
-			this.manaController,
 			this.animationController,
 		);
 		this.DASH = new DashState(
 			this.stateMachine,
 			this.character,
-			this.keybindController,
-			this.manaController,
 			this.animationController,
 		);
 		this.CLIMB = new ClimbState(
 			this.stateMachine,
 			this.character,
 			this.keybindController,
-			this.manaController,
 			this.animationController,
 		);
 		this.CHARGE_MANA = new ChargeManaState(

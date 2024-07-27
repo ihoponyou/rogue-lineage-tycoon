@@ -1,6 +1,8 @@
 import { BaseComponent, Component } from "@flamework/components";
 import Signal from "@rbxts/signal";
 
+type UnlockedCallback = (unlockedBy: Player, unlocked: boolean) => void;
+
 @Component({
 	tag: "Unlockable",
 })
@@ -9,19 +11,17 @@ export class Unlockable<
 	I extends Instance = Instance,
 > extends BaseComponent<A, I> {
 	private _isUnlocked = false;
-	private unlocked = new Signal<(unlocked: boolean) => void>();
+	private unlocked = new Signal<UnlockedCallback>();
 
-	public unlock(): void {
+	public unlock(player: Player): void {
 		if (this._isUnlocked) {
 			warn("already unlocked");
 			return;
 		}
-		this.unlocked.Fire(true);
+		this.unlocked.Fire(player, true);
 	}
 
-	public onUnlocked(
-		callback: (unlocked: boolean) => void,
-	): RBXScriptConnection {
+	public onUnlocked(callback: UnlockedCallback): RBXScriptConnection {
 		return this.unlocked.Connect(callback);
 	}
 }

@@ -2,8 +2,8 @@ import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
 import { deserializeColor3 } from "shared/serialized-color3";
-import { selectManaAmount } from "shared/store/slices/players/selectors";
 import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
+import { selectManaAmount } from "shared/store/slices/players/slices/mana/selectors";
 import { FillBar } from ".";
 
 // const MANA_TWEEN_INFO = new TweenInfo(
@@ -24,8 +24,6 @@ import { FillBar } from ".";
 
 // 		this.manaTweenTimeStep = 0;
 // 	}
-
-// TODO: use useMotion to mimic original tween properties
 
 export function ManaBar() {
 	const serializedManaColor = useSelector(
