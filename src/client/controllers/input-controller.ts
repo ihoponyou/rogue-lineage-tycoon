@@ -8,7 +8,10 @@ import {
 import Signal from "@rbxts/signal";
 import { LOCAL_PLAYER } from "client/constants";
 import { store } from "client/store";
-import { selectManaEnabled } from "shared/store/slices/players/slices/mana/selectors";
+import {
+	selectMana,
+	selectManaEnabled,
+} from "shared/store/slices/players/slices/mana/selectors";
 import { OnLocalCharacterAdded } from "../../../types/lifecycles";
 import { CharacterClient } from "../components/character-client";
 import { KeybindController } from "./keybind-controller";
@@ -26,20 +29,22 @@ export type Direction = "forward" | "backward" | "left" | "right";
 
 @Controller()
 export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
-	static inputVector = new Vector2();
-	readonly runTriggered = new Signal();
-	readonly dashTriggered = new Signal<(direction: Direction) => void>();
-	readonly climbTriggered = new Signal<
+	public static inputVector = new Vector2();
+	public readonly runTriggered = new Signal();
+	public readonly dashTriggered = new Signal<
+		(direction: Direction) => void
+	>();
+	public readonly climbTriggered = new Signal<
 		(wallCastResult: RaycastResult) => void
 	>();
-	readonly chargeManaTriggered = new Signal<(bool: boolean) => void>();
+	public readonly chargeManaTriggered = new Signal<(bool: boolean) => void>();
 
 	private character?: CharacterClient;
 	private lastForwardInputTick = 0;
 
-	constructor(private keybindController: KeybindController) {}
+	public constructor(private keybindController: KeybindController) {}
 
-	onStart(): void {
+	public onStart(): void {
 		ContextActionService.BindAction(
 			"input_forward",
 			(_, state) => {
@@ -74,11 +79,11 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 		);
 	}
 
-	onTick(dt: number): void {
+	public onTick(dt: number): void {
 		InputController.inputVector = this.getInputVector();
 	}
 
-	onLocalCharacterAdded(character: Model): void {
+	public onLocalCharacterAdded(character: Model): void {
 		const components = Dependency<Components>();
 		components
 			.waitForComponent<CharacterClient>(character)
@@ -86,7 +91,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	}
 
 	// like the old unity one
-	getAxis(axis: InputAxis): 1 | 0 | -1 {
+	public getAxis(axis: InputAxis): 1 | 0 | -1 {
 		const isRightDown = UserInputService.IsKeyDown(
 			this.keybindController.keybinds.right,
 		);
@@ -113,7 +118,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 		}
 	}
 
-	getInputVector(): Vector2 {
+	public getInputVector(): Vector2 {
 		return new Vector2(
 			this.getAxis(InputAxis.Horizontal),
 			this.getAxis(InputAxis.Vertical),
@@ -151,6 +156,9 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private handleJumpInput(state: Enum.UserInputState) {
 		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		if (!this.character) return Enum.ContextActionResult.Pass;
+		const manaData = store.getState(selectMana(LOCAL_PLAYER.UserId));
+		if ((manaData?.amount ?? 0) <= 0 || !manaData?.climbEnabled)
+			return Enum.ContextActionResult.Pass;
 
 		const humanoidRootPart = this.character.getHumanoidRootPart();
 		const forwardCast = Workspace.Raycast(

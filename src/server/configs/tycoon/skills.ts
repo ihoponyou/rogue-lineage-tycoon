@@ -1,3 +1,5 @@
+import { store } from "server/store";
+
 interface SkillConfig {
 	readonly teach: (player: Player) => void;
 }
@@ -10,17 +12,17 @@ export const SKILLS: { [name: string]: SkillConfig } = {
 	},
 	ManaRun: {
 		teach: (player) => {
-			print(`${player} got mana run`);
+			store.toggleManaRunEnabled(player.UserId, true);
 		},
 	},
 	ManaDash: {
 		teach: (player) => {
-			print(`${player} got mana dash`);
+			store.toggleManaDashEnabled(player.UserId, true);
 		},
 	},
 	ManaClimb: {
 		teach: (player) => {
-			print(`${player} got mana climb`);
+			store.toggleManaClimbEnabled(player.UserId, true);
 		},
 	},
 };

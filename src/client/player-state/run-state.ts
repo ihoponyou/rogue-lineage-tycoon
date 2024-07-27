@@ -4,7 +4,7 @@ import { VFX } from "shared/constants";
 import { deserializeColor3 } from "shared/serialized-color3";
 import { StateMachine } from "shared/state-machine";
 import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
-import { selectManaAmount } from "shared/store/slices/players/slices/mana/selectors";
+import { selectMana } from "shared/store/slices/players/slices/mana/selectors";
 import { CharacterClient } from "../components/character-client";
 import { AnimationController } from "../controllers/animation-controller";
 import { InputController } from "../controllers/input-controller";
@@ -13,7 +13,7 @@ import { Events } from "../networking";
 import { CharacterState } from "./character-state";
 
 export class RunState extends CharacterState {
-	readonly name = "Run";
+	public readonly name = "Run";
 
 	private manaTrail = this.newManaTrail();
 	private dashConnection?: RBXScriptConnection;
@@ -21,10 +21,9 @@ export class RunState extends CharacterState {
 	private chargeManaConnection?: RBXScriptConnection;
 	private climbConnection?: RBXScriptConnection;
 
-	constructor(
+	public constructor(
 		stateMachine: StateMachine,
 		character: CharacterClient,
-
 		private keybindController: KeybindController,
 		private inputController: InputController,
 		private animationController: AnimationController,
@@ -42,10 +41,10 @@ export class RunState extends CharacterState {
 		);
 	}
 
-	override enter(): void {
-		const manaAmount =
-			store.getState(selectManaAmount(LOCAL_PLAYER.UserId)) ?? 0;
-		manaAmount > 0 ? this.manaRun() : this.run();
+	public override enter(): void {
+		const manaData = store.getState(selectMana(LOCAL_PLAYER.UserId));
+		const canManaRun = (manaData?.amount ?? 0) > 0 && manaData?.runEnabled;
+		canManaRun ? this.manaRun() : this.run();
 
 		this.dashConnection = this.inputController.dashTriggered.Connect(
 			(direction) => {
@@ -67,12 +66,12 @@ export class RunState extends CharacterState {
 		);
 	}
 
-	override update(): void {
+	public override update(): void {
 		if (!this.keybindController.isKeyDown("forward"))
 			this.stateMachine.transitionTo("idle");
 	}
 
-	override exit(): void {
+	public override exit(): void {
 		this.character.instance.Humanoid.WalkSpeed =
 			this.character.getWalkSpeed();
 

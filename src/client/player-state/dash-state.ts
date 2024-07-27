@@ -5,7 +5,7 @@ import { SFX, VFX } from "shared/constants";
 import { deserializeColor3 } from "shared/serialized-color3";
 import { StateMachine } from "shared/state-machine";
 import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
-import { selectManaAmount } from "shared/store/slices/players/slices/mana/selectors";
+import { selectMana } from "shared/store/slices/players/slices/mana/selectors";
 import { CharacterClient } from "../components/character-client";
 import { AnimationController } from "../controllers/animation-controller";
 import { Direction } from "../controllers/input-controller";
@@ -29,7 +29,7 @@ export class DashState extends CharacterState {
 	private manaDashSound = this.newDashSound();
 	private dashAngle = 0;
 
-	constructor(
+	public constructor(
 		stateMachine: StateMachine,
 		character: CharacterClient,
 		private animationController: AnimationController,
@@ -56,16 +56,17 @@ export class DashState extends CharacterState {
 
 		this.dashAngle = DIRECTION_TO_ANGLE[direction];
 		const humanoidRootPart = this.character.getHumanoidRootPart();
-		const manaAmount =
-			store.getState(selectManaAmount(LOCAL_PLAYER.UserId)) ?? 0;
-		const hasMana = manaAmount > 0;
+
+		const manaData = store.getState(selectMana(LOCAL_PLAYER.UserId));
+		const canManaDash =
+			(manaData?.amount ?? 0) > 0 && manaData?.dashEnabled;
 
 		this.dashVelocity.Parent = humanoidRootPart;
 		this.dashVelocity.Velocity = humanoidRootPart.CFrame.mul(
 			CFrame.Angles(0, math.rad(this.dashAngle), 0),
-		).LookVector.mul(hasMana ? 60 : 50);
+		).LookVector.mul(canManaDash ? 60 : 50);
 
-		if (hasMana) {
+		if (canManaDash) {
 			this.manaDashSound.Play();
 			this.manaParticles.Enabled = true;
 		}
