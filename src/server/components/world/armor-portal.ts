@@ -22,21 +22,21 @@ export class ArmorPortal
 	private trove = new Trove();
 	private debounce = new Array<Player>();
 
-	constructor(private identityService: IdentityService) {
+	public constructor(private identityService: IdentityService) {
 		super();
 	}
 
-	onStart(): void {
+	public onStart(): void {
 		this.trove.connect(this.instance.Touched, (otherPart) =>
 			this.onTouched(otherPart),
 		);
 	}
 
-	onRemoved(): void {
+	public onRemoved(): void {
 		this.trove.destroy();
 	}
 
-	onTouched(otherPart: BasePart): void {
+	public onTouched(otherPart: BasePart): void {
 		const character = otherPart.Parent as Model | undefined;
 		if (!character) return;
 		const player = Players.GetPlayerFromCharacter(character);

@@ -28,7 +28,7 @@ const CLIMB_DIRECTION_TO_ANIMATION_NAME = {
 export class ClimbState extends CharacterState {
 	public readonly name = "Climb";
 
-	constructor(
+	public constructor(
 		stateMachine: StateMachine,
 		character: CharacterClient,
 		private keybindController: KeybindController,

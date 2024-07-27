@@ -1,7 +1,6 @@
 import { Components } from "@flamework/components";
 import { Dependency, OnStart, Service } from "@flamework/core";
 import { Logger } from "@rbxts/log";
-import Object from "@rbxts/object-utils";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
 import { CharacterServer } from "server/components/character/character-server";
@@ -32,7 +31,7 @@ export class IdentityService
 
 	public constructor(private readonly logger: Logger) {}
 
-	onStart() {
+	public onStart() {
 		this.defaultDescription.HatAccessory = "48474313";
 
 		const BLACK = Color3.fromRGB(17, 17, 17);
@@ -45,7 +44,7 @@ export class IdentityService
 		this.defaultDescription.Shirt = 6168685211;
 	}
 
-	onPlayerAdded(player: Player) {
+	public onPlayerAdded(player: Player) {
 		this.playerDescriptions[player.UserId] =
 			this.getPlayerAvatarDescription(player.UserId);
 		this.cleanPlayerDescription(this.playerDescriptions[player.UserId]);
@@ -139,7 +138,7 @@ export class IdentityService
 			});
 	}
 
-	getPlayerAvatarDescription(playerId: number): HumanoidDescription {
+	public getPlayerAvatarDescription(playerId: number): HumanoidDescription {
 		const [success, playerDescription] = pcall((userId: number) => {
 			return Players.GetHumanoidDescriptionFromUserId(userId);
 		}, playerId);
@@ -147,11 +146,11 @@ export class IdentityService
 		return success ? playerDescription : this.defaultDescription;
 	}
 
-	getSavedPlayerDescription(player: Player): HumanoidDescription {
+	public getSavedPlayerDescription(player: Player): HumanoidDescription {
 		return this.playerDescriptions[player.UserId];
 	}
 
-	cleanPlayerDescription(description: HumanoidDescription) {
+	public cleanPlayerDescription(description: HumanoidDescription) {
 		description.Shirt = 0;
 		description.Pants = 0;
 		description.GraphicTShirt = 0;
@@ -181,7 +180,7 @@ export class IdentityService
 		this.logger.Debug("Cleaned {@Character}'s face", character);
 	}
 
-	setCharacterSkinColor(character: Model, color: Color3) {
+	public setCharacterSkinColor(character: Model, color: Color3) {
 		for (const part of character.GetChildren()) {
 			if (!part.IsA("BasePart")) continue;
 			part.Color = color;
@@ -189,7 +188,10 @@ export class IdentityService
 		character.SetAttribute("SkinColor", color);
 	}
 
-	setDescriptionSkinColor(description: HumanoidDescription, color: Color3) {
+	public setDescriptionSkinColor(
+		description: HumanoidDescription,
+		color: Color3,
+	) {
 		description.HeadColor = color;
 		description.LeftArmColor = color;
 		description.LeftLegColor = color;
@@ -198,7 +200,7 @@ export class IdentityService
 		description.TorsoColor = color;
 	}
 
-	removeHair(character: Model) {
+	public removeHair(character: Model) {
 		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
 		if (!humanoid) error(`Failed to find Humanoid in ${character}`);
 
@@ -208,7 +210,7 @@ export class IdentityService
 		}
 	}
 
-	setHairColor(character: Model, color: Color3) {
+	public setHairColor(character: Model, color: Color3) {
 		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
 		if (!humanoid) error(`Failed to find Humanoid in ${character}`);
 
@@ -262,7 +264,7 @@ export class IdentityService
 		clone.Name = "face";
 	}
 
-	addEyelashes(character: Model) {
+	public addEyelashes(character: Model) {
 		const head = character.FindFirstChild("Head") as BasePart;
 		if (!head || head.Size !== new Vector3(2, 1, 1)) return;
 		if (head.FindFirstChild("Lashes")) return;
@@ -271,7 +273,7 @@ export class IdentityService
 		lashes.Parent = head;
 	}
 
-	setSex(character: Model, sex: Sex) {
+	public setSex(character: Model, sex: Sex) {
 		if (sex === "Female") {
 			this.addEyelashes(character);
 		} else {
@@ -281,7 +283,7 @@ export class IdentityService
 		}
 	}
 
-	setArmor(character: Model, armorName: string) {
+	public setArmor(character: Model, armorName: string) {
 		const player = Players.GetPlayerFromCharacter(character) as Player;
 		const identity = store.getState(selectIdentity(player.UserId));
 		if (identity === undefined) error("no data");
@@ -291,17 +293,17 @@ export class IdentityService
 			for (const instance of character.GetChildren()) {
 				if (instance.IsA("Clothing")) instance.Destroy();
 			}
-			Object.entries(ARMORS[oldArmorName].StatChanges).forEach(
-				(entry) => {
-					// TODO: subtract old armor's stats
-				},
-			);
+			// Object.entries(ARMORS[oldArmorName].StatChanges).forEach(
+			// 	(entry) => {
+			// 		// TODO: subtract old armor's stats
+			// 	},
+			// );
 		}
 
 		const armor = ARMORS[armorName];
-		Object.entries(armor.StatChanges).forEach((entry) => {
-			// TODO: add new armor's stats
-		});
+		// Object.entries(armor.StatChanges).forEach((entry) => {
+		// 	// TODO: add new armor's stats
+		// });
 
 		const variation =
 			armor.Variations[identity.sex] ?? armor.Variations.Male;
@@ -311,7 +313,7 @@ export class IdentityService
 		store.setArmor(player.UserId, armorName);
 	}
 
-	setFirstName(player: Player, name: string) {
+	public setFirstName(player: Player, name: string) {
 		if (player.Character) {
 			const humanoid =
 				player.Character.FindFirstChildWhichIsA("Humanoid");
@@ -361,7 +363,7 @@ export class IdentityService
 		humanoid.AddAccessory(customHead?.Clone() as Accessory);
 	}
 
-	addCustomAccessory(character: Model, raceName: keyof RaceGlossary) {
+	public addCustomAccessory(character: Model, raceName: keyof RaceGlossary) {
 		const customAccessory =
 			APPEARANCE.CustomAccessories.FindFirstChild(raceName);
 
@@ -371,7 +373,11 @@ export class IdentityService
 		humanoid.AddAccessory(customAccessory?.Clone() as Accessory);
 	}
 
-	setPhenotype(character: Model, raceName: string, phenotypeName: string) {
+	public setPhenotype(
+		character: Model,
+		raceName: string,
+		phenotypeName: string,
+	) {
 		const race = RACES[raceName];
 		const phenotype = race.Phenotypes[phenotypeName];
 
@@ -399,15 +405,15 @@ export class IdentityService
 			this.addCustomAccessory(character, raceName);
 	}
 
-	getRandomSex(): Sex {
+	public getRandomSex(): Sex {
 		return math.random() > 0.5 ? "Male" : "Female";
 	}
 
-	getRandomManaColor(): Color3 {
+	public getRandomManaColor(): Color3 {
 		return new Color3(math.random(), math.random(), math.random());
 	}
 
-	getRandomNewRace(oldRace: keyof RaceGlossary): string {
+	public getRandomNewRace(oldRace: keyof RaceGlossary): string {
 		let newRace = "";
 		do {
 			newRace = getRandomRollable() as string;
@@ -415,7 +421,7 @@ export class IdentityService
 		return newRace;
 	}
 
-	getRandomPersonality(raceName: keyof RaceGlossary): string {
+	public getRandomPersonality(raceName: keyof RaceGlossary): string {
 		if (raceName === "Fischeran") {
 			raceName = "Rigan";
 		} else if (!APPEARANCE.Faces.FindFirstChild(raceName)) {

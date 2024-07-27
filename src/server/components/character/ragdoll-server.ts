@@ -144,7 +144,7 @@ export class RagdollServer extends Ragdoll implements OnStart {
 		this.humanoid.AutoRotate = !on;
 		this.changeHumanoidState(on);
 
-		for (const [name, joint] of this.joints) {
+		for (const [_, joint] of this.joints) {
 			joint.motor.Enabled = !on;
 			if (joint.motor.Part1) joint.motor.Part1.CanCollide = on;
 		}

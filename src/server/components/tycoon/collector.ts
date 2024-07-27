@@ -24,7 +24,7 @@ export class Collector
 	@Inject
 	private components!: Components;
 
-	constructor(private toggleable: Toggleable) {
+	public constructor(private toggleable: Toggleable) {
 		super();
 		const tycoon = this.instance.FindFirstAncestorOfClass("Model");
 		if (!tycoon) error("could not find parent tycoon");

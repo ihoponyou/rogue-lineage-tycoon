@@ -26,15 +26,15 @@ export class Climate
 	private components = Dependency<Components>();
 	private overlapParams = new OverlapParams();
 
-	onStart(): void {
+	public onStart(): void {
 		this.overlapParams.FilterType = Enum.RaycastFilterType.Include;
 	}
 
-	onCharacterAdded(character: StarterCharacter): void {
+	public onCharacterAdded(character: StarterCharacter): void {
 		this.overlapParams.AddToFilter(character);
 	}
 
-	onTick(dt: number): void {
+	public onTick(dt: number): void {
 		const processedPlayers = new Array<Player>();
 		for (const part of Workspace.GetPartBoundsInBox(
 			this.instance.CFrame,

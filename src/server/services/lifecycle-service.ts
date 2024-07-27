@@ -1,5 +1,7 @@
-import { Dependency, Modding, OnStart, Service } from "@flamework/core";
+import { Components } from "@flamework/components";
+import { Modding, OnStart, Service } from "@flamework/core";
 import { Players } from "@rbxts/services";
+import { Inject } from "shared/inject";
 import {
 	OnCharacterAdded,
 	OnCharacterRemoving,
@@ -7,8 +9,6 @@ import {
 	OnPlayerRemoving,
 	OnRemoved,
 } from "../../../types/lifecycles";
-import { Components } from "@flamework/components";
-import { Inject } from "shared/inject";
 
 @Service()
 export class LifecycleService implements OnStart {
@@ -23,7 +23,7 @@ export class LifecycleService implements OnStart {
 	@Inject
 	private components!: Components;
 
-	onStart(): void {
+	public onStart(): void {
 		// const playerAddedListeners = this.newLifecycleEvent<OnPlayerAdded>();
 		const playerAddedListeners = new Set<OnPlayerAdded>();
 		Modding.onListenerAdded<OnPlayerAdded>((obj) =>

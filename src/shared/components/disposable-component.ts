@@ -8,7 +8,7 @@ export abstract class DisposableComponent<
 > extends BaseComponent<A, I> {
 	protected trove = new Trove();
 
-	override destroy(): void {
+	public override destroy(): void {
 		this.trove.destroy();
 		super.destroy();
 	}

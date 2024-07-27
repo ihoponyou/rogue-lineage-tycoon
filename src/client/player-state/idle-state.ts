@@ -3,21 +3,21 @@ import { State } from "shared/state-machine/state";
 import { InputController } from "../controllers/input-controller";
 
 export class IdleState extends State {
-	readonly name = "Idle";
+	public readonly name = "Idle";
 
 	private runConnection?: RBXScriptConnection;
 	private dashConnection?: RBXScriptConnection;
 	private climbConnection?: RBXScriptConnection;
 	private chargeManaConnection?: RBXScriptConnection;
 
-	constructor(
+	public constructor(
 		stateMachine: StateMachine,
 		private inputController: InputController,
 	) {
 		super(stateMachine);
 	}
 
-	override enter(...args: Array<unknown>): void {
+	public override enter(): void {
 		this.runConnection = this.inputController.runTriggered.Connect(() => {
 			this.stateMachine.transitionTo("run");
 		});
@@ -33,7 +33,7 @@ export class IdleState extends State {
 			});
 	}
 
-	override exit(): void {
+	public override exit(): void {
 		if (this.runConnection) this.runConnection.Disconnect();
 		if (this.dashConnection) this.dashConnection.Disconnect();
 		if (this.climbConnection) this.climbConnection.Disconnect();

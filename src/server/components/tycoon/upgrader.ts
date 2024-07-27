@@ -25,7 +25,7 @@ export class Upgrader
 	@Inject
 	private components!: Components;
 
-	constructor(private toggleable: Toggleable) {
+	public constructor(private toggleable: Toggleable) {
 		super();
 		if (this.config === undefined)
 			error(`upgrader "${this.instance.Name} does not exist"`);
@@ -47,7 +47,7 @@ export class Upgrader
 	}
 
 	protected upgrade(product: Product): void {
-		const old = product.attributes.value;
+		// const old = product.attributes.value;
 		product.attributes.value *= this.config.multiplier;
 		// print(`${old} -> ${product.attributes.value}`);
 	}

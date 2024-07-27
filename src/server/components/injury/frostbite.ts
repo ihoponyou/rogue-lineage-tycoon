@@ -1,5 +1,5 @@
 import { Component } from "@flamework/components";
-import { OnTick } from "@flamework/core";
+import { OnStart, OnTick } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import { Workspace } from "@rbxts/services";
 import { IdentityService } from "server/services/identity-service";
@@ -18,10 +18,10 @@ const ICE_COLOR = Color3.fromRGB(152, 194, 219);
 @Component({
 	tag: "Frostbite",
 })
-export class Frostbite extends BaseInjury implements OnTick {
-	readonly name = "Frostbite";
+export class Frostbite extends BaseInjury implements OnStart, OnTick {
+	public readonly name = "Frostbite";
 
-	constructor(
+	public constructor(
 		character: CharacterServer,
 		private logger: Logger,
 		private identityService: IdentityService,
@@ -76,11 +76,11 @@ export class Frostbite extends BaseInjury implements OnTick {
 		this.logger.Info(DEATH_MESSAGE_TEMPLATE, this.character.instance.Name);
 	}
 
-	calculateTickDamage(humanoid: Humanoid, deltaTime: number): number {
+	private calculateTickDamage(humanoid: Humanoid, deltaTime: number): number {
 		return math.min(humanoid.Health, (humanoid.MaxHealth * deltaTime) / 5);
 	}
 
-	freezePart(part: BasePart): void {
+	private freezePart(part: BasePart): void {
 		part.Transparency = 1;
 		part.Anchored = true;
 

@@ -1,11 +1,10 @@
-import { ReplicatedStorage, UserInputService } from "@rbxts/services";
-import { Events } from "../networking";
-import { CharacterState } from "./character-state";
+import { SFX } from "shared/constants";
 import { StateMachine } from "shared/state-machine";
 import { CharacterClient } from "../components/character-client";
-import { KeybindController } from "../controllers/keybind-controller";
 import { InputController } from "../controllers/input-controller";
-import { SFX } from "shared/constants";
+import { KeybindController } from "../controllers/keybind-controller";
+import { Events } from "../networking";
+import { CharacterState } from "./character-state";
 
 export class ChargeManaState extends CharacterState {
 	public readonly name = "ChargeMana";
@@ -17,7 +16,7 @@ export class ChargeManaState extends CharacterState {
 	private manaFilledConnection?: RBXScriptConnection;
 	private runConnection?: RBXScriptConnection;
 
-	constructor(
+	public constructor(
 		stateMachine: StateMachine,
 		character: CharacterClient,
 		private keybindController: KeybindController,

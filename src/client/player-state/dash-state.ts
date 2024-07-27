@@ -76,7 +76,7 @@ export class DashState extends CharacterState {
 		);
 	}
 
-	public update(deltaTime: number): void {
+	public update(): void {
 		if (tick() - this.tickEntered >= DASH_LENGTH) {
 			this.stateMachine.transitionTo("idle");
 			return;

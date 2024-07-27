@@ -6,6 +6,7 @@ import { Events } from "client/networking";
 @Controller()
 export class ChatController implements OnStart {
 	private generalChannel!: TextChannel;
+
 	public onStart(): void {
 		this.generalChannel = TextChatService.WaitForChild(
 			"TextChannels",

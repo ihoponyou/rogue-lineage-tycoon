@@ -1,5 +1,5 @@
 import { Component } from "@flamework/components";
-import { Flamework, OnStart } from "@flamework/core";
+import { OnStart } from "@flamework/core";
 import { Interactable } from ".";
 
 @Component()

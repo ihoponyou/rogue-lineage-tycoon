@@ -1,13 +1,12 @@
-import { Controller, Dependency } from "@flamework/core";
+import { Components } from "@flamework/components";
+import { Controller } from "@flamework/core";
+import { CharacterClient as Character } from "client/components/character-client";
+import { ANIMATIONS } from "shared/constants";
+import { Inject } from "shared/inject";
 import {
 	OnLocalCharacterAdded,
 	OnLocalCharacterRemoving,
 } from "../../../types/lifecycles";
-import { CharacterClient as Character } from "client/components/character-client";
-import { Components } from "@flamework/components";
-import { ReplicatedStorage } from "@rbxts/services";
-import { ANIMATIONS } from "shared/constants";
-import { Inject } from "shared/inject";
 
 @Controller()
 export class AnimationController
@@ -19,7 +18,7 @@ export class AnimationController
 	@Inject
 	private components!: Components;
 
-	onLocalCharacterAdded(character: Model): void {
+	public onLocalCharacterAdded(character: Model): void {
 		this.components
 			.waitForComponent<Character>(character)
 			.andThen((value) => {
@@ -32,11 +31,11 @@ export class AnimationController
 			});
 	}
 
-	onLocalCharacterRemoving(character: Model): void {
+	public onLocalCharacterRemoving(): void {
 		this.loadedTracks.clear();
 	}
 
-	loadAnimation(animation: Animation): boolean {
+	public loadAnimation(animation: Animation): boolean {
 		const animator = this.character?.getAnimator();
 		if (!animator) error(`animator unavailable;`);
 
@@ -55,13 +54,13 @@ export class AnimationController
 		return true;
 	}
 
-	play(trackName: string): void {
+	public play(trackName: string): void {
 		const track = this.loadedTracks.get(trackName);
 		if (!track) error(`${trackName} not found`);
 		track.Play();
 	}
 
-	stop(trackName: string): void {
+	public stop(trackName: string): void {
 		const track = this.loadedTracks.get(trackName);
 		if (!track) error(`${trackName} not found`);
 		track.Stop();

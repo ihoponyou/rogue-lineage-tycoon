@@ -1,22 +1,22 @@
 import { StateMachine } from ".";
 
 export abstract class State {
-	abstract readonly name: string;
+	public abstract readonly name: string;
 
 	protected tickEntered = 0;
 
-	constructor(protected readonly stateMachine: StateMachine) {}
+	public constructor(protected readonly stateMachine: StateMachine) {}
 
-	initialize(): void {}
+	public initialize(): void {}
 
-	enter(...args: Array<unknown>): void {
+	public enter(..._args: Array<unknown>): void {
 		this.tickEntered = tick();
 		// print(`+ ${this.name}`);
 	}
 
-	update(deltaTime: number): void {}
+	public update(_deltaTime: number): void {}
 
-	exit(): void {
+	public exit(): void {
 		// print(`- ${this.name}`);
 	}
 }

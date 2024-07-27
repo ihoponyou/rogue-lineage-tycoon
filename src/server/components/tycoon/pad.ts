@@ -37,7 +37,7 @@ export class Pad
 	@Inject
 	private components!: Components;
 
-	constructor(private model: ModelComponent) {
+	public constructor(private model: ModelComponent) {
 		super();
 	}
 

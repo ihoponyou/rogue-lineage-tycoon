@@ -1,7 +1,7 @@
 // https://github.com/Tesmi-Develop
 // https://discord.com/channels/476080952636997633/1250858120679260212/1250859525683019796
-import { Dependency, Modding, Reflect } from "@flamework/core";
-import { Constructor, AbstractConstructor } from "@flamework/core/out/utility";
+import { Dependency, Reflect } from "@flamework/core";
+import { AbstractConstructor, Constructor } from "@flamework/core/out/utility";
 
 type ReturnMethods<T extends object> = ExtractKeys<T, Callback>;
 type TMethod<T> = (

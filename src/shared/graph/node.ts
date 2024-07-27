@@ -1,3 +1,3 @@
 export class Node<T> {
-	constructor(private value: T) {}
+	public constructor(private value: T) {}
 }

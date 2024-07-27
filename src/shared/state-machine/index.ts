@@ -1,7 +1,7 @@
 import { State } from "./state";
 
 class NullState extends State {
-	name = "Null";
+	public name = "Null";
 }
 
 export class StateMachine {
@@ -43,7 +43,7 @@ export class StateMachine {
 			return;
 		}
 
-		const oldStateName = this.currentState.name;
+		// const oldStateName = this.currentState.name;
 
 		this.currentState.exit();
 		this.currentState = newState;

@@ -23,7 +23,7 @@ export abstract class Character<
 {
 	protected raycastParams = new RaycastParams();
 
-	onStart(): void {
+	public onStart(): void {
 		this.raycastParams.CollisionGroup = "Characters";
 		this.raycastParams.FilterType = Enum.RaycastFilterType.Exclude;
 		this.raycastParams.IgnoreWater = true;
@@ -40,9 +40,7 @@ export abstract class Character<
 		);
 	}
 
-	protected abstract onHealthChanged(health: number): void;
-
-	getAnimator(): Animator {
+	public getAnimator(): Animator {
 		const animator = this.instance.Humanoid.FindFirstChild("Animator") as
 			| Animator
 			| undefined;
@@ -51,20 +49,20 @@ export abstract class Character<
 		return animator;
 	}
 
-	getPlayer(): Player {
+	public getPlayer(): Player {
 		const player = Players.GetPlayerFromCharacter(this.instance);
 		if (!player)
 			error(`Player not found from character ${this.instance.Name}`);
 		return player;
 	}
 
-	getHead(): Head {
+	public getHead(): Head {
 		const head = this.instance.FindFirstChild("Head") as Head | undefined;
 		if (!head) error(`Head not found in character ${this.instance.Name}`);
 		return head;
 	}
 
-	getTorso(): Torso {
+	public getTorso(): Torso {
 		const torso = this.instance.FindFirstChild("Torso") as
 			| Torso
 			| undefined;
@@ -72,7 +70,7 @@ export abstract class Character<
 		return torso;
 	}
 
-	getHumanoidRootPart(): HumanoidRootPart {
+	public getHumanoidRootPart(): HumanoidRootPart {
 		const humanoidRootPart = this.instance.FindFirstChild(
 			"HumanoidRootPart",
 		) as HumanoidRootPart | undefined;
@@ -81,15 +79,17 @@ export abstract class Character<
 		return humanoidRootPart;
 	}
 
-	getRaycastParams(): RaycastParams {
+	public getRaycastParams(): RaycastParams {
 		return this.raycastParams;
 	}
 
-	getWalkSpeed(): number {
+	public getWalkSpeed(): number {
 		return 20;
 	}
 
-	resetToWalkSpeed(): void {
+	public resetToWalkSpeed(): void {
 		this.instance.Humanoid.WalkSpeed = this.getWalkSpeed();
 	}
+
+	protected onHealthChanged(_health: number): void {}
 }

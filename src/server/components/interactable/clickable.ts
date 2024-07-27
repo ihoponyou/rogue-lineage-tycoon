@@ -7,7 +7,7 @@ import { InputBasedInteractable } from "./input-based-interactable";
 export class Clickable extends InputBasedInteractable {
 	protected inputInstance = new Instance("ClickDetector");
 
-	override onStart(): void {
+	public override onStart(): void {
 		super.onStart();
 
 		this.trove.connect(this.inputInstance.MouseClick, (player) =>

@@ -25,7 +25,7 @@ export class Carriable
 	@Inject
 	private components!: Components;
 
-	constructor(
+	public constructor(
 		private character: CharacterServer,
 		private ragdoll: RagdollServer,
 	) {
@@ -55,7 +55,7 @@ export class Carriable
 			: this.pickUp(characterComponent);
 	}
 
-	pickUp(carrier: CharacterServer): void {
+	public pickUp(carrier: CharacterServer): void {
 		this.attributes.isCarried = true;
 
 		const ragdoll = this.components.getComponent<RagdollServer>(
@@ -96,7 +96,7 @@ export class Carriable
 		);
 	}
 
-	drop(carrier: CharacterServer): void {
+	public drop(carrier: CharacterServer): void {
 		this.attributes.isCarried = false;
 
 		this.carryTrove.clean();

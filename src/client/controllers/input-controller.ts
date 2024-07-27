@@ -79,7 +79,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 		);
 	}
 
-	public onTick(dt: number): void {
+	public onTick(): void {
 		InputController.inputVector = this.getInputVector();
 	}
 

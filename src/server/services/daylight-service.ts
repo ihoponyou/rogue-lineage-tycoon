@@ -6,7 +6,7 @@ export const SECONDS_PER_DAY = MINUTES_PER_DAY * 60;
 
 @Service()
 export class DaylightService implements OnTick {
-	onTick(dt: number): void {
+	public onTick(_dt: number): void {
 		Lighting.ClockTime = ((tick() * 24) / SECONDS_PER_DAY) % 24;
 	}
 }

@@ -24,7 +24,7 @@ export class CharacterStateMachine
 	private CLIMB!: ClimbState;
 	private CHARGE_MANA!: ChargeManaState;
 
-	constructor(
+	public constructor(
 		private character: CharacterClient,
 		private inputController: InputController,
 		private keybindController: KeybindController,

@@ -35,10 +35,6 @@ export class CharacterClient extends Character<
 		this.trove.add(stateMachine);
 	}
 
-	protected override onHealthChanged(health: number): void {
-		// producer.setHealthAmount(health);
-	}
-
 	public override destroy(): void {
 		this.components.removeComponent<CharacterStateMachine>(this.instance);
 		super.destroy();

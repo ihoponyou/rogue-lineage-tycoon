@@ -11,7 +11,7 @@ export class KeyInteractable<
 	private promptDebounce = false;
 	protected inputInstance = new Instance("ProximityPrompt");
 
-	override onStart(): void {
+	public override onStart(): void {
 		super.onStart();
 
 		this.inputInstance.ClickablePrompt = false;

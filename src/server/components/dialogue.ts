@@ -15,7 +15,7 @@ export class Dialogue extends DisposableComponent implements OnStart {
 	private static openDialogues = new Map<Player, Array<ImageLabel>>();
 	private config = DIALOGUE[this.instance.Name];
 
-	constructor(private clickable: Clickable) {
+	public constructor(private clickable: Clickable) {
 		super();
 	}
 

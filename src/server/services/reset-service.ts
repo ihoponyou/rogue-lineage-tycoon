@@ -7,7 +7,7 @@ import { Events } from "server/networking";
 export class ResetService implements OnStart {
 	private components = Dependency<Components>();
 
-	onStart(): void {
+	public onStart(): void {
 		Events.reset.connect((player) => {
 			if (!player.Character) return;
 

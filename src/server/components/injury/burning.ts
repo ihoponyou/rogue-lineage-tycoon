@@ -16,7 +16,7 @@ const TICKS_TO_DIE = 8;
 export class Burning extends DisposableComponent<{}, Model> implements OnStart {
 	private killTicks = 0;
 
-	constructor(private character: CharacterServer) {
+	public constructor(private character: CharacterServer) {
 		super();
 	}
 

@@ -42,7 +42,7 @@ export class PlayerServer extends AbstractPlayer {
 	public async loadCharacter(
 		leavingPurgatory: boolean = false,
 	): Promise<CharacterServer> {
-		return new Promise((resolve, reject, onCancel) => {
+		return new Promise((resolve, reject) => {
 			if (this.instance.Parent === undefined) {
 				reject("player has already left");
 				return;

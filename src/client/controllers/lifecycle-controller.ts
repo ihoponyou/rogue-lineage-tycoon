@@ -13,7 +13,7 @@ export class LifecycleController implements OnStart {
 	@Inject
 	private components!: Components;
 
-	onStart(): void {
+	public onStart(): void {
 		const localCharacterAddedListeners = new Set<OnLocalCharacterAdded>();
 		Modding.onListenerAdded<OnLocalCharacterAdded>((obj) =>
 			localCharacterAddedListeners.add(obj),

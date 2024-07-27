@@ -29,7 +29,7 @@ export class Grippable
 	@Inject
 	private components!: Components;
 
-	constructor(
+	public constructor(
 		private character: CharacterServer,
 		private ragdoll: RagdollServer,
 	) {
@@ -59,7 +59,7 @@ export class Grippable
 			: this.grip(characterComponent);
 	}
 
-	grip(gripper: CharacterServer): void {
+	public grip(gripper: CharacterServer): void {
 		const floorCheck = Workspace.Raycast(
 			this.character.getHumanoidRootPart().Position,
 			Vector3.yAxis.mul(-4),
@@ -141,7 +141,19 @@ export class Grippable
 		this.snapToGround(floorCheck, gripper, this.character);
 	}
 
-	snapToGround(
+	public release(gripper: CharacterServer): void {
+		this.attributes.gettingGripped = false;
+
+		this.gripTrove.clean();
+
+		gripper.instance.Humanoid.AutoRotate = true;
+		gripper.getHumanoidRootPart().Anchored = false;
+		this.character.getHumanoidRootPart().Anchored = false;
+
+		// redisable motor6ds if ragdolled
+	}
+
+	private snapToGround(
 		floorCheck: RaycastResult,
 		gripper: CharacterServer,
 		grippee: CharacterServer,
@@ -170,17 +182,5 @@ export class Grippable
 		gripper.instance.PivotTo(
 			grippeePivot.mul(gripperRotOffset).add(gripperPosOffset),
 		);
-	}
-
-	release(gripper: CharacterServer): void {
-		this.attributes.gettingGripped = false;
-
-		this.gripTrove.clean();
-
-		gripper.instance.Humanoid.AutoRotate = true;
-		gripper.getHumanoidRootPart().Anchored = false;
-		this.character.getHumanoidRootPart().Anchored = false;
-
-		// redisable motor6ds if ragdolled
 	}
 }

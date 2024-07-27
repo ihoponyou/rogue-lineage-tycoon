@@ -27,7 +27,7 @@ export class Dropper
 	@Inject
 	private components!: Components;
 
-	constructor(private toggleable: Toggleable) {
+	public constructor(private toggleable: Toggleable) {
 		super();
 		if (!this.config)
 			error(`dropper "${this.instance.Name}" does not exist`);
@@ -74,7 +74,7 @@ export class Dropper
 
 			this.components
 				.waitForComponent<ModelComponent>(clone)
-				.andThen((model) => {
+				.andThen((_model) => {
 					// model.setNetworkOwner(
 					// 	this.plotAsset.getPlot().getOwner()?.instance,
 					// );

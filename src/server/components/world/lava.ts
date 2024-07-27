@@ -1,7 +1,7 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { OnRemoved } from "../../../../types/lifecycles";
 import { Trove } from "@rbxts/trove";
+import { OnRemoved } from "../../../../types/lifecycles";
 
 @Component({
 	tag: "Lava",
@@ -12,17 +12,17 @@ export class Lava
 {
 	private trove = new Trove();
 
-	onStart(): void {
+	public onStart(): void {
 		this.trove.connect(this.instance.Touched, (otherPart) =>
 			this.onTouched(otherPart),
 		);
 	}
 
-	onRemoved(): void {
+	public onRemoved(): void {
 		this.trove.destroy();
 	}
 
-	onTouched(otherPart: BasePart): void {
+	public onTouched(otherPart: BasePart): void {
 		if (otherPart.Parent) otherPart.Parent.AddTag("Burning");
 	}
 }

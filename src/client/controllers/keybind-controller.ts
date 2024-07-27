@@ -1,10 +1,7 @@
-import { Controller, OnStart, OnTick } from "@flamework/core";
+import { Controller } from "@flamework/core";
 import Object from "@rbxts/object-utils";
 import { ContextActionService, UserInputService } from "@rbxts/services";
 import { valueof } from "../../../types/valueof";
-
-const BEGIN = Enum.UserInputState.Begin;
-const END = Enum.UserInputState.End;
 
 export interface Keybinds {
 	forward: Enum.KeyCode;
@@ -51,37 +48,15 @@ type Action = (state: Enum.UserInputState) => Enum.ContextActionResult | void;
 
 @Controller()
 export class KeybindController {
-	keybinds = DEFAULT_KEYBINDS;
+	public keybinds = DEFAULT_KEYBINDS;
 
-	// like the old unity one
-	getAxis(axis: InputAxis): 1 | 0 | -1 {
-		const isRightDown = UserInputService.IsKeyDown(this.keybinds.right);
-		const isLeftDown = UserInputService.IsKeyDown(this.keybinds.left);
-		const isForwardDown = UserInputService.IsKeyDown(this.keybinds.forward);
-		const isBackwardDown = UserInputService.IsKeyDown(
-			this.keybinds.backward,
-		);
-
-		if (axis === InputAxis.Horizontal) {
-			if (isRightDown && isLeftDown) return 0;
-			else if (isRightDown) return 1;
-			else if (isLeftDown) return -1;
-			else return 0;
-		} else {
-			if (isForwardDown && isBackwardDown) return 0;
-			else if (isForwardDown) return 1;
-			else if (isBackwardDown) return -1;
-			else return 0;
-		}
-	}
-
-	isKeyDown(action: keyof Keybinds): boolean {
+	public isKeyDown(action: keyof Keybinds): boolean {
 		return UserInputService.IsKeyDown(
 			this.keybinds[action] as Enum.KeyCode,
 		);
 	}
 
-	isDirectionalKey(key: Enum.KeyCode): boolean {
+	public isDirectionalKey(key: Enum.KeyCode): boolean {
 		return (
 			key === this.keybinds.forward ||
 			key === this.keybinds.backward ||
@@ -90,7 +65,7 @@ export class KeybindController {
 		);
 	}
 
-	isDirectionalKeyDown(): boolean {
+	public isDirectionalKeyDown(): boolean {
 		return (
 			UserInputService.IsKeyDown(this.keybinds.forward) ||
 			UserInputService.IsKeyDown(this.keybinds.backward) ||
@@ -99,13 +74,15 @@ export class KeybindController {
 		);
 	}
 
-	getKeyActionName(key: valueof<Keybinds>): keyof Keybinds | undefined {
+	public getKeyActionName(
+		key: valueof<Keybinds>,
+	): keyof Keybinds | undefined {
 		for (const [actionName, actionKey] of Object.entries(this.keybinds)) {
 			if (key === actionKey) return actionName;
 		}
 	}
 
-	loadKeybind(
+	public loadKeybind(
 		actionName: keyof Keybinds,
 		keybind: valueof<Keybinds>,
 		action: Action,
@@ -121,17 +98,17 @@ export class KeybindController {
 		);
 	}
 
-	unloadKeybind(actionName: keyof Keybinds) {
+	public unloadKeybind(actionName: keyof Keybinds) {
 		ContextActionService.UnbindAction(`input_${actionName}`);
 	}
 
-	unloadAllKeybinds() {
+	public unloadAllKeybinds() {
 		for (const actionName of Object.keys(this.keybinds)) {
 			this.unloadKeybind(actionName);
 		}
 	}
 
-	changeKeybind(
+	public changeKeybind(
 		actionName: keyof Keybinds,
 		newKey: valueof<Keybinds>,
 		action: Action,

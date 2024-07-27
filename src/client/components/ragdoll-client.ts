@@ -12,7 +12,7 @@ import { Ragdoll } from "shared/components/ragdoll";
 export class RagdollClient extends Ragdoll implements OnStart {
 	private animator = this.humanoid.WaitForChild("Animator") as Animator;
 
-	onStart(): void {
+	public onStart(): void {
 		this.configureHumanoid();
 
 		this.onAttributeChanged("isRagdolled", (newValue) => {
@@ -22,7 +22,7 @@ export class RagdollClient extends Ragdoll implements OnStart {
 		});
 	}
 
-	stopAnimations(): void {
+	public stopAnimations(): void {
 		for (const track of this.animator.GetPlayingAnimationTracks()) {
 			track.Stop(2);
 		}

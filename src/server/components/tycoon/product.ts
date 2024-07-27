@@ -1,9 +1,9 @@
-import { BaseComponent, Component } from "@flamework/components";
+import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { DisposableComponent } from "shared/components/disposable-component";
-import { Currency } from "../../../../types/currency";
 import { PRODUCTS } from "server/configs/tycoon";
+import { DisposableComponent } from "shared/components/disposable-component";
 import { ModelComponent } from "shared/components/model";
+import { Currency } from "../../../../types/currency";
 
 interface ProductAttributes {
 	isProcessed: boolean;
@@ -25,7 +25,7 @@ export class Product
 	extends DisposableComponent<ProductAttributes, ProductInstance>
 	implements OnStart
 {
-	constructor(private model: ModelComponent) {
+	public constructor(private model: ModelComponent) {
 		super();
 	}
 

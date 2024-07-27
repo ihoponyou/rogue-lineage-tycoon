@@ -8,9 +8,9 @@
         "project": "./tsconfig.json"
     },
     "plugins": [
-        "roblox-ts",
         "@typescript-eslint",
         "@typescript-eslint/eslint-plugin",
+        "roblox-ts",
         "prettier"
     ],
     "extends": [
@@ -20,26 +20,26 @@
         "plugin:roblox-ts/recommended"
     ],
     "rules": {
-        "prettier/prettier": "warn",
-        "@typescript-eslint/array-type": [
+        "@typescript-eslint/no-unused-vars":
+        [
             "warn",
             {
-                "default": "generic",
-                "readonly": "generic"
+                "argsIgnorePattern": "^_",
+                "varsIgnorePattern": "^_",
+                "caughtErrorsIgnorePattern": "^_"
             }
         ],
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-namespace": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/explicit-member-accessibility": "warn",
-	"prefer-const": [
-		"warn",
-		{
-			"destructuring": "all"
-		}
-	],
+        "prettier/prettier": "warn",
+        "prefer-const": [
+            "warn",
+            {
+                "destructuring": "all"
+            }
+        ],
         "no-undef-init": "error"
     }
 }

@@ -36,7 +36,7 @@ export abstract class Interactable<
 		this._isEnabled = false;
 	}
 
-	public isPlayerAllowed(player: Player): boolean {
+	public isPlayerAllowed(_player: Player): boolean {
 		return true;
 	}
 }

@@ -53,7 +53,7 @@ export class CharacterServer
 	@Inject
 	private dataService!: DataService;
 
-	constructor(private ragdoll: RagdollServer) {
+	public constructor(private ragdoll: RagdollServer) {
 		super();
 	}
 
