@@ -72,8 +72,7 @@ export class RunState extends CharacterState {
 	}
 
 	public override exit(): void {
-		this.character.instance.Humanoid.WalkSpeed =
-			this.character.getWalkSpeed();
+		this.character.getHumanoid().WalkSpeed = this.character.getWalkSpeed();
 
 		this.animationController.stop("Run");
 		this.animationController.stop("ManaRun");
@@ -92,14 +91,14 @@ export class RunState extends CharacterState {
 	}
 
 	private run(): void {
-		this.character.instance.Humanoid.WalkSpeed =
+		this.character.getHumanoid().WalkSpeed =
 			this.character.getWalkSpeed() * 1.5;
 
 		this.animationController.play("Run");
 	}
 
 	private manaRun(): void {
-		this.character.instance.Humanoid.WalkSpeed =
+		this.character.getHumanoid().WalkSpeed =
 			this.character.getWalkSpeed() * 2;
 
 		this.animationController.play("ManaRun");

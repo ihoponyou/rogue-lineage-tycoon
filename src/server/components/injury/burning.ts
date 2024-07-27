@@ -49,7 +49,7 @@ export class Burning extends DisposableComponent<{}, Model> implements OnStart {
 			if (this.killTicks >= TICKS_TO_DIE / 2)
 				this.instance.AddTag("BurnScar");
 
-			const humanoid = this.character.instance.Humanoid;
+			const humanoid = this.character.getHumanoid();
 			humanoid.TakeDamage(math.min(BURN_DAMAGE, humanoid.Health));
 
 			this.character.adjustTemperature(HEAT_AMOUNT);

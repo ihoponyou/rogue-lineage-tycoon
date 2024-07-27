@@ -1,10 +1,6 @@
 import { Component, Components } from "@flamework/components";
 import { Workspace } from "@rbxts/services";
-import {
-	Character,
-	CharacterAttributes,
-	CharacterInstance,
-} from "shared/components/abstract-character";
+import { AbstractCharacter } from "shared/components/abstract-character";
 import { Inject } from "shared/inject";
 import { Events } from "../networking";
 import { CharacterStateMachine } from "./character-state-machine";
@@ -17,10 +13,7 @@ const events = Events.character;
 		isAlive: true,
 	},
 })
-export class CharacterClient extends Character<
-	CharacterAttributes,
-	CharacterInstance
-> {
+export class CharacterClient extends AbstractCharacter {
 	@Inject
 	private components!: Components;
 
@@ -43,6 +36,6 @@ export class CharacterClient extends Character<
 	private onKilled(): void {
 		const camera = Workspace.CurrentCamera;
 		if (!camera) return;
-		camera.CameraSubject = this.instance.Head;
+		camera.CameraSubject = this.getHead();
 	}
 }

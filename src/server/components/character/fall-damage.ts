@@ -44,7 +44,7 @@ export class FallDamage extends BaseComponent implements OnTick {
 			if (distanceFallen < 15) return;
 
 			const damage = this.calculateDamage(distanceFallen);
-			const humanoid = this.character.instance.Humanoid;
+			const humanoid = this.character.getHumanoid();
 
 			humanoid.TakeDamage(damage);
 			if (damage > humanoid.MaxHealth * 0.75) {

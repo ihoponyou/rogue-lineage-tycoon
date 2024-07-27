@@ -31,7 +31,7 @@ export class ChargeManaState extends CharacterState {
 	}
 
 	public override enter(): void {
-		this.character.instance.Humanoid.WalkSpeed =
+		this.character.getHumanoid().WalkSpeed =
 			this.character.getWalkSpeed() * 0.85;
 		Events.mana.charge(true);
 		this.chargeSound.Play();

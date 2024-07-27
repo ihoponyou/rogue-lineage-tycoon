@@ -1,47 +1,45 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
+import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
 import { DisposableComponent } from "./disposable-component";
-import { RagdollAttributes } from "./ragdoll";
 
-export interface CharacterInstance extends StarterCharacter {
-	Humanoid: Humanoid;
-}
-
-export interface CharacterAttributes extends RagdollAttributes {
+export interface CharacterAttributes {
 	isKnocked: boolean;
 	isAlive: boolean;
 }
 
 @Component()
-export abstract class Character<
-		A extends CharacterAttributes,
-		I extends CharacterInstance,
-	>
-	extends DisposableComponent<A, I>
+export abstract class AbstractCharacter
+	extends DisposableComponent<CharacterAttributes, Model>
 	implements OnStart
 {
 	protected raycastParams = new RaycastParams();
+	protected humanoid!: Humanoid;
 
 	public onStart(): void {
+		const character = promiseR6(this.instance).expect();
+		this.humanoid = character.Humanoid;
+
 		this.raycastParams.CollisionGroup = "Characters";
 		this.raycastParams.FilterType = Enum.RaycastFilterType.Exclude;
 		this.raycastParams.IgnoreWater = true;
 
 		this.raycastParams.AddToFilter(this.instance);
 
-		this.instance.Humanoid.SetStateEnabled(
-			Enum.HumanoidStateType.Dead,
-			false,
-		);
+		this.humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
 
-		this.trove.connect(this.instance.Humanoid.HealthChanged, (health) =>
+		this.trove.connect(this.humanoid.HealthChanged, (health) =>
 			this.onHealthChanged(health),
 		);
 	}
 
+	public getHumanoid(): Humanoid {
+		return this.humanoid;
+	}
+
 	public getAnimator(): Animator {
-		const animator = this.instance.Humanoid.FindFirstChild("Animator") as
+		const animator = this.humanoid.FindFirstChild("Animator") as
 			| Animator
 			| undefined;
 		if (!animator)
@@ -88,7 +86,7 @@ export abstract class Character<
 	}
 
 	public resetToWalkSpeed(): void {
-		this.instance.Humanoid.WalkSpeed = this.getWalkSpeed();
+		this.humanoid.WalkSpeed = this.getWalkSpeed();
 	}
 
 	protected onHealthChanged(_health: number): void {}

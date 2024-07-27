@@ -61,7 +61,7 @@ export class Frostbite extends BaseInjury implements OnStart, OnTick {
 		if (characterTemperature === undefined) return;
 		if (characterTemperature > UPPER_TEMPERATURE_THRESHOLD) return;
 
-		const humanoid = this.character.instance.Humanoid;
+		const humanoid = this.character.getHumanoid();
 		humanoid.TakeDamage(this.calculateTickDamage(humanoid, dt));
 		if (humanoid.Health > 0) return;
 

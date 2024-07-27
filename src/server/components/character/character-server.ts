@@ -5,11 +5,7 @@ import { setInterval } from "@rbxts/set-timeout";
 import { Events } from "server/networking";
 import { DataService } from "server/services/data-service";
 import { store } from "server/store";
-import {
-	Character,
-	CharacterAttributes,
-	CharacterInstance,
-} from "shared/components/abstract-character";
+import { AbstractCharacter } from "shared/components/abstract-character";
 import { Inject } from "shared/inject";
 import {
 	deserializeVector3,
@@ -30,6 +26,7 @@ const BASE_REGEN_RATE = 0.5;
 const MINIMUM_TEMPERATURE = 0;
 const MAXIMUM_TEMPERATURE = 100;
 const KNOCK_PERCENT_THRESHOLD = 0.15;
+const DEFAULT_JUMP_POWER = 50;
 
 const EVENTS = Events.character;
 
@@ -41,10 +38,7 @@ const EVENTS = Events.character;
 	},
 })
 // consider using server/client/shared namespaces to allow name overlap
-export class CharacterServer
-	extends Character<CharacterAttributes, CharacterInstance>
-	implements OnTick
-{
+export class CharacterServer extends AbstractCharacter implements OnTick {
 	private disconnectReleaseListener?: () => void;
 
 	@Inject
@@ -80,7 +74,7 @@ export class CharacterServer
 		let savedHealth = store.getState(selectHealth(this.getPlayer().UserId));
 		if (savedHealth === undefined) error("health not found");
 		if (savedHealth < 1) savedHealth = 100;
-		this.instance.Humanoid.Health = savedHealth;
+		this.humanoid.Health = savedHealth;
 	}
 
 	public loadConditions(): void {
@@ -113,7 +107,7 @@ export class CharacterServer
 		store.decayStomach(player.UserId, dt);
 		store.decayToxicity(player.UserId, dt);
 
-		const humanoid = this.instance.Humanoid;
+		const humanoid = this.humanoid;
 		if (humanoid.Health >= humanoid.MaxHealth) return;
 
 		const boost = 0; // TODO: health regen multiplier
@@ -123,7 +117,7 @@ export class CharacterServer
 
 	public override onHealthChanged(health: number): void {
 		store.setHealth(this.getPlayer().UserId, health);
-		const percentHealth = health / this.instance.Humanoid.MaxHealth;
+		const percentHealth = health / this.humanoid.MaxHealth;
 		if (this.attributes.isKnocked) {
 			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
 				if (this.instance.GetAttribute("isCarried") === true) return;
@@ -159,7 +153,7 @@ export class CharacterServer
 		if (!this.attributes.isAlive) return;
 		this.attributes.isAlive = false;
 
-		this.instance.Humanoid.Health = 0;
+		this.humanoid.Health = 0;
 		this.breakJoints();
 
 		const player = this.getPlayer();
@@ -226,5 +220,9 @@ export class CharacterServer
 			this.instance.AddTag("Frostbite");
 		else if (newTemperature === MAXIMUM_TEMPERATURE)
 			this.instance.AddTag("BurnScar");
+	}
+
+	public toggleJump(enable: boolean): void {
+		this.humanoid.JumpPower = enable ? DEFAULT_JUMP_POWER : 0;
 	}
 }

@@ -181,8 +181,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 		);
 
 		const inAir =
-			this.character.instance.Humanoid.FloorMaterial ===
-			Enum.Material.Air;
+			this.character.getHumanoid().FloorMaterial === Enum.Material.Air;
 		if (!forwardCast || !inAir) {
 			return Enum.ContextActionResult.Pass;
 		}

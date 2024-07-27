@@ -46,7 +46,7 @@ export class ClimbState extends CharacterState {
 	private inputEndedConnection?: RBXScriptConnection;
 
 	public override enter(wallCastResult: RaycastResult): void {
-		const humanoid = this.character.instance.Humanoid;
+		const humanoid = this.character.getHumanoid();
 		humanoid.AutoRotate = false;
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Freefall, false);
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Running, false);
@@ -230,7 +230,7 @@ export class ClimbState extends CharacterState {
 	}
 
 	public override exit(): void {
-		const humanoid = this.character.instance.Humanoid;
+		const humanoid = this.character.getHumanoid();
 		humanoid.AutoRotate = true;
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Freefall, true);
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Running, true);

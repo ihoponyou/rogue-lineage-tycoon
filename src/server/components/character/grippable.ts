@@ -84,8 +84,8 @@ export class Grippable
 
 		this.instance.RemoveTag("Burning");
 
-		const gripperHumanoid = gripper.instance.Humanoid;
-		const humanoid = this.character.instance.Humanoid;
+		const gripperHumanoid = gripper.getHumanoid();
+		const humanoid = this.character.getHumanoid();
 
 		humanoid.AutoRotate = false;
 		gripperHumanoid.AutoRotate = false;
@@ -146,7 +146,7 @@ export class Grippable
 
 		this.gripTrove.clean();
 
-		gripper.instance.Humanoid.AutoRotate = true;
+		gripper.getHumanoid().AutoRotate = true;
 		gripper.getHumanoidRootPart().Anchored = false;
 		this.character.getHumanoidRootPart().Anchored = false;
 
