@@ -1,5 +1,6 @@
 import { Networking } from "@flamework/networking";
 import { CharacterClientEvents } from "./character";
+import { CombatServerEvents } from "./combat";
 import { CurrencyClientEvents, CurrencyServerFunctions } from "./currency";
 import { DialogueClientEvents } from "./dialogue";
 import { ManaClientEvents, ManaServerEvents } from "./mana";
@@ -8,6 +9,7 @@ import { ReflexClientEvents, ReflexServerEvents } from "./reflex";
 interface ServerEvents {
 	reset(): void;
 	mana: ManaServerEvents;
+	combat: CombatServerEvents;
 	reflex: ReflexServerEvents;
 }
 

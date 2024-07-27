@@ -1,4 +1,5 @@
 import { Component, Components } from "@flamework/components";
+import { OnStart } from "@flamework/core";
 import { Workspace } from "@rbxts/services";
 import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
@@ -9,17 +10,22 @@ import { selectHealth } from "shared/store/slices/players/slices/resources/selec
 import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
 import { selectTransform } from "shared/store/slices/players/slices/transform/selectors";
 import { CharacterServer } from "./character/character-server";
+import { CombatManager } from "./combat-manager";
 
 const TYCOON_FOLDER = Workspace.Tycoons;
 
 @Component({
 	tag: "Player",
 })
-export class PlayerServer extends AbstractPlayer {
+export class PlayerServer extends AbstractPlayer implements OnStart {
 	private assets = new Array<string>();
 
 	@Inject
 	private components!: Components;
+
+	public onStart(): void {
+		this.instance.AddTag(CombatManager.TAG);
+	}
 
 	public hasAsset(assetName: string): boolean {
 		getAssetConfig(assetName);
