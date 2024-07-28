@@ -1382,12 +1382,17 @@ interface ReplicatedStorage extends Instance {
 				ClimbLeft: Animation;
 			};
 			Combat: Folder & {
+				Carrying: Animation;
+				Punch1: Animation;
+				Carried: Animation;
 				PickUp: Animation;
 				Gripping: Animation;
+				Punch5: Animation;
 				Throw: Animation;
-				Carried: Animation;
+				Punch4: Animation;
 				Gripped: Animation;
-				Carrying: Animation;
+				Punch3: Animation;
+				Punch2: Animation;
 			};
 		};
 		Effects: Folder & {
@@ -1504,6 +1509,7 @@ interface ReplicatedStorage extends Instance {
 			["serialized-color3"]: ModuleScript;
 			networking: ModuleScript & {
 				currency: ModuleScript;
+				combat: ModuleScript;
 				dialogue: ModuleScript;
 				mana: ModuleScript;
 				character: ModuleScript;
@@ -1525,6 +1531,23 @@ interface ReplicatedStorage extends Instance {
 			["get-digit"]: ModuleScript;
 			inject: ModuleScript;
 			["on-player-removing"]: ModuleScript;
+			cmdr: Folder & {
+				hooks: Folder & {
+					["before-run"]: ModuleScript;
+				};
+			};
+			["state-machine"]: ModuleScript & {
+				state: ModuleScript;
+			};
+			components: Folder & {
+				toggleable: ModuleScript;
+				["abstract-player"]: ModuleScript;
+				["disposable-component"]: ModuleScript;
+				["combat-manager"]: ModuleScript;
+				ragdoll: ModuleScript;
+				["abstract-character"]: ModuleScript;
+				model: ModuleScript;
+			};
 			store: ModuleScript & {
 				slices: Folder & {
 					players: ModuleScript & {
@@ -1544,7 +1567,9 @@ interface ReplicatedStorage extends Instance {
 							currencies: ModuleScript & {
 								selectors: ModuleScript;
 							};
-							mana: ModuleScript;
+							mana: ModuleScript & {
+								selectors: ModuleScript;
+							};
 							identity: ModuleScript & {
 								selectors: ModuleScript;
 							};
@@ -1554,25 +1579,48 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 			};
-			["cast-visualizer"]: ModuleScript;
-			["state-machine"]: ModuleScript & {
-				state: ModuleScript;
-			};
-			components: Folder & {
-				toggleable: ModuleScript;
-				["abstract-player"]: ModuleScript;
-				["disposable-component"]: ModuleScript;
-				ragdoll: ModuleScript;
-				["abstract-character"]: ModuleScript;
-				model: ModuleScript;
-			};
-			cmdr: Folder & {
-				hooks: Folder & {
-					["before-run"]: ModuleScript;
-				};
-			};
 		};
 		client: Folder & {
+			constants: ModuleScript;
+			["player-state"]: Folder & {
+				["character-state"]: ModuleScript;
+				["climb-state"]: ModuleScript;
+				["charge-mana-state"]: ModuleScript;
+				["dash-state"]: ModuleScript;
+				["run-state"]: ModuleScript;
+				["idle-state"]: ModuleScript;
+			};
+			networking: ModuleScript;
+			components: Folder & {
+				["character-state-machine"]: ModuleScript;
+				["ragdoll-client"]: ModuleScript;
+				["combat-manager"]: ModuleScript;
+				["player-client"]: ModuleScript;
+				["character-client"]: ModuleScript;
+			};
+			gui: Folder & {
+				components: Folder & {
+					digit: ModuleScript;
+					app: ModuleScript;
+					stats: ModuleScript;
+					["name-plate"]: ModuleScript;
+					["silver-logo"]: ModuleScript;
+					layer: ModuleScript;
+					["dialogue-box"]: ModuleScript & {
+						["dialogue-option"]: ModuleScript;
+						["char-label"]: ModuleScript;
+					};
+					["fill-bar"]: ModuleScript & {
+						["mana-bar"]: ModuleScript;
+						["temperature-bar"]: ModuleScript;
+						["stomach-bar"]: ModuleScript;
+					};
+				};
+				hooks: Folder & {
+					["use-motion"]: ModuleScript;
+					["reflex-hooks"]: ModuleScript;
+				};
+			};
 			store: ModuleScript & {
 				slices: Folder & {
 					dialogue: ModuleScript & {
@@ -1584,61 +1632,23 @@ interface ReplicatedStorage extends Instance {
 				};
 				selectors: ModuleScript;
 			};
-			["player-state"]: Folder & {
-				["character-state"]: ModuleScript;
-				["climb-state"]: ModuleScript;
-				["charge-mana-state"]: ModuleScript;
-				["dash-state"]: ModuleScript;
-				["run-state"]: ModuleScript;
-				["idle-state"]: ModuleScript;
-			};
-			networking: ModuleScript;
-			gui: Folder & {
-				components: Folder & {
-					digit: ModuleScript;
-					app: ModuleScript;
-					["fill-bar"]: ModuleScript & {
-						["mana-bar"]: ModuleScript;
-						["temperature-bar"]: ModuleScript;
-						["stomach-bar"]: ModuleScript;
-					};
-					stats: ModuleScript;
-					["silver-logo"]: ModuleScript;
-					layer: ModuleScript;
-					["name-plate"]: ModuleScript;
-					["dialogue-box"]: ModuleScript & {
-						["dialogue-option"]: ModuleScript;
-						["char-label"]: ModuleScript;
-					};
-				};
-				hooks: Folder & {
-					["use-motion"]: ModuleScript;
-					["reflex-hooks"]: ModuleScript;
-				};
-			};
 			controllers: Folder & {
-				["component-controller"]: ModuleScript;
-				["chat-controller"]: ModuleScript;
-				["mana-controller"]: ModuleScript;
+				["lifecycle-controller"]: ModuleScript;
 				["keybind-controller"]: ModuleScript;
 				["animation-controller"]: ModuleScript;
 				["input-controller"]: ModuleScript;
-				["lifecycle-controller"]: ModuleScript;
+				["chat-controller"]: ModuleScript;
 				["gui-controller"]: ModuleScript;
 			};
-			components: Folder & {
-				["player-client"]: ModuleScript;
-				["character-client"]: ModuleScript;
-				["ragdoll-client"]: ModuleScript;
-				["character-state-machine"]: ModuleScript;
-			};
-			constants: ModuleScript;
 		};
 	};
 	rbxts_include: Folder & {
 		node_modules: Folder & {
 			["@rbxts"]: Folder & {
 				["reflex-class"]: Folder & {
+					node_modules: Folder & {
+						["@rbxts"]: Folder;
+					};
 					out: ModuleScript & {
 						source: Folder & {
 							["class-producer"]: ModuleScript;
@@ -1660,46 +1670,13 @@ interface ReplicatedStorage extends Instance {
 						Logger: ModuleScript;
 					};
 				};
-				charm: ModuleScript & {
-					mapped: ModuleScript;
-					atom: ModuleScript;
-					effect: ModuleScript;
-					observe: ModuleScript;
-					utils: Folder & {
-						collect: ModuleScript;
-						count: ModuleScript;
-						setInterval: ModuleScript;
-					};
-					modules: Folder & {
-						React: ModuleScript;
-						Promise: ModuleScript;
-						ReactRoblox: ModuleScript;
-					};
-					types: ModuleScript;
-					sync: ModuleScript & {
-						validate: ModuleScript;
-						client: ModuleScript;
-						patch: ModuleScript;
-						server: ModuleScript;
-					};
-					subscribe: ModuleScript;
-					react: Folder & {
-						useAtom: ModuleScript;
-					};
-					computed: ModuleScript;
-					store: ModuleScript;
-					__tests__: Folder & {
-						react: Folder & {
-							helpers: Folder & {
-								renderHook: ModuleScript;
-							};
-						};
-						benchmarks: Folder & {
-							["atom.bench"]: ModuleScript;
-						};
-					};
+				profileservice: Folder & {
+					src: ModuleScript;
 				};
 				["shared-components-flamework"]: Folder & {
+					node_modules: Folder & {
+						["@rbxts"]: Folder;
+					};
 					LICENSE: StringValue;
 					out: ModuleScript & {
 						utilities: ModuleScript;
@@ -2002,16 +1979,52 @@ interface ReplicatedStorage extends Instance {
 						Expectation: ModuleScript;
 					};
 				};
-				["validate-tree"]: ModuleScript;
+				charm: ModuleScript & {
+					mapped: ModuleScript;
+					atom: ModuleScript;
+					effect: ModuleScript;
+					observe: ModuleScript;
+					utils: Folder & {
+						collect: ModuleScript;
+						count: ModuleScript;
+						setInterval: ModuleScript;
+					};
+					modules: Folder & {
+						React: ModuleScript;
+						Promise: ModuleScript;
+						ReactRoblox: ModuleScript;
+					};
+					types: ModuleScript;
+					sync: ModuleScript & {
+						validate: ModuleScript;
+						client: ModuleScript;
+						patch: ModuleScript;
+						server: ModuleScript;
+					};
+					subscribe: ModuleScript;
+					react: Folder & {
+						useAtom: ModuleScript;
+					};
+					computed: ModuleScript;
+					store: ModuleScript;
+					__tests__: Folder & {
+						react: Folder & {
+							helpers: Folder & {
+								renderHook: ModuleScript;
+							};
+						};
+						benchmarks: Folder & {
+							["atom.bench"]: ModuleScript;
+						};
+					};
+				};
 				react: ModuleScript & {
 					tags: ModuleScript;
-				};
-				profileservice: Folder & {
-					src: ModuleScript;
 				};
 				dumpster: Folder & {
 					Dumpster: ModuleScript;
 				};
+				["validate-tree"]: ModuleScript;
 				flipper: Folder & {
 					typings: Folder;
 					src: ModuleScript & {

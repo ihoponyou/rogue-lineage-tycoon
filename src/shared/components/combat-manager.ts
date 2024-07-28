@@ -5,6 +5,7 @@ export namespace SharedComponents {
 	interface CombatManagerAttributes {
 		stunned: boolean;
 		combo: number;
+		lightAttackCooldown: boolean;
 	}
 
 	@Component()
@@ -13,6 +14,10 @@ export namespace SharedComponents {
 
 		protected canAttack(): boolean {
 			return !this.attributes.stunned;
+		}
+
+		protected canLightAttack(): boolean {
+			return this.canAttack() && !this.attributes.lightAttackCooldown;
 		}
 	}
 }

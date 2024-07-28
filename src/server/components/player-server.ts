@@ -108,6 +108,18 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 		});
 	}
 
+	public getCharacter(): CharacterServer {
+		const model = this.instance.Character;
+		if (model === undefined)
+			error(`${this.instance.Name}.Character is undefined`);
+		const character = this.components.getComponent<CharacterServer>(model);
+		if (character === undefined)
+			error(
+				`${this.instance.Name}'s character missing character component`,
+			);
+		return character;
+	}
+
 	private isInsideTycoon(position: Vector3): boolean {
 		const character = this.instance.Character;
 		if (character === undefined) error("nil character");

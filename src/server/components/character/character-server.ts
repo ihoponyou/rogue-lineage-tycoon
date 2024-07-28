@@ -70,35 +70,6 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		);
 	}
 
-	public loadHealth(): void {
-		let savedHealth = store.getState(selectHealth(this.getPlayer().UserId));
-		if (savedHealth === undefined) error("health not found");
-		if (savedHealth < 1) savedHealth = 100;
-		this.humanoid.Health = savedHealth;
-	}
-
-	public loadConditions(): void {
-		const conditions = store.getState(
-			selectConditions(this.getPlayer().UserId),
-		);
-		if (conditions === undefined) error("conditions not found");
-		for (const condition of conditions) {
-			this.instance.AddTag(condition);
-		}
-	}
-
-	public loadTransform(): void {
-		const savedTransform = store.getState(
-			selectTransform(this.getPlayer().UserId),
-		);
-		if (savedTransform === undefined) error("transform not found");
-		this.instance.PivotTo(
-			new CFrame(deserializeVector3(savedTransform.position)).mul(
-				CFrame.fromOrientation(0, savedTransform.yRotation, 0),
-			),
-		);
-	}
-
 	public onTick(dt: number): void {
 		if (!this.attributes.isAlive) return;
 
@@ -130,6 +101,35 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		if (health > 0) return;
 
 		this.knock();
+	}
+
+	public loadHealth(): void {
+		let savedHealth = store.getState(selectHealth(this.getPlayer().UserId));
+		if (savedHealth === undefined) error("health not found");
+		if (savedHealth < 1) savedHealth = 100;
+		this.humanoid.Health = savedHealth;
+	}
+
+	public loadConditions(): void {
+		const conditions = store.getState(
+			selectConditions(this.getPlayer().UserId),
+		);
+		if (conditions === undefined) error("conditions not found");
+		for (const condition of conditions) {
+			this.instance.AddTag(condition);
+		}
+	}
+
+	public loadTransform(): void {
+		const savedTransform = store.getState(
+			selectTransform(this.getPlayer().UserId),
+		);
+		if (savedTransform === undefined) error("transform not found");
+		this.instance.PivotTo(
+			new CFrame(deserializeVector3(savedTransform.position)).mul(
+				CFrame.fromOrientation(0, savedTransform.yRotation, 0),
+			),
+		);
 	}
 
 	public knock(): void {
@@ -224,5 +224,9 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 
 	public toggleJump(enable: boolean): void {
 		this.humanoid.JumpPower = enable ? DEFAULT_JUMP_POWER : 0;
+	}
+
+	public takeDamage(amount: number): void {
+		this.humanoid.TakeDamage(amount);
 	}
 }
