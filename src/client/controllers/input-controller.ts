@@ -48,41 +48,31 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	public onStart(): void {
 		ContextActionService.BindAction(
 			"input_forward",
-			(_, state) => {
-				return this.handleForwardInput(state);
-			},
+			(_, state) => this.handleForwardInput(state),
 			false,
 			this.keybindController.keybinds.forward,
 		);
 		ContextActionService.BindAction(
 			"input_dash",
-			(_, state) => {
-				return this.handleDashInput(state);
-			},
+			(_, state) => this.handleDashInput(state),
 			true,
 			this.keybindController.keybinds.dash,
 		);
 		ContextActionService.BindAction(
 			"input_jump",
-			(_, state) => {
-				return this.handleJumpInput(state);
-			},
+			(_, state) => this.handleJumpInput(state),
 			false,
 			this.keybindController.keybinds.jump,
 		);
 		ContextActionService.BindAction(
 			"input_mana",
-			(_, state) => {
-				return this.handleManaInput(state);
-			},
+			(_, state) => this.handleManaInput(state),
 			true,
 			this.keybindController.keybinds.chargeMana,
 		);
 		ContextActionService.BindAction(
 			"input_light_attack",
-			(_, state) => {
-				return this.handleLightAttackInput(state);
-			},
+			(_, state) => this.handleLightAttackInput(state),
 			true,
 			this.keybindController.keybinds.lightAttack,
 		);
@@ -210,6 +200,6 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private handleLightAttackInput(state: Enum.UserInputState) {
 		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		this.lightAttackTriggered.Fire();
-		return Enum.ContextActionResult.Sink;
+		return Enum.ContextActionResult.Pass;
 	}
 }

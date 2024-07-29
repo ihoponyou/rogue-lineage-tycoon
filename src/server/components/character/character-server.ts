@@ -227,6 +227,6 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	}
 
 	public takeDamage(amount: number): void {
-		this.humanoid.TakeDamage(amount);
+		this.humanoid.TakeDamage(math.min(this.humanoid.Health, amount));
 	}
 }

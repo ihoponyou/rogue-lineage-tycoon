@@ -9,26 +9,31 @@ export class HitService implements OnStart {
 
 	public onStart(): void {
 		Events.combat.damage.connect((player, characters) =>
-			this.handleDamage(player, characters),
+			characters.forEach((character) =>
+				this.registerHit(player, character),
+			),
 		);
 	}
 
-	private handleDamage(player: Player, characters: Model[]): void {
+	private registerHit(player: Player, character: Model): void {
 		if (player.Character === undefined) return;
 		const hitter = this.components.getComponent<CharacterServer>(
 			player.Character,
 		);
 		if (hitter === undefined) return;
-		characters.forEach((victimInstance) => {
-			const victim =
-				this.components.getComponent<CharacterServer>(victimInstance);
-			if (victim === undefined) return;
-			if (!this.canHit(hitter, victim)) return;
-			victim.takeDamage(10);
-		});
+		const victim = this.components.getComponent<CharacterServer>(character);
+		if (victim === undefined) return;
+		if (!this.canHit(hitter, victim)) return;
+
+		victim.takeDamage(10);
 	}
 
 	private canHit(hitter: CharacterServer, victim: CharacterServer): boolean {
-		return true;
+		return (
+			hitter.attributes.isAlive &&
+			!hitter.attributes.isKnocked &&
+			victim.attributes.isAlive &&
+			!victim.attributes.isKnocked
+		);
 	}
 }

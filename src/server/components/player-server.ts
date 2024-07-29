@@ -10,7 +10,7 @@ import { selectHealth } from "shared/store/slices/players/slices/resources/selec
 import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
 import { selectTransform } from "shared/store/slices/players/slices/transform/selectors";
 import { CharacterServer } from "./character/character-server";
-import { CombatManager } from "./combat-manager";
+import { CombatManager } from "./combat-manager-server";
 
 const TYCOON_FOLDER = Workspace.Tycoons;
 

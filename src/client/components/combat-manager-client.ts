@@ -46,13 +46,11 @@ export class CombatManager
 				playedSound = true;
 				print("play sound");
 			},
-			// true,
 		);
 		const tryDamageConn = this.animationController.connectToMarkerReached(
 			animationName,
 			"contact",
 			() => Events.combat.damage(this.spawnHitbox(new Vector3(6, 6, 5))),
-			// true,
 		);
 		this.animationController.connectToAnimationTrackStopped(
 			animationName,
@@ -65,7 +63,7 @@ export class CombatManager
 				tryDamageConn.Disconnect();
 			},
 		);
-		this.animationController.play(animationName, undefined, undefined, 1.5);
+		this.animationController.play(animationName);
 	}
 
 	private spawnHitbox(size: Vector3): Model[] {
