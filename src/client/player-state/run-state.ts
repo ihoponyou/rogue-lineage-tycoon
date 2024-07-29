@@ -20,6 +20,7 @@ export class RunState extends CharacterState {
 	private manaEmptiedConnection?: RBXScriptConnection;
 	private chargeManaConnection?: RBXScriptConnection;
 	private climbConnection?: RBXScriptConnection;
+	private cancelConn?: RBXScriptConnection;
 
 	public constructor(
 		stateMachine: StateMachine,
@@ -47,9 +48,7 @@ export class RunState extends CharacterState {
 		canManaRun ? this.manaRun() : this.run();
 
 		this.dashConnection = this.inputController.dashTriggered.Connect(
-			(direction) => {
-				this.stateMachine.transitionTo("dash", direction);
-			},
+			(direction) => this.stateMachine.transitionTo("dash", direction),
 		);
 
 		this.manaEmptiedConnection = Events.mana.emptied.connect(() =>
@@ -63,6 +62,10 @@ export class RunState extends CharacterState {
 
 		this.climbConnection = this.inputController.climbTriggered.Connect(
 			(cast) => this.stateMachine.transitionTo("climb", cast),
+		);
+
+		this.cancelConn = Events.character.stopRun.connect(() =>
+			this.stateMachine.transitionTo("idle"),
 		);
 	}
 
@@ -82,6 +85,7 @@ export class RunState extends CharacterState {
 		this.manaEmptiedConnection?.Disconnect();
 		this.chargeManaConnection?.Disconnect();
 		this.climbConnection?.Disconnect();
+		this.cancelConn?.Disconnect();
 	}
 
 	private onManaEmptied(): void {

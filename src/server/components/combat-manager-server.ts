@@ -38,6 +38,7 @@ export class CombatManager
 	private handleLightAttack(): void {
 		if (!this.canLightAttack()) return;
 		const character = this.playerServer.getCharacter();
+		Events.character.stopRun(this.playerServer.instance);
 
 		this.attributes.lightAttackCooldown = true;
 		this.trove.add(
