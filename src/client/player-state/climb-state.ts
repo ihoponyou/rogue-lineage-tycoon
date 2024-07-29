@@ -4,6 +4,7 @@ import {
 	UserInputService,
 	Workspace,
 } from "@rbxts/services";
+import { Trove } from "@rbxts/trove";
 import { LOCAL_PLAYER } from "client/constants";
 import { store } from "client/store";
 import { hasLineOfSight } from "shared/line-of-sight";
@@ -28,6 +29,13 @@ const CLIMB_DIRECTION_TO_ANIMATION_NAME = {
 export class ClimbState extends CharacterState {
 	public readonly name = "Climb";
 
+	private goalPart = this.newGoalPart();
+	private goalAttachment = this.newGoalAttachment();
+	private climbForce = this.newClimbForce();
+	private climbConstraint = this.newClimbConstraint();
+
+	private trove = new Trove();
+
 	public constructor(
 		stateMachine: StateMachine,
 		character: CharacterClient,
@@ -36,14 +44,6 @@ export class ClimbState extends CharacterState {
 	) {
 		super(stateMachine, character);
 	}
-
-	private goalPart = this.newGoalPart();
-	private goalAttachment = this.newGoalAttachment();
-	private climbForce = this.newClimbForce();
-	private climbConstraint = this.newClimbConstraint();
-
-	private inputBeganConnection?: RBXScriptConnection;
-	private inputEndedConnection?: RBXScriptConnection;
 
 	public override enter(wallCastResult: RaycastResult): void {
 		const humanoid = this.character.getHumanoid();
@@ -78,11 +78,11 @@ export class ClimbState extends CharacterState {
 			this.keybindController.keybinds.jump,
 		);
 
-		this.inputBeganConnection = UserInputService.InputBegan.Connect(
-			(input, gpe) => this.handleClimbAnimations(input, gpe),
+		this.trove.connect(UserInputService.InputBegan, (input, gpe) =>
+			this.handleClimbAnimations(input, gpe),
 		);
-		this.inputEndedConnection = UserInputService.InputEnded.Connect(
-			(input, gpe) => this.handleClimbAnimations(input, gpe),
+		this.trove.connect(UserInputService.InputEnded, (input, gpe) =>
+			this.handleClimbAnimations(input, gpe),
 		);
 	}
 
@@ -234,7 +234,6 @@ export class ClimbState extends CharacterState {
 		humanoid.AutoRotate = true;
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Freefall, true);
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Running, true);
-		// humanoid.ChangeState(Enum.HumanoidStateType.GettingUp);
 
 		this.climbConstraint.Enabled = false;
 		this.climbForce.Enabled = false;
@@ -245,8 +244,7 @@ export class ClimbState extends CharacterState {
 		this.animationController.stop("ClimbRight");
 		this.animationController.stop("ClimbIdle");
 
-		if (this.inputBeganConnection) this.inputBeganConnection.Disconnect();
-		if (this.inputEndedConnection) this.inputEndedConnection.Disconnect();
+		this.trove.clean();
 
 		ContextActionService.UnbindAction("input_cancel_climb");
 

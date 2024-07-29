@@ -1,42 +1,52 @@
+import { Trove } from "@rbxts/trove";
+import { CharacterClient } from "client/components/character-client";
 import { StateMachine } from "shared/state-machine";
-import { State } from "shared/state-machine/state";
 import { InputController } from "../controllers/input-controller";
+import { CharacterState } from "./character-state";
+import {
+	createAttackTransition,
+	createChargeManaTransition,
+	createClimbTransition,
+	createDashTransition,
+	createRunTransition,
+} from "./transitions";
 
-export class IdleState extends State {
+export class IdleState extends CharacterState {
 	public readonly name = "Idle";
 
-	private runConnection?: RBXScriptConnection;
-	private dashConnection?: RBXScriptConnection;
-	private climbConnection?: RBXScriptConnection;
-	private chargeManaConnection?: RBXScriptConnection;
+	private transitions = new Trove();
 
 	public constructor(
 		stateMachine: StateMachine,
+		character: CharacterClient,
 		private inputController: InputController,
 	) {
-		super(stateMachine);
+		super(stateMachine, character);
 	}
 
 	public override enter(): void {
-		this.runConnection = this.inputController.runTriggered.Connect(() => {
-			this.stateMachine.transitionTo("run");
-		});
-		this.dashConnection = this.inputController.dashTriggered.Connect(
-			(direction) => this.stateMachine.transitionTo("dash", direction),
+		this.transitions.add(
+			createRunTransition(this.stateMachine, this.inputController),
 		);
-		this.climbConnection = this.inputController.climbTriggered.Connect(
-			(cast) => this.stateMachine.transitionTo("climb", cast),
+		this.transitions.add(
+			createDashTransition(this.stateMachine, this.inputController),
 		);
-		this.chargeManaConnection =
-			this.inputController.chargeManaTriggered.Connect((charging) => {
-				if (charging) this.stateMachine.transitionTo("chargemana");
-			});
+		this.transitions.add(
+			createClimbTransition(this.stateMachine, this.inputController),
+		);
+		this.transitions.add(
+			createChargeManaTransition(this.stateMachine, this.inputController),
+		);
+		this.transitions.add(
+			createAttackTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
+		);
 	}
 
 	public override exit(): void {
-		if (this.runConnection) this.runConnection.Disconnect();
-		if (this.dashConnection) this.dashConnection.Disconnect();
-		if (this.climbConnection) this.climbConnection.Disconnect();
-		if (this.chargeManaConnection) this.chargeManaConnection.Disconnect();
+		this.transitions.clean();
 	}
 }

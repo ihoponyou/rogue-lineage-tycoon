@@ -1,20 +1,23 @@
+import { Trove } from "@rbxts/trove";
+import { CharacterClient } from "client/components/character-client";
 import { SFX } from "shared/constants";
 import { StateMachine } from "shared/state-machine";
-import { CharacterClient } from "../components/character-client";
 import { InputController } from "../controllers/input-controller";
 import { KeybindController } from "../controllers/keybind-controller";
 import { Events } from "../networking";
 import { CharacterState } from "./character-state";
+import {
+	createClimbTransition,
+	createDashTransition,
+	createRunTransition,
+} from "./transitions";
 
 export class ChargeManaState extends CharacterState {
 	public readonly name = "ChargeMana";
 	private chargeSound = SFX.Charging.Clone();
 	private filledSound = SFX.FinishedCharging.Clone();
 
-	private dashConnection?: RBXScriptConnection;
-	private climbConnection?: RBXScriptConnection;
-	private manaFilledConnection?: RBXScriptConnection;
-	private runConnection?: RBXScriptConnection;
+	private trove = new Trove();
 
 	public constructor(
 		stateMachine: StateMachine,
@@ -36,20 +39,22 @@ export class ChargeManaState extends CharacterState {
 		Events.mana.charge(true);
 		this.chargeSound.Play();
 
-		this.dashConnection = this.inputController.dashTriggered.Connect(
-			(direction) => this.stateMachine.transitionTo("dash", direction),
+		this.trove.add(
+			Events.mana.filled.connect(() =>
+				this.stateMachine.transitionTo("idle"),
+			),
 		);
 
-		this.manaFilledConnection = Events.mana.filled.connect(() =>
-			this.stateMachine.transitionTo("idle"),
+		this.trove.add(
+			createDashTransition(this.stateMachine, this.inputController),
 		);
 
-		this.climbConnection = this.inputController.climbTriggered.Connect(
-			(cast) => this.stateMachine.transitionTo("climb", cast),
+		this.trove.add(
+			createClimbTransition(this.stateMachine, this.inputController),
 		);
 
-		this.runConnection = this.inputController.runTriggered.Connect(() =>
-			this.stateMachine.transitionTo("run"),
+		this.trove.add(
+			createRunTransition(this.stateMachine, this.inputController),
 		);
 	}
 
@@ -65,9 +70,6 @@ export class ChargeManaState extends CharacterState {
 		this.character.resetToWalkSpeed();
 		Events.mana.charge(false);
 
-		this.dashConnection?.Disconnect();
-		this.climbConnection?.Disconnect();
-		this.manaFilledConnection?.Disconnect();
-		this.runConnection?.Disconnect();
+		this.trove.clean();
 	}
 }

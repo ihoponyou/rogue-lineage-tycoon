@@ -1,44 +1,35 @@
-import { Component } from "@flamework/components";
-import { OnStart } from "@flamework/core";
 import { Debris, Workspace } from "@rbxts/services";
-import { LOCAL_PLAYER } from "client/constants";
+import { CharacterClient } from "client/components/character-client";
 import { AnimationController } from "client/controllers/animation-controller";
-import { InputController } from "client/controllers/input-controller";
 import { Events } from "client/networking";
-import { SharedComponents } from "shared/components/combat-manager";
-import { PlayerClient } from "./player-client";
+import { StateMachine } from "shared/state-machine";
+import { InputController } from "../controllers/input-controller";
+import { CharacterState } from "./character-state";
 
-const VISUALIZE_HITBOXES = true;
+const VISUALIZE_HITBOXES = false;
 
-@Component({
-	tag: SharedComponents.CombatManager.TAG,
-	predicate: (instance) => instance === LOCAL_PLAYER,
-})
-export class CombatManager
-	extends SharedComponents.CombatManager
-	implements OnStart
-{
+export class AttackState extends CharacterState {
+	public readonly name = "Attack";
+
+	// stun transition
+	private playEffectsConn?: RBXScriptConnection;
+	private registerHitConn?: RBXScriptConnection;
+
 	public constructor(
-		private animationController: AnimationController,
+		stateMachine: StateMachine,
+		character: CharacterClient,
 		private inputController: InputController,
-		private playerClient: PlayerClient,
+		private animationController: AnimationController,
 	) {
-		super();
+		super(stateMachine, character);
 	}
 
-	public onStart(): void {
-		this.inputController.onLightAttackTriggered(() => this.lightAttack());
-	}
-
-	private lightAttack(): void {
-		if (!this.canLightAttack()) return;
-
+	public override enter(): void {
 		Events.combat.lightAttack();
-
-		const animationName = `Punch${this.attributes.combo + 1}`;
+		const animationName = `Punch${this.character.attributes.combo + 1}`;
 
 		let playedSound = false;
-		const swingSoundConn = this.animationController.connectToMarkerReached(
+		this.playEffectsConn = this.animationController.connectToMarkerReached(
 			animationName,
 			"swing",
 			() => {
@@ -47,7 +38,7 @@ export class CombatManager
 				print("play sound");
 			},
 		);
-		const tryDamageConn = this.animationController.connectToMarkerReached(
+		this.registerHitConn = this.animationController.connectToMarkerReached(
 			animationName,
 			"contact",
 			() => Events.combat.damage(this.spawnHitbox(new Vector3(6, 6, 5))),
@@ -59,21 +50,27 @@ export class CombatManager
 					warn(
 						`swing sound did not play for ${animationName}: keyframe markers may be missing`,
 					);
-				swingSoundConn.Disconnect();
-				tryDamageConn.Disconnect();
+				this.playEffectsConn?.Disconnect();
+				this.registerHitConn?.Disconnect();
+				this.stateMachine.transitionTo("idle");
 			},
 		);
 		this.animationController.play(animationName);
 	}
 
+	public override exit(): void {
+		this.playEffectsConn?.Disconnect();
+		this.registerHitConn?.Disconnect();
+	}
+
+	// TODO: hitbox module
 	private spawnHitbox(size: Vector3): Model[] {
-		const character = this.playerClient.getCharacter();
 		const overlapParams = new OverlapParams();
-		overlapParams.AddToFilter(character.instance);
+		overlapParams.AddToFilter(this.character.instance);
 		overlapParams.CollisionGroup = "Characters";
 		overlapParams.FilterType = Enum.RaycastFilterType.Exclude;
 
-		const rootPartCFrame = character.getHumanoidRootPart().CFrame;
+		const rootPartCFrame = this.character.getHumanoidRootPart().CFrame;
 		const hitboxCFrame = rootPartCFrame.add(
 			rootPartCFrame.LookVector.mul(size.Z / 2),
 		);

@@ -35,6 +35,9 @@ const EVENTS = Events.character;
 	defaults: {
 		isKnocked: false,
 		isAlive: true,
+		isStunned: false,
+		combo: 0,
+		lightAttackCooldown: false,
 	},
 })
 // consider using server/client/shared namespaces to allow name overlap
@@ -55,6 +58,7 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		super.onStart();
 
 		this.instance.AddTag("FallDamage");
+		this.instance.AddTag("CombatManager");
 
 		const player = this.getPlayer();
 		this.disconnectReleaseListener = this.dataService.connectToPreRelease(

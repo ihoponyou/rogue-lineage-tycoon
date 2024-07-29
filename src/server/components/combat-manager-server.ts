@@ -1,57 +1,53 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Events } from "server/networking";
-import { SharedComponents } from "shared/components/combat-manager";
-import { PlayerServer } from "./player-server";
+import { DisposableComponent } from "shared/components/disposable-component";
+import { CharacterServer } from "./character/character-server";
 
 const M1_RESET_DELAY = 1;
 
 @Component({
 	tag: "CombatManager",
-	defaults: {
-		stunned: false,
-		combo: 0,
-		lightAttackCooldown: false,
-	},
 })
 export class CombatManager
-	extends SharedComponents.CombatManager
+	extends DisposableComponent<{}, Model>
 	implements OnStart
 {
 	private maxCombo = 5;
 	private attackSpeed = 1;
 	private comboReset?: thread;
 
-	public constructor(private playerServer: PlayerServer) {
+	public constructor(private characterServer: CharacterServer) {
 		super();
 	}
 
 	public onStart(): void {
 		this.trove.add(
 			Events.combat.lightAttack.connect((player) => {
-				if (player !== this.instance) return;
+				if (player !== this.characterServer.getPlayer()) return;
 				this.handleLightAttack();
 			}),
 		);
 	}
 
 	private handleLightAttack(): void {
-		if (!this.canLightAttack()) return;
-		const character = this.playerServer.getCharacter();
-		Events.character.stopRun(this.playerServer.instance);
+		if (!this.characterServer.canLightAttack()) return;
+		Events.character.stopRun(this.characterServer.getPlayer());
 
-		this.attributes.lightAttackCooldown = true;
+		this.characterServer.attributes.lightAttackCooldown = true;
 		this.trove.add(
 			task.delay(
 				0.475 / this.attackSpeed,
-				() => (this.attributes.lightAttackCooldown = false),
+				() =>
+					(this.characterServer.attributes.lightAttackCooldown =
+						false),
 			),
 		);
 
-		character.toggleJump(false);
+		this.characterServer.toggleJump(false);
 		this.trove.add(
 			task.delay(0.7 / this.attackSpeed, () =>
-				character.toggleJump(true),
+				this.characterServer.toggleJump(true),
 			),
 		);
 
@@ -61,11 +57,12 @@ export class CombatManager
 		}
 		this.comboReset = this.trove.add(
 			task.delay(M1_RESET_DELAY, () => {
-				this.attributes.combo = 0;
+				this.characterServer.attributes.combo = 0;
 				this.comboReset = undefined;
 			}),
 		);
 
-		if (++this.attributes.combo >= this.maxCombo) this.attributes.combo = 0;
+		if (++this.characterServer.attributes.combo >= this.maxCombo)
+			this.characterServer.attributes.combo = 0;
 	}
 }

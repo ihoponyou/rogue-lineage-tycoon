@@ -7,6 +7,9 @@ import { DisposableComponent } from "./disposable-component";
 export interface CharacterAttributes {
 	isKnocked: boolean;
 	isAlive: boolean;
+	isStunned: boolean;
+	combo: number;
+	lightAttackCooldown: boolean;
 }
 
 @Component()
@@ -87,6 +90,14 @@ export abstract class AbstractCharacter
 
 	public resetToWalkSpeed(): void {
 		this.humanoid.WalkSpeed = this.getWalkSpeed();
+	}
+
+	public canAttack(): boolean {
+		return !this.attributes.isStunned;
+	}
+
+	public canLightAttack(): boolean {
+		return this.canAttack() && !this.attributes.lightAttackCooldown;
 	}
 
 	protected onHealthChanged(_health: number): void {}

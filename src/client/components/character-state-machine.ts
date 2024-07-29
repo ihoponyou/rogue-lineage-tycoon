@@ -1,6 +1,6 @@
-import { Component } from "@flamework/components";
+import { BaseComponent, Component } from "@flamework/components";
 import { OnStart, OnTick } from "@flamework/core";
-import { DisposableComponent } from "shared/components/disposable-component";
+import { AttackState } from "client/player-state/attack-state";
 import { StateMachine } from "shared/state-machine";
 import { AnimationController } from "../controllers/animation-controller";
 import { InputController } from "../controllers/input-controller";
@@ -14,15 +14,10 @@ import { CharacterClient } from "./character-client";
 
 @Component()
 export class CharacterStateMachine
-	extends DisposableComponent<{}, Instance>
+	extends BaseComponent<{}, Model>
 	implements OnStart, OnTick
 {
 	private stateMachine = new StateMachine();
-	private IDLE!: IdleState;
-	private RUN!: RunState;
-	private DASH!: DashState;
-	private CLIMB!: ClimbState;
-	private CHARGE_MANA!: ChargeManaState;
 
 	public constructor(
 		private character: CharacterClient,
@@ -34,45 +29,52 @@ export class CharacterStateMachine
 	}
 
 	public onStart(): void {
-		this.trove.add(this.stateMachine);
-
-		this.IDLE = new IdleState(this.stateMachine, this.inputController);
-		this.RUN = new RunState(
+		const idle = new IdleState(
 			this.stateMachine,
 			this.character,
-			this.keybindController,
-			this.inputController,
-			this.animationController,
-		);
-		this.DASH = new DashState(
-			this.stateMachine,
-			this.character,
-			this.animationController,
-		);
-		this.CLIMB = new ClimbState(
-			this.stateMachine,
-			this.character,
-			this.keybindController,
-			this.animationController,
-		);
-		this.CHARGE_MANA = new ChargeManaState(
-			this.stateMachine,
-			this.character,
-			this.keybindController,
 			this.inputController,
 		);
-
 		this.stateMachine.addStates([
-			this.IDLE,
-			this.RUN,
-			this.DASH,
-			this.CLIMB,
-			this.CHARGE_MANA,
+			idle,
+			new RunState(
+				this.stateMachine,
+				this.character,
+				this.keybindController,
+				this.inputController,
+				this.animationController,
+			),
+			new DashState(
+				this.stateMachine,
+				this.character,
+				this.animationController,
+			),
+			new ClimbState(
+				this.stateMachine,
+				this.character,
+				this.keybindController,
+				this.animationController,
+			),
+			new ChargeManaState(
+				this.stateMachine,
+				this.character,
+				this.keybindController,
+				this.inputController,
+			),
+			new AttackState(
+				this.stateMachine,
+				this.character,
+				this.inputController,
+				this.animationController,
+			),
 		]);
-		this.stateMachine.initialize(this.IDLE);
+		this.stateMachine.initialize(idle);
 	}
 
 	public onTick(dt: number): void {
 		this.stateMachine.update(dt);
+	}
+
+	public override destroy(): void {
+		this.stateMachine.destroy();
 	}
 }

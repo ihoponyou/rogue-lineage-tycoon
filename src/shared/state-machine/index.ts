@@ -1,12 +1,12 @@
 import { State } from "./state";
 
-class NullState extends State {
-	public name = "Null";
-}
-
 export class StateMachine {
+	private static NullState = class extends State {
+		public name = "Null";
+	};
+
 	private initialized = false;
-	private currentState = new NullState(this);
+	private currentState = new StateMachine.NullState(this);
 	private states = new Map<string, State>([["null", this.currentState]]);
 
 	public initialize(initialState: State) {
