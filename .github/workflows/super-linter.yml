@@ -6,7 +6,8 @@
 # https://github.com/github/super-linter
 name: Lint Codebase
 
-on: workflow_dispatch
+on: [push, pull_request]
+
 jobs:
   lint:
     runs-on: ubuntu-latest
