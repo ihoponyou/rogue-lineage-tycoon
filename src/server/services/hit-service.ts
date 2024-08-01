@@ -25,6 +25,7 @@ export class HitService implements OnStart {
 		if (victim === undefined) return;
 		if (!this.canHit(hitter, victim)) return;
 
+		print("registered");
 		Events.playEffect.broadcast(`Hit`, character, "Blunt");
 		victim.takeDamage(10);
 	}
@@ -34,7 +35,9 @@ export class HitService implements OnStart {
 			hitter.attributes.isAlive &&
 			!hitter.attributes.isKnocked &&
 			victim.attributes.isAlive &&
-			!victim.attributes.isKnocked
+			!victim.attributes.isKnocked &&
+			hitter.instance.GetAttribute("isRagdolled") === false &&
+			victim.instance.GetAttribute("isRagdolled") === false
 		);
 	}
 }

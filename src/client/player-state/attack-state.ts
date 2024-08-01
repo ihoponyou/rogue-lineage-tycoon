@@ -33,15 +33,20 @@ export class AttackState extends CharacterState {
 			animationName,
 			"swing",
 			() => {
-				// also replicate to other clients
+				const swingSound = this.character
+					.getTorso()
+					.FindFirstChild("Swing");
+				if (swingSound !== undefined && swingSound.IsA("Sound"))
+					swingSound.Play();
 				playedSound = true;
-				print("play sound");
 			},
 		);
 		this.registerHitConn = this.animationController.connectToMarkerReached(
 			animationName,
 			"contact",
-			() => Events.combat.damage(this.spawnHitbox(new Vector3(6, 6, 5))),
+			() => {
+				Events.combat.damage(this.spawnHitbox(new Vector3(6, 6, 5)));
+			},
 		);
 		this.animationController.connectToAnimationTrackStopped(
 			animationName,
