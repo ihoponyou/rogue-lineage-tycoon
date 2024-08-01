@@ -18,11 +18,11 @@ type RagdollJoint = {
 const SOCKET_ANGLES: { [key: string]: SocketAngles } = {
 	Hip: {
 		UpperAngle: 30,
-		TwistAngle: 135,
+		TwistAngle: 120,
 	},
 	Shoulder: {
-		UpperAngle: 100,
-		TwistAngle: 45,
+		UpperAngle: 90,
+		TwistAngle: 179,
 	},
 	Neck: {
 		UpperAngle: 10,
