@@ -2,7 +2,7 @@ import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Events } from "server/networking";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { Character } from "./character/character";
+import { Character } from "./character";
 
 const M1_RESET_DELAY = 1;
 

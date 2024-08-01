@@ -3,7 +3,7 @@ import { Dependency, OnStart, Service } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
-import { Character } from "server/components/character/character";
+import { Character } from "server/components/character";
 import { ARMORS, getRandomStarterArmor } from "server/configs/armors";
 import { getRandomFirstName } from "server/configs/names";
 import {

@@ -3,8 +3,8 @@ import { OnStart } from "@flamework/core";
 import { Workspace } from "@rbxts/services";
 import { ANIMATIONS, SFX, VFX } from "shared/constants";
 import { Inject } from "shared/inject";
+import { Character } from ".";
 import { KeyInteractable } from "../interactable/key-interactable";
-import { Character } from "./character";
 import { RagdollServer } from "./ragdoll-server";
 
 interface Attributes {

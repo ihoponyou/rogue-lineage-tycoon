@@ -8,7 +8,7 @@ import {
 	selectTemperature,
 } from "shared/store/slices/players/slices/resources/selectors";
 import { BaseInjury } from ".";
-import { Character } from "../character/character";
+import { Character } from "../character";
 
 const LOWER_TEMPERATURE_THRESHOLD = 95;
 

@@ -4,7 +4,7 @@ import { Players, Workspace } from "@rbxts/services";
 import { store } from "server/store";
 import { selectTemperature } from "shared/store/slices/players/slices/resources/selectors";
 import { OnCharacterAdded } from "../../../../types/lifecycles";
-import { Character } from "../character/character";
+import { Character } from "../character";
 
 interface Attributes {
 	temperature: number;

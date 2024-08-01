@@ -1,7 +1,7 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { store } from "server/store";
 import { Condition } from "shared/configs/conditions";
-import { Character } from "../character/character";
+import { Character } from "../character";
 
 @Component()
 export abstract class BaseInjury extends BaseComponent<{}, Model> {

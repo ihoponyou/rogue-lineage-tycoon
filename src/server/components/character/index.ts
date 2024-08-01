@@ -6,7 +6,6 @@ import { Events } from "server/networking";
 import { DataService } from "server/services/data-service";
 import { store } from "server/store";
 import { SharedComponents } from "shared/components/character";
-import { Inject } from "shared/inject";
 import {
 	deserializeVector3,
 	serializeVector3,
@@ -41,15 +40,13 @@ const EVENTS = Events.character;
 	},
 })
 export class Character extends SharedComponents.Character implements OnTick {
-	private disconnectReleaseListener?: () => void;
+	private inVoid = false;
 
-	@Inject
-	private components!: Components;
-
-	@Inject
-	private dataService!: DataService;
-
-	public constructor(private ragdoll: RagdollServer) {
+	public constructor(
+		private ragdoll: RagdollServer,
+		private components: Components,
+		private dataService: DataService,
+	) {
 		super();
 	}
 
@@ -90,22 +87,6 @@ export class Character extends SharedComponents.Character implements OnTick {
 		const boost = 0; // TODO: health regen multiplier
 		const regenRate = BASE_REGEN_RATE * (1 + boost);
 		humanoid.TakeDamage(dt * -regenRate);
-	}
-
-	private onHealthChanged(health: number): void {
-		store.setHealth(this.getPlayer().UserId, health);
-		const percentHealth = health / this.humanoid.MaxHealth;
-		if (this.attributes.isKnocked) {
-			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
-				if (this.instance.GetAttribute("isCarried") === true) return;
-				this.attributes.isKnocked = false;
-				this.ragdoll.toggle(false);
-			}
-			return;
-		}
-
-		if (health > 0) return;
-		this.knock();
 	}
 
 	public loadHealth(): void {
@@ -232,5 +213,21 @@ export class Character extends SharedComponents.Character implements OnTick {
 
 	public takeDamage(amount: number): void {
 		this.humanoid.TakeDamage(math.min(this.humanoid.Health, amount));
+	}
+
+	private onHealthChanged(health: number): void {
+		store.setHealth(this.getPlayer().UserId, health);
+		const percentHealth = health / this.humanoid.MaxHealth;
+		if (this.attributes.isKnocked) {
+			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
+				if (this.instance.GetAttribute("isCarried") === true) return;
+				this.attributes.isKnocked = false;
+				this.ragdoll.toggle(false);
+			}
+			return;
+		}
+
+		if (health > 0) return;
+		this.knock();
 	}
 }
