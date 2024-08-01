@@ -1,11 +1,7 @@
-import { Component, Components } from "@flamework/components";
+import { Component } from "@flamework/components";
 import { Workspace } from "@rbxts/services";
 import { SharedComponents } from "shared/components/character";
-import { Inject } from "shared/inject";
 import { Events } from "../networking";
-import { CharacterStateMachine } from "./character-state-machine";
-
-const events = Events.character;
 
 @Component({
 	defaults: {
@@ -14,23 +10,12 @@ const events = Events.character;
 	},
 })
 export class Character extends SharedComponents.Character {
-	@Inject
-	private components!: Components;
-
 	public override onStart(): void {
 		super.onStart();
+		print("a");
+		this.instance.AddTag("CharacterStateMachine");
 
-		this.trove.add(events.killed.connect(() => this.onKilled()));
-
-		const stateMachine =
-			this.components.addComponent<CharacterStateMachine>(this.instance);
-
-		this.trove.add(stateMachine);
-	}
-
-	public override destroy(): void {
-		this.components.removeComponent<CharacterStateMachine>(this.instance);
-		super.destroy();
+		this.trove.add(Events.character.killed.connect(() => this.onKilled()));
 	}
 
 	private onKilled(): void {

@@ -12,7 +12,9 @@ import { IdleState } from "../player-state/idle-state";
 import { RunState } from "../player-state/run-state";
 import { Character } from "./character";
 
-@Component()
+@Component({
+	tag: "CharacterStateMachine",
+})
 export class CharacterStateMachine
 	extends BaseComponent<{}, Model>
 	implements OnStart, OnTick
@@ -76,5 +78,6 @@ export class CharacterStateMachine
 
 	public override destroy(): void {
 		this.stateMachine.destroy();
+		super.destroy();
 	}
 }

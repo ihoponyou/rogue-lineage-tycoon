@@ -1,5 +1,6 @@
 import { Component, Components } from "@flamework/components";
 import { OnTick } from "@flamework/core";
+import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { Events } from "server/networking";
@@ -70,6 +71,18 @@ export class Character extends SharedComponents.Character implements OnTick {
 
 		this.trove.connect(this.humanoid.HealthChanged, (health) =>
 			this.onHealthChanged(health),
+		);
+
+		const character = promiseR6(this.instance).expect();
+		this.trove.connect(
+			character.HumanoidRootPart.AncestryChanged,
+			(_, parent) => {
+				if (parent !== undefined) return;
+				this.components
+					.waitForComponent<PlayerServer>(this.getPlayer())
+					.expect()
+					.loadCharacter();
+			},
 		);
 	}
 

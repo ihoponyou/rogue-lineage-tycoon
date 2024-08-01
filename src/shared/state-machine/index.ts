@@ -5,6 +5,7 @@ export class StateMachine {
 		public name = "Null";
 	};
 
+	private destroyed = false;
 	private initialized = false;
 	private currentState = new StateMachine.NullState(this);
 	private states = new Map<string, State>([["null", this.currentState]]);
@@ -33,6 +34,7 @@ export class StateMachine {
 
 	public update(deltaTime: number): void {
 		// print("updating sm", this.currentState.name);
+		if (this.destroyed) return;
 		this.currentState.update(deltaTime);
 	}
 
@@ -54,5 +56,6 @@ export class StateMachine {
 
 	public destroy(): void {
 		this.transitionTo("Null");
+		this.destroyed = true;
 	}
 }
