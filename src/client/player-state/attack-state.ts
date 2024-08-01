@@ -1,5 +1,5 @@
 import { Debris, Workspace } from "@rbxts/services";
-import { CharacterClient } from "client/components/character-client";
+import { Character } from "client/components/character";
 import { AnimationController } from "client/controllers/animation-controller";
 import { Events } from "client/networking";
 import { StateMachine } from "shared/state-machine";
@@ -17,7 +17,7 @@ export class AttackState extends CharacterState {
 
 	public constructor(
 		stateMachine: StateMachine,
-		character: CharacterClient,
+		character: Character,
 		private inputController: InputController,
 		private animationController: AnimationController,
 	) {

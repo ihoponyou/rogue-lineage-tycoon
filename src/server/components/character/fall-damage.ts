@@ -1,6 +1,6 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnTick } from "@flamework/core";
-import { CharacterServer } from "./character-server";
+import { Character } from "./character";
 import { RagdollServer } from "./ragdoll-server";
 
 @Component({
@@ -11,7 +11,7 @@ export class FallDamage extends BaseComponent implements OnTick {
 	private startHeight = 0;
 
 	public constructor(
-		private character: CharacterServer,
+		private character: Character,
 		private ragdoll: RagdollServer,
 	) {
 		super();

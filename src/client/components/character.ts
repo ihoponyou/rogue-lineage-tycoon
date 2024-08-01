@@ -1,6 +1,6 @@
 import { Component, Components } from "@flamework/components";
 import { Workspace } from "@rbxts/services";
-import { AbstractCharacter } from "shared/components/abstract-character";
+import { SharedComponents } from "shared/components/character";
 import { Inject } from "shared/inject";
 import { Events } from "../networking";
 import { CharacterStateMachine } from "./character-state-machine";
@@ -13,7 +13,7 @@ const events = Events.character;
 		isAlive: true,
 	},
 })
-export class CharacterClient extends AbstractCharacter {
+export class Character extends SharedComponents.Character {
 	@Inject
 	private components!: Components;
 

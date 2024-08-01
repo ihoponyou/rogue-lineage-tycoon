@@ -5,7 +5,7 @@ import { setInterval } from "@rbxts/set-timeout";
 import { Events } from "server/networking";
 import { DataService } from "server/services/data-service";
 import { store } from "server/store";
-import { AbstractCharacter } from "shared/components/abstract-character";
+import { SharedComponents } from "shared/components/character";
 import { Inject } from "shared/inject";
 import {
 	deserializeVector3,
@@ -40,8 +40,7 @@ const EVENTS = Events.character;
 		lightAttackCooldown: false,
 	},
 })
-// consider using server/client/shared namespaces to allow name overlap
-export class CharacterServer extends AbstractCharacter implements OnTick {
+export class Character extends SharedComponents.Character implements OnTick {
 	private disconnectReleaseListener?: () => void;
 
 	@Inject
@@ -61,16 +60,19 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		this.instance.AddTag("CombatManager");
 
 		const player = this.getPlayer();
-		this.disconnectReleaseListener = this.dataService.connectToPreRelease(
-			player,
-			(profile) => {
+		this.trove.add(
+			this.dataService.connectToPreRelease(player, (profile) => {
 				const pivot = this.instance.GetPivot();
 				const yRotation = pivot.ToEulerAnglesXYZ()[1];
 				profile.Data.transform.position = serializeVector3(
 					pivot.Position,
 				);
 				profile.Data.transform.yRotation = yRotation;
-			},
+			}),
+		);
+
+		this.trove.connect(this.humanoid.HealthChanged, (health) =>
+			this.onHealthChanged(health),
 		);
 	}
 
@@ -90,7 +92,7 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		humanoid.TakeDamage(dt * -regenRate);
 	}
 
-	public override onHealthChanged(health: number): void {
+	private onHealthChanged(health: number): void {
 		store.setHealth(this.getPlayer().UserId, health);
 		const percentHealth = health / this.humanoid.MaxHealth;
 		if (this.attributes.isKnocked) {
@@ -103,7 +105,6 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		}
 
 		if (health > 0) return;
-
 		this.knock();
 	}
 
@@ -161,9 +162,8 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		this.breakJoints();
 
 		const player = this.getPlayer();
-		const playerId = player.UserId;
 
-		store.subtractLife(playerId);
+		store.subtractLife(player.UserId);
 
 		EVENTS.killed.fire(player);
 

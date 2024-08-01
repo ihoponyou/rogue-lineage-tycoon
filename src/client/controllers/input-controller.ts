@@ -13,7 +13,7 @@ import {
 	selectManaEnabled,
 } from "shared/store/slices/players/slices/mana/selectors";
 import { OnLocalCharacterAdded } from "../../../types/lifecycles";
-import { CharacterClient } from "../components/character-client";
+import { Character } from "../components/character";
 import { KeybindController } from "./keybind-controller";
 
 const BEGIN = Enum.UserInputState.Begin;
@@ -39,7 +39,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	>();
 	public readonly chargeManaTriggered = new Signal<(bool: boolean) => void>();
 
-	private character?: CharacterClient;
+	private character?: Character;
 	private lightAttackTriggered = new Signal();
 	private lastForwardInputTick = 0;
 
@@ -85,7 +85,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	public onLocalCharacterAdded(character: Model): void {
 		const components = Dependency<Components>();
 		components
-			.waitForComponent<CharacterClient>(character)
+			.waitForComponent<Character>(character)
 			.andThen((component) => (this.character = component));
 	}
 

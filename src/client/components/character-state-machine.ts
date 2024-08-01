@@ -10,7 +10,7 @@ import { ClimbState } from "../player-state/climb-state";
 import { DashState } from "../player-state/dash-state";
 import { IdleState } from "../player-state/idle-state";
 import { RunState } from "../player-state/run-state";
-import { CharacterClient } from "./character-client";
+import { Character } from "./character";
 
 @Component()
 export class CharacterStateMachine
@@ -20,7 +20,7 @@ export class CharacterStateMachine
 	private stateMachine = new StateMachine();
 
 	public constructor(
-		private character: CharacterClient,
+		private character: Character,
 		private inputController: InputController,
 		private keybindController: KeybindController,
 		private animationController: AnimationController,

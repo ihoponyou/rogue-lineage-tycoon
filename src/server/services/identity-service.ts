@@ -3,7 +3,7 @@ import { Dependency, OnStart, Service } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
-import { CharacterServer } from "server/components/character/character-server";
+import { Character } from "server/components/character/character";
 import { ARMORS, getRandomStarterArmor } from "server/configs/armors";
 import { getRandomFirstName } from "server/configs/names";
 import {
@@ -132,11 +132,9 @@ export class IdentityService
 		);
 
 		const components = Dependency<Components>();
-		components
-			.waitForComponent<CharacterServer>(character)
-			.then((component) => {
-				component.giveForceField();
-			});
+		components.waitForComponent<Character>(character).then((component) => {
+			component.giveForceField();
+		});
 	}
 
 	public getPlayerAvatarDescription(playerId: number): HumanoidDescription {

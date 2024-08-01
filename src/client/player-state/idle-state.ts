@@ -1,5 +1,5 @@
 import { Trove } from "@rbxts/trove";
-import { CharacterClient } from "client/components/character-client";
+import { Character } from "client/components/character";
 import { StateMachine } from "shared/state-machine";
 import { InputController } from "../controllers/input-controller";
 import { CharacterState } from "./character-state";
@@ -18,7 +18,7 @@ export class IdleState extends CharacterState {
 
 	public constructor(
 		stateMachine: StateMachine,
-		character: CharacterClient,
+		character: Character,
 		private inputController: InputController,
 	) {
 		super(stateMachine, character);

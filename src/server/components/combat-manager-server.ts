@@ -2,7 +2,7 @@ import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Events } from "server/networking";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { CharacterServer } from "./character/character-server";
+import { Character } from "./character/character";
 
 const M1_RESET_DELAY = 1;
 
@@ -17,7 +17,7 @@ export class CombatManager
 	private attackSpeed = 1;
 	private comboReset?: thread;
 
-	public constructor(private characterServer: CharacterServer) {
+	public constructor(private characterServer: Character) {
 		super();
 	}
 

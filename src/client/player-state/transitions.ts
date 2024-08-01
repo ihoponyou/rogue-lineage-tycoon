@@ -1,4 +1,4 @@
-import { CharacterClient } from "client/components/character-client";
+import { Character } from "client/components/character";
 import { InputController } from "client/controllers/input-controller";
 import { StateMachine } from "shared/state-machine";
 
@@ -41,7 +41,7 @@ export function createClimbTransition(
 export function createAttackTransition(
 	stateMachine: StateMachine,
 	inputController: InputController,
-	character: CharacterClient,
+	character: Character,
 ) {
 	return inputController.onLightAttackTriggered(() => {
 		if (character.canLightAttack()) stateMachine.transitionTo("attack");

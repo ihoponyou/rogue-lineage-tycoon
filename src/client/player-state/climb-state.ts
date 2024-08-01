@@ -10,7 +10,7 @@ import { store } from "client/store";
 import { hasLineOfSight } from "shared/line-of-sight";
 import { StateMachine } from "shared/state-machine";
 import { selectManaAmount } from "shared/store/slices/players/slices/mana/selectors";
-import { CharacterClient } from "../components/character-client";
+import { Character } from "../components/character";
 import { AnimationController } from "../controllers/animation-controller";
 import { Direction, InputController } from "../controllers/input-controller";
 import { KeybindController } from "../controllers/keybind-controller";
@@ -38,7 +38,7 @@ export class ClimbState extends CharacterState {
 
 	public constructor(
 		stateMachine: StateMachine,
-		character: CharacterClient,
+		character: Character,
 		private keybindController: KeybindController,
 		private animationController: AnimationController,
 	) {

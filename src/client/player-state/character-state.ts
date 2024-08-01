@@ -1,11 +1,11 @@
 import { StateMachine } from "shared/state-machine";
 import { State } from "shared/state-machine/state";
-import { CharacterClient } from "../components/character-client";
+import { Character } from "../components/character";
 
 export abstract class CharacterState extends State {
 	public constructor(
 		stateMachine: StateMachine,
-		protected character: CharacterClient,
+		protected character: Character,
 	) {
 		super(stateMachine);
 	}
