@@ -7,13 +7,13 @@ export interface CurrencyData {
 	readonly multiplier: number;
 }
 
-export type Currencies = Record<Currency, CurrencyData>;
+export type CurrencyRecord = Record<Currency, CurrencyData>;
 
 export interface CurrenciesState {
-	readonly [playerId: string]: Currencies | undefined;
+	readonly [playerId: string]: CurrencyRecord | undefined;
 }
 
-export const DEFAULT_CURRENCY_DATA = {
+export const DEFAULT_CURRENCY_RECORD = {
 	Silver: {
 		amount: 0,
 		multiplier: 1,
@@ -34,6 +34,25 @@ export const DEFAULT_CURRENCY_DATA = {
 
 const initialState: CurrenciesState = {};
 
+function createDispatcher(
+	action: (currentData: CurrencyRecord) => CurrencyRecord,
+) {
+	return (currentState: CurrenciesState, playerId: number | string) => {
+		const id = tostring(playerId);
+		const data = currentState[id];
+
+		if (data === undefined) {
+			warn(`currency slice: data missing for ${id}`);
+			return currentState;
+		}
+
+		return {
+			...currentState,
+			[id]: action(data),
+		};
+	};
+}
+
 export const currenciesSlice = createProducer(initialState, {
 	loadPlayerData: (state, playerId: string | number, data: PlayerData) => ({
 		...state,
@@ -45,86 +64,59 @@ export const currenciesSlice = createProducer(initialState, {
 		[tostring(playerId)]: undefined,
 	}),
 
-	resetLineageValues: (state, playerId: string | number) => {
-		const id = tostring(playerId);
-		const playerData = state[id];
-		const insight = playerData?.Insight;
-
+	resetLineageValues: createDispatcher((oldData) => {
 		return {
-			...state,
-			[id]: {
-				...DEFAULT_CURRENCY_DATA,
-				Insight: insight ?? DEFAULT_CURRENCY_DATA.Insight,
-			},
+			...oldData,
+			Insight: oldData.Insight,
 		};
-	},
+	}),
 
 	setCurrencyAmount: (
 		state,
 		playerId: string | number,
 		currency: Currency,
 		amount: number,
-	) => {
-		const id = tostring(playerId);
-		const playerData = state[id];
-		if (!playerData) return state;
-		const currencyData = playerData[currency];
-
-		return {
-			...state,
-			[id]: playerData && {
-				...playerData,
+	) =>
+		createDispatcher((oldData) => {
+			return {
+				...oldData,
 				[currency]: {
-					...currencyData,
+					...oldData[currency],
 					amount: amount,
 				},
-			},
-		};
-	},
+			};
+		})(state, playerId),
 
 	setCurrencyMultiplier: (
 		state,
 		playerId: string | number,
 		currency: Currency,
 		multiplier: number,
-	) => {
-		const id = tostring(playerId);
-		const playerData = state[id];
-		if (!playerData) return state;
-		const currencyData = playerData[currency];
-
-		return {
-			...state,
-			[id]: playerData && {
-				...playerData,
+	) =>
+		createDispatcher((oldData) => {
+			return {
+				...oldData,
 				[currency]: {
-					...currencyData,
+					...oldData[currency],
 					multiplier: multiplier,
 				},
-			},
-		};
-	},
+			};
+		})(state, playerId),
 
 	addCurrency: (
 		state,
 		playerId: string | number,
 		currency: Currency,
 		amount: number,
-	) => {
-		const id = tostring(playerId);
-		const playerData = state[id];
-		if (!playerData) return state;
-		const currencyData = playerData[currency];
-
-		return {
-			...state,
-			[id]: playerData && {
-				...playerData,
+	) =>
+		createDispatcher((oldData) => {
+			const oldCurrencyData = oldData[currency];
+			return {
+				...oldData,
 				[currency]: {
-					...currencyData,
-					amount: currencyData.amount + amount,
+					...oldCurrencyData,
+					amount: oldCurrencyData.amount + amount,
 				},
-			},
-		};
-	},
+			};
+		})(state, playerId),
 });

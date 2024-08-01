@@ -20,6 +20,7 @@ import { selectIdentity } from "shared/store/slices/players/slices/identity/sele
 import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
 
 const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
+const HAIR_TEXTURE = "rbxassetid://13655022252";
 
 @Service()
 export class IdentityService
@@ -200,32 +201,35 @@ export class IdentityService
 		description.TorsoColor = color;
 	}
 
-	public removeHair(character: Model) {
-		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
-		if (!humanoid) error(`Failed to find Humanoid in ${character}`);
+	private findHumanoidIn(model: Model): Humanoid {
+		const humanoid = model.FindFirstChildOfClass("Humanoid");
+		if (humanoid === undefined)
+			error(`Failed to find Humanoid in ${model}`);
+		return humanoid;
+	}
 
-		for (const accessory of humanoid.GetAccessories()) {
-			if (accessory.AccessoryType !== Enum.AccessoryType.Hair) continue;
+	public removeHair(character: Model) {
+		const humanoid = this.findHumanoidIn(character);
+		humanoid.GetAccessories().forEach((accessory) => {
+			if (accessory.AccessoryType !== Enum.AccessoryType.Hair) return;
 			accessory.Destroy();
-		}
+		});
 	}
 
 	public setHairColor(character: Model, color: Color3) {
-		const humanoid = character.FindFirstChildWhichIsA("Humanoid");
-		if (!humanoid) error(`Failed to find Humanoid in ${character}`);
-
-		for (const accessory of humanoid.GetAccessories()) {
-			if (accessory.AccessoryType !== Enum.AccessoryType.Hair) continue;
+		const humanoid = this.findHumanoidIn(character);
+		humanoid.GetAccessories().forEach((accessory) => {
+			if (accessory.AccessoryType !== Enum.AccessoryType.Hair) return;
 
 			const handle = accessory.FindFirstChild("Handle");
-			if (!handle) continue;
+			if (!handle) return;
 
 			for (const child of handle.GetChildren()) {
 				if (!child.IsA("SpecialMesh")) continue;
-				child.TextureId = "rbxassetid://13655022252";
+				child.TextureId = HAIR_TEXTURE;
 				child.VertexColor = new Vector3(color.R, color.G, color.B);
 			}
-		}
+		});
 	}
 
 	public async setEyeColor(model: Model, color: Color3) {

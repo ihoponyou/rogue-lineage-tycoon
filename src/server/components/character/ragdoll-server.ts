@@ -31,9 +31,8 @@ const SOCKET_ANGLES: { [key: string]: SocketAngles } = {
 };
 
 function getSocketTypeFromMotorName(name: string): SocketType {
-	// eslint-disable-next-line roblox-ts/lua-truthiness
-	return (name.match("Hip")[0] ||
-		name.match("Shoulder")[0] ||
+	return (name.match("Hip")[0] ??
+		name.match("Shoulder")[0] ??
 		name.match("Neck")[0]) as SocketType;
 }
 

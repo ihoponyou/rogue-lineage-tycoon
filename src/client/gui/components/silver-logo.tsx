@@ -3,6 +3,22 @@ import { useSelector } from "@rbxts/react-reflex";
 import { LOCAL_PLAYER } from "client/constants";
 import { selectCurrency } from "shared/store/slices/players/slices/currencies/selectors";
 
+function BorderImage() {
+	return (
+		<imagelabel
+			key="Border"
+			BackgroundTransparency={1}
+			Image="rbxassetid://2739347995"
+			ImageColor3={Color3.fromRGB(245, 197, 130)}
+			Position={new UDim2(0, -2, 0, -2)}
+			ScaleType={Enum.ScaleType.Slice}
+			Size={new UDim2(1, 4, 1, 5)}
+			SliceCenter={new Rect(5, 5, 5, 5)}
+			ZIndex={3}
+		/>
+	);
+}
+
 export function SilverLogo() {
 	const silver = useSelector(selectCurrency(LOCAL_PLAYER.UserId, "Silver"));
 
@@ -72,17 +88,7 @@ export function SilverLogo() {
 					TextTruncate={Enum.TextTruncate.AtEnd}
 					ZIndex={0}
 				>
-					<imagelabel
-						key="Border"
-						BackgroundTransparency={1}
-						Image="rbxassetid://2739347995"
-						ImageColor3={Color3.fromRGB(245, 197, 130)}
-						Position={new UDim2(0, -2, 0, -2)}
-						ScaleType={Enum.ScaleType.Slice}
-						Size={new UDim2(1, 4, 1, 5)}
-						SliceCenter={new Rect(5, 5, 5, 5)}
-						ZIndex={3}
-					/>
+					<BorderImage />
 				</textbox>
 				<textbutton
 					key="DropButton"
@@ -103,17 +109,7 @@ export function SilverLogo() {
 					TextSize={14}
 					ZIndex={0}
 				>
-					<imagelabel
-						key="Border"
-						BackgroundTransparency={1}
-						Image="rbxassetid://2739347995"
-						ImageColor3={Color3.fromRGB(245, 197, 130)}
-						Position={new UDim2(0, -2, 0, -2)}
-						ScaleType={Enum.ScaleType.Slice}
-						Size={new UDim2(1, 4, 1, 5)}
-						SliceCenter={new Rect(5, 5, 5, 5)}
-						ZIndex={3}
-					/>
+					<BorderImage />
 				</textbutton>
 			</frame>
 		</imagelabel>
