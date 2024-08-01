@@ -5,8 +5,10 @@ import { StateMachine } from "shared/state-machine";
 export function createRunTransition(
 	stateMachine: StateMachine,
 	inputController: InputController,
+	character: Character,
 ) {
 	return inputController.runTriggered.Connect(() => {
+		if (character.instance.GetAttribute("isRagdolled") === true) return;
 		stateMachine.transitionTo("run");
 	});
 }
@@ -14,8 +16,10 @@ export function createRunTransition(
 export function createChargeManaTransition(
 	stateMachine: StateMachine,
 	inputController: InputController,
+	character: Character,
 ) {
 	return inputController.chargeManaTriggered.Connect((charging) => {
+		if (character.instance.GetAttribute("isRagdolled") === true) return;
 		if (charging) stateMachine.transitionTo("chargemana");
 	});
 }
@@ -23,19 +27,23 @@ export function createChargeManaTransition(
 export function createDashTransition(
 	stateMachine: StateMachine,
 	inputController: InputController,
+	character: Character,
 ) {
-	return inputController.dashTriggered.Connect((direction) =>
-		stateMachine.transitionTo("dash", direction),
-	);
+	return inputController.dashTriggered.Connect((direction) => {
+		if (character.instance.GetAttribute("isRagdolled") === true) return;
+		stateMachine.transitionTo("dash", direction);
+	});
 }
 
 export function createClimbTransition(
 	stateMachine: StateMachine,
 	inputController: InputController,
+	character: Character,
 ) {
-	return inputController.climbTriggered.Connect((cast) =>
-		stateMachine.transitionTo("climb", cast),
-	);
+	return inputController.climbTriggered.Connect((cast) => {
+		if (character.instance.GetAttribute("isRagdolled") === true) return;
+		stateMachine.transitionTo("climb", cast);
+	});
 }
 
 export function createAttackTransition(
@@ -44,6 +52,7 @@ export function createAttackTransition(
 	character: Character,
 ) {
 	return inputController.onLightAttackTriggered(() => {
+		if (character.instance.GetAttribute("isRagdolled") === true) return;
 		if (character.canLightAttack()) stateMachine.transitionTo("attack");
 	});
 }

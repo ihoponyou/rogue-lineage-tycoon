@@ -46,15 +46,27 @@ export class ChargeManaState extends CharacterState {
 		);
 
 		this.trove.add(
-			createDashTransition(this.stateMachine, this.inputController),
+			createDashTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
 		);
 
 		this.trove.add(
-			createClimbTransition(this.stateMachine, this.inputController),
+			createClimbTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
 		);
 
 		this.trove.add(
-			createRunTransition(this.stateMachine, this.inputController),
+			createRunTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
 		);
 	}
 

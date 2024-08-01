@@ -12,7 +12,7 @@ import { Events } from "../networking";
 export class Character extends SharedComponents.Character {
 	public override onStart(): void {
 		super.onStart();
-		print("a");
+
 		this.instance.AddTag("CharacterStateMachine");
 
 		this.trove.add(Events.character.killed.connect(() => this.onKilled()));

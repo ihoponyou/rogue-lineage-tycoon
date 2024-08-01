@@ -26,16 +26,32 @@ export class IdleState extends CharacterState {
 
 	public override enter(): void {
 		this.transitions.add(
-			createRunTransition(this.stateMachine, this.inputController),
+			createRunTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
 		);
 		this.transitions.add(
-			createDashTransition(this.stateMachine, this.inputController),
+			createDashTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
 		);
 		this.transitions.add(
-			createClimbTransition(this.stateMachine, this.inputController),
+			createClimbTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
 		);
 		this.transitions.add(
-			createChargeManaTransition(this.stateMachine, this.inputController),
+			createChargeManaTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
 		);
 		this.transitions.add(
 			createAttackTransition(

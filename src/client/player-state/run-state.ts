@@ -58,11 +58,19 @@ export class RunState extends CharacterState {
 		this.trove.add(Events.mana.emptied.connect(() => this.onManaEmptied()));
 
 		this.trove.add(
-			createChargeManaTransition(this.stateMachine, this.inputController),
+			createChargeManaTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
 		);
 
 		this.trove.add(
-			createClimbTransition(this.stateMachine, this.inputController),
+			createClimbTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
 		);
 
 		this.trove.add(

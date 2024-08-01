@@ -1416,6 +1416,7 @@ interface ReplicatedStorage extends Instance {
 				Injured: Sound;
 				Stealth: Sound;
 				Charging: Sound;
+				Swing: Sound;
 				Pondus: Sound & {
 					FlangeSoundEffect: FlangeSoundEffect;
 				};
@@ -1456,6 +1457,7 @@ interface ReplicatedStorage extends Instance {
 				LordsbaneLightning: ParticleEmitter;
 				SilverEmit: ParticleEmitter;
 				Poison: ParticleEmitter;
+				PunchHit: ParticleEmitter;
 				M2Trail: Trail;
 				OrangeFire: ParticleEmitter;
 				BloodHit: ParticleEmitter;
@@ -1471,7 +1473,7 @@ interface ReplicatedStorage extends Instance {
 				MagiCircle: ParticleEmitter;
 				Fire: ParticleEmitter;
 				PondusParticle: ParticleEmitter;
-				PunchEmit: ParticleEmitter;
+				ManaRunTrail: Trail;
 				DarkMatter: ParticleEmitter;
 				Smoke: ParticleEmitter;
 				DBloodTrue: ParticleEmitter;
@@ -1483,10 +1485,9 @@ interface ReplicatedStorage extends Instance {
 					OrangeFire: ParticleEmitter;
 				};
 				MonkParticle: ParticleEmitter;
-				ManaStopParticle: ParticleEmitter;
 				Sparks: ParticleEmitter;
 				CommandFX: ParticleEmitter;
-				ManaRunTrail: Trail;
+				ManaStopParticle: ParticleEmitter;
 				Feathers: ParticleEmitter;
 				ColdBreath: ParticleEmitter;
 				LElectric: ParticleEmitter;
@@ -1543,9 +1544,8 @@ interface ReplicatedStorage extends Instance {
 				toggleable: ModuleScript;
 				["abstract-player"]: ModuleScript;
 				["disposable-component"]: ModuleScript;
-				["combat-manager"]: ModuleScript;
+				character: ModuleScript;
 				ragdoll: ModuleScript;
-				["abstract-character"]: ModuleScript;
 				model: ModuleScript;
 			};
 			store: ModuleScript & {
@@ -1581,22 +1581,24 @@ interface ReplicatedStorage extends Instance {
 			};
 		};
 		client: Folder & {
+			effects: ModuleScript;
 			constants: ModuleScript;
 			["player-state"]: Folder & {
+				["run-state"]: ModuleScript;
+				["attack-state"]: ModuleScript;
 				["character-state"]: ModuleScript;
 				["climb-state"]: ModuleScript;
 				["charge-mana-state"]: ModuleScript;
 				["dash-state"]: ModuleScript;
-				["run-state"]: ModuleScript;
+				transitions: ModuleScript;
 				["idle-state"]: ModuleScript;
 			};
 			networking: ModuleScript;
 			components: Folder & {
+				character: ModuleScript;
 				["character-state-machine"]: ModuleScript;
 				["ragdoll-client"]: ModuleScript;
-				["combat-manager"]: ModuleScript;
 				["player-client"]: ModuleScript;
-				["character-client"]: ModuleScript;
 			};
 			gui: Folder & {
 				components: Folder & {
@@ -1634,6 +1636,7 @@ interface ReplicatedStorage extends Instance {
 			};
 			controllers: Folder & {
 				["lifecycle-controller"]: ModuleScript;
+				["effect-controller"]: ModuleScript;
 				["keybind-controller"]: ModuleScript;
 				["animation-controller"]: ModuleScript;
 				["input-controller"]: ModuleScript;
