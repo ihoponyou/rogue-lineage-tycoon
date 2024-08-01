@@ -26,4 +26,5 @@
 			{ "transform": "rbxts-transformer-flamework" }
 		]
 	},
+	"include": ["src/**/*", "types/*"]
 }
