@@ -25,6 +25,7 @@ export class HitService implements OnStart {
 		if (victim === undefined) return;
 		if (!this.canHit(hitter, victim)) return;
 
+		Events.playEffect.broadcast(`Hit`, character, "Blunt");
 		victim.takeDamage(10);
 	}
 

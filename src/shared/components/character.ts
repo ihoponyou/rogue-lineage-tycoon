@@ -93,6 +93,7 @@ export namespace SharedComponents {
 			this.humanoid.WalkSpeed = this.getWalkSpeed();
 		}
 
+		// not in combat manager so that state machine can use this
 		public canAttack(): boolean {
 			return !this.attributes.isStunned;
 		}
