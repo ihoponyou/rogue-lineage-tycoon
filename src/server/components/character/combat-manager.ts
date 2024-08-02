@@ -2,7 +2,7 @@ import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Events } from "server/networking";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { Character } from "./character";
+import { Character } from ".";
 
 const M1_RESET_DELAY = 1;
 
@@ -26,6 +26,12 @@ export class CombatManager
 			Events.combat.lightAttack.connect((player) => {
 				if (player !== this.characterServer.getPlayer()) return;
 				this.handleLightAttack();
+			}),
+		);
+		this.trove.add(
+			Events.combat.block.connect((player, blockUp) => {
+				if (player !== this.characterServer.getPlayer()) return;
+				this.handleBlock(blockUp);
 			}),
 		);
 	}
@@ -64,5 +70,15 @@ export class CombatManager
 
 		if (++this.characterServer.attributes.combo >= this.maxCombo)
 			this.characterServer.attributes.combo = 0;
+	}
+
+	private handleBlock(blockUp: boolean): void {
+		if (
+			this.characterServer.instance.GetAttribute("isRagdolled") === true
+		) {
+			Events.combat.unblock(this.characterServer.getPlayer());
+			return;
+		}
+		this.characterServer.attributes.isBlocking = blockUp;
 	}
 }

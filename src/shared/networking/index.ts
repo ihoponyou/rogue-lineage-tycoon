@@ -1,6 +1,6 @@
 import { Networking } from "@flamework/networking";
 import { CharacterClientEvents } from "./character";
-import { CombatServerEvents } from "./combat";
+import { CombatClientEvents, CombatServerEvents } from "./combat";
 import { CurrencyClientEvents, CurrencyServerFunctions } from "./currency";
 import { DialogueClientEvents } from "./dialogue";
 import { ManaClientEvents, ManaServerEvents } from "./mana";
@@ -22,6 +22,7 @@ interface ClientEvents {
 	currency: CurrencyClientEvents;
 	reflex: ReflexClientEvents;
 	dialogue: DialogueClientEvents;
+	combat: CombatClientEvents;
 }
 
 interface ServerFunctions {

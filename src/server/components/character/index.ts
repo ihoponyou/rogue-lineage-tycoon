@@ -227,6 +227,14 @@ export class Character extends SharedComponents.Character implements OnTick {
 		this.humanoid.TakeDamage(math.min(this.humanoid.Health, amount));
 	}
 
+	public isBehind(character: Character): boolean {
+		const position = this.instance.GetPivot().Position;
+		const theirCFrame = character.instance.GetPivot();
+		const toThem = theirCFrame.Position.sub(position);
+		const dot = theirCFrame.LookVector.Dot(toThem.Unit);
+		return dot > 0;
+	}
+
 	private onHealthChanged(health: number): void {
 		store.setHealth(this.getPlayer().UserId, health);
 		const percentHealth = health / this.humanoid.MaxHealth;

@@ -25,19 +25,32 @@ export class HitService implements OnStart {
 		if (victim === undefined) return;
 		if (!this.canHit(hitter, victim)) return;
 
-		print("registered");
+		const blockable360 = false;
+		const blocked =
+			victim.attributes.isBlocking &&
+			!blockable360 &&
+			!hitter.isBehind(victim);
+		if (blocked) {
+			Events.combat.blockHit(player);
+			Events.playEffect.broadcast(`BlockHit`, character, "Blunt");
+			return;
+		}
+
 		Events.playEffect.broadcast(`Hit`, character, "Blunt");
 		victim.takeDamage(10);
 	}
 
 	private canHit(hitter: Character, victim: Character): boolean {
-		return (
-			hitter.attributes.isAlive &&
-			!hitter.attributes.isKnocked &&
-			victim.attributes.isAlive &&
-			!victim.attributes.isKnocked &&
-			hitter.instance.GetAttribute("isRagdolled") === false &&
-			victim.instance.GetAttribute("isRagdolled") === false
+		const bothAlive =
+			hitter.attributes.isAlive && victim.attributes.isAlive;
+		const neitherKnocked = !(
+			hitter.attributes.isKnocked || victim.attributes.isKnocked
 		);
+		const neitherRagdolled = !(
+			hitter.instance.GetAttribute("isRagdolled") === true &&
+			victim.instance.GetAttribute("isRagdolled") === true
+		);
+
+		return bothAlive && neitherKnocked && neitherRagdolled;
 	}
 }
