@@ -36,13 +36,12 @@ const EVENTS = Events.character;
 		isKnocked: false,
 		isAlive: true,
 		isStunned: false,
+		isBlocking: false,
 		combo: 0,
 		lightAttackCooldown: false,
 	},
 })
 export class Character extends SharedComponents.Character implements OnTick {
-	private inVoid = false;
-
 	public constructor(
 		private ragdoll: RagdollServer,
 		private components: Components,

@@ -40,8 +40,9 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	public readonly chargeManaTriggered = new Signal<(bool: boolean) => void>();
 
 	private character?: Character;
-	private lightAttackTriggered = new Signal();
 	private lastForwardInputTick = 0;
+	private lightAttackTriggered = new Signal();
+	private blockTriggered = new Signal();
 
 	public constructor(private keybindController: KeybindController) {}
 
@@ -75,6 +76,12 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			(_, state) => this.handleLightAttackInput(state),
 			true,
 			this.keybindController.keybinds.lightAttack,
+		);
+		ContextActionService.BindAction(
+			"input_block",
+			(_, state) => this.handleBlockInput(state),
+			true,
+			this.keybindController.keybinds.block,
 		);
 	}
 
@@ -126,6 +133,10 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 
 	public onLightAttackTriggered(callback: () => void): RBXScriptConnection {
 		return this.lightAttackTriggered.Connect(callback);
+	}
+
+	public onBlockTriggered(callback: () => void): RBXScriptConnection {
+		return this.blockTriggered.Connect(callback);
 	}
 
 	private handleForwardInput(state: Enum.UserInputState) {
@@ -201,5 +212,11 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		this.lightAttackTriggered.Fire();
 		return Enum.ContextActionResult.Pass;
+	}
+
+	private handleBlockInput(state: Enum.UserInputState) {
+		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
+		this.blockTriggered.Fire();
+		return Enum.ContextActionResult.Sink;
 	}
 }

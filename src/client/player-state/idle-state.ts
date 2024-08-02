@@ -5,6 +5,7 @@ import { InputController } from "../controllers/input-controller";
 import { CharacterState } from "./character-state";
 import {
 	createAttackTransition,
+	createBlockTransition,
 	createChargeManaTransition,
 	createClimbTransition,
 	createDashTransition,
@@ -55,6 +56,13 @@ export class IdleState extends CharacterState {
 		);
 		this.transitions.add(
 			createAttackTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
+		);
+		this.transitions.add(
+			createBlockTransition(
 				this.stateMachine,
 				this.inputController,
 				this.character,

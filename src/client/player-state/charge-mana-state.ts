@@ -79,7 +79,7 @@ export class ChargeManaState extends CharacterState {
 	}
 
 	public override exit(): void {
-		this.character.resetToWalkSpeed();
+		this.character.resetWalkSpeed();
 		Events.mana.charge(false);
 
 		this.trove.clean();

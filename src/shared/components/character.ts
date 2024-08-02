@@ -2,6 +2,7 @@ import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
+import { BASE_WALK_SPEED } from "shared/configs";
 import { DisposableComponent } from "./disposable-component";
 
 export namespace SharedComponents {
@@ -9,6 +10,7 @@ export namespace SharedComponents {
 		isKnocked: boolean;
 		isAlive: boolean;
 		isStunned: boolean;
+		isBlocking: boolean;
 		combo: number;
 		lightAttackCooldown: boolean;
 	}
@@ -86,11 +88,15 @@ export namespace SharedComponents {
 		}
 
 		public getWalkSpeed(): number {
-			return 20;
+			return BASE_WALK_SPEED; // plus bonuses
 		}
 
-		public resetToWalkSpeed(): void {
+		public resetWalkSpeed(): void {
 			this.humanoid.WalkSpeed = this.getWalkSpeed();
+		}
+
+		public setWalkSpeed(speed: number): void {
+			this.humanoid.WalkSpeed = speed;
 		}
 
 		// not in combat manager so that state machine can use this

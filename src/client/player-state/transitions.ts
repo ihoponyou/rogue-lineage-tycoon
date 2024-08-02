@@ -56,3 +56,14 @@ export function createAttackTransition(
 		if (character.canLightAttack()) stateMachine.transitionTo("attack");
 	});
 }
+
+export function createBlockTransition(
+	stateMachine: StateMachine,
+	inputController: InputController,
+	character: Character,
+) {
+	return inputController.onBlockTriggered(() => {
+		if (character.instance.GetAttribute("isRagdolled") === true) return;
+		stateMachine.transitionTo("block");
+	});
+}

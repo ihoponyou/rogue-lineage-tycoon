@@ -1,6 +1,7 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart, OnTick } from "@flamework/core";
 import { AttackState } from "client/player-state/attack-state";
+import { BlockState } from "client/player-state/block-state";
 import { StateMachine } from "shared/state-machine";
 import { AnimationController } from "../controllers/animation-controller";
 import { InputController } from "../controllers/input-controller";
@@ -66,6 +67,12 @@ export class CharacterStateMachine
 				this.stateMachine,
 				this.character,
 				this.inputController,
+				this.animationController,
+			),
+			new BlockState(
+				this.stateMachine,
+				this.character,
+				this.keybindController,
 				this.animationController,
 			),
 		]);

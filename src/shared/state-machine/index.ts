@@ -24,6 +24,11 @@ export class StateMachine {
 	}
 
 	public addState(state: State): void {
+		const name = state.name.lower();
+		if (this.states.has(name)) {
+			// TODO: get class name?
+			error(`duplicate state: "${state.name}"`);
+		}
 		this.states.set(state.name.lower(), state);
 		state.initialize();
 	}
@@ -41,8 +46,7 @@ export class StateMachine {
 	public transitionTo(newStateName: string, ...args: Array<unknown>) {
 		const newState = this.states.get(newStateName.lower());
 		if (!newState) {
-			warn(`no ${newStateName}`);
-			return;
+			error(`State "${newStateName}" does not exist`);
 		}
 
 		// const oldStateName = this.currentState.name;
