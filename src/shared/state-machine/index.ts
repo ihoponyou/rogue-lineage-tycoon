@@ -1,12 +1,13 @@
 import { State } from "./state";
 
-class NullState extends State {
-	public name = "Null";
-}
-
 export class StateMachine {
+	private static NullState = class extends State {
+		public name = "Null";
+	};
+
+	private destroyed = false;
 	private initialized = false;
-	private currentState = new NullState(this);
+	private currentState = new StateMachine.NullState(this);
 	private states = new Map<string, State>([["null", this.currentState]]);
 
 	public initialize(initialState: State) {
@@ -23,6 +24,11 @@ export class StateMachine {
 	}
 
 	public addState(state: State): void {
+		const name = state.name.lower();
+		if (this.states.has(name)) {
+			// TODO: get class name?
+			error(`duplicate state: "${state.name}"`);
+		}
 		this.states.set(state.name.lower(), state);
 		state.initialize();
 	}
@@ -33,14 +39,14 @@ export class StateMachine {
 
 	public update(deltaTime: number): void {
 		// print("updating sm", this.currentState.name);
+		if (this.destroyed) return;
 		this.currentState.update(deltaTime);
 	}
 
 	public transitionTo(newStateName: string, ...args: Array<unknown>) {
 		const newState = this.states.get(newStateName.lower());
 		if (!newState) {
-			warn(`no ${newStateName}`);
-			return;
+			error(`State "${newStateName}" does not exist`);
 		}
 
 		// const oldStateName = this.currentState.name;
@@ -54,5 +60,6 @@ export class StateMachine {
 
 	public destroy(): void {
 		this.transitionTo("Null");
+		this.destroyed = true;
 	}
 }

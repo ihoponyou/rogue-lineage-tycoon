@@ -4,7 +4,7 @@ import { Players, Workspace } from "@rbxts/services";
 import { store } from "server/store";
 import { selectTemperature } from "shared/store/slices/players/slices/resources/selectors";
 import { OnCharacterAdded } from "../../../../types/lifecycles";
-import { CharacterServer } from "../character/character-server";
+import { Character } from "../character";
 
 interface Attributes {
 	temperature: number;
@@ -49,7 +49,7 @@ export class Climate
 			processedPlayers.push(player);
 
 			const characterComponent =
-				this.components.getComponent<CharacterServer>(character);
+				this.components.getComponent<Character>(character);
 			if (!characterComponent) continue;
 
 			const characterTemperature = store.getState(

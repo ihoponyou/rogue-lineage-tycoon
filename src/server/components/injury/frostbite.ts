@@ -9,7 +9,7 @@ import {
 	selectTemperature,
 } from "shared/store/slices/players/slices/resources/selectors";
 import { BaseInjury } from ".";
-import { CharacterServer } from "../character/character-server";
+import { Character } from "../character";
 
 const UPPER_TEMPERATURE_THRESHOLD = 5;
 const DEATH_MESSAGE_TEMPLATE = "{Character} froze to death innit";
@@ -22,7 +22,7 @@ export class Frostbite extends BaseInjury implements OnStart, OnTick {
 	public readonly name = "Frostbite";
 
 	public constructor(
-		character: CharacterServer,
+		character: Character,
 		private logger: Logger,
 		private identityService: IdentityService,
 	) {
@@ -61,7 +61,7 @@ export class Frostbite extends BaseInjury implements OnStart, OnTick {
 		if (characterTemperature === undefined) return;
 		if (characterTemperature > UPPER_TEMPERATURE_THRESHOLD) return;
 
-		const humanoid = this.character.instance.Humanoid;
+		const humanoid = this.character.getHumanoid();
 		humanoid.TakeDamage(this.calculateTickDamage(humanoid, dt));
 		if (humanoid.Health > 0) return;
 

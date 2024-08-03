@@ -13,7 +13,7 @@ import {
 	selectManaEnabled,
 } from "shared/store/slices/players/slices/mana/selectors";
 import { OnLocalCharacterAdded } from "../../../types/lifecycles";
-import { CharacterClient } from "../components/character-client";
+import { Character } from "../components/character";
 import { KeybindController } from "./keybind-controller";
 
 const BEGIN = Enum.UserInputState.Begin;
@@ -39,43 +39,49 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	>();
 	public readonly chargeManaTriggered = new Signal<(bool: boolean) => void>();
 
-	private character?: CharacterClient;
+	private character?: Character;
 	private lastForwardInputTick = 0;
+	private lightAttackTriggered = new Signal();
+	private blockTriggered = new Signal();
 
 	public constructor(private keybindController: KeybindController) {}
 
 	public onStart(): void {
 		ContextActionService.BindAction(
 			"input_forward",
-			(_, state) => {
-				return this.handleForwardInput(state);
-			},
+			(_, state) => this.handleForwardInput(state),
 			false,
 			this.keybindController.keybinds.forward,
 		);
 		ContextActionService.BindAction(
 			"input_dash",
-			(_, state) => {
-				return this.handleDashInput(state);
-			},
+			(_, state) => this.handleDashInput(state),
 			true,
 			this.keybindController.keybinds.dash,
 		);
 		ContextActionService.BindAction(
 			"input_jump",
-			(_, state) => {
-				return this.handleJumpInput(state);
-			},
+			(_, state) => this.handleJumpInput(state),
 			false,
 			this.keybindController.keybinds.jump,
 		);
 		ContextActionService.BindAction(
 			"input_mana",
-			(_, state) => {
-				return this.handleManaInput(state);
-			},
+			(_, state) => this.handleManaInput(state),
 			true,
 			this.keybindController.keybinds.chargeMana,
+		);
+		ContextActionService.BindAction(
+			"input_light_attack",
+			(_, state) => this.handleLightAttackInput(state),
+			true,
+			this.keybindController.keybinds.lightAttack,
+		);
+		ContextActionService.BindAction(
+			"input_block",
+			(_, state) => this.handleBlockInput(state),
+			true,
+			this.keybindController.keybinds.block,
 		);
 	}
 
@@ -86,7 +92,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	public onLocalCharacterAdded(character: Model): void {
 		const components = Dependency<Components>();
 		components
-			.waitForComponent<CharacterClient>(character)
+			.waitForComponent<Character>(character)
 			.andThen((component) => (this.character = component));
 	}
 
@@ -123,6 +129,14 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			this.getAxis(InputAxis.Horizontal),
 			this.getAxis(InputAxis.Vertical),
 		);
+	}
+
+	public onLightAttackTriggered(callback: () => void): RBXScriptConnection {
+		return this.lightAttackTriggered.Connect(callback);
+	}
+
+	public onBlockTriggered(callback: () => void): RBXScriptConnection {
+		return this.blockTriggered.Connect(callback);
 	}
 
 	private handleForwardInput(state: Enum.UserInputState) {
@@ -168,8 +182,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 		);
 
 		const inAir =
-			this.character.instance.Humanoid.FloorMaterial ===
-			Enum.Material.Air;
+			this.character.getHumanoid().FloorMaterial === Enum.Material.Air;
 		if (!forwardCast || !inAir) {
 			return Enum.ContextActionResult.Pass;
 		}
@@ -192,6 +205,18 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 		if (state === BEGIN || state === END) {
 			this.chargeManaTriggered.Fire(state === BEGIN);
 		}
+		return Enum.ContextActionResult.Sink;
+	}
+
+	private handleLightAttackInput(state: Enum.UserInputState) {
+		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
+		this.lightAttackTriggered.Fire();
+		return Enum.ContextActionResult.Pass;
+	}
+
+	private handleBlockInput(state: Enum.UserInputState) {
+		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
+		this.blockTriggered.Fire();
 		return Enum.ContextActionResult.Sink;
 	}
 }

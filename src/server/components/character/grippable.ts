@@ -3,8 +3,8 @@ import { OnStart } from "@flamework/core";
 import { Workspace } from "@rbxts/services";
 import { ANIMATIONS, SFX, VFX } from "shared/constants";
 import { Inject } from "shared/inject";
+import { Character } from ".";
 import { KeyInteractable } from "../interactable/key-interactable";
-import { CharacterServer } from "./character-server";
 import { RagdollServer } from "./ragdoll-server";
 
 interface Attributes {
@@ -30,7 +30,7 @@ export class Grippable
 	private components!: Components;
 
 	public constructor(
-		private character: CharacterServer,
+		private character: Character,
 		private ragdoll: RagdollServer,
 	) {
 		super();
@@ -50,8 +50,9 @@ export class Grippable
 
 	public override interact(player: Player): void {
 		if (!player.Character) return;
-		const characterComponent =
-			this.components.getComponent<CharacterServer>(player.Character);
+		const characterComponent = this.components.getComponent<Character>(
+			player.Character,
+		);
 		if (!characterComponent) return;
 		print(this.attributes.gettingGripped);
 		this.attributes.gettingGripped
@@ -59,7 +60,7 @@ export class Grippable
 			: this.grip(characterComponent);
 	}
 
-	public grip(gripper: CharacterServer): void {
+	public grip(gripper: Character): void {
 		const floorCheck = Workspace.Raycast(
 			this.character.getHumanoidRootPart().Position,
 			Vector3.yAxis.mul(-4),
@@ -84,8 +85,8 @@ export class Grippable
 
 		this.instance.RemoveTag("Burning");
 
-		const gripperHumanoid = gripper.instance.Humanoid;
-		const humanoid = this.character.instance.Humanoid;
+		const gripperHumanoid = gripper.getHumanoid();
+		const humanoid = this.character.getHumanoid();
 
 		humanoid.AutoRotate = false;
 		gripperHumanoid.AutoRotate = false;
@@ -93,7 +94,7 @@ export class Grippable
 		const torso = this.character.getTorso();
 		const head = this.character.getHead();
 		const hitSound = this.gripTrove.clone(SFX.PunchHit);
-		const hitParticle = this.gripTrove.clone(VFX.PunchEmit);
+		const hitParticle = this.gripTrove.clone(VFX.PunchHit);
 		hitSound.Parent = torso;
 		hitParticle.Parent = head;
 
@@ -141,12 +142,12 @@ export class Grippable
 		this.snapToGround(floorCheck, gripper, this.character);
 	}
 
-	public release(gripper: CharacterServer): void {
+	public release(gripper: Character): void {
 		this.attributes.gettingGripped = false;
 
 		this.gripTrove.clean();
 
-		gripper.instance.Humanoid.AutoRotate = true;
+		gripper.getHumanoid().AutoRotate = true;
 		gripper.getHumanoidRootPart().Anchored = false;
 		this.character.getHumanoidRootPart().Anchored = false;
 
@@ -155,8 +156,8 @@ export class Grippable
 
 	private snapToGround(
 		floorCheck: RaycastResult,
-		gripper: CharacterServer,
-		grippee: CharacterServer,
+		gripper: Character,
+		grippee: Character,
 	) {
 		const gripperRootPart = gripper.getHumanoidRootPart();
 		const grippeeRootPart = grippee.getHumanoidRootPart();

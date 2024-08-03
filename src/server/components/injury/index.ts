@@ -1,13 +1,13 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { store } from "server/store";
 import { Condition } from "shared/configs/conditions";
-import { CharacterServer } from "../character/character-server";
+import { Character } from "../character";
 
 @Component()
 export abstract class BaseInjury extends BaseComponent<{}, Model> {
 	protected abstract readonly name: Condition;
 
-	public constructor(protected character: CharacterServer) {
+	public constructor(protected character: Character) {
 		super();
 	}
 

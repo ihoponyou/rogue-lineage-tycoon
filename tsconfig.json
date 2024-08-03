@@ -1,11 +1,10 @@
 {
 	"compilerOptions": {
-		// required
 		"allowSyntheticDefaultImports": true,
 		"downlevelIteration": true,
 		"jsx": "react",
 		"jsxFactory": "React.createElement",
-		"jsxFragmentFactory": "React.createFragment",
+		"jsxFragmentFactory": "React.Fragment",
 		"module": "commonjs",
 		"moduleResolution": "Node",
 		"noLib": true,
@@ -16,7 +15,6 @@
 		"target": "ESNext",
 		"typeRoots": ["node_modules/@rbxts", "node_modules/@flamework", "types"],
 
-		// configurable
 		"rootDir": "src",
 		"outDir": "out",
 		"baseUrl": "src",
@@ -28,4 +26,5 @@
 			{ "transform": "rbxts-transformer-flamework" }
 		]
 	},
+	"include": ["src/**/*", "types/*"]
 }

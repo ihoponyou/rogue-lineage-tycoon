@@ -8,7 +8,7 @@ import { deserializeVector3 } from "shared/serialized-vector3";
 import { selectHealth } from "shared/store/slices/players/slices/resources/selectors";
 import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
 import { selectTransform } from "shared/store/slices/players/slices/transform/selectors";
-import { CharacterServer } from "./character/character-server";
+import { Character } from "./character";
 
 const TYCOON_FOLDER = Workspace.Tycoons;
 
@@ -41,7 +41,7 @@ export class PlayerServer extends AbstractPlayer {
 
 	public async loadCharacter(
 		leavingPurgatory: boolean = false,
-	): Promise<CharacterServer> {
+	): Promise<Character> {
 		return new Promise((resolve, reject) => {
 			if (this.instance.Parent === undefined) {
 				reject("player has already left");
@@ -89,7 +89,7 @@ export class PlayerServer extends AbstractPlayer {
 			}
 
 			this.components
-				.waitForComponent<CharacterServer>(this.instance.Character)
+				.waitForComponent<Character>(this.instance.Character)
 				.andThen(
 					(component) => {
 						component.loadHealth();
@@ -100,6 +100,18 @@ export class PlayerServer extends AbstractPlayer {
 					(reason) => reject(reason),
 				);
 		});
+	}
+
+	public getCharacter(): Character {
+		const model = this.instance.Character;
+		if (model === undefined)
+			error(`${this.instance.Name}.Character is undefined`);
+		const character = this.components.getComponent<Character>(model);
+		if (character === undefined)
+			error(
+				`${this.instance.Name}'s character missing character component`,
+			);
+		return character;
 	}
 
 	private isInsideTycoon(position: Vector3): boolean {

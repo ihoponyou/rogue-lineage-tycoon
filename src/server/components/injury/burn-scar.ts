@@ -8,7 +8,7 @@ import {
 	selectTemperature,
 } from "shared/store/slices/players/slices/resources/selectors";
 import { BaseInjury } from ".";
-import { CharacterServer } from "../character/character-server";
+import { Character } from "../character";
 
 const LOWER_TEMPERATURE_THRESHOLD = 95;
 
@@ -18,7 +18,7 @@ const LOWER_TEMPERATURE_THRESHOLD = 95;
 export class BurnScar extends BaseInjury implements OnStart, OnTick {
 	public readonly name = "BurnScar";
 
-	public constructor(protected character: CharacterServer) {
+	public constructor(protected character: Character) {
 		super(character);
 	}
 

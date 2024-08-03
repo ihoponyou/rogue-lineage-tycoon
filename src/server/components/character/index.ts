@@ -1,16 +1,12 @@
 import { Component, Components } from "@flamework/components";
 import { OnTick } from "@flamework/core";
+import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { Events } from "server/networking";
 import { DataService } from "server/services/data-service";
 import { store } from "server/store";
-import {
-	Character,
-	CharacterAttributes,
-	CharacterInstance,
-} from "shared/components/abstract-character";
-import { Inject } from "shared/inject";
+import { SharedComponents } from "shared/components/character";
 import {
 	deserializeVector3,
 	serializeVector3,
@@ -30,6 +26,7 @@ const BASE_REGEN_RATE = 0.5;
 const MINIMUM_TEMPERATURE = 0;
 const MAXIMUM_TEMPERATURE = 100;
 const KNOCK_PERCENT_THRESHOLD = 0.15;
+const DEFAULT_JUMP_POWER = 50;
 
 const EVENTS = Events.character;
 
@@ -38,22 +35,18 @@ const EVENTS = Events.character;
 	defaults: {
 		isKnocked: false,
 		isAlive: true,
+		isStunned: false,
+		isBlocking: false,
+		combo: 0,
+		lightAttackCooldown: false,
 	},
 })
-// consider using server/client/shared namespaces to allow name overlap
-export class CharacterServer
-	extends Character<CharacterAttributes, CharacterInstance>
-	implements OnTick
-{
-	private disconnectReleaseListener?: () => void;
-
-	@Inject
-	private components!: Components;
-
-	@Inject
-	private dataService!: DataService;
-
-	public constructor(private ragdoll: RagdollServer) {
+export class Character extends SharedComponents.Character implements OnTick {
+	public constructor(
+		private ragdoll: RagdollServer,
+		private components: Components,
+		private dataService: DataService,
+	) {
 		super();
 	}
 
@@ -61,26 +54,58 @@ export class CharacterServer
 		super.onStart();
 
 		this.instance.AddTag("FallDamage");
+		this.instance.AddTag("CombatManager");
 
 		const player = this.getPlayer();
-		this.disconnectReleaseListener = this.dataService.connectToPreRelease(
-			player,
-			(profile) => {
+		this.trove.add(
+			this.dataService.connectToPreRelease(player, (profile) => {
 				const pivot = this.instance.GetPivot();
 				const yRotation = pivot.ToEulerAnglesXYZ()[1];
 				profile.Data.transform.position = serializeVector3(
 					pivot.Position,
 				);
 				profile.Data.transform.yRotation = yRotation;
+			}),
+		);
+
+		this.trove.connect(this.humanoid.HealthChanged, (health) =>
+			this.onHealthChanged(health),
+		);
+
+		const character = promiseR6(this.instance).expect();
+		this.trove.connect(
+			character.HumanoidRootPart.AncestryChanged,
+			(_, parent) => {
+				if (parent !== undefined) return;
+				this.components
+					.waitForComponent<PlayerServer>(this.getPlayer())
+					.expect()
+					.loadCharacter();
 			},
 		);
+	}
+
+	public onTick(dt: number): void {
+		if (!this.attributes.isAlive) return;
+
+		const player = this.getPlayer();
+
+		store.decayStomach(player.UserId, dt);
+		store.decayToxicity(player.UserId, dt);
+
+		const humanoid = this.humanoid;
+		if (humanoid.Health >= humanoid.MaxHealth) return;
+
+		const boost = 0; // TODO: health regen multiplier
+		const regenRate = BASE_REGEN_RATE * (1 + boost);
+		humanoid.TakeDamage(dt * -regenRate);
 	}
 
 	public loadHealth(): void {
 		let savedHealth = store.getState(selectHealth(this.getPlayer().UserId));
 		if (savedHealth === undefined) error("health not found");
 		if (savedHealth < 1) savedHealth = 100;
-		this.instance.Humanoid.Health = savedHealth;
+		this.humanoid.Health = savedHealth;
 	}
 
 	public loadConditions(): void {
@@ -105,39 +130,6 @@ export class CharacterServer
 		);
 	}
 
-	public onTick(dt: number): void {
-		if (!this.attributes.isAlive) return;
-
-		const player = this.getPlayer();
-
-		store.decayStomach(player.UserId, dt);
-		store.decayToxicity(player.UserId, dt);
-
-		const humanoid = this.instance.Humanoid;
-		if (humanoid.Health >= humanoid.MaxHealth) return;
-
-		const boost = 0; // TODO: health regen multiplier
-		const regenRate = BASE_REGEN_RATE * (1 + boost);
-		humanoid.TakeDamage(dt * -regenRate);
-	}
-
-	public override onHealthChanged(health: number): void {
-		store.setHealth(this.getPlayer().UserId, health);
-		const percentHealth = health / this.instance.Humanoid.MaxHealth;
-		if (this.attributes.isKnocked) {
-			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
-				if (this.instance.GetAttribute("isCarried") === true) return;
-				this.attributes.isKnocked = false;
-				this.ragdoll.toggle(false);
-			}
-			return;
-		}
-
-		if (health > 0) return;
-
-		this.knock();
-	}
-
 	public knock(): void {
 		if (this.attributes.isKnocked) return;
 		this.attributes.isKnocked = true;
@@ -159,13 +151,12 @@ export class CharacterServer
 		if (!this.attributes.isAlive) return;
 		this.attributes.isAlive = false;
 
-		this.instance.Humanoid.Health = 0;
+		this.humanoid.Health = 0;
 		this.breakJoints();
 
 		const player = this.getPlayer();
-		const playerId = player.UserId;
 
-		store.subtractLife(playerId);
+		store.subtractLife(player.UserId);
 
 		EVENTS.killed.fire(player);
 
@@ -226,5 +217,37 @@ export class CharacterServer
 			this.instance.AddTag("Frostbite");
 		else if (newTemperature === MAXIMUM_TEMPERATURE)
 			this.instance.AddTag("BurnScar");
+	}
+
+	public toggleJump(enable: boolean): void {
+		this.humanoid.JumpPower = enable ? DEFAULT_JUMP_POWER : 0;
+	}
+
+	public takeDamage(amount: number): void {
+		this.humanoid.TakeDamage(math.min(this.humanoid.Health, amount));
+	}
+
+	public isBehind(character: Character): boolean {
+		const position = this.instance.GetPivot().Position;
+		const theirCFrame = character.instance.GetPivot();
+		const toThem = theirCFrame.Position.sub(position);
+		const dot = theirCFrame.LookVector.Dot(toThem.Unit);
+		return dot > 0;
+	}
+
+	private onHealthChanged(health: number): void {
+		store.setHealth(this.getPlayer().UserId, health);
+		const percentHealth = health / this.humanoid.MaxHealth;
+		if (this.attributes.isKnocked) {
+			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
+				if (this.instance.GetAttribute("isCarried") === true) return;
+				this.attributes.isKnocked = false;
+				this.ragdoll.toggle(false);
+			}
+			return;
+		}
+
+		if (health > 0) return;
+		this.knock();
 	}
 }

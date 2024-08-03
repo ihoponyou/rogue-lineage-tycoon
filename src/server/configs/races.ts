@@ -318,9 +318,9 @@ export const RACES: RaceGlossary = {
 		StatChanges: {},
 		Phenotypes: {
 			Default: {
-				EyeColor: Color3.fromRGB(76, 255, 255),
-				HairColor: Color3.fromRGB(180, 254, 255),
-				SkinColor: Color3.fromRGB(147, 232, 255),
+				EyeColor: Color3.fromRGB(0, 0, 0),
+				HairColor: Color3.fromRGB(221, 221, 221),
+				SkinColor: Color3.fromRGB(166, 160, 147),
 			},
 		},
 		IsBald: true,

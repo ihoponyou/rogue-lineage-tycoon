@@ -1,3 +1,4 @@
+import { Trove } from "@rbxts/trove";
 import { LOCAL_PLAYER } from "client/constants";
 import { store } from "client/store";
 import { VFX } from "shared/constants";
@@ -5,25 +6,27 @@ import { deserializeColor3 } from "shared/serialized-color3";
 import { StateMachine } from "shared/state-machine";
 import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
 import { selectMana } from "shared/store/slices/players/slices/mana/selectors";
-import { CharacterClient } from "../components/character-client";
+import { Character } from "../components/character";
 import { AnimationController } from "../controllers/animation-controller";
 import { InputController } from "../controllers/input-controller";
 import { KeybindController } from "../controllers/keybind-controller";
 import { Events } from "../networking";
 import { CharacterState } from "./character-state";
+import {
+	createAttackTransition,
+	createChargeManaTransition,
+	createClimbTransition,
+} from "./transitions";
 
 export class RunState extends CharacterState {
 	public readonly name = "Run";
 
 	private manaTrail = this.newManaTrail();
-	private dashConnection?: RBXScriptConnection;
-	private manaEmptiedConnection?: RBXScriptConnection;
-	private chargeManaConnection?: RBXScriptConnection;
-	private climbConnection?: RBXScriptConnection;
+	private trove = new Trove();
 
 	public constructor(
 		stateMachine: StateMachine,
-		character: CharacterClient,
+		character: Character,
 		private keybindController: KeybindController,
 		private inputController: InputController,
 		private animationController: AnimationController,
@@ -46,23 +49,42 @@ export class RunState extends CharacterState {
 		const canManaRun = (manaData?.amount ?? 0) > 0 && manaData?.runEnabled;
 		canManaRun ? this.manaRun() : this.run();
 
-		this.dashConnection = this.inputController.dashTriggered.Connect(
-			(direction) => {
-				this.stateMachine.transitionTo("dash", direction);
-			},
+		this.trove.add(
+			this.inputController.dashTriggered.Connect((direction) =>
+				this.stateMachine.transitionTo("dash", direction),
+			),
 		);
 
-		this.manaEmptiedConnection = Events.mana.emptied.connect(() =>
-			this.onManaEmptied(),
+		this.trove.add(Events.mana.emptied.connect(() => this.onManaEmptied()));
+
+		this.trove.add(
+			createChargeManaTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
 		);
 
-		this.chargeManaConnection =
-			this.inputController.chargeManaTriggered.Connect((charging) => {
-				if (charging) this.stateMachine.transitionTo("chargemana");
-			});
+		this.trove.add(
+			createClimbTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
+		);
 
-		this.climbConnection = this.inputController.climbTriggered.Connect(
-			(cast) => this.stateMachine.transitionTo("climb", cast),
+		this.trove.add(
+			createAttackTransition(
+				this.stateMachine,
+				this.inputController,
+				this.character,
+			),
+		);
+
+		this.trove.add(
+			Events.character.stopRun.connect(() =>
+				this.stateMachine.transitionTo("idle"),
+			),
 		);
 	}
 
@@ -72,17 +94,13 @@ export class RunState extends CharacterState {
 	}
 
 	public override exit(): void {
-		this.character.instance.Humanoid.WalkSpeed =
-			this.character.getWalkSpeed();
+		this.character.getHumanoid().WalkSpeed = this.character.getWalkSpeed();
 
 		this.animationController.stop("Run");
 		this.animationController.stop("ManaRun");
 		this.manaTrail.Enabled = false;
 
-		this.dashConnection?.Disconnect();
-		this.manaEmptiedConnection?.Disconnect();
-		this.chargeManaConnection?.Disconnect();
-		this.climbConnection?.Disconnect();
+		this.trove.clean();
 	}
 
 	private onManaEmptied(): void {
@@ -92,14 +110,14 @@ export class RunState extends CharacterState {
 	}
 
 	private run(): void {
-		this.character.instance.Humanoid.WalkSpeed =
+		this.character.getHumanoid().WalkSpeed =
 			this.character.getWalkSpeed() * 1.5;
 
 		this.animationController.play("Run");
 	}
 
 	private manaRun(): void {
-		this.character.instance.Humanoid.WalkSpeed =
+		this.character.getHumanoid().WalkSpeed =
 			this.character.getWalkSpeed() * 2;
 
 		this.animationController.play("ManaRun");

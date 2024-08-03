@@ -1,6 +1,6 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnTick } from "@flamework/core";
-import { CharacterServer } from "./character-server";
+import { Character } from ".";
 import { RagdollServer } from "./ragdoll-server";
 
 @Component({
@@ -11,7 +11,7 @@ export class FallDamage extends BaseComponent implements OnTick {
 	private startHeight = 0;
 
 	public constructor(
-		private character: CharacterServer,
+		private character: Character,
 		private ragdoll: RagdollServer,
 	) {
 		super();
@@ -44,7 +44,7 @@ export class FallDamage extends BaseComponent implements OnTick {
 			if (distanceFallen < 15) return;
 
 			const damage = this.calculateDamage(distanceFallen);
-			const humanoid = this.character.instance.Humanoid;
+			const humanoid = this.character.getHumanoid();
 
 			humanoid.TakeDamage(damage);
 			if (damage > humanoid.MaxHealth * 0.75) {

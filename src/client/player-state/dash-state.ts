@@ -6,7 +6,7 @@ import { deserializeColor3 } from "shared/serialized-color3";
 import { StateMachine } from "shared/state-machine";
 import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
 import { selectMana } from "shared/store/slices/players/slices/mana/selectors";
-import { CharacterClient } from "../components/character-client";
+import { Character } from "../components/character";
 import { AnimationController } from "../controllers/animation-controller";
 import { Direction } from "../controllers/input-controller";
 import { CharacterState } from "./character-state";
@@ -31,7 +31,7 @@ export class DashState extends CharacterState {
 
 	public constructor(
 		stateMachine: StateMachine,
-		character: CharacterClient,
+		character: Character,
 		private animationController: AnimationController,
 	) {
 		super(stateMachine, character);

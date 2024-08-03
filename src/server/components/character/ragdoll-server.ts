@@ -18,11 +18,11 @@ type RagdollJoint = {
 const SOCKET_ANGLES: { [key: string]: SocketAngles } = {
 	Hip: {
 		UpperAngle: 30,
-		TwistAngle: 135,
+		TwistAngle: 120,
 	},
 	Shoulder: {
-		UpperAngle: 100,
-		TwistAngle: 45,
+		UpperAngle: 90,
+		TwistAngle: 179,
 	},
 	Neck: {
 		UpperAngle: 10,
@@ -31,9 +31,8 @@ const SOCKET_ANGLES: { [key: string]: SocketAngles } = {
 };
 
 function getSocketTypeFromMotorName(name: string): SocketType {
-	// eslint-disable-next-line roblox-ts/lua-truthiness
-	return (name.match("Hip")[0] ||
-		name.match("Shoulder")[0] ||
+	return (name.match("Hip")[0] ??
+		name.match("Shoulder")[0] ??
 		name.match("Neck")[0]) as SocketType;
 }
 

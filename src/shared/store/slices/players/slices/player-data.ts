@@ -1,5 +1,5 @@
 import { Condition } from "shared/configs/conditions";
-import { Currencies, DEFAULT_CURRENCY_DATA } from "./currencies";
+import { CurrencyRecord, DEFAULT_CURRENCY_RECORD } from "./currencies";
 import { DEFAULT_IDENTITY, Identity } from "./identity";
 import { DEFAULT_MANA_DATA, ManaData } from "./mana";
 import { DEFAULT_RESOURCES, Resources } from "./resources";
@@ -8,7 +8,7 @@ import { DEFAULT_TRANSFORM_DATA, TransformData } from "./transform";
 
 export type PlayerData = {
 	stats: Stats;
-	currencies: Currencies;
+	currencies: CurrencyRecord;
 	resources: Resources;
 	mana: ManaData;
 	conditions: Array<Condition>;
@@ -18,7 +18,7 @@ export type PlayerData = {
 
 export const DEFAULT_PLAYER_DATA: PlayerData = {
 	stats: DEFAULT_STATS,
-	currencies: DEFAULT_CURRENCY_DATA,
+	currencies: DEFAULT_CURRENCY_RECORD,
 	resources: DEFAULT_RESOURCES,
 	mana: DEFAULT_MANA_DATA,
 	conditions: [],
