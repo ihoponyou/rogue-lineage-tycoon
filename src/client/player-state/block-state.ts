@@ -34,9 +34,9 @@ export class BlockState extends CharacterState {
 		);
 
 		this.trove.add(
-			Events.combat.blockHit.connect(() =>
-				this.animationController.play("BlockHit"),
-			),
+			Events.combat.blockHit.connect(() => {
+				this.animationController.play(`BlockHit${math.random(1, 3)}`);
+			}),
 		);
 	}
 

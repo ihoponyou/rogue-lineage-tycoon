@@ -31,7 +31,7 @@ export class HitService implements OnStart {
 			!blockable360 &&
 			!hitter.isBehind(victim);
 		if (blocked) {
-			Events.combat.blockHit(player);
+			Events.combat.blockHit(victim.getPlayer());
 			Events.playEffect.broadcast(`BlockHit`, character, "Blunt");
 			return;
 		}
