@@ -5,15 +5,16 @@ import { Profile } from "@rbxts/profileservice/globals";
 import { RunService } from "@rbxts/services";
 import { PlayerServer } from "server/components/player-server";
 import { store } from "server/store";
+import {
+	selectPlayerCurrencies,
+	selectPlayerData,
+} from "server/store/selectors";
 import { Inject } from "shared/inject";
 import { onThisPlayerRemoving } from "shared/on-player-removing";
-import { selectPlayerData } from "shared/store/slices/players/selectors";
-import { selectCurrencies } from "shared/store/slices/players/slices/currencies/selectors";
 import {
 	DEFAULT_PLAYER_DATA,
 	PlayerData,
-} from "shared/store/slices/players/slices/player-data";
-import { DEFAULT_RESOURCES } from "shared/store/slices/players/slices/resources";
+} from "shared/store/slices/player-data";
 import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 
 const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Testing" : "Production";
@@ -101,25 +102,19 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 
 		this.profiles.set(player.UserId, profile);
 		this.preReleaseListeners.set(player, []);
-		store.loadPlayerData(player.UserId, profile.Data);
+		store.loadPlayerData(player, profile.Data);
 		this.giveLeaderStatsFolder(player);
 
 		this.joinTicks.set(player, math.round(tick()));
 
 		const unsubscribe = store.subscribe(
-			selectPlayerData(player.UserId),
+			selectPlayerData(player),
 			(data) => {
 				if (data) profile.Data = data;
 			},
 		);
 
 		onThisPlayerRemoving(player, unsubscribe);
-	}
-
-	public resetLifeValues(player: Player): void {
-		const profile = this.getProfile(player);
-		profile.Data.conditions = [];
-		profile.Data.resources = DEFAULT_RESOURCES;
 	}
 
 	private giveLeaderStatsFolder(player: Player) {
@@ -141,7 +136,7 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 
 		onThisPlayerRemoving(
 			player,
-			store.subscribe(selectCurrencies(player.UserId), (data) => {
+			store.subscribe(selectPlayerCurrencies(player), (data) => {
 				silver.Value = data?.Silver.amount ?? 0;
 				valu.Value = data?.Valu.amount ?? 0;
 				insight.Value = data?.Insight.amount ?? 0;

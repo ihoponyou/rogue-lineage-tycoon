@@ -6,12 +6,11 @@ import {
 	Workspace,
 } from "@rbxts/services";
 import Signal from "@rbxts/signal";
-import { LOCAL_PLAYER } from "client/constants";
 import { store } from "client/store";
 import {
 	selectMana,
 	selectManaEnabled,
-} from "shared/store/slices/players/slices/mana/selectors";
+} from "shared/store/slices/mana/selectors";
 import { OnLocalCharacterAdded } from "../../../types/lifecycles";
 import { Character } from "../components/character";
 import { KeybindController } from "./keybind-controller";
@@ -170,7 +169,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private handleJumpInput(state: Enum.UserInputState) {
 		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		if (!this.character) return Enum.ContextActionResult.Pass;
-		const manaData = store.getState(selectMana(LOCAL_PLAYER.UserId));
+		const manaData = store.getState(selectMana());
 		if ((manaData?.amount ?? 0) <= 0 || !manaData?.climbEnabled)
 			return Enum.ContextActionResult.Pass;
 
@@ -198,9 +197,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	}
 
 	private handleManaInput(state: Enum.UserInputState) {
-		const manaEnabled = store.getState(
-			selectManaEnabled(LOCAL_PLAYER.UserId),
-		);
+		const manaEnabled = store.getState(selectManaEnabled());
 		if (!manaEnabled) return Enum.ContextActionResult.Pass;
 		if (state === BEGIN || state === END) {
 			this.chargeManaTriggered.Fire(state === BEGIN);

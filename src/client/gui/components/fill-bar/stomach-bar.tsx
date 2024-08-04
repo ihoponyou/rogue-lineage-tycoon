@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { LOCAL_PLAYER } from "client/constants";
-import { selectRace } from "shared/store/slices/players/slices/identity/selectors";
-import { selectStomach } from "shared/store/slices/players/slices/resources/selectors";
+import { selectRace } from "shared/store/slices/identity/selectors";
+import { selectStomach } from "shared/store/slices/resources/selectors";
 import { FillBar } from ".";
 
 const WHITE_STOMACH_RACES = [
@@ -19,11 +18,11 @@ const DEFAULT_STOMACH_COLOR = Color3.fromRGB(240, 208, 26);
 const WHITE_STOMACH_COLOR = Color3.fromRGB(229, 229, 204);
 
 export function StomachBar() {
-	const stomachAmount = useSelector(selectStomach(LOCAL_PLAYER.UserId)) ?? 0;
+	const stomachAmount = useSelector(selectStomach()) ?? 0;
 
 	// TODO: white stomach stays when wiping from white-stomached race to a non white-stomached race
 	const [stomachColor, setStomachColor] = useState(DEFAULT_STOMACH_COLOR);
-	const raceName = useSelector(selectRace(LOCAL_PLAYER.UserId));
+	const raceName = useSelector(selectRace());
 	useEffect(() => {
 		if (!WHITE_STOMACH_RACES.includes(raceName ?? "")) return;
 		setStomachColor(WHITE_STOMACH_COLOR);

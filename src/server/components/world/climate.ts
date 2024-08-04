@@ -2,7 +2,6 @@ import { BaseComponent, Component, Components } from "@flamework/components";
 import { Dependency, OnStart, OnTick } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
 import { store } from "server/store";
-import { selectTemperature } from "shared/store/slices/players/slices/resources/selectors";
 import { OnCharacterAdded } from "../../../../types/lifecycles";
 import { Character } from "../character";
 
@@ -52,9 +51,9 @@ export class Climate
 				this.components.getComponent<Character>(character);
 			if (!characterComponent) continue;
 
-			const characterTemperature = store.getState(
-				selectTemperature(player.UserId),
-			);
+			const characterTemperature = store
+				.getState()
+				.get(tostring(player.UserId))?.resources.temperature;
 			if (characterTemperature === undefined) continue;
 			const climateTemperature = this.attributes.temperature;
 

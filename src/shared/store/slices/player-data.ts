@@ -1,24 +1,24 @@
 import { Condition } from "shared/configs/conditions";
-import { CurrencyRecord, DEFAULT_CURRENCY_RECORD } from "./currencies";
+import { Currencies, DEFAULT_CURRENCY_STATE } from "./currencies";
 import { DEFAULT_IDENTITY, Identity } from "./identity";
 import { DEFAULT_MANA_DATA, ManaData } from "./mana";
 import { DEFAULT_RESOURCES, Resources } from "./resources";
 import { DEFAULT_STATS, Stats } from "./stats";
 import { DEFAULT_TRANSFORM_DATA, TransformData } from "./transform";
 
-export type PlayerData = {
+export interface PlayerData {
 	stats: Stats;
-	currencies: CurrencyRecord;
+	currencies: Currencies;
 	resources: Resources;
 	mana: ManaData;
 	conditions: Array<Condition>;
 	identity: Identity;
 	transform: TransformData;
-};
+}
 
 export const DEFAULT_PLAYER_DATA: PlayerData = {
 	stats: DEFAULT_STATS,
-	currencies: DEFAULT_CURRENCY_RECORD,
+	currencies: DEFAULT_CURRENCY_STATE,
 	resources: DEFAULT_RESOURCES,
 	mana: DEFAULT_MANA_DATA,
 	conditions: [],

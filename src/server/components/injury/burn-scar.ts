@@ -3,10 +3,7 @@ import { OnStart, OnTick } from "@flamework/core";
 import { store } from "server/store";
 import { APPEARANCE } from "shared/constants";
 
-import {
-	selectResources,
-	selectTemperature,
-} from "shared/store/slices/players/slices/resources/selectors";
+import { selectPlayer } from "server/store/selectors";
 import { BaseInjury } from ".";
 import { Character } from "../character";
 
@@ -26,11 +23,11 @@ export class BurnScar extends BaseInjury implements OnStart, OnTick {
 		this.inflict();
 
 		const player = this.character.getPlayer();
-		const data = store.getState(selectResources(player.UserId));
+		const data = store.getState(selectPlayer(player))?.resources;
 		if (!data) error("no data");
 
 		if (data.temperature === 100) {
-			store.setTemperature(player.UserId, 70);
+			store.setTemperature(player, 70);
 		}
 
 		APPEARANCE.FacialExtras.Scars.BurnScar.Clone().Parent =
@@ -39,8 +36,8 @@ export class BurnScar extends BaseInjury implements OnStart, OnTick {
 
 	public onTick(_dt: number): void {
 		const characterTemperature = store.getState(
-			selectTemperature(this.character.getPlayer().UserId),
-		);
+			selectPlayer(this.character.getPlayer()),
+		)?.resources.temperature;
 		if (characterTemperature === undefined) return;
 		if (characterTemperature < LOWER_TEMPERATURE_THRESHOLD) return;
 		if (this.instance.HasTag("Burning")) return;

@@ -102,11 +102,7 @@ export class Plot
 	private onTellerInteracted(player: Player): void {
 		if (!this.owner) return;
 		if (player !== this.owner.instance) return;
-		store.addCurrency(
-			this.owner.instance.UserId,
-			"Silver",
-			this.bank.Silver,
-		);
+		store.addCurrency(this.owner.instance, "Silver", this.bank.Silver);
 		this.bank.Silver = 0;
 		this.instance.Teller.SurfaceGui.TextLabel.Text = `0`;
 	}

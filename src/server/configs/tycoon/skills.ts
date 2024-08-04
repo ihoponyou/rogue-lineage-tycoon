@@ -12,17 +12,17 @@ export const SKILLS: { [name: string]: SkillConfig } = {
 	},
 	ManaRun: {
 		teach: (player) => {
-			store.toggleManaRunEnabled(player.UserId, true);
+			store.toggleManaRunEnabled(player, true);
 		},
 	},
 	ManaDash: {
 		teach: (player) => {
-			store.toggleManaDashEnabled(player.UserId, true);
+			store.toggleManaDashEnabled(player, true);
 		},
 	},
 	ManaClimb: {
 		teach: (player) => {
-			store.toggleManaClimbEnabled(player.UserId, true);
+			store.toggleManaClimbEnabled(player, true);
 		},
 	},
 };

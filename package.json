@@ -43,6 +43,7 @@
     "@rbxts/services": "^1.5.4",
     "@rbxts/set-timeout": "^1.1.2",
     "@rbxts/shared-components-flamework": "^2.2.4",
+    "@rbxts/sift": "^0.0.9",
     "@rbxts/signal": "^1.1.1",
     "@rbxts/t": "^3.1.1",
     "@rbxts/timer": "^0.0.9",

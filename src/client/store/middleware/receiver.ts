@@ -4,11 +4,13 @@ import { Events } from "client/networking";
 export function receiverMiddleware(): ProducerMiddleware {
 	const receiver = createBroadcastReceiver({
 		start: () => {
-			Events.reflex.start.fire();
+			Events.reflex.start();
 		},
 	});
 
-	Events.reflex.dispatch.connect((actions) => receiver.dispatch(actions));
+	Events.reflex.dispatch.connect((actions) => {
+		receiver.dispatch(actions);
+	});
 
 	return receiver.middleware;
 }

@@ -12,13 +12,13 @@ export abstract class BaseInjury extends BaseComponent<{}, Model> {
 	}
 
 	public inflict(): void {
-		store.addCondition(this.character.getPlayer().UserId, this.name);
+		store.addCondition(this.character.getPlayer(), this.name);
 
 		this.playInjuryEffects();
 	}
 
 	public heal(): void {
-		store.removeCondition(this.character.getPlayer().UserId, this.name);
+		store.removeCondition(this.character.getPlayer(), this.name);
 
 		this.instance.RemoveTag(this.name);
 	}
