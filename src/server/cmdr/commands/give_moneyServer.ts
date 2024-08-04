@@ -3,10 +3,10 @@ import { store } from "server/store";
 import { Currency } from "../../../../types/currency";
 
 export = function (
-	context: CommandContext,
+	_context: CommandContext,
 	player: Player,
 	currency: Currency,
 	amount: number,
 ) {
-	store.addCurrency(player.UserId, currency, amount);
+	store.addCurrency(player, currency, amount);
 };

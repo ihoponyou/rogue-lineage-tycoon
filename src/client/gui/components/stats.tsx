@@ -1,12 +1,11 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { LOCAL_PLAYER } from "client/constants";
 import { getDigit } from "shared/get-digit";
 import {
 	selectHealth,
 	selectToxicity,
-} from "shared/store/slices/players/slices/resources/selectors";
-import { selectStats } from "shared/store/slices/players/slices/stats/selectors";
+} from "shared/store/slices/resources/selectors";
+import { selectStats } from "shared/store/slices/stats/selectors";
 import { Digit } from "./digit";
 import { FillBar } from "./fill-bar";
 import { StomachBar } from "./fill-bar/stomach-bar";
@@ -14,9 +13,9 @@ import { TemperatureBar } from "./fill-bar/temperature-bar";
 import { NamePlate } from "./name-plate";
 
 export function Stats() {
-	const stats = useSelector(selectStats(LOCAL_PLAYER.UserId));
-	const healthAmount = useSelector(selectHealth(LOCAL_PLAYER.UserId)) ?? -1;
-	const toxicity = useSelector(selectToxicity(LOCAL_PLAYER.UserId)) ?? 0;
+	const stats = useSelector(selectStats());
+	const healthAmount = useSelector(selectHealth()) ?? -1;
+	const toxicity = useSelector(selectToxicity()) ?? 0;
 
 	return (
 		<frame

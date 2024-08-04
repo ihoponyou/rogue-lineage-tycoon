@@ -1,11 +1,10 @@
 import { Trove } from "@rbxts/trove";
-import { LOCAL_PLAYER } from "client/constants";
 import { store } from "client/store";
 import { VFX } from "shared/constants";
 import { deserializeColor3 } from "shared/serialized-color3";
 import { StateMachine } from "shared/state-machine";
-import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
-import { selectMana } from "shared/store/slices/players/slices/mana/selectors";
+import { selectManaColor } from "shared/store/slices/identity/selectors";
+import { selectMana } from "shared/store/slices/mana/selectors";
 import { Character } from "../components/character";
 import { AnimationController } from "../controllers/animation-controller";
 import { InputController } from "../controllers/input-controller";
@@ -36,7 +35,7 @@ export class RunState extends CharacterState {
 
 	public override initialize(): void {
 		store.subscribe(
-			selectManaColor(LOCAL_PLAYER.UserId),
+			selectManaColor(),
 			(serializedColor) =>
 				(this.manaTrail.Color = new ColorSequence(
 					deserializeColor3(serializedColor ?? new Color3()),
@@ -45,7 +44,7 @@ export class RunState extends CharacterState {
 	}
 
 	public override enter(): void {
-		const manaData = store.getState(selectMana(LOCAL_PLAYER.UserId));
+		const manaData = store.getState(selectMana());
 		const canManaRun = (manaData?.amount ?? 0) > 0 && manaData?.runEnabled;
 		canManaRun ? this.manaRun() : this.run();
 

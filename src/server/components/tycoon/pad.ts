@@ -4,10 +4,10 @@ import Signal from "@rbxts/signal";
 import { TouchableModel } from "server/components/interactable/touchable/touchable-model";
 import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
+import { selectPlayer } from "server/store/selectors";
 import { ModelComponent } from "shared/components/model";
 import { Hideable } from "shared/hideable";
 import { Inject } from "shared/inject";
-import { selectCurrency } from "shared/store/slices/players/slices/currencies/selectors";
 import { PlayerServer } from "../player-server";
 import { Plot } from "./plot";
 
@@ -81,16 +81,16 @@ export class Pad
 			return;
 		}
 
-		const currencyData = store.getState(
-			selectCurrency(player.UserId, this.assetConfig.currency),
-		);
+		const currencyData = store.getState(selectPlayer(player))?.currencies[
+			this.assetConfig.currency
+		];
 		if (currencyData === undefined) return;
 		if (currencyData.amount < this.assetConfig.cost) {
 			print(playerServer.Name, "error = broke");
 			return;
 		}
 		store.addCurrency(
-			player.UserId,
+			player,
 			this.assetConfig.currency,
 			-this.assetConfig.cost,
 		);
