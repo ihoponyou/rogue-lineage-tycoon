@@ -7,7 +7,7 @@ import { LOCAL_PLAYER } from "client/constants";
 import { App } from "client/gui/components/app";
 import { Events } from "client/networking";
 import { store } from "client/store";
-import { selectCurrencies } from "shared/store/slices/players/slices/currencies/selectors";
+import { selectCurrencies } from "shared/store/slices/currencies/selectors";
 
 @Controller()
 export class GuiController implements OnStart {
@@ -15,13 +15,10 @@ export class GuiController implements OnStart {
 	private root = createRoot(new Instance("Folder"));
 
 	public onStart() {
-		store.subscribe(
-			selectCurrencies(LOCAL_PLAYER.UserId),
-			(state, previousState) => {
-				if (state?.Silver.amount !== previousState?.Silver.amount)
-					SoundService.PlayLocalSound(SoundService.SilverChange);
-			},
-		);
+		store.subscribe(selectCurrencies(), (state, previousState) => {
+			if (state?.Silver.amount !== previousState?.Silver.amount)
+				SoundService.PlayLocalSound(SoundService.SilverChange);
+		});
 
 		Events.dialogue.open.connect((speakerName, text, options) => {
 			store.setDialogueText(text);

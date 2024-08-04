@@ -4,7 +4,7 @@ import {
 	useSelector,
 	UseSelectorHook,
 } from "@rbxts/react-reflex";
-import { RootStore } from "client/store";
+import { store } from "client/store";
 
-export const useRootProducer: UseProducerHook<RootStore> = useProducer;
-export const useRootSelector: UseSelectorHook<RootStore> = useSelector;
+export const useRootProducer: UseProducerHook<typeof store> = useProducer;
+export const useRootSelector: UseSelectorHook<typeof store> = useSelector;

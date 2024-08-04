@@ -6,17 +6,17 @@ import { setInterval } from "@rbxts/set-timeout";
 import { Events } from "server/networking";
 import { DataService } from "server/services/data-service";
 import { store } from "server/store";
+import {
+	selectPlayer,
+	selectPlayerConditions,
+	selectPlayerHealth,
+	selectPlayerTransform,
+} from "server/store/selectors";
 import { SharedComponents } from "shared/components/character";
 import {
 	deserializeVector3,
 	serializeVector3,
 } from "shared/serialized-vector3";
-import { selectConditions } from "shared/store/slices/players/slices/conditions/selectors";
-import {
-	selectHealth,
-	selectTemperature,
-} from "shared/store/slices/players/slices/resources/selectors";
-import { selectTransform } from "shared/store/slices/players/slices/transform/selectors";
 import { PlayerServer } from "../player-server";
 import { RagdollServer } from "./ragdoll-server";
 
@@ -90,8 +90,8 @@ export class Character extends SharedComponents.Character implements OnTick {
 
 		const player = this.getPlayer();
 
-		store.decayStomach(player.UserId, dt);
-		store.decayToxicity(player.UserId, dt);
+		store.decayStomach(player, dt);
+		store.decayToxicity(player, dt);
 
 		const humanoid = this.humanoid;
 		if (humanoid.Health >= humanoid.MaxHealth) return;
@@ -102,7 +102,7 @@ export class Character extends SharedComponents.Character implements OnTick {
 	}
 
 	public loadHealth(): void {
-		let savedHealth = store.getState(selectHealth(this.getPlayer().UserId));
+		let savedHealth = store.getState(selectPlayerHealth(this.getPlayer()));
 		if (savedHealth === undefined) error("health not found");
 		if (savedHealth < 1) savedHealth = 100;
 		this.humanoid.Health = savedHealth;
@@ -110,7 +110,7 @@ export class Character extends SharedComponents.Character implements OnTick {
 
 	public loadConditions(): void {
 		const conditions = store.getState(
-			selectConditions(this.getPlayer().UserId),
+			selectPlayerConditions(this.getPlayer()),
 		);
 		if (conditions === undefined) error("conditions not found");
 		for (const condition of conditions) {
@@ -120,7 +120,7 @@ export class Character extends SharedComponents.Character implements OnTick {
 
 	public loadTransform(): void {
 		const savedTransform = store.getState(
-			selectTransform(this.getPlayer().UserId),
+			selectPlayerTransform(this.getPlayer()),
 		);
 		if (savedTransform === undefined) error("transform not found");
 		this.instance.PivotTo(
@@ -156,7 +156,7 @@ export class Character extends SharedComponents.Character implements OnTick {
 
 		const player = this.getPlayer();
 
-		store.subtractLife(player.UserId);
+		store.subtractLife(player);
 
 		EVENTS.killed.fire(player);
 
@@ -203,7 +203,8 @@ export class Character extends SharedComponents.Character implements OnTick {
 
 	public adjustTemperature(amount: number) {
 		const player = this.getPlayer();
-		const temperature = store.getState(selectTemperature(player.UserId));
+		const temperature = store.getState(selectPlayer(player))?.resources
+			.temperature;
 		if (temperature === undefined) error("no data");
 
 		const newTemperature = math.clamp(
@@ -211,7 +212,7 @@ export class Character extends SharedComponents.Character implements OnTick {
 			MINIMUM_TEMPERATURE,
 			MAXIMUM_TEMPERATURE,
 		);
-		store.setTemperature(tostring(player.UserId), newTemperature);
+		store.setTemperature(player, newTemperature);
 
 		if (newTemperature === MINIMUM_TEMPERATURE)
 			this.instance.AddTag("Frostbite");
@@ -236,7 +237,7 @@ export class Character extends SharedComponents.Character implements OnTick {
 	}
 
 	private onHealthChanged(health: number): void {
-		store.setHealth(this.getPlayer().UserId, health);
+		store.setHealth(this.getPlayer(), health);
 		const percentHealth = health / this.humanoid.MaxHealth;
 		if (this.attributes.isKnocked) {
 			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {

@@ -1,7 +1,7 @@
 import { CommandContext } from "@rbxts/cmdr";
 import { store } from "server/store";
 
-export = function (context: CommandContext, player: Player, days: number) {
-	store.setDays(player.UserId, days);
+export = function (_context: CommandContext, player: Player, days: number) {
+	store.setDays(player, days);
 	return `Set ${player.Name}'s days to ${days}`;
 };

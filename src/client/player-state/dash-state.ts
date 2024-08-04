@@ -1,11 +1,10 @@
 import { Workspace } from "@rbxts/services";
-import { LOCAL_PLAYER } from "client/constants";
 import { store } from "client/store";
 import { SFX, VFX } from "shared/constants";
 import { deserializeColor3 } from "shared/serialized-color3";
 import { StateMachine } from "shared/state-machine";
-import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
-import { selectMana } from "shared/store/slices/players/slices/mana/selectors";
+import { selectManaColor } from "shared/store/slices/identity/selectors";
+import { selectMana } from "shared/store/slices/mana/selectors";
 import { Character } from "../components/character";
 import { AnimationController } from "../controllers/animation-controller";
 import { Direction } from "../controllers/input-controller";
@@ -42,7 +41,7 @@ export class DashState extends CharacterState {
 
 	public override initialize(): void {
 		store.subscribe(
-			selectManaColor(LOCAL_PLAYER.UserId),
+			selectManaColor(),
 			(serializedColor) =>
 				(this.manaParticles.Color = new ColorSequence(
 					deserializeColor3(serializedColor ?? new Color3()),
@@ -57,7 +56,7 @@ export class DashState extends CharacterState {
 		this.dashAngle = DIRECTION_TO_ANGLE[direction];
 		const humanoidRootPart = this.character.getHumanoidRootPart();
 
-		const manaData = store.getState(selectMana(LOCAL_PLAYER.UserId));
+		const manaData = store.getState(selectMana());
 		const canManaDash =
 			(manaData?.amount ?? 0) > 0 && manaData?.dashEnabled;
 

@@ -1,9 +1,8 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { LOCAL_PLAYER } from "client/constants";
 import { deserializeColor3 } from "shared/serialized-color3";
-import { selectManaColor } from "shared/store/slices/players/slices/identity/selectors";
-import { selectManaAmount } from "shared/store/slices/players/slices/mana/selectors";
+import { selectManaColor } from "shared/store/slices/identity/selectors";
+import { selectManaAmount } from "shared/store/slices/mana/selectors";
 import { FillBar } from ".";
 
 // const MANA_TWEEN_INFO = new TweenInfo(
@@ -26,15 +25,13 @@ import { FillBar } from ".";
 // 	}
 
 export function ManaBar() {
-	const serializedManaColor = useSelector(
-		selectManaColor(LOCAL_PLAYER.UserId),
-	);
+	const serializedManaColor = useSelector(selectManaColor());
 	const manaColor =
 		serializedManaColor !== undefined
 			? deserializeColor3(serializedManaColor)
 			: new Color3(1, 1, 1);
 
-	const manaAmount = useSelector(selectManaAmount(LOCAL_PLAYER.UserId)) ?? -1;
+	const manaAmount = useSelector(selectManaAmount()) ?? -1;
 
 	return (
 		<frame

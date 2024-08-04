@@ -13,10 +13,10 @@ import {
 	getRandomRollable,
 } from "server/configs/races";
 import { store } from "server/store";
+import { selectPlayerIdentity } from "server/store/selectors";
 import { APPEARANCE } from "shared/constants";
 import { deserializeColor3 } from "shared/serialized-color3";
-import { Sex } from "shared/store/slices/players/slices/identity";
-import { selectIdentity } from "shared/store/slices/players/slices/identity/selectors";
+import { Sex } from "shared/store/slices/identity";
 import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
 
 const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
@@ -60,13 +60,13 @@ export class IdentityService
 			this.getPlayerAvatarDescription(player.UserId);
 		this.cleanPlayerDescription(this.playerDescriptions[player.UserId]);
 
-		const data = store.getState(selectIdentity(player.UserId));
+		const data = store.getState(selectPlayerIdentity(player));
 		if (!data) error("missing data");
 
 		let raceName = data.raceName;
 		if (raceName === "") {
 			raceName = getRandomRollable();
-			store.setRace(player.UserId, raceName);
+			store.setRace(player, raceName);
 		}
 		const race = RACES[raceName];
 
@@ -74,7 +74,7 @@ export class IdentityService
 			let personality = data.personality;
 			if (personality === "") {
 				personality = this.getRandomPersonality(raceName);
-				store.setPersonality(player.UserId, personality);
+				store.setPersonality(player, personality);
 			}
 			this.setFace(character, raceName, personality);
 		} else {
@@ -84,14 +84,14 @@ export class IdentityService
 		let phenotypeName = data.phenotypeName;
 		if (phenotypeName === "") {
 			phenotypeName = getRandomPhenotype(raceName);
-			store.setPhenotype(player.UserId, phenotypeName);
+			store.setPhenotype(player, phenotypeName);
 		}
 		this.setPhenotype(character, raceName, phenotypeName);
 
 		let sex = data.sex;
 		if (sex === "") {
 			sex = this.getRandomSex();
-			store.setSex(player.UserId, sex);
+			store.setSex(player, sex);
 		}
 		this.setSex(character, sex);
 
@@ -114,7 +114,7 @@ export class IdentityService
 				default:
 					armorName = getRandomStarterArmor();
 			}
-			store.setArmor(player.UserId, armorName);
+			store.setArmor(player, armorName);
 		}
 		this.setArmor(character, armorName);
 
@@ -125,7 +125,7 @@ export class IdentityService
 			serializedColor.B === -1
 				? this.getRandomManaColor()
 				: deserializeColor3(serializedColor);
-		store.setManaColor(player.UserId, newColor);
+		store.setManaColor(player, newColor);
 
 		character.Humanoid.ApplyDescription(
 			this.playerDescriptions[player.UserId],
@@ -287,7 +287,7 @@ export class IdentityService
 
 	public setArmor(character: Model, armorName: string) {
 		const player = Players.GetPlayerFromCharacter(character) as Player;
-		const identity = store.getState(selectIdentity(player.UserId));
+		const identity = store.getState(selectPlayerIdentity(player));
 		if (identity === undefined) error("no data");
 
 		const oldArmorName = identity.armorName;
@@ -312,7 +312,7 @@ export class IdentityService
 		variation.Shirt.Clone().Parent = character;
 		variation.Pants.Clone().Parent = character;
 
-		store.setArmor(player.UserId, armorName);
+		store.setArmor(player, armorName);
 	}
 
 	public setFirstName(player: Player, name: string) {
@@ -322,7 +322,7 @@ export class IdentityService
 			if (humanoid) humanoid.DisplayName = name;
 		}
 
-		store.setFirstName(player.UserId, name);
+		store.setFirstName(player, name);
 	}
 
 	public async addCustomHead(

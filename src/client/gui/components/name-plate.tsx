@@ -1,12 +1,11 @@
 import { useSelector } from "@rbxts/react-reflex";
-import { LOCAL_PLAYER } from "client/constants";
-import { selectFirstName } from "shared/store/slices/players/slices/identity/selectors";
+import { selectFirstName } from "shared/store/slices/identity/selectors";
 import React = require("@rbxts/react");
 
 const NAME_FONT = new Font("rbxasset://fonts/families/RomanAntique.json");
 
 export function NamePlate() {
-	const firstName = useSelector(selectFirstName(LOCAL_PLAYER.UserId));
+	const firstName = useSelector(selectFirstName());
 
 	return (
 		<textlabel

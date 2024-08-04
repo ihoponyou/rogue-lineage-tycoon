@@ -1,12 +1,10 @@
 import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { LOCAL_PLAYER } from "client/constants";
-import { selectTemperature } from "shared/store/slices/players/slices/resources/selectors";
+import { selectTemperature } from "shared/store/slices/resources/selectors";
 
 export function TemperatureBar() {
-	const currentTemperature =
-		useSelector(selectTemperature(LOCAL_PLAYER.UserId)) ?? 0;
+	const currentTemperature = useSelector(selectTemperature()) ?? 0;
 
 	const [percent, setPercent] = useMotor(currentTemperature / 100);
 	useEffect(

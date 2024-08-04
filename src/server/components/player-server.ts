@@ -2,12 +2,10 @@ import { Component, Components } from "@flamework/components";
 import { Workspace } from "@rbxts/services";
 import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
+import { selectPlayer } from "server/store/selectors";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { Inject } from "shared/inject";
 import { deserializeVector3 } from "shared/serialized-vector3";
-import { selectHealth } from "shared/store/slices/players/slices/resources/selectors";
-import { selectLives } from "shared/store/slices/players/slices/stats/selectors";
-import { selectTransform } from "shared/store/slices/players/slices/transform/selectors";
 import { Character } from "./character";
 
 const TYCOON_FOLDER = Workspace.Tycoons;
@@ -52,39 +50,41 @@ export class PlayerServer extends AbstractPlayer {
 			while (this.instance.Character === undefined)
 				this.instance.CharacterAdded.Wait();
 
-			const health = store.getState(selectHealth(this.UserId));
+			const playerState = store.getState(selectPlayer(this.instance));
+
+			const health = playerState?.resources.health;
 			if (health !== undefined && health <= 0) {
-				store.resetLifeValues(this.UserId);
+				store.resetLifeValues(this.instance);
 			}
 
 			if (leavingPurgatory) {
-				store.setLives(this.instance.UserId, 3);
+				store.setLives(this.instance, 3);
 				// TODO: choose random town spawn
-				store.setPosition(this.UserId, Vector3.zero);
-				store.setRotation(this.UserId, 0);
+				store.setPosition(this.instance, Vector3.zero);
+				store.setRotation(this.instance, 0);
 			} else {
-				const lives = store.getState(selectLives(this.UserId));
+				const lives = playerState?.stats.lives;
 				if (lives !== undefined && lives <= 0) {
 					const purgatorySpawn = Workspace.HouseOfPurgatory.Spawn;
-					store.setPosition(this.UserId, purgatorySpawn.Position);
+					store.setPosition(this.instance, purgatorySpawn.Position);
 					store.setRotation(
-						this.UserId,
+						this.instance,
 						purgatorySpawn.CFrame.ToEulerAnglesXYZ()[1],
 					);
 				}
 			}
 
-			const transform = store.getState(selectTransform(this.UserId));
+			const transform = playerState?.transform;
 			if (transform !== undefined) {
 				const deserialedPos = deserializeVector3(transform.position);
 				if (
 					transform.position.Y <= Workspace.FallenPartsDestroyHeight
 				) {
-					store.setPosition(this.UserId, Vector3.zero);
-					store.setRotation(this.UserId, 0);
+					store.setPosition(this.instance, Vector3.zero);
+					store.setRotation(this.instance, 0);
 				} else if (this.isInsideTycoon(deserialedPos)) {
-					store.setPosition(this.UserId, Vector3.zero);
-					store.setRotation(this.UserId, 0);
+					store.setPosition(this.instance, Vector3.zero);
+					store.setRotation(this.instance, 0);
 				}
 			}
 

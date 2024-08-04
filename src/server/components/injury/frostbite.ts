@@ -4,10 +4,7 @@ import { Logger } from "@rbxts/log";
 import { Workspace } from "@rbxts/services";
 import { IdentityService } from "server/services/identity-service";
 import { store } from "server/store";
-import {
-	selectResources,
-	selectTemperature,
-} from "shared/store/slices/players/slices/resources/selectors";
+import { selectPlayerResources } from "server/store/selectors";
 import { BaseInjury } from ".";
 import { Character } from "../character";
 
@@ -33,10 +30,10 @@ export class Frostbite extends BaseInjury implements OnStart, OnTick {
 		this.inflict();
 
 		const player = this.character.getPlayer();
-		const data = store.getState(selectResources(player.UserId));
+		const data = store.getState(selectPlayerResources(player));
 		if (!data) error("no data");
 		if (data.temperature === 0) {
-			store.setTemperature(player.UserId, 15);
+			store.setTemperature(player, 15);
 		}
 
 		let skinColor = this.character.instance.GetAttribute("SkinColor");
@@ -56,8 +53,8 @@ export class Frostbite extends BaseInjury implements OnStart, OnTick {
 	public onTick(dt: number): void {
 		if (!this.character.attributes.isAlive) return;
 		const characterTemperature = store.getState(
-			selectTemperature(this.character.getPlayer().UserId),
-		);
+			selectPlayerResources(this.character.getPlayer()),
+		)?.temperature;
 		if (characterTemperature === undefined) return;
 		if (characterTemperature > UPPER_TEMPERATURE_THRESHOLD) return;
 

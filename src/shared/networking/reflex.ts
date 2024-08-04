@@ -1,5 +1,5 @@
 import { BroadcastAction } from "@rbxts/reflex";
-import { PlayerData } from "shared/store/slices/players/slices/player-data";
+import { PlayerData } from "shared/store/slices/player-data";
 
 export interface ReflexServerEvents {
 	start: () => void;
