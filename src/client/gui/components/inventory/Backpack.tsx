@@ -10,7 +10,7 @@ export function Backpack() {
 
 	const items: JSX.Element[] = [];
 	inventory.forEach((_value, key) => {
-		items.push(<ItemButton name={key} />);
+		items.push(<ItemButton tool={key} />);
 	});
 
 	return (

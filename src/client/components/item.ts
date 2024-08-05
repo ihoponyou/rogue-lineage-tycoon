@@ -1,0 +1,16 @@
+import { Component } from "@flamework/components";
+import { Events } from "client/networking";
+import { AbstractItem } from "shared/components/abstract-item";
+
+@Component({
+	tag: Item.TAG,
+})
+export class Item extends AbstractItem {
+	public equip(): void {
+		Events.item.equip(this.instance);
+	}
+
+	public unequip(): void {
+		Events.item.unequip(this.instance);
+	}
+}

@@ -1,8 +1,9 @@
-import React, { useState } from "@rbxts/react";
+import React, { useContext, useState } from "@rbxts/react";
+import { signalContext } from "client/gui/context";
 import { useMotion } from "client/gui/hooks/use-motion";
 
 interface Props {
-	name: string;
+	tool: Tool;
 }
 
 const COLOR = {
@@ -15,7 +16,9 @@ const SIZE = {
 	deselected: 6,
 };
 
-export function ItemButton({ name }: Props) {
+export function ItemButton({ tool }: Props) {
+	const signal = useContext(signalContext);
+
 	const quantity = 1;
 	const inHotbar = false;
 	const [size, sizeMotion] = useMotion(SIZE.deselected);
@@ -51,7 +54,7 @@ export function ItemButton({ name }: Props) {
 			}
 			Selectable={false}
 			Size={new UDim2(0, 60, 0, 60)}
-			Text={name}
+			Text={tool.Name}
 			TextColor3={Color3.fromRGB(47, 43, 30)}
 			TextSize={13}
 			TextTransparency={textTransparency}
@@ -59,6 +62,8 @@ export function ItemButton({ name }: Props) {
 			Event={{
 				MouseButton1Down: () => {
 					setSelected(!selected);
+					// the value doesnt update immediately?
+					signal.Fire(!selected ? tool : undefined);
 				},
 			}}
 		>

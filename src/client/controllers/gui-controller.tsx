@@ -3,8 +3,10 @@ import React, { StrictMode } from "@rbxts/react";
 import { ReflexProvider } from "@rbxts/react-reflex";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
 import { SoundService, StarterGui } from "@rbxts/services";
+import Signal from "@rbxts/signal";
 import { LOCAL_PLAYER } from "client/constants";
 import { App } from "client/gui/components/app";
+import { signalContext, ToolSelectedCallback } from "client/gui/context";
 import { Events } from "client/networking";
 import { store } from "client/store";
 import { selectCurrencies } from "shared/store/slices/currencies/selectors";
@@ -13,6 +15,8 @@ import { selectCurrencies } from "shared/store/slices/currencies/selectors";
 export class GuiController implements OnStart {
 	private playerGui = LOCAL_PLAYER.WaitForChild("PlayerGui");
 	private root = createRoot(new Instance("Folder"));
+
+	private selectedTool = new Signal<ToolSelectedCallback>();
 
 	public onStart() {
 		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Health, false);
@@ -39,9 +43,15 @@ export class GuiController implements OnStart {
 		this.root.render(
 			<StrictMode>
 				<ReflexProvider producer={store}>
-					{createPortal(<App />, this.playerGui)}
+					<signalContext.Provider value={this.selectedTool}>
+						{createPortal(<App />, this.playerGui)}
+					</signalContext.Provider>
 				</ReflexProvider>
 			</StrictMode>,
 		);
+	}
+
+	public onToolSelected(callback: ToolSelectedCallback): RBXScriptConnection {
+		return this.selectedTool.Connect(callback);
 	}
 }

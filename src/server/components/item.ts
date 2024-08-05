@@ -1,23 +1,19 @@
-import { BaseComponent, Component, Components } from "@flamework/components";
+import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Workspace } from "@rbxts/services";
+import { Events } from "server/networking";
 import { store } from "server/store";
+import { AbstractItem } from "shared/components/abstract-item";
 import { ModelComponent } from "shared/components/model";
-import { getItemConfig } from "shared/configs/items";
+import { DEFAULT_ROOT_JOINT_C0, getItemConfig } from "shared/configs/items";
 import { TouchableModel } from "./interactable/touchable/touchable-model";
 import { PlayerServer } from "./player-server";
-
-const DEFAULT_ROOT_JOINT_C0 = new CFrame(0, -1, 0).mul(
-	CFrame.Angles(math.rad(-90), 0, 0),
-);
 
 @Component({
 	tag: Item.TAG,
 })
-export class Item extends BaseComponent<{}, Tool> implements OnStart {
-	public static readonly TAG = "Item";
-
+export class Item extends AbstractItem implements OnStart {
 	private config = getItemConfig(this.instance.Name);
 	private worldModel!: ModelComponent;
 	private rootJoint!: Motor6D;
@@ -46,7 +42,6 @@ export class Item extends BaseComponent<{}, Tool> implements OnStart {
 		this.rootJoint.Parent = worldModel.PrimaryPart;
 		this.rootJoint.Name = "RootJoint";
 		this.rootJoint.Part1 = worldModel.PrimaryPart;
-		this.rootJoint.C0 = DEFAULT_ROOT_JOINT_C0;
 
 		worldModel.AddTag(TouchableModel.TAG);
 		this.touchable = this.components
@@ -58,6 +53,20 @@ export class Item extends BaseComponent<{}, Tool> implements OnStart {
 			this.pickUp(player);
 		});
 		this.touchable.enable();
+
+		Events.item.equip.connect((player, tool) => {
+			if (tool !== this.instance) return;
+			if (this.owner === undefined) return;
+			if (this.owner.instance !== player) return;
+			this.equip();
+		});
+
+		Events.item.unequip.connect((player, tool) => {
+			if (tool !== this.instance) return;
+			if (this.owner === undefined) return;
+			if (this.owner.instance !== player) return;
+			this.unequip();
+		});
 	}
 
 	public pickUp(player: Player): void {
@@ -66,26 +75,49 @@ export class Item extends BaseComponent<{}, Tool> implements OnStart {
 		if (playerServer === undefined) return;
 		this.touchable.disable();
 		this.owner = playerServer;
-		this.instance.Parent = this.owner.instance;
-		this.equip();
-		store.giveItem(player, this.instance.Name);
+
+		this.worldModel.instance.PrimaryPart!.CanCollide = false;
+
+		this.equipped = true;
+		this.unequip();
+
+		store.giveItem(player, this.instance);
 	}
 
 	public drop(): void {
+		if (this.equipped) this.unequip();
 		this.owner = undefined;
+		this.worldModel.instance.PrimaryPart!.CanCollide = true;
 		this.instance.Parent = Workspace;
 	}
 
 	public equip(): void {
+		if (this.equipped) return;
 		if (this.owner === undefined) return;
+
 		const character = this.owner.getCharacter();
 		this.worldModel.instance.Parent = character.instance;
 		const rig = promiseR6(character.instance).expect();
 		this.rootJoint.Part0 = rig["Right Arm"];
+		this.rootJoint.C0 = this.config.equipC0 ?? DEFAULT_ROOT_JOINT_C0;
+
+		this.equipped = true;
 	}
 
 	public unequip(): void {
+		if (!this.equipped) return;
 		if (this.owner === undefined) return;
-		this.worldModel.instance.Parent = this.instance;
+
+		if (this.config.holsterLimb === undefined) {
+			this.worldModel.instance.Parent = this.instance;
+		} else {
+			const character = this.owner.getCharacter();
+			this.worldModel.instance.Parent = character.instance;
+			const rig = promiseR6(character.instance).expect();
+			this.rootJoint.Part0 = rig[this.config.holsterLimb];
+			this.rootJoint.C0 = this.config.holsterC0 ?? DEFAULT_ROOT_JOINT_C0;
+		}
+
+		this.equipped = false;
 	}
 }

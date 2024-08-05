@@ -121,6 +121,15 @@ interface ReplicatedStorage extends Instance {
 				Sound: Sound;
 				PocketSand: ParticleEmitter;
 			};
+			IntermissumPart: Part & {
+				IllusionArm: ParticleEmitter;
+				PointLight: PointLight;
+				Hit: Sound;
+				IllusionHead: ParticleEmitter;
+				IllusionSnap: ParticleEmitter;
+				Snap: Sound;
+				Attachment: Attachment;
+			};
 			SlashRing: MeshPart;
 			ItemTemplate: Part & {
 				Mesh: SpecialMesh;
@@ -221,14 +230,24 @@ interface ReplicatedStorage extends Instance {
 			HoppaTornado: MeshPart & {
 				Sound: Sound;
 			};
-			IntermissumPart: Part & {
-				IllusionArm: ParticleEmitter;
-				PointLight: PointLight;
-				Hit: Sound;
-				IllusionHead: ParticleEmitter;
-				IllusionSnap: ParticleEmitter;
-				Snap: Sound;
-				Attachment: Attachment;
+			Weapons: Folder & {
+				["Bronze Sword"]: Model & {
+					["Bronze Sword"]: MeshPart & {
+						Stats: Folder & {
+							Speed: NumberValue;
+							Length: IntValue;
+							Damage: NumberValue;
+						};
+						TestTrail: Trail;
+						PropWeld: Weld;
+						Sword: Folder;
+						Prop: Folder;
+						Weld: Weld;
+						Hit1: ParticleEmitter;
+						Attachment2: Attachment;
+						Attachment1: Attachment;
+					};
+				};
 			};
 			MoriLaser: Part;
 			FireBallExplosion: Part & {
@@ -1530,6 +1549,7 @@ interface ReplicatedStorage extends Instance {
 			configs: ModuleScript & {
 				group: ModuleScript;
 				character: ModuleScript;
+				items: ModuleScript;
 				conditions: ModuleScript;
 			};
 			constants: ModuleScript;
@@ -1546,16 +1566,10 @@ interface ReplicatedStorage extends Instance {
 			enums: ModuleScript;
 			store: ModuleScript & {
 				slices: ModuleScript & {
-					transform: ModuleScript & {
+					inventory: ModuleScript & {
 						selectors: ModuleScript;
 					};
 					stats: ModuleScript & {
-						selectors: ModuleScript;
-					};
-					resources: ModuleScript & {
-						selectors: ModuleScript;
-					};
-					conditions: ModuleScript & {
 						selectors: ModuleScript;
 					};
 					currencies: ModuleScript & {
@@ -1565,6 +1579,15 @@ interface ReplicatedStorage extends Instance {
 						selectors: ModuleScript;
 					};
 					identity: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					transform: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					conditions: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					resources: ModuleScript & {
 						selectors: ModuleScript;
 					};
 					["player-data"]: ModuleScript;
@@ -1645,9 +1668,9 @@ interface ReplicatedStorage extends Instance {
 					["name-plate"]: ModuleScript;
 					inventory: Folder & {
 						HotbarFrame: ModuleScript;
-						BackpackFrame: ModuleScript;
+						Backpack: ModuleScript;
+						ItemButton: ModuleScript;
 						EmptyHotbarSlot: ModuleScript;
-						HotbarSlot: ModuleScript;
 					};
 					app: ModuleScript;
 					["fill-bar"]: ModuleScript & {
