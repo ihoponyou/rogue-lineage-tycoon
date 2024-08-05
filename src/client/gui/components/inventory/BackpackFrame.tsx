@@ -26,6 +26,7 @@ export function BackpackFrame() {
 			/>
 			<scrollingframe
 				BackgroundTransparency={1}
+				BorderSizePixel={0}
 				BottomImage="rbxassetid://3515608177"
 				HorizontalScrollBarInset={Enum.ScrollBarInset.Always}
 				MidImage="rbxassetid://3515608813"
