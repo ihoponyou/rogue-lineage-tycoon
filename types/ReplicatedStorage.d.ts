@@ -122,6 +122,12 @@ interface ReplicatedStorage extends Instance {
 				PocketSand: ParticleEmitter;
 			};
 			SlashRing: MeshPart;
+			ItemTemplate: Part & {
+				Mesh: SpecialMesh;
+				BillboardGui: BillboardGui & {
+					ToolName: TextLabel;
+				};
+			};
 			NocerePart: Part & {
 				PointLight: PointLight;
 				Hit: Sound;
@@ -1382,16 +1388,20 @@ interface ReplicatedStorage extends Instance {
 				ClimbLeft: Animation;
 			};
 			Combat: Folder & {
+				DefaultBlock: Animation;
+				Punch3: Animation;
 				Carrying: Animation;
 				Punch1: Animation;
 				Carried: Animation;
+				BlockHit3: Animation;
+				BlockHit1: Animation;
 				PickUp: Animation;
 				Gripping: Animation;
 				Punch5: Animation;
 				Throw: Animation;
 				Punch4: Animation;
 				Gripped: Animation;
-				Punch3: Animation;
+				BlockHit2: Animation;
 				Punch2: Animation;
 			};
 		};
@@ -1456,11 +1466,15 @@ interface ReplicatedStorage extends Instance {
 				ShriekerSmoke: ParticleEmitter;
 				LordsbaneLightning: ParticleEmitter;
 				SilverEmit: ParticleEmitter;
-				Poison: ParticleEmitter;
-				PunchHit: ParticleEmitter;
+				Torso: Folder & {
+					OrangeFire: ParticleEmitter;
+					BlockParticle: ParticleEmitter;
+					PunchHit: ParticleEmitter;
+					Injure: ParticleEmitter;
+					BloodHit: ParticleEmitter;
+				};
 				M2Trail: Trail;
 				OrangeFire: ParticleEmitter;
-				BloodHit: ParticleEmitter;
 				Steam: ParticleEmitter;
 				SpecialBloodHit: ParticleEmitter;
 				Sweat: ParticleEmitter;
@@ -1478,27 +1492,23 @@ interface ReplicatedStorage extends Instance {
 				Smoke: ParticleEmitter;
 				DBloodTrue: ParticleEmitter;
 				MonasticFire: ParticleEmitter;
-				BlockParticle: ParticleEmitter;
 				Cameo: ParticleEmitter;
-				Torso: Folder & {
-					Injure: ParticleEmitter;
-					OrangeFire: ParticleEmitter;
-				};
-				MonkParticle: ParticleEmitter;
+				ManaStopParticle: ParticleEmitter;
+				LElectric: ParticleEmitter;
 				Sparks: ParticleEmitter;
 				CommandFX: ParticleEmitter;
-				ManaStopParticle: ParticleEmitter;
+				MonkParticle: ParticleEmitter;
 				Feathers: ParticleEmitter;
 				ColdBreath: ParticleEmitter;
-				LElectric: ParticleEmitter;
-				ChargePart: ParticleEmitter;
 				Electric: ParticleEmitter & {
 					ElectricLight: PointLight;
 				};
+				ChargePart: ParticleEmitter;
 				DBloodOff: ParticleEmitter;
+				DBloodOn: ParticleEmitter;
 				SpearEmit: ParticleEmitter;
 				Broken: ParticleEmitter;
-				DBloodOn: ParticleEmitter;
+				Poison: ParticleEmitter;
 				Injure: ParticleEmitter;
 				LannisParticle: ParticleEmitter;
 			};
@@ -1517,8 +1527,9 @@ interface ReplicatedStorage extends Instance {
 				reflex: ModuleScript;
 			};
 			charAt: ModuleScript;
-			configs: Folder & {
+			configs: ModuleScript & {
 				group: ModuleScript;
+				character: ModuleScript;
 				conditions: ModuleScript;
 			};
 			constants: ModuleScript;
@@ -1532,86 +1543,113 @@ interface ReplicatedStorage extends Instance {
 			["get-digit"]: ModuleScript;
 			inject: ModuleScript;
 			["on-player-removing"]: ModuleScript;
-			cmdr: Folder & {
-				hooks: Folder & {
-					["before-run"]: ModuleScript;
+			enums: ModuleScript;
+			store: ModuleScript & {
+				slices: ModuleScript & {
+					transform: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					stats: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					resources: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					conditions: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					currencies: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					mana: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					identity: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					["player-data"]: ModuleScript;
 				};
 			};
 			["state-machine"]: ModuleScript & {
 				state: ModuleScript;
 			};
+			cmdr: Folder & {
+				hooks: Folder & {
+					["before-run"]: ModuleScript;
+				};
+			};
 			components: Folder & {
 				toggleable: ModuleScript;
-				["abstract-player"]: ModuleScript;
-				["disposable-component"]: ModuleScript;
 				character: ModuleScript;
+				["disposable-component"]: ModuleScript;
 				ragdoll: ModuleScript;
 				model: ModuleScript;
+				["abstract-player"]: ModuleScript;
+			};
+		};
+		client: Folder & {
+			networking: ModuleScript;
+			configs: Folder;
+			effects: ModuleScript;
+			["player-state"]: Folder & {
+				["block-state"]: ModuleScript;
+				["climb-state"]: ModuleScript;
+				["attack-state"]: ModuleScript;
+				["idle-state"]: ModuleScript;
+				["character-state"]: ModuleScript;
+				["charge-mana-state"]: ModuleScript;
+				["dash-state"]: ModuleScript;
+				transitions: ModuleScript;
+				["run-state"]: ModuleScript;
+			};
+			constants: ModuleScript;
+			components: Folder & {
+				["player-client"]: ModuleScript;
+				["character-state-machine"]: ModuleScript;
+				["ragdoll-client"]: ModuleScript;
+				character: ModuleScript;
+			};
+			controllers: Folder & {
+				["lifecycle-controller"]: ModuleScript;
+				["inventory-controller"]: ModuleScript;
+				["input-controller"]: ModuleScript;
+				["keybind-controller"]: ModuleScript;
+				["effect-controller"]: ModuleScript;
+				["chat-controller"]: ModuleScript;
+				["animation-controller"]: ModuleScript;
+				["gui-controller"]: ModuleScript;
 			};
 			store: ModuleScript & {
+				middleware: Folder & {
+					receiver: ModuleScript;
+				};
 				slices: Folder & {
-					players: ModuleScript & {
-						slices: Folder & {
-							transform: ModuleScript & {
-								selectors: ModuleScript;
-							};
-							stats: ModuleScript & {
-								selectors: ModuleScript;
-							};
-							resources: ModuleScript & {
-								selectors: ModuleScript;
-							};
-							conditions: ModuleScript & {
-								selectors: ModuleScript;
-							};
-							currencies: ModuleScript & {
-								selectors: ModuleScript;
-							};
-							mana: ModuleScript & {
-								selectors: ModuleScript;
-							};
-							identity: ModuleScript & {
-								selectors: ModuleScript;
-							};
-							["player-data"]: ModuleScript;
-						};
+					dialogue: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					gui: ModuleScript & {
 						selectors: ModuleScript;
 					};
 				};
 			};
-		};
-		client: Folder & {
-			effects: ModuleScript;
-			constants: ModuleScript;
-			["player-state"]: Folder & {
-				["run-state"]: ModuleScript;
-				["attack-state"]: ModuleScript;
-				["character-state"]: ModuleScript;
-				["climb-state"]: ModuleScript;
-				["charge-mana-state"]: ModuleScript;
-				["dash-state"]: ModuleScript;
-				transitions: ModuleScript;
-				["idle-state"]: ModuleScript;
-			};
-			networking: ModuleScript;
-			components: Folder & {
-				character: ModuleScript;
-				["character-state-machine"]: ModuleScript;
-				["ragdoll-client"]: ModuleScript;
-				["player-client"]: ModuleScript;
-			};
 			gui: Folder & {
 				components: Folder & {
-					digit: ModuleScript;
-					app: ModuleScript;
-					stats: ModuleScript;
-					["name-plate"]: ModuleScript;
-					["silver-logo"]: ModuleScript;
-					layer: ModuleScript;
 					["dialogue-box"]: ModuleScript & {
 						["dialogue-option"]: ModuleScript;
 						["char-label"]: ModuleScript;
 					};
+					stats: ModuleScript;
+					["silver-logo"]: ModuleScript;
+					layer: ModuleScript;
+					digit: ModuleScript;
+					["name-plate"]: ModuleScript;
+					inventory: Folder & {
+						HotbarFrame: ModuleScript;
+						BackpackFrame: ModuleScript;
+						EmptyHotbarSlot: ModuleScript;
+						HotbarSlot: ModuleScript;
+					};
+					app: ModuleScript;
 					["fill-bar"]: ModuleScript & {
 						["mana-bar"]: ModuleScript;
 						["temperature-bar"]: ModuleScript;
@@ -1622,26 +1660,6 @@ interface ReplicatedStorage extends Instance {
 					["use-motion"]: ModuleScript;
 					["reflex-hooks"]: ModuleScript;
 				};
-			};
-			store: ModuleScript & {
-				slices: Folder & {
-					dialogue: ModuleScript & {
-						selectors: ModuleScript;
-					};
-				};
-				middleware: Folder & {
-					receiver: ModuleScript;
-				};
-				selectors: ModuleScript;
-			};
-			controllers: Folder & {
-				["lifecycle-controller"]: ModuleScript;
-				["effect-controller"]: ModuleScript;
-				["keybind-controller"]: ModuleScript;
-				["animation-controller"]: ModuleScript;
-				["input-controller"]: ModuleScript;
-				["chat-controller"]: ModuleScript;
-				["gui-controller"]: ModuleScript;
 			};
 		};
 	};
@@ -1980,6 +1998,114 @@ interface ReplicatedStorage extends Instance {
 						ExpectationContext: ModuleScript;
 						Context: ModuleScript;
 						Expectation: ModuleScript;
+					};
+				};
+				sift: Folder & {
+					out: ModuleScript & {
+						Dictionary: ModuleScript & {
+							includes: ModuleScript;
+							flip: ModuleScript;
+							every: ModuleScript;
+							update: ModuleScript;
+							equalsDeep: ModuleScript;
+							flatten: ModuleScript;
+							copy: ModuleScript;
+							mergeDeep: ModuleScript;
+							values: ModuleScript;
+							keys: ModuleScript;
+							copyDeep: ModuleScript;
+							some: ModuleScript;
+							freeze: ModuleScript;
+							map: ModuleScript;
+							removeValue: ModuleScript;
+							fromEntries: ModuleScript;
+							freezeDeep: ModuleScript;
+							set: ModuleScript;
+							removeValues: ModuleScript;
+							fromArrays: ModuleScript;
+							entries: ModuleScript;
+							removeKeys: ModuleScript;
+							removeKey: ModuleScript;
+							count: ModuleScript;
+							filter: ModuleScript;
+							has: ModuleScript;
+							withKeys: ModuleScript;
+							equals: ModuleScript;
+							merge: ModuleScript;
+						};
+						Set: ModuleScript & {
+							map: ModuleScript;
+							["delete"]: ModuleScript;
+							differenceSymmetric: ModuleScript;
+							intersection: ModuleScript;
+							fromArray: ModuleScript;
+							toArray: ModuleScript;
+							isSuperset: ModuleScript;
+							merge: ModuleScript;
+							copy: ModuleScript;
+							count: ModuleScript;
+							filter: ModuleScript;
+							has: ModuleScript;
+							isSubset: ModuleScript;
+							difference: ModuleScript;
+							add: ModuleScript;
+						};
+						Types: ModuleScript;
+						Array: ModuleScript & {
+							last: ModuleScript;
+							shuffle: ModuleScript;
+							is: ModuleScript;
+							concatDeep: ModuleScript;
+							update: ModuleScript;
+							copy: ModuleScript;
+							reduceRight: ModuleScript;
+							copyDeep: ModuleScript;
+							map: ModuleScript;
+							removeValue: ModuleScript;
+							equals: ModuleScript;
+							first: ModuleScript;
+							find: ModuleScript;
+							removeIndex: ModuleScript;
+							count: ModuleScript;
+							reverse: ModuleScript;
+							zipAll: ModuleScript;
+							includes: ModuleScript;
+							removeValues: ModuleScript;
+							zip: ModuleScript;
+							unshift: ModuleScript;
+							toSet: ModuleScript;
+							equalsDeep: ModuleScript;
+							flatten: ModuleScript;
+							splice: ModuleScript;
+							sort: ModuleScript;
+							difference: ModuleScript;
+							freezeDeep: ModuleScript;
+							slice: ModuleScript;
+							findLast: ModuleScript;
+							freeze: ModuleScript;
+							findWhere: ModuleScript;
+							removeIndices: ModuleScript;
+							findWhereLast: ModuleScript;
+							shift: ModuleScript;
+							pop: ModuleScript;
+							set: ModuleScript;
+							create: ModuleScript;
+							every: ModuleScript;
+							at: ModuleScript;
+							push: ModuleScript;
+							insert: ModuleScript;
+							filter: ModuleScript;
+							differenceSymmetric: ModuleScript;
+							concat: ModuleScript;
+							reduce: ModuleScript;
+							some: ModuleScript;
+						};
+						Util: ModuleScript & {
+							equalObjects: ModuleScript;
+							isEmpty: ModuleScript;
+							func: ModuleScript;
+						};
+						None: ModuleScript;
 					};
 				};
 				charm: ModuleScript & {
