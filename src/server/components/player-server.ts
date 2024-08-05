@@ -5,7 +5,7 @@ import { store } from "server/store";
 import { selectPlayer } from "server/store/selectors";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { Inject } from "shared/inject";
-import { deserializeVector3 } from "shared/serialized-vector3";
+import { deserializeVector3 } from "shared/modules/serialized-vector3";
 import { Character } from "./character";
 
 const TYCOON_FOLDER = Workspace.Tycoons;

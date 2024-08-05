@@ -6,7 +6,7 @@ import {
 } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
 import { store } from "client/store";
-import { hasLineOfSight } from "shared/line-of-sight";
+import { hasLineOfSight } from "shared/modules/line-of-sight";
 import { StateMachine } from "shared/modules/state-machine";
 import { selectManaAmount } from "shared/store/slices/mana/selectors";
 import { Character } from "../components/character";

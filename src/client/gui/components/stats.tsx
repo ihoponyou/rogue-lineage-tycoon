@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { selectBackpackOpen } from "client/store/slices/gui/selectors";
-import { getDigit } from "shared/get-digit";
+import { getDigit } from "shared/modules/get-digit";
 import {
 	selectHealth,
 	selectToxicity,

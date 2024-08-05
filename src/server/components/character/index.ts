@@ -16,7 +16,7 @@ import { AbstractCharacter } from "shared/components/abstract-character";
 import {
 	deserializeVector3,
 	serializeVector3,
-} from "shared/serialized-vector3";
+} from "shared/modules/serialized-vector3";
 import { PlayerServer } from "../player-server";
 import { RagdollServer } from "./ragdoll-server";
 

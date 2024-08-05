@@ -1,6 +1,6 @@
 import { Component } from "@flamework/components";
 import { Players } from "@rbxts/services";
-import { getCharacterFromBodyPart } from "shared/getCharacterFromBodyPart";
+import { getCharacterFromBodyPart } from "shared/modules/character-from-body-part";
 import { Interactable } from "..";
 
 type TouchableInstance = BasePart | Model;

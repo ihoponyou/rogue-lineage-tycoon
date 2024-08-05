@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { deserializeColor3 } from "shared/serialized-color3";
+import { deserializeColor3 } from "shared/modules/serialized-color3";
 import { selectManaColor } from "shared/store/slices/identity/selectors";
 import { selectManaAmount } from "shared/store/slices/mana/selectors";
 import { FillBar } from ".";

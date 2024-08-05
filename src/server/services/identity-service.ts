@@ -15,7 +15,7 @@ import {
 import { store } from "server/store";
 import { selectPlayerIdentity } from "server/store/selectors";
 import { APPEARANCE } from "shared/constants";
-import { deserializeColor3 } from "shared/serialized-color3";
+import { deserializeColor3 } from "shared/modules/serialized-color3";
 import { Sex } from "shared/store/slices/identity";
 import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
 

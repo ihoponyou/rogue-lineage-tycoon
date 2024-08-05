@@ -1,15 +1,15 @@
 import { Trove } from "@rbxts/trove";
+import { Events } from "client/network";
 import { store } from "client/store";
 import { VFX } from "shared/constants";
+import { deserializeColor3 } from "shared/modules/serialized-color3";
 import { StateMachine } from "shared/modules/state-machine";
-import { deserializeColor3 } from "shared/serialized-color3";
 import { selectManaColor } from "shared/store/slices/identity/selectors";
 import { selectMana } from "shared/store/slices/mana/selectors";
 import { Character } from "../components/character";
 import { AnimationController } from "../controllers/animation-controller";
 import { InputController } from "../controllers/input-controller";
 import { KeybindController } from "../controllers/keybind-controller";
-import { Events } from "../network";
 import { CharacterState } from "./character-state";
 import {
 	createAttackTransition,
