@@ -12,7 +12,7 @@ import {
 	selectPlayerHealth,
 	selectPlayerTransform,
 } from "server/store/selectors";
-import { SharedComponents } from "shared/components/character";
+import { AbstractCharacter } from "shared/components/abstract-character";
 import {
 	deserializeVector3,
 	serializeVector3,
@@ -41,7 +41,7 @@ const EVENTS = Events.character;
 		lightAttackCooldown: false,
 	},
 })
-export class Character extends SharedComponents.Character implements OnTick {
+export class Character extends AbstractCharacter implements OnTick {
 	public constructor(
 		private ragdoll: RagdollServer,
 		private components: Components,
