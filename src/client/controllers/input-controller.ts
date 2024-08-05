@@ -1,10 +1,6 @@
 import { Components } from "@flamework/components";
 import { Controller, Dependency, OnStart, OnTick } from "@flamework/core";
-import {
-	ContextActionService,
-	UserInputService,
-	Workspace,
-} from "@rbxts/services";
+import { UserInputService, Workspace } from "@rbxts/services";
 import Signal from "@rbxts/signal";
 import { store } from "client/store";
 import {
@@ -46,41 +42,43 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	public constructor(private keybindController: KeybindController) {}
 
 	public onStart(): void {
-		ContextActionService.BindAction(
-			"input_forward",
-			(_, state) => this.handleForwardInput(state),
-			false,
+		this.keybindController.loadKeybind(
+			"forward",
 			this.keybindController.keybinds.forward,
+			(state) => this.handleForwardInput(state),
 		);
-		ContextActionService.BindAction(
-			"input_dash",
-			(_, state) => this.handleDashInput(state),
-			true,
+		this.keybindController.loadKeybind(
+			"dash",
 			this.keybindController.keybinds.dash,
+			(state) => this.handleDashInput(state),
 		);
-		ContextActionService.BindAction(
-			"input_jump",
-			(_, state) => this.handleJumpInput(state),
-			false,
+		this.keybindController.loadKeybind(
+			"jump",
 			this.keybindController.keybinds.jump,
+			(state) => this.handleJumpInput(state),
 		);
-		ContextActionService.BindAction(
-			"input_mana",
-			(_, state) => this.handleManaInput(state),
-			true,
+		this.keybindController.loadKeybind(
+			"chargeMana",
 			this.keybindController.keybinds.chargeMana,
+			(state) => this.handleManaInput(state),
 		);
-		ContextActionService.BindAction(
-			"input_light_attack",
-			(_, state) => this.handleLightAttackInput(state),
-			true,
+		this.keybindController.loadKeybind(
+			"lightAttack",
 			this.keybindController.keybinds.lightAttack,
+			(state) => this.handleLightAttackInput(state),
 		);
-		ContextActionService.BindAction(
-			"input_block",
-			(_, state) => this.handleBlockInput(state),
-			true,
+		this.keybindController.loadKeybind(
+			"block",
 			this.keybindController.keybinds.block,
+			(state) => this.handleBlockInput(state),
+		);
+		this.keybindController.loadKeybind(
+			"toggleBackpack",
+			this.keybindController.keybinds.toggleBackpack,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				store.toggleBackpack();
+			},
 		);
 	}
 

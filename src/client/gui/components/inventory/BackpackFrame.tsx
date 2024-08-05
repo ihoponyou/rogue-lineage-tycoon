@@ -1,6 +1,10 @@
 import React from "@rbxts/react";
+import { useSelector } from "@rbxts/react-reflex";
+import { selectBackpackOpen } from "client/store/slices/gui/selectors";
 
 export function BackpackFrame() {
+	const backpackOpen = useSelector(selectBackpackOpen());
+
 	return (
 		<frame
 			key="BackpackFrame"
@@ -11,6 +15,7 @@ export function BackpackFrame() {
 			Position={new UDim2(0.5, 0, 1, -80)}
 			Size={new UDim2(0.5, 0, 0.5, 0)}
 			ZIndex={0}
+			Visible={backpackOpen}
 		>
 			<imagelabel
 				key="Overlay"

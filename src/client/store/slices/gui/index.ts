@@ -9,7 +9,7 @@ const initialState: GuiState = {
 };
 
 export const guiSlice = createProducer(initialState, {
-	toggleBackpack(state, open?: boolean) {
+	toggleBackpack: (state, open?: boolean) => {
 		return {
 			...state,
 			backpackOpen: open ?? !state.backpackOpen,

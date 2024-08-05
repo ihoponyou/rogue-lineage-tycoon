@@ -19,6 +19,7 @@ export interface Keybinds {
 	grip: Enum.KeyCode;
 	injure: Enum.KeyCode;
 	forceFeed: Enum.KeyCode;
+	toggleBackpack: Enum.KeyCode;
 }
 
 const DEFAULT_KEYBINDS: Keybinds = {
@@ -37,6 +38,7 @@ const DEFAULT_KEYBINDS: Keybinds = {
 	grip: Enum.KeyCode.B,
 	injure: Enum.KeyCode.N,
 	forceFeed: Enum.KeyCode.P,
+	toggleBackpack: Enum.KeyCode.Backquote,
 };
 
 export enum InputAxis {
@@ -87,6 +89,7 @@ export class KeybindController {
 		keybind: valueof<Keybinds>,
 		action: Action,
 	) {
+		ContextActionService.UnbindAction(`input_${actionName}`);
 		ContextActionService.BindAction(
 			`input_${actionName}`,
 			(_, state) => {

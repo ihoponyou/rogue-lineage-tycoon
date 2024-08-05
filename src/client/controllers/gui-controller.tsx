@@ -2,7 +2,7 @@ import { Controller, OnStart } from "@flamework/core";
 import React, { StrictMode } from "@rbxts/react";
 import { ReflexProvider } from "@rbxts/react-reflex";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
-import { SoundService } from "@rbxts/services";
+import { SoundService, StarterGui } from "@rbxts/services";
 import { LOCAL_PLAYER } from "client/constants";
 import { App } from "client/gui/components/app";
 import { Events } from "client/networking";
@@ -15,6 +15,11 @@ export class GuiController implements OnStart {
 	private root = createRoot(new Instance("Folder"));
 
 	public onStart() {
+		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Health, false);
+		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, false);
+		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false);
+		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false);
+
 		store.subscribe(selectCurrencies(), (state, previousState) => {
 			if (state?.Silver.amount !== previousState?.Silver.amount)
 				SoundService.PlayLocalSound(SoundService.SilverChange);
