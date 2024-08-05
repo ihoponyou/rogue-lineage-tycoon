@@ -1,13 +1,21 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { selectBackpackOpen } from "client/store/slices/gui/selectors";
+import { selectInventory } from "shared/store/slices/inventory/selectors";
+import { ItemButton } from "./ItemButton";
 
-export function BackpackFrame() {
+export function Backpack() {
 	const backpackOpen = useSelector(selectBackpackOpen());
+	const inventory = useSelector(selectInventory());
+
+	const items: JSX.Element[] = [];
+	inventory.forEach((_value, key) => {
+		items.push(<ItemButton name={key} />);
+	});
 
 	return (
 		<frame
-			key="BackpackFrame"
+			key="Backpack"
 			AnchorPoint={new Vector2(0.5, 1)}
 			BackgroundColor3={Color3.fromRGB(0, 0, 0)}
 			BackgroundTransparency={0.8}
@@ -52,6 +60,7 @@ export function BackpackFrame() {
 					PaddingRight={new UDim(0, 8)}
 					PaddingTop={new UDim(0, 8)}
 				/>
+				{items}
 			</scrollingframe>
 		</frame>
 	);

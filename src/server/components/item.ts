@@ -2,8 +2,9 @@ import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Workspace } from "@rbxts/services";
-import { getItemConfig } from "server/configs/items";
+import { store } from "server/store";
 import { ModelComponent } from "shared/components/model";
+import { getItemConfig } from "shared/configs/items";
 import { TouchableModel } from "./interactable/touchable/touchable-model";
 import { PlayerServer } from "./player-server";
 
@@ -67,6 +68,7 @@ export class Item extends BaseComponent<{}, Tool> implements OnStart {
 		this.owner = playerServer;
 		this.instance.Parent = this.owner.instance;
 		this.equip();
+		store.giveItem(player, this.instance.Name);
 	}
 
 	public drop(): void {

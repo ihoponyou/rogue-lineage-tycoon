@@ -1,6 +1,13 @@
 import React from "@rbxts/react";
 
-export function HotbarSlot() {
+interface Props {
+	name: string;
+}
+
+export function ItemButton({ name }: Props) {
+	const quantity = 1;
+	const inHotbar = false;
+
 	return (
 		<textbutton
 			key="ToolFrame"
@@ -19,11 +26,10 @@ export function HotbarSlot() {
 			}
 			Selectable={false}
 			Size={new UDim2(0, 60, 0, 60)}
-			Text="???"
+			Text={name}
 			TextColor3={Color3.fromRGB(47, 43, 30)}
 			TextSize={13}
 			TextWrapped={true}
-			Visible={false}
 		>
 			<imagelabel
 				key="Overlay"
@@ -51,11 +57,11 @@ export function HotbarSlot() {
 				}
 				Position={new UDim2(0.5, 0, 1, 0)}
 				Size={new UDim2(0, 20, 0, 12)}
-				Text="x?"
+				Text={tostring(quantity)}
 				TextColor3={Color3.fromRGB(47, 44, 38)}
 				TextSize={14}
 				TextYAlignment={Enum.TextYAlignment.Bottom}
-				Visible={false}
+				Visible={quantity > 1}
 				ZIndex={2}
 			>
 				<imagelabel
@@ -88,6 +94,7 @@ export function HotbarSlot() {
 				TextSize={14}
 				TextYAlignment={Enum.TextYAlignment.Bottom}
 				ZIndex={2}
+				Visible={inHotbar}
 			>
 				<imagelabel
 					BackgroundTransparency={1}
