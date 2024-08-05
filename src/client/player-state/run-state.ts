@@ -1,8 +1,8 @@
 import { Trove } from "@rbxts/trove";
 import { store } from "client/store";
 import { VFX } from "shared/constants";
+import { StateMachine } from "shared/modules/state-machine";
 import { deserializeColor3 } from "shared/serialized-color3";
-import { StateMachine } from "shared/state-machine";
 import { selectManaColor } from "shared/store/slices/identity/selectors";
 import { selectMana } from "shared/store/slices/mana/selectors";
 import { Character } from "../components/character";

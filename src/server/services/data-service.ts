@@ -10,7 +10,7 @@ import {
 	selectPlayerData,
 } from "server/store/selectors";
 import { Inject } from "shared/inject";
-import { onThisPlayerRemoving } from "shared/on-player-removing";
+import { onThisPlayerRemoving } from "shared/modules/on-player-removing";
 import {
 	DEFAULT_PLAYER_DATA,
 	PlayerData,
