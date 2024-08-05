@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { selectBackpackOpen } from "client/store/slices/gui/selectors";
 import { selectInventory } from "shared/store/slices/inventory/selectors";
-import { ItemButton } from "./ItemButton";
+import { ItemButton } from "./item-button";
 
 export function Backpack() {
 	const backpackOpen = useSelector(selectBackpackOpen());
