@@ -1,7 +1,7 @@
 import { Components } from "@flamework/components";
 import { OnStart, Service } from "@flamework/core";
 import { Character } from "server/components/character";
-import { Events } from "server/networking";
+import { Events } from "server/network";
 
 @Service()
 export class HitService implements OnStart {

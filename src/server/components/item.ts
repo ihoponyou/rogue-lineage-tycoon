@@ -2,7 +2,7 @@ import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Workspace } from "@rbxts/services";
-import { Events } from "server/networking";
+import { Events } from "server/network";
 import { store } from "server/store";
 import { AbstractItem } from "shared/components/abstract-item";
 import { ModelComponent } from "shared/components/model";

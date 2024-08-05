@@ -1,6 +1,6 @@
 import { Service } from "@flamework/core";
 import { Players } from "@rbxts/services";
-import { Events } from "server/networking";
+import { Events } from "server/network";
 import { OnPlayerAdded } from "../../../types/lifecycles";
 
 @Service()

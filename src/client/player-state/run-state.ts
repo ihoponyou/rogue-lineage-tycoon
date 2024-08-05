@@ -9,7 +9,7 @@ import { Character } from "../components/character";
 import { AnimationController } from "../controllers/animation-controller";
 import { InputController } from "../controllers/input-controller";
 import { KeybindController } from "../controllers/keybind-controller";
-import { Events } from "../networking";
+import { Events } from "../network";
 import { CharacterState } from "./character-state";
 import {
 	createAttackTransition,

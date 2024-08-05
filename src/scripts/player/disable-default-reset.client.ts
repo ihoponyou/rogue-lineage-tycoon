@@ -1,5 +1,5 @@
 import { StarterGui } from "@rbxts/services";
-import { Events } from "client//networking";
+import { Events } from "client/network";
 
 const resetBindable = new Instance("BindableEvent");
 resetBindable.Event.Connect(() => {

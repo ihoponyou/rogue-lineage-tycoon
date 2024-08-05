@@ -1,7 +1,7 @@
 import { Component } from "@flamework/components";
 import { Workspace } from "@rbxts/services";
 import { AbstractCharacter } from "shared/components/abstract-character";
-import { Events } from "../networking";
+import { Events } from "../network";
 
 @Component({
 	defaults: {

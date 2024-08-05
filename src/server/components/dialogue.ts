@@ -2,7 +2,7 @@ import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { ReplicatedStorage } from "@rbxts/services";
 import { DIALOGUE } from "server/configs/dialogue";
-import { Events } from "server/networking";
+import { Events } from "server/network";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Clickable } from "./interactable/clickable";
 

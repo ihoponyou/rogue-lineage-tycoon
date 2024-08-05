@@ -3,7 +3,7 @@ import { OnTick } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
-import { Events } from "server/networking";
+import { Events } from "server/network";
 import { DataService } from "server/services/data-service";
 import { store } from "server/store";
 import {

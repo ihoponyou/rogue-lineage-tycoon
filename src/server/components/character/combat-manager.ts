@@ -1,6 +1,6 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { Events } from "server/networking";
+import { Events } from "server/network";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Character } from ".";
 

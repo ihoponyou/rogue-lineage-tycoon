@@ -1,5 +1,5 @@
 import { Lighting } from "@rbxts/services";
-import { Events } from "client//networking";
+import { Events } from "client/network";
 
 Events.kicked.connect(() => {
 	const blur = new Instance("BlurEffect");

@@ -1,5 +1,5 @@
 import { createBroadcaster, ProducerMiddleware } from "@rbxts/reflex";
-import { Events } from "server/networking";
+import { Events } from "server/network";
 import slices from "shared/store/slices";
 
 export function broadcasterMiddleware(): ProducerMiddleware {

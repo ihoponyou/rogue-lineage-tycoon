@@ -1,5 +1,5 @@
 import { Component } from "@flamework/components";
-import { Events } from "client/networking";
+import { Events } from "client/network";
 import { AbstractItem } from "shared/components/abstract-item";
 
 @Component({

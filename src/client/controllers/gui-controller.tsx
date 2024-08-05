@@ -7,7 +7,7 @@ import Signal from "@rbxts/signal";
 import { LOCAL_PLAYER } from "client/constants";
 import { App } from "client/gui/components/app";
 import { signalContext, ToolSelectedCallback } from "client/gui/context";
-import { Events } from "client/networking";
+import { Events } from "client/network";
 import { store } from "client/store";
 import { selectCurrencies } from "shared/store/slices/currencies/selectors";
 

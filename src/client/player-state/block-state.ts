@@ -1,5 +1,5 @@
 import { Trove } from "@rbxts/trove";
-import { Events } from "client/networking";
+import { Events } from "client/network";
 import { BLOCK_WALK_SPEED } from "shared/configs";
 import { StateMachine } from "shared/state-machine";
 import { Character } from "../components/character";

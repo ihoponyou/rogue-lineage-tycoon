@@ -4,7 +4,7 @@ import { SFX } from "shared/constants";
 import { StateMachine } from "shared/state-machine";
 import { InputController } from "../controllers/input-controller";
 import { KeybindController } from "../controllers/keybind-controller";
-import { Events } from "../networking";
+import { Events } from "../network";
 import { CharacterState } from "./character-state";
 import {
 	createClimbTransition,

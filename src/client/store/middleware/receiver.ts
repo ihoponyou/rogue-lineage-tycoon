@@ -1,5 +1,5 @@
 import { ProducerMiddleware, createBroadcastReceiver } from "@rbxts/reflex";
-import { Events } from "client/networking";
+import { Events } from "client/network";
 
 export function receiverMiddleware(): ProducerMiddleware {
 	const receiver = createBroadcastReceiver({
