@@ -1,12 +1,37 @@
-import React from "@rbxts/react";
+import React, { useState } from "@rbxts/react";
+import { useMotion } from "client/gui/hooks/use-motion";
 
 interface Props {
 	name: string;
 }
 
+const COLOR = {
+	selected: Color3.fromRGB(255, 248, 238),
+	deselected: Color3.fromRGB(215, 203, 191),
+};
+
+const SIZE = {
+	selected: 10,
+	deselected: 6,
+};
+
 export function ItemButton({ name }: Props) {
 	const quantity = 1;
 	const inHotbar = false;
+	const [size, sizeMotion] = useMotion(SIZE.deselected);
+	const [textTransparency, textTransparencyMotion] = useMotion(0);
+	const [color, colorMotion] = useMotion(COLOR.deselected);
+
+	const [selected, setSelected] = useState(false);
+
+	sizeMotion.tween(selected ? SIZE.selected : SIZE.deselected, {
+		time: 0.1,
+		style: selected ? Enum.EasingStyle.Back : undefined,
+	});
+	textTransparencyMotion.tween(selected ? 0 : 0.2, { time: 0.1 });
+	colorMotion.tween(selected ? COLOR.selected : COLOR.deselected, {
+		time: 0.1,
+	});
 
 	return (
 		<textbutton
@@ -14,7 +39,7 @@ export function ItemButton({ name }: Props) {
 			Active={false}
 			AnchorPoint={new Vector2(0.5, 0)}
 			AutoButtonColor={false}
-			BackgroundColor3={Color3.fromRGB(255, 248, 238)}
+			BackgroundColor3={color}
 			BorderSizePixel={0}
 			Font={Enum.Font.Fantasy}
 			FontFace={
@@ -29,7 +54,13 @@ export function ItemButton({ name }: Props) {
 			Text={name}
 			TextColor3={Color3.fromRGB(47, 43, 30)}
 			TextSize={13}
+			TextTransparency={textTransparency}
 			TextWrapped={true}
+			Event={{
+				MouseButton1Down: () => {
+					setSelected(!selected);
+				},
+			}}
 		>
 			<imagelabel
 				key="Overlay"
@@ -39,7 +70,7 @@ export function ItemButton({ name }: Props) {
 				ImageColor3={Color3.fromRGB(245, 197, 130)}
 				Position={new UDim2(0.5, 0, 0.5, 0)}
 				ScaleType={Enum.ScaleType.Slice}
-				Size={new UDim2(1, 10, 1, 10)}
+				Size={size.map((value) => new UDim2(1, value, 1, value))}
 				SliceCenter={new Rect(13, 13, 13, 13)}
 			/>
 			<textlabel
@@ -57,7 +88,7 @@ export function ItemButton({ name }: Props) {
 				}
 				Position={new UDim2(0.5, 0, 1, 0)}
 				Size={new UDim2(0, 20, 0, 12)}
-				Text={tostring(quantity)}
+				Text={`x${quantity}`}
 				TextColor3={Color3.fromRGB(47, 44, 38)}
 				TextSize={14}
 				TextYAlignment={Enum.TextYAlignment.Bottom}
