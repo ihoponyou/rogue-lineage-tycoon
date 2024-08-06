@@ -23,15 +23,22 @@ export function DraggableItemButton(props: ItemButtonProps) {
 				Enum.UserInputType.MouseButton1,
 			)
 		) {
-			// there should only be one but plural because
-			const hoveredSlots = LOCAL_PLAYER_GUI.GetGuiObjectsAtPosition(
+			const hoveredObjects = LOCAL_PLAYER_GUI.GetGuiObjectsAtPosition(
 				mousePos.X,
 				mousePos.Y,
-			).filter((value) => value.Name === "EmptySlot");
+			);
 
-			if (hoveredSlots.size() > 0) {
-				const slot = hoveredSlots[0].LayoutOrder;
-				store.addToHotbar(slot, props.tool);
+			const index = hoveredObjects.findIndex(
+				(object) =>
+					object.Name === "EmptySlot" || object.Name === "Backpack",
+			);
+			const object = hoveredObjects[index];
+			if (object === undefined) {
+				// is this cursed?
+			} else if (object.Name === "EmptySlot") {
+				store.addToHotbar(props.tool, object.LayoutOrder);
+			} else if (object.Name === "Backpack") {
+				store.removeFromHotbar(props.tool);
 			}
 
 			setDragging(false);
