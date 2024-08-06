@@ -2,12 +2,18 @@ import Immut from "@rbxts/immut";
 import { createProducer } from "@rbxts/reflex";
 import { getItemConfig } from "shared/configs/items";
 
-const initialState = new ReadonlyMap<Tool, number>();
+interface Inventory {
+	items: ReadonlyMap<Tool, number>;
+}
+
+const initialState: Inventory = {
+	items: new Map(),
+};
 
 export const inventorySlice = createProducer(initialState, {
 	giveItem: (state, item: Tool, quantity: number = 1) => {
 		const itemConfig = getItemConfig(item.Name);
-		const currentCount = state.get(item);
+		const currentCount = state.items.get(item);
 		if (
 			currentCount !== undefined &&
 			currentCount + quantity > itemConfig.maxStackSize
@@ -15,7 +21,7 @@ export const inventorySlice = createProducer(initialState, {
 			return state;
 
 		return Immut.produce(state, (draft) => {
-			draft.set(
+			draft.items.set(
 				item,
 				currentCount === undefined ? quantity : currentCount + quantity,
 			);
@@ -23,14 +29,17 @@ export const inventorySlice = createProducer(initialState, {
 	},
 
 	takeItem: (state, item: Tool, quantity: number = 1) => {
-		const currentCount = state.get(item) ?? 0;
+		const currentCount = state.items.get(item);
+		if (currentCount === undefined) {
+			return state;
+		}
 		const newCount = math.max(currentCount - quantity, 0);
 
 		return Immut.produce(state, (draft) => {
 			if (newCount > 0) {
-				draft.set(item, newCount);
+				draft.items.set(item, newCount);
 			} else {
-				draft.delete(item);
+				draft.items.delete(item);
 			}
 		});
 	},

@@ -1,9 +1,8 @@
 import { Components } from "@flamework/components";
 import { Controller, OnStart } from "@flamework/core";
 import { Item } from "client/components/item";
+import { MAX_HOTBAR_SLOTS } from "client/constants";
 import { GuiController } from "./gui-controller";
-
-const MAX_HOTBAR_SLOTS = 12;
 
 @Controller()
 export class InventoryController implements OnStart {

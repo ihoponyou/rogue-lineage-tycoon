@@ -1,22 +1,25 @@
-import React, { useState } from "@rbxts/react";
+import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { selectBackpackOpen } from "client/store/slices/gui/selectors";
-import { selectInventory } from "shared/store/slices/inventory/selectors";
+import { selectItems } from "shared/store/slices/inventory/selectors";
 import { ItemButton } from "./item-button";
 
-export function Backpack() {
+interface Props {
+	activeTool?: Tool;
+	setActiveTool: React.Dispatch<React.SetStateAction<Tool | undefined>>;
+}
+
+export function Backpack(props: Props) {
 	const backpackOpen = useSelector(selectBackpackOpen());
-	const inventory = useSelector(selectInventory());
+	const items = useSelector(selectItems());
 
-	const [activeTool, setActiveTool] = useState<Tool | undefined>(undefined);
-
-	const items: JSX.Element[] = [];
-	inventory.forEach((_value, key) => {
-		items.push(
+	const buttons: JSX.Element[] = [];
+	items.forEach((_quantity, tool) => {
+		buttons.push(
 			<ItemButton
-				tool={key}
-				activeTool={activeTool}
-				setActiveTool={setActiveTool}
+				tool={tool}
+				activeTool={props.activeTool}
+				setActiveTool={props.setActiveTool}
 			/>,
 		);
 	});
@@ -68,7 +71,7 @@ export function Backpack() {
 					PaddingRight={new UDim(0, 8)}
 					PaddingTop={new UDim(0, 8)}
 				/>
-				{items}
+				{buttons}
 			</scrollingframe>
 		</frame>
 	);
