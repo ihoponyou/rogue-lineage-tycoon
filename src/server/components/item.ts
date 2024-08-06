@@ -84,10 +84,10 @@ export class Item extends AbstractItem implements OnStart {
 		this.instance.Parent = player;
 		this.worldModel.instance.PrimaryPart!.CanCollide = false;
 
-		this.rigToLimb(
-			this.config.holsterLimb,
-			this.config.holsterC0 ?? DEFAULT_ROOT_JOINT_C0,
-		);
+		if (this.config.hideOnHolster) {
+			this.worldModel.hide();
+		}
+		this.rigToLimb(this.config.holsterLimb, this.config.holsterC0);
 
 		store.giveItem(player, this.instance);
 	}
@@ -109,10 +109,7 @@ export class Item extends AbstractItem implements OnStart {
 		if (this.config.hideOnHolster) {
 			this.worldModel.show();
 		}
-		this.rigToLimb(
-			this.config.equipLimb,
-			this.config.equipC0 ?? DEFAULT_ROOT_JOINT_C0,
-		);
+		this.rigToLimb(this.config.equipLimb, this.config.equipC0);
 
 		this.equipped = true;
 	}
@@ -124,16 +121,15 @@ export class Item extends AbstractItem implements OnStart {
 		if (this.config.hideOnHolster) {
 			this.worldModel.hide();
 		}
-
-		this.rigToLimb(
-			this.config.holsterLimb,
-			this.config.holsterC0 ?? DEFAULT_ROOT_JOINT_C0,
-		);
+		this.rigToLimb(this.config.holsterLimb, this.config.holsterC0);
 
 		this.equipped = false;
 	}
 
-	private rigToLimb(limb: BodyPart, c0: CFrame): void {
+	private rigToLimb(
+		limb: BodyPart,
+		c0: CFrame = DEFAULT_ROOT_JOINT_C0,
+	): void {
 		if (this.owner === undefined) return;
 		const character = this.owner.getCharacter();
 		this.worldModel.instance.Parent = character.instance;
