@@ -1,6 +1,9 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { selectBackpackOpen } from "client/store/slices/gui/selectors";
+import {
+	selectBackpackOpen,
+	selectHotbar,
+} from "client/store/slices/gui/selectors";
 import { selectItems } from "shared/store/slices/inventory/selectors";
 import { DraggableItemButton } from "./draggable-item-button";
 
@@ -12,9 +15,11 @@ interface Props {
 export function Backpack(props: Props) {
 	const backpackOpen = useSelector(selectBackpackOpen());
 	const items = useSelector(selectItems());
+	const hotbar = useSelector(selectHotbar());
 
 	const buttons: JSX.Element[] = [];
 	items.forEach((_quantity, tool) => {
+		if (hotbar.has(tool)) return;
 		buttons.push(
 			<DraggableItemButton
 				tool={tool}

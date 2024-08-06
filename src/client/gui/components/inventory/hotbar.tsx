@@ -5,8 +5,8 @@ import {
 	selectBackpackOpen,
 	selectHotbar,
 } from "client/store/slices/gui/selectors";
+import { DraggableItemButton } from "./draggable-item-button";
 import { EmptyHotbarSlot } from "./empty-hotbar-slot";
-import { ItemButton } from "./item-button";
 
 interface Props {
 	activeTool?: Tool;
@@ -17,22 +17,27 @@ export function Hotbar(props: Props) {
 	const hotbarItems = useSelector(selectHotbar());
 	const backpackOpen = useSelector(selectBackpackOpen());
 
-	const buttons: JSX.Element[] = [];
-	hotbarItems.forEach((tool, slot) => {
-		buttons.insert(
-			slot,
-			<ItemButton
+	const itemButtons = new Array<JSX.Element>();
+	hotbarItems.forEach((slot, tool) => {
+		itemButtons[slot] = (
+			<DraggableItemButton
 				tool={tool}
 				activeTool={props.activeTool}
 				setActiveTool={props.setActiveTool}
-			/>,
+				layoutOrder={slot}
+			/>
 		);
 	});
 
+	const emptySlots = new Array<JSX.Element>();
 	if (backpackOpen) {
 		for (let i = 0; i < MAX_HOTBAR_SLOTS; i++) {
-			if (buttons[i] !== undefined) continue;
-			buttons[i] = <EmptyHotbarSlot />;
+			emptySlots[i] = (
+				<EmptyHotbarSlot
+					index={i}
+					visible={itemButtons[i] === undefined}
+				/>
+			);
 		}
 	}
 
@@ -49,8 +54,10 @@ export function Hotbar(props: Props) {
 				CellSize={new UDim2(0, 60, 0, 60)}
 				FillDirection={Enum.FillDirection.Vertical}
 				HorizontalAlignment={Enum.HorizontalAlignment.Center}
+				SortOrder={Enum.SortOrder.LayoutOrder}
 			/>
-			{buttons}
+			{itemButtons}
+			{emptySlots}
 		</frame>
 	);
 }

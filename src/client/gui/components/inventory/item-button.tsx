@@ -8,6 +8,7 @@ export interface ItemButtonProps {
 	setActiveTool: React.Dispatch<React.SetStateAction<Tool | undefined>>;
 	position?: React.Binding<UDim2>;
 	onClick?: () => void;
+	layoutOrder?: number;
 }
 
 const COLOR = {
@@ -26,6 +27,7 @@ export function ItemButton({
 	setActiveTool,
 	position,
 	onClick,
+	layoutOrder,
 }: ItemButtonProps) {
 	const signal = useContext(signalContext);
 
@@ -76,6 +78,7 @@ export function ItemButton({
 				},
 			}}
 			Position={position}
+			LayoutOrder={layoutOrder ?? -1}
 		>
 			<imagelabel
 				key="Overlay"
