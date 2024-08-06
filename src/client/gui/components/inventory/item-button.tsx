@@ -1,4 +1,5 @@
 import React, { useContext } from "@rbxts/react";
+import { GuiService } from "@rbxts/services";
 import { signalContext } from "client/gui/context";
 import { useMotion } from "client/gui/hooks/use-motion";
 
@@ -7,7 +8,7 @@ export interface ItemButtonProps {
 	activeTool?: Tool;
 	setActiveTool: React.Dispatch<React.SetStateAction<Tool | undefined>>;
 	position?: React.Binding<UDim2>;
-	onClick?: () => void;
+	onClick?: (relativeToCursor: Vector2) => void;
 	layoutOrder?: number;
 }
 
@@ -51,7 +52,6 @@ export function ItemButton({
 		<textbutton
 			key={tool.Name}
 			Active={false}
-			AnchorPoint={new Vector2(0.5, 0)}
 			AutoButtonColor={false}
 			BackgroundColor3={color}
 			BorderSizePixel={0}
@@ -71,8 +71,14 @@ export function ItemButton({
 			TextTransparency={textTransparency}
 			TextWrapped={true}
 			Event={{
-				MouseButton1Down: () => {
-					if (onClick) onClick();
+				MouseButton1Down: (rbx, x, y) => {
+					if (onClick) {
+						const inset = GuiService.GetGuiInset()[0];
+						const mousePos = new Vector2(x, y).sub(inset);
+						const diff = rbx.AbsolutePosition.sub(mousePos);
+
+						onClick(diff);
+					}
 					setActiveTool(!selected ? tool : undefined);
 					signal.Fire(!selected ? tool : undefined);
 				},

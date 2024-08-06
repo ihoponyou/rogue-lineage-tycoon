@@ -1,46 +1,6 @@
-import React from "@rbxts/react";
-import { useSelector } from "@rbxts/react-reflex";
-import { MAX_HOTBAR_SLOTS } from "client/constants";
-import {
-	selectBackpackOpen,
-	selectHotbar,
-} from "client/store/slices/gui/selectors";
-import { DraggableItemButton } from "./draggable-item-button";
-import { EmptyHotbarSlot } from "./empty-hotbar-slot";
+import React, { PropsWithChildren } from "@rbxts/react";
 
-interface Props {
-	activeTool?: Tool;
-	setActiveTool: React.Dispatch<React.SetStateAction<Tool | undefined>>;
-}
-
-export function Hotbar(props: Props) {
-	const hotbarItems = useSelector(selectHotbar());
-	const backpackOpen = useSelector(selectBackpackOpen());
-
-	const itemButtons = new Array<JSX.Element>();
-	hotbarItems.forEach((slot, tool) => {
-		itemButtons[slot] = (
-			<DraggableItemButton
-				tool={tool}
-				activeTool={props.activeTool}
-				setActiveTool={props.setActiveTool}
-				layoutOrder={slot}
-			/>
-		);
-	});
-
-	const emptySlots = new Array<JSX.Element>();
-	if (backpackOpen) {
-		for (let i = 0; i < MAX_HOTBAR_SLOTS; i++) {
-			emptySlots[i] = (
-				<EmptyHotbarSlot
-					index={i}
-					visible={itemButtons[i] === undefined}
-				/>
-			);
-		}
-	}
-
+export function Hotbar(props: PropsWithChildren) {
 	return (
 		<frame
 			key="Hotbar"
@@ -56,8 +16,7 @@ export function Hotbar(props: Props) {
 				HorizontalAlignment={Enum.HorizontalAlignment.Center}
 				SortOrder={Enum.SortOrder.LayoutOrder}
 			/>
-			{itemButtons}
-			{emptySlots}
+			{props.children}
 		</frame>
 	);
 }

@@ -9,15 +9,15 @@ import { ItemButton, ItemButtonProps } from "./item-button";
 
 export function DraggableItemButton(props: ItemButtonProps) {
 	const [position, setPosition] = useBinding(new UDim2());
+	const [cursorOffset, setCursorOffset] = useState(Vector2.zero);
 	const [dragging, setDragging] = useState(false);
 	const app = useContext(appContext);
 
 	useEventListener(RunService.RenderStepped, (_deltaTime) => {
 		if (!dragging) return;
 
-		const mousePos = UserInputService.GetMouseLocation().sub(
-			GuiService.GetGuiInset()[0],
-		);
+		const inset = GuiService.GetGuiInset()[0];
+		const mousePos = UserInputService.GetMouseLocation().sub(inset);
 		if (
 			!UserInputService.IsMouseButtonPressed(
 				Enum.UserInputType.MouseButton1,
@@ -45,7 +45,12 @@ export function DraggableItemButton(props: ItemButtonProps) {
 			return;
 		}
 
-		setPosition(UDim2.fromOffset(mousePos.X, mousePos.Y));
+		setPosition(
+			UDim2.fromOffset(
+				mousePos.X + cursorOffset.X + inset.X,
+				mousePos.Y + cursorOffset.Y + inset.Y,
+			),
+		);
 	});
 
 	return dragging && app?.current
@@ -59,6 +64,9 @@ export function DraggableItemButton(props: ItemButtonProps) {
 		: ItemButton({
 				...props,
 				position: position,
-				onClick: () => setDragging(true),
+				onClick: (relativeToCursor) => {
+					setCursorOffset(relativeToCursor);
+					setDragging(true);
+				},
 			});
 }

@@ -1,33 +1,9 @@
-import React from "@rbxts/react";
+import React, { PropsWithChildren } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import {
-	selectBackpackOpen,
-	selectHotbar,
-} from "client/store/slices/gui/selectors";
-import { selectItems } from "shared/store/slices/inventory/selectors";
-import { DraggableItemButton } from "./draggable-item-button";
+import { selectBackpackOpen } from "client/store/slices/gui/selectors";
 
-interface Props {
-	activeTool?: Tool;
-	setActiveTool: React.Dispatch<React.SetStateAction<Tool | undefined>>;
-}
-
-export function Backpack(props: Props) {
+export function Backpack(props: PropsWithChildren) {
 	const backpackOpen = useSelector(selectBackpackOpen());
-	const items = useSelector(selectItems());
-	const hotbar = useSelector(selectHotbar());
-
-	const buttons: JSX.Element[] = [];
-	items.forEach((_quantity, tool) => {
-		if (hotbar.has(tool)) return;
-		buttons.push(
-			<DraggableItemButton
-				tool={tool}
-				activeTool={props.activeTool}
-				setActiveTool={props.setActiveTool}
-			/>,
-		);
-	});
 
 	return (
 		<frame
@@ -76,7 +52,7 @@ export function Backpack(props: Props) {
 					PaddingRight={new UDim(0, 8)}
 					PaddingTop={new UDim(0, 8)}
 				/>
-				{buttons}
+				{props.children}
 			</scrollingframe>
 		</frame>
 	);
