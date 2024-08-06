@@ -2,10 +2,12 @@ import React, { useContext } from "@rbxts/react";
 import { signalContext } from "client/gui/context";
 import { useMotion } from "client/gui/hooks/use-motion";
 
-interface Props {
+export interface ItemButtonProps {
 	tool: Tool;
 	activeTool?: Tool;
 	setActiveTool: React.Dispatch<React.SetStateAction<Tool | undefined>>;
+	position?: React.Binding<UDim2>;
+	onClick?: () => void;
 }
 
 const COLOR = {
@@ -18,7 +20,13 @@ const SIZE = {
 	deselected: 6,
 };
 
-export function ItemButton({ tool, activeTool, setActiveTool }: Props) {
+export function ItemButton({
+	tool,
+	activeTool,
+	setActiveTool,
+	position,
+	onClick,
+}: ItemButtonProps) {
 	const signal = useContext(signalContext);
 
 	const quantity = 1;
@@ -62,10 +70,12 @@ export function ItemButton({ tool, activeTool, setActiveTool }: Props) {
 			TextWrapped={true}
 			Event={{
 				MouseButton1Down: () => {
+					if (onClick) onClick();
 					setActiveTool(!selected ? tool : undefined);
 					signal.Fire(!selected ? tool : undefined);
 				},
 			}}
+			Position={position}
 		>
 			<imagelabel
 				key="Overlay"

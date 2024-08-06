@@ -8,3 +8,7 @@ defaultSignal.Connect(() => {
 	warn("fired the fallback signal; GuiController failed to provide a value?");
 });
 export const signalContext = createContext(defaultSignal);
+
+export const appContext = createContext<
+	React.MutableRefObject<ScreenGui | undefined> | undefined
+>(undefined);

@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { selectBackpackOpen } from "client/store/slices/gui/selectors";
 import { selectItems } from "shared/store/slices/inventory/selectors";
-import { ItemButton } from "./item-button";
+import { DraggableItemButton } from "./draggable-item-button";
 
 interface Props {
 	activeTool?: Tool;
@@ -16,7 +16,7 @@ export function Backpack(props: Props) {
 	const buttons: JSX.Element[] = [];
 	items.forEach((_quantity, tool) => {
 		buttons.push(
-			<ItemButton
+			<DraggableItemButton
 				tool={tool}
 				activeTool={props.activeTool}
 				setActiveTool={props.setActiveTool}

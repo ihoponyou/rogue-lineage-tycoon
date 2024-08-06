@@ -4,7 +4,7 @@ import { ReflexProvider } from "@rbxts/react-reflex";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
 import { SoundService, StarterGui } from "@rbxts/services";
 import Signal from "@rbxts/signal";
-import { LOCAL_PLAYER } from "client/constants";
+import { LOCAL_PLAYER_GUI } from "client/constants";
 import { App } from "client/gui/components/app";
 import { signalContext, ToolSelectedCallback } from "client/gui/context";
 import { Events } from "client/network";
@@ -13,7 +13,6 @@ import { selectCurrencies } from "shared/store/slices/currencies/selectors";
 
 @Controller()
 export class GuiController implements OnStart {
-	private playerGui = LOCAL_PLAYER.WaitForChild("PlayerGui");
 	private root = createRoot(new Instance("Folder"));
 
 	private selectedTool = new Signal<ToolSelectedCallback>();
@@ -39,12 +38,11 @@ export class GuiController implements OnStart {
 			store.setDialogueOptions([]);
 			store.setSpeakerName("");
 		});
-
 		this.root.render(
 			<StrictMode>
 				<ReflexProvider producer={store}>
 					<signalContext.Provider value={this.selectedTool}>
-						{createPortal(<App />, this.playerGui)}
+						{createPortal(<App />, LOCAL_PLAYER_GUI)}
 					</signalContext.Provider>
 				</ReflexProvider>
 			</StrictMode>,
