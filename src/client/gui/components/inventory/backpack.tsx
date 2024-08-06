@@ -1,4 +1,4 @@
-import React from "@rbxts/react";
+import React, { useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { selectBackpackOpen } from "client/store/slices/gui/selectors";
 import { selectInventory } from "shared/store/slices/inventory/selectors";
@@ -8,9 +8,17 @@ export function Backpack() {
 	const backpackOpen = useSelector(selectBackpackOpen());
 	const inventory = useSelector(selectInventory());
 
+	const [activeTool, setActiveTool] = useState<Tool | undefined>(undefined);
+
 	const items: JSX.Element[] = [];
 	inventory.forEach((_value, key) => {
-		items.push(<ItemButton tool={key} />);
+		items.push(
+			<ItemButton
+				tool={key}
+				activeTool={activeTool}
+				setActiveTool={setActiveTool}
+			/>,
+		);
 	});
 
 	return (

@@ -6,7 +6,11 @@ import { Events } from "server/network";
 import { store } from "server/store";
 import { AbstractItem } from "shared/components/abstract-item";
 import { ModelComponent } from "shared/components/model";
-import { DEFAULT_ROOT_JOINT_C0, getItemConfig } from "shared/configs/items";
+import {
+	BodyPart,
+	DEFAULT_ROOT_JOINT_C0,
+	getItemConfig,
+} from "shared/configs/items";
 import { TouchableModel } from "./interactable/touchable/touchable-model";
 import { PlayerServer } from "./player-server";
 
@@ -73,33 +77,42 @@ export class Item extends AbstractItem implements OnStart {
 		if (this.owner !== undefined) return;
 		const playerServer = this.components.getComponent<PlayerServer>(player);
 		if (playerServer === undefined) return;
-		this.touchable.disable();
-		this.owner = playerServer;
 
+		this.touchable.disable();
+
+		this.owner = playerServer;
+		this.instance.Parent = player;
 		this.worldModel.instance.PrimaryPart!.CanCollide = false;
 
-		this.equipped = true;
-		this.unequip();
+		this.rigToLimb(
+			this.config.holsterLimb,
+			this.config.holsterC0 ?? DEFAULT_ROOT_JOINT_C0,
+		);
 
 		store.giveItem(player, this.instance);
 	}
 
 	public drop(): void {
 		if (this.equipped) this.unequip();
+
 		this.owner = undefined;
-		this.worldModel.instance.PrimaryPart!.CanCollide = true;
 		this.instance.Parent = Workspace;
+		this.worldModel.instance.PrimaryPart!.CanCollide = true;
+
+		this.rootJoint.Part0 = undefined;
 	}
 
 	public equip(): void {
 		if (this.equipped) return;
 		if (this.owner === undefined) return;
 
-		const character = this.owner.getCharacter();
-		this.worldModel.instance.Parent = character.instance;
-		const rig = promiseR6(character.instance).expect();
-		this.rootJoint.Part0 = rig["Right Arm"];
-		this.rootJoint.C0 = this.config.equipC0 ?? DEFAULT_ROOT_JOINT_C0;
+		if (this.config.hideOnHolster) {
+			this.worldModel.show();
+		}
+		this.rigToLimb(
+			this.config.equipLimb,
+			this.config.equipC0 ?? DEFAULT_ROOT_JOINT_C0,
+		);
 
 		this.equipped = true;
 	}
@@ -108,16 +121,24 @@ export class Item extends AbstractItem implements OnStart {
 		if (!this.equipped) return;
 		if (this.owner === undefined) return;
 
-		if (this.config.holsterLimb === undefined) {
-			this.worldModel.instance.Parent = this.instance;
-		} else {
-			const character = this.owner.getCharacter();
-			this.worldModel.instance.Parent = character.instance;
-			const rig = promiseR6(character.instance).expect();
-			this.rootJoint.Part0 = rig[this.config.holsterLimb];
-			this.rootJoint.C0 = this.config.holsterC0 ?? DEFAULT_ROOT_JOINT_C0;
+		if (this.config.hideOnHolster) {
+			this.worldModel.hide();
 		}
 
+		this.rigToLimb(
+			this.config.holsterLimb,
+			this.config.holsterC0 ?? DEFAULT_ROOT_JOINT_C0,
+		);
+
 		this.equipped = false;
+	}
+
+	private rigToLimb(limb: BodyPart, c0: CFrame): void {
+		if (this.owner === undefined) return;
+		const character = this.owner.getCharacter();
+		this.worldModel.instance.Parent = character.instance;
+		const rig = promiseR6(character.instance).expect();
+		this.rootJoint.Part0 = rig[limb];
+		this.rootJoint.C0 = c0;
 	}
 }

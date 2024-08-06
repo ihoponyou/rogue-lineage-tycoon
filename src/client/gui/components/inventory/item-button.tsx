@@ -1,9 +1,11 @@
-import React, { useContext, useState } from "@rbxts/react";
+import React, { useContext } from "@rbxts/react";
 import { signalContext } from "client/gui/context";
 import { useMotion } from "client/gui/hooks/use-motion";
 
 interface Props {
 	tool: Tool;
+	activeTool?: Tool;
+	setActiveTool: React.Dispatch<React.SetStateAction<Tool | undefined>>;
 }
 
 const COLOR = {
@@ -16,7 +18,7 @@ const SIZE = {
 	deselected: 6,
 };
 
-export function ItemButton({ tool }: Props) {
+export function ItemButton({ tool, activeTool, setActiveTool }: Props) {
 	const signal = useContext(signalContext);
 
 	const quantity = 1;
@@ -25,8 +27,7 @@ export function ItemButton({ tool }: Props) {
 	const [textTransparency, textTransparencyMotion] = useMotion(0);
 	const [color, colorMotion] = useMotion(COLOR.deselected);
 
-	const [selected, setSelected] = useState(false);
-
+	const selected = tool === activeTool;
 	sizeMotion.tween(selected ? SIZE.selected : SIZE.deselected, {
 		time: 0.1,
 		style: selected ? Enum.EasingStyle.Back : undefined,
@@ -38,7 +39,7 @@ export function ItemButton({ tool }: Props) {
 
 	return (
 		<textbutton
-			key="ToolFrame"
+			key={tool.Name}
 			Active={false}
 			AnchorPoint={new Vector2(0.5, 0)}
 			AutoButtonColor={false}
@@ -61,8 +62,7 @@ export function ItemButton({ tool }: Props) {
 			TextWrapped={true}
 			Event={{
 				MouseButton1Down: () => {
-					setSelected(!selected);
-					// the value doesnt update immediately?
+					setActiveTool(!selected ? tool : undefined);
 					signal.Fire(!selected ? tool : undefined);
 				},
 			}}

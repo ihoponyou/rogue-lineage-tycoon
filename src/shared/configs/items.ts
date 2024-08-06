@@ -1,14 +1,16 @@
 import { ReplicatedStorage } from "@rbxts/services";
 
-type BodyPart = "Right Arm" | "Torso";
+export type BodyPart = "Right Arm" | "Torso";
 
 interface ItemConfig {
 	droppable: boolean;
 	maxStackSize: number;
 	worldModel: Model;
+	hideOnHolster: boolean;
+	equipLimb: BodyPart;
 	equipC0?: CFrame;
+	holsterLimb: BodyPart;
 	holsterC0?: CFrame;
-	holsterLimb?: BodyPart;
 }
 
 function cframeFromOrientationDeg(
@@ -32,11 +34,16 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		droppable: true,
 		maxStackSize: 99,
 		worldModel: ReplicatedStorage.Assets.Tycoon.Products.Goblet,
+		hideOnHolster: true,
+		equipLimb: "Right Arm",
+		holsterLimb: "Right Arm",
 	},
 	"Bronze Sword": {
 		droppable: false,
 		maxStackSize: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Sword"],
+		hideOnHolster: false,
+		equipLimb: "Right Arm",
 		equipC0: new CFrame(0, -1, -1.75).mul(
 			cframeFromOrientationDeg(-90, 90),
 		),
