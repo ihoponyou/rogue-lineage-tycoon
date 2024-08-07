@@ -4,14 +4,14 @@ import { useSelector } from "@rbxts/react-reflex";
 import { createPortal } from "@rbxts/react-roblox";
 import { GuiService, RunService, UserInputService } from "@rbxts/services";
 import { LOCAL_PLAYER_GUI } from "client/constants";
-import { appContext, signalContext } from "client/gui/context";
+import { appContext } from "client/gui/context";
 import { store } from "client/store";
 import { selectHotbarHasTool } from "client/store/slices/gui/selectors";
 import { ItemButton, ItemButtonProps } from "./item-button";
 
 export function DraggableItemButton(props: ItemButtonProps) {
+	print("rendering");
 	const app = useContext(appContext);
-	const signal = useContext(signalContext);
 
 	const hasTool = useSelector(selectHotbarHasTool(props.tool));
 
@@ -26,7 +26,7 @@ export function DraggableItemButton(props: ItemButtonProps) {
 		const mousePos = UserInputService.GetMouseLocation().sub(inset);
 		setPosition(
 			UDim2.fromOffset(
-				mousePos.X + cursorOffset.X + inset.X,
+				mousePos.X + cursorOffset.X + inset.X + 30,
 				mousePos.Y + cursorOffset.Y + inset.Y,
 			),
 		);
@@ -36,16 +36,16 @@ export function DraggableItemButton(props: ItemButtonProps) {
 		? createPortal(
 				ItemButton({
 					...props,
-					position: position,
+					positionBinding: position,
 					dragging: true,
 					onM1Up: (screenPos) => {
 						setDragging(false);
+
 						const hoveredObjects =
 							LOCAL_PLAYER_GUI.GetGuiObjectsAtPosition(
 								screenPos.X,
 								screenPos.Y,
 							);
-
 						const index = hoveredObjects.findIndex(
 							(object) => object.Name === "EmptySlot",
 						);
@@ -64,7 +64,6 @@ export function DraggableItemButton(props: ItemButtonProps) {
 									? props.tool
 									: undefined;
 							props.setActiveTool(newTool);
-							signal.Fire(newTool);
 						}
 					},
 				}),
@@ -72,7 +71,7 @@ export function DraggableItemButton(props: ItemButtonProps) {
 			)
 		: ItemButton({
 				...props,
-				position: position,
+				position: props.position,
 				onM1Down: (cursorOffset) => {
 					setDragging(true);
 					setCursorOffset(cursorOffset);

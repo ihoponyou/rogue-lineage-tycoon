@@ -7,9 +7,11 @@ import { selectHotbarHasTool } from "client/store/slices/gui/selectors";
 
 export interface ItemButtonProps {
 	tool: Tool;
+	quantity: number;
 	activeTool: Tool | undefined;
 	setActiveTool: (tool?: Tool) => void;
-	position?: React.Binding<UDim2>;
+	position?: UDim2;
+	positionBinding?: React.Binding<UDim2>;
 	slot?: number;
 	dragging?: boolean;
 	onM1Down?: (cursorOffset: Vector2) => void;
@@ -34,6 +36,22 @@ const TEXT_TRANSPARENCY = {
 const TWEEN_OPTIONS: Ripple.TweenOptions = {
 	time: 0.1,
 };
+
+// TODO: change with custom binds
+const SLOT_LABELS = [
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+	"0",
+	"-",
+	"=",
+];
 
 export function ItemButton(props: ItemButtonProps) {
 	const quantity = 1;
@@ -60,6 +78,7 @@ export function ItemButton(props: ItemButtonProps) {
 		<textbutton
 			key={props.tool.Name}
 			Active={false}
+			AnchorPoint={new Vector2(0.5, 0)}
 			AutoButtonColor={false}
 			BackgroundColor3={color}
 			BorderSizePixel={0}
@@ -95,7 +114,7 @@ export function ItemButton(props: ItemButtonProps) {
 					}
 				},
 			}}
-			Position={props.position}
+			Position={props.positionBinding ?? props.position}
 			LayoutOrder={props.slot}
 		>
 			<imagelabel
@@ -156,7 +175,7 @@ export function ItemButton(props: ItemButtonProps) {
 				}
 				Position={new UDim2(0.5, 0, 0, 0)}
 				Size={new UDim2(0, 16, 0, 12)}
-				Text={tostring(props.slot)}
+				Text={props.slot !== undefined ? SLOT_LABELS[props.slot] : "?"}
 				TextColor3={Color3.fromRGB(47, 44, 38)}
 				TextSize={14}
 				TextYAlignment={Enum.TextYAlignment.Bottom}

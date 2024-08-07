@@ -3,6 +3,7 @@ import React from "@rbxts/react";
 interface Props {
 	index: number;
 	visible: boolean;
+	position: UDim2;
 }
 
 export function EmptyHotbarSlot(props: Props) {
@@ -17,8 +18,9 @@ export function EmptyHotbarSlot(props: Props) {
 			ScaleType={Enum.ScaleType.Slice}
 			Size={new UDim2(0, 60, 0, 61)}
 			SliceCenter={new Rect(5, 5, 5, 5)}
-			ZIndex={0}
+			ZIndex={-1}
 			Visible={props.visible}
+			Position={props.position}
 		/>
 	);
 }
