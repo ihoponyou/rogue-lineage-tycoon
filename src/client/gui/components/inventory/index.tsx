@@ -27,7 +27,7 @@ export function Inventory() {
 				tool={tool}
 				activeTool={activeTool}
 				setActiveTool={setActiveTool}
-				layoutOrder={slot}
+				slot={slot}
 			/>
 		);
 		if (slot === undefined) {

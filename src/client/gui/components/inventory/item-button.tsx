@@ -1,17 +1,19 @@
-import React, { useContext } from "@rbxts/react";
+import React from "@rbxts/react";
+import { useSelector } from "@rbxts/react-reflex";
+import Ripple from "@rbxts/ripple";
 import { GuiService } from "@rbxts/services";
-import { signalContext } from "client/gui/context";
 import { useMotion } from "client/gui/hooks/use-motion";
+import { selectHotbarHasTool } from "client/store/slices/gui/selectors";
 
 export interface ItemButtonProps {
 	tool: Tool;
-	activeTool?: Tool;
-	setActiveTool: React.Dispatch<React.SetStateAction<Tool | undefined>>;
+	activeTool: Tool | undefined;
+	setActiveTool: (tool?: Tool) => void;
 	position?: React.Binding<UDim2>;
-	onM1Down?: (cursorOffset: Vector2) => void;
-	onM1Up?: (screenPos: Vector2) => boolean;
-	layoutOrder?: number;
+	slot?: number;
 	dragging?: boolean;
+	onM1Down?: (cursorOffset: Vector2) => void;
+	onM1Up?: (screenPos: Vector2) => void;
 }
 
 const COLOR = {
@@ -24,40 +26,39 @@ const SIZE = {
 	deselected: 6,
 };
 
-export function ItemButton({
-	tool,
-	activeTool,
-	setActiveTool,
-	position,
-	onM1Down,
-	onM1Up,
-	layoutOrder,
-	dragging,
-}: ItemButtonProps) {
-	const signal = useContext(signalContext);
+const TEXT_TRANSPARENCY = {
+	selected: 0,
+	deselected: 0.2,
+};
 
+const TWEEN_OPTIONS: Ripple.TweenOptions = {
+	time: 0.1,
+};
+
+export function ItemButton(props: ItemButtonProps) {
 	const quantity = 1;
-	const inHotbar = false;
+	const inHotbar = useSelector(selectHotbarHasTool(props.tool));
 	const [size, sizeMotion] = useMotion(SIZE.deselected);
 	const [textTransparency, textTransparencyMotion] = useMotion(0);
 	const [color, colorMotion] = useMotion(COLOR.deselected);
 
-	const selected = tool === activeTool;
+	const selected = props.tool === props.activeTool;
 	sizeMotion.tween(selected ? SIZE.selected : SIZE.deselected, {
-		time: 0.1,
+		...TWEEN_OPTIONS,
 		style: selected ? Enum.EasingStyle.Back : undefined,
 	});
-	textTransparencyMotion.tween(selected ? 0 : 0.2, { time: 0.1 });
+	textTransparencyMotion.tween(
+		selected ? TEXT_TRANSPARENCY.selected : TEXT_TRANSPARENCY.deselected,
+		TWEEN_OPTIONS,
+	);
 	colorMotion.tween(
-		selected || dragging ? COLOR.selected : COLOR.deselected,
-		{
-			time: 0.1,
-		},
+		selected || props.dragging ? COLOR.selected : COLOR.deselected,
+		TWEEN_OPTIONS,
 	);
 
 	return (
 		<textbutton
-			key={tool.Name}
+			key={props.tool.Name}
 			Active={false}
 			AutoButtonColor={false}
 			BackgroundColor3={color}
@@ -72,36 +73,30 @@ export function ItemButton({
 			}
 			Selectable={false}
 			Size={new UDim2(0, 60, 0, 60)}
-			Text={tool.Name}
+			Text={props.tool.Name}
 			TextColor3={Color3.fromRGB(47, 43, 30)}
 			TextSize={13}
 			TextTransparency={textTransparency}
 			TextWrapped={true}
 			Event={{
 				MouseButton1Down: (rbx, x, y) => {
-					if (onM1Down) {
+					if (props.onM1Down) {
 						const inset = GuiService.GetGuiInset()[0];
 						const mousePos = new Vector2(x, y).sub(inset);
 						const diff = rbx.AbsolutePosition.sub(mousePos);
-						// colorMotion.set(COLOR.selected);
-						onM1Down(diff);
+						props.onM1Down(diff);
 					}
 				},
 				MouseButton1Up: (_rbx, x, y) => {
-					let transferred = false;
-					if (onM1Up) {
+					if (props.onM1Up) {
 						const inset = GuiService.GetGuiInset()[0];
 						const mousePos = new Vector2(x, y).sub(inset);
-						transferred = onM1Up(mousePos);
-					}
-					if (!transferred) {
-						setActiveTool(!selected ? tool : undefined);
-						signal.Fire(!selected ? tool : undefined);
+						props.onM1Up(mousePos);
 					}
 				},
 			}}
-			Position={position}
-			LayoutOrder={layoutOrder}
+			Position={props.position}
+			LayoutOrder={props.slot}
 		>
 			<imagelabel
 				key="Overlay"
@@ -161,7 +156,7 @@ export function ItemButton({
 				}
 				Position={new UDim2(0.5, 0, 0, 0)}
 				Size={new UDim2(0, 16, 0, 12)}
-				Text="?"
+				Text={tostring(props.slot)}
 				TextColor3={Color3.fromRGB(47, 44, 38)}
 				TextSize={14}
 				TextYAlignment={Enum.TextYAlignment.Bottom}

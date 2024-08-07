@@ -4,18 +4,20 @@ import { useSelector } from "@rbxts/react-reflex";
 import { createPortal } from "@rbxts/react-roblox";
 import { GuiService, RunService, UserInputService } from "@rbxts/services";
 import { LOCAL_PLAYER_GUI } from "client/constants";
-import { appContext } from "client/gui/context";
+import { appContext, signalContext } from "client/gui/context";
 import { store } from "client/store";
 import { selectHotbarHasTool } from "client/store/slices/gui/selectors";
 import { ItemButton, ItemButtonProps } from "./item-button";
 
 export function DraggableItemButton(props: ItemButtonProps) {
+	const app = useContext(appContext);
+	const signal = useContext(signalContext);
+
+	const hasTool = useSelector(selectHotbarHasTool(props.tool));
+
 	const [position, setPosition] = useBinding(new UDim2());
 	const [cursorOffset, setCursorOffset] = useState(Vector2.zero);
 	const [dragging, setDragging] = useState(false);
-	const app = useContext(appContext);
-
-	const hasTool = useSelector(selectHotbarHasTool(props.tool));
 
 	useEventListener(RunService.RenderStepped, (_deltaTime) => {
 		if (!dragging) return;
@@ -48,12 +50,21 @@ export function DraggableItemButton(props: ItemButtonProps) {
 							(object) => object.Name === "EmptySlot",
 						);
 						const object = hoveredObjects[index];
-						if (object !== undefined) {
-							store.addToHotbar(props.tool, object.LayoutOrder);
-							return !hasTool;
-						} else {
+						let transferred = false;
+						if (object === undefined) {
 							store.removeFromHotbar(props.tool);
-							return hasTool;
+							transferred = hasTool;
+						} else {
+							store.addToHotbar(props.tool, object.LayoutOrder);
+							transferred = !hasTool;
+						}
+						if (!transferred) {
+							const newTool =
+								props.tool !== props.activeTool
+									? props.tool
+									: undefined;
+							props.setActiveTool(newTool);
+							signal.Fire(newTool);
 						}
 					},
 				}),
