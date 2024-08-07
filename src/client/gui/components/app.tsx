@@ -4,7 +4,8 @@ import { selectManaEnabled } from "shared/store/slices/mana/selectors";
 import { appContext } from "../context";
 import { DialogueBox } from "./dialogue-box";
 import { ManaBar } from "./fill-bar/mana-bar";
-import { Inventory } from "./inventory";
+import { Backpack } from "./inventory/backpack";
+import { Hotbar } from "./inventory/hotbar";
 import { SilverLogo } from "./silver-logo";
 import { Stats } from "./stats";
 
@@ -24,7 +25,8 @@ export function App() {
 			<Stats />
 			<DialogueBox />
 			<appContext.Provider value={ref}>
-				<Inventory />
+				<Backpack />
+				<Hotbar />
 			</appContext.Provider>
 		</screengui>
 	);

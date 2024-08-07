@@ -12,3 +12,7 @@ export function selectHotbar() {
 export function selectHotbarHasTool(tool: Tool) {
 	return createSelector(selectHotbar(), (tools) => tools.has(tool));
 }
+
+export function selectActiveTool() {
+	return (state: RootState) => state.gui.activeTool;
+}

@@ -1,10 +1,48 @@
-import React, { PropsWithChildren } from "@rbxts/react";
+import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { selectBackpackOpen } from "client/store/slices/gui/selectors";
+import { MAX_HOTBAR_SLOTS } from "client/constants";
+import {
+	selectBackpackOpen,
+	selectHotbar,
+} from "client/store/slices/gui/selectors";
+import { selectItems } from "shared/store/slices/inventory/selectors";
+import { DraggableItemButton } from "./draggable-item-button";
+import { EmptyHotbarSlot } from "./empty-hotbar-slot";
 
-export function Backpack(props: PropsWithChildren) {
+export function Backpack() {
 	const backpackOpen = useSelector(selectBackpackOpen());
+	const items = useSelector(selectItems());
+	const hotbarItems = useSelector(selectHotbar());
 
+	const backpackButtons = new Array<JSX.Element>();
+	const emptySlots = new Array<JSX.Element>();
+	items.forEach((quantity, tool) => {
+		const slot = hotbarItems.get(tool);
+		if (slot !== undefined) return;
+		const element = (
+			<DraggableItemButton
+				tool={tool}
+				quantity={quantity}
+				slot={slot}
+				position={
+					slot !== undefined
+						? UDim2.fromScale(slot / (MAX_HOTBAR_SLOTS - 1))
+						: undefined
+				}
+			/>
+		);
+		backpackButtons.push(element);
+	});
+
+	for (let i = 0; i < MAX_HOTBAR_SLOTS; i++) {
+		emptySlots.push(
+			<EmptyHotbarSlot
+				index={i}
+				visible={true}
+				position={UDim2.fromScale(i / (MAX_HOTBAR_SLOTS - 1))}
+			/>,
+		);
+	}
 	return (
 		<frame
 			key="Backpack"
@@ -52,7 +90,7 @@ export function Backpack(props: PropsWithChildren) {
 					PaddingRight={new UDim(0, 8)}
 					PaddingTop={new UDim(0, 8)}
 				/>
-				{props.children}
+				{backpackButtons}
 			</scrollingframe>
 		</frame>
 	);

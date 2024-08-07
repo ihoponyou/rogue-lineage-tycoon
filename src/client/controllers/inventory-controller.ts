@@ -2,20 +2,18 @@ import { Components } from "@flamework/components";
 import { Controller, OnStart } from "@flamework/core";
 import { Item } from "client/components/item";
 import { MAX_HOTBAR_SLOTS } from "client/constants";
-import { GuiController } from "./gui-controller";
+import { store } from "client/store";
+import { selectActiveTool } from "client/store/slices/gui/selectors";
 
 @Controller()
 export class InventoryController implements OnStart {
 	private activeItem?: Item;
 	private hotbar = new Array<Tool>(MAX_HOTBAR_SLOTS);
 
-	public constructor(
-		private components: Components,
-		private guiController: GuiController,
-	) {}
+	public constructor(private components: Components) {}
 
 	public onStart(): void {
-		this.guiController.onToolSelected((tool) => this.switchItem(tool));
+		store.subscribe(selectActiveTool(), (tool) => this.switchItem(tool));
 	}
 
 	private switchItem(newItem: Tool | undefined) {

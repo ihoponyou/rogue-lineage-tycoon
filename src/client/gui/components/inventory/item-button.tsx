@@ -3,13 +3,14 @@ import { useSelector } from "@rbxts/react-reflex";
 import Ripple from "@rbxts/ripple";
 import { GuiService } from "@rbxts/services";
 import { useMotion } from "client/gui/hooks/use-motion";
-import { selectHotbarHasTool } from "client/store/slices/gui/selectors";
+import {
+	selectActiveTool,
+	selectHotbarHasTool,
+} from "client/store/slices/gui/selectors";
 
 export interface ItemButtonProps {
 	tool: Tool;
 	quantity: number;
-	activeTool: Tool | undefined;
-	setActiveTool: (tool?: Tool) => void;
 	position?: UDim2;
 	positionBinding?: React.Binding<UDim2>;
 	slot?: number;
@@ -56,11 +57,12 @@ const SLOT_LABELS = [
 export function ItemButton(props: ItemButtonProps) {
 	const quantity = 1;
 	const inHotbar = useSelector(selectHotbarHasTool(props.tool));
+	const activeTool = useSelector(selectActiveTool());
 	const [size, sizeMotion] = useMotion(SIZE.deselected);
 	const [textTransparency, textTransparencyMotion] = useMotion(0);
 	const [color, colorMotion] = useMotion(COLOR.deselected);
 
-	const selected = props.tool === props.activeTool;
+	const selected = props.tool === activeTool;
 	sizeMotion.tween(selected ? SIZE.selected : SIZE.deselected, {
 		...TWEEN_OPTIONS,
 		style: selected ? Enum.EasingStyle.Back : undefined,

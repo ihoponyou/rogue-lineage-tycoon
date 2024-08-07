@@ -6,13 +6,16 @@ import { GuiService, RunService, UserInputService } from "@rbxts/services";
 import { LOCAL_PLAYER_GUI } from "client/constants";
 import { appContext } from "client/gui/context";
 import { store } from "client/store";
-import { selectHotbarHasTool } from "client/store/slices/gui/selectors";
+import {
+	selectActiveTool,
+	selectHotbarHasTool,
+} from "client/store/slices/gui/selectors";
 import { ItemButton, ItemButtonProps } from "./item-button";
 
 export function DraggableItemButton(props: ItemButtonProps) {
-	print("rendering");
 	const app = useContext(appContext);
 
+	const activeTool = useSelector(selectActiveTool());
 	const hasTool = useSelector(selectHotbarHasTool(props.tool));
 
 	const [position, setPosition] = useBinding(new UDim2());
@@ -55,15 +58,15 @@ export function DraggableItemButton(props: ItemButtonProps) {
 							store.removeFromHotbar(props.tool);
 							transferred = hasTool;
 						} else {
-							store.addToHotbar(props.tool, object.LayoutOrder);
+							store.addToHotbar(object.LayoutOrder, props.tool);
 							transferred = !hasTool;
 						}
 						if (!transferred) {
 							const newTool =
-								props.tool !== props.activeTool
+								props.tool !== activeTool
 									? props.tool
 									: undefined;
-							props.setActiveTool(newTool);
+							store.setActiveTool(newTool);
 						}
 					},
 				}),
