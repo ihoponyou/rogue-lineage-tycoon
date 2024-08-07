@@ -8,8 +8,10 @@ export interface ItemButtonProps {
 	activeTool?: Tool;
 	setActiveTool: React.Dispatch<React.SetStateAction<Tool | undefined>>;
 	position?: React.Binding<UDim2>;
-	onClick?: (relativeToCursor: Vector2) => void;
+	onM1Down?: (cursorOffset: Vector2) => void;
+	onM1Up?: (screenPos: Vector2) => boolean;
 	layoutOrder?: number;
+	dragging?: boolean;
 }
 
 const COLOR = {
@@ -27,8 +29,10 @@ export function ItemButton({
 	activeTool,
 	setActiveTool,
 	position,
-	onClick,
+	onM1Down,
+	onM1Up,
 	layoutOrder,
+	dragging,
 }: ItemButtonProps) {
 	const signal = useContext(signalContext);
 
@@ -44,9 +48,12 @@ export function ItemButton({
 		style: selected ? Enum.EasingStyle.Back : undefined,
 	});
 	textTransparencyMotion.tween(selected ? 0 : 0.2, { time: 0.1 });
-	colorMotion.tween(selected ? COLOR.selected : COLOR.deselected, {
-		time: 0.1,
-	});
+	colorMotion.tween(
+		selected || dragging ? COLOR.selected : COLOR.deselected,
+		{
+			time: 0.1,
+		},
+	);
 
 	return (
 		<textbutton
@@ -72,19 +79,29 @@ export function ItemButton({
 			TextWrapped={true}
 			Event={{
 				MouseButton1Down: (rbx, x, y) => {
-					if (onClick) {
+					if (onM1Down) {
 						const inset = GuiService.GetGuiInset()[0];
 						const mousePos = new Vector2(x, y).sub(inset);
 						const diff = rbx.AbsolutePosition.sub(mousePos);
-
-						onClick(diff);
+						// colorMotion.set(COLOR.selected);
+						onM1Down(diff);
 					}
-					setActiveTool(!selected ? tool : undefined);
-					signal.Fire(!selected ? tool : undefined);
+				},
+				MouseButton1Up: (_rbx, x, y) => {
+					let transferred = false;
+					if (onM1Up) {
+						const inset = GuiService.GetGuiInset()[0];
+						const mousePos = new Vector2(x, y).sub(inset);
+						transferred = onM1Up(mousePos);
+					}
+					if (!transferred) {
+						setActiveTool(!selected ? tool : undefined);
+						signal.Fire(!selected ? tool : undefined);
+					}
 				},
 			}}
 			Position={position}
-			LayoutOrder={layoutOrder ?? -1}
+			LayoutOrder={layoutOrder}
 		>
 			<imagelabel
 				key="Overlay"
