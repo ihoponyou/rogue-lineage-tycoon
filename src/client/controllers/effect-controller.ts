@@ -1,12 +1,12 @@
 import { Controller, OnStart } from "@flamework/core";
 import { EFFECTS } from "client/effects";
-import { Events } from "client/networking";
+import { Events } from "client/network";
 
 @Controller()
 export class EffectController implements OnStart {
 	public onStart(): void {
 		Events.playEffect.connect((name, ...args: unknown[]) => {
-			print(name, ...args);
+			// print(name, ...args);
 			EFFECTS[name](...args);
 		});
 	}

@@ -1,7 +1,7 @@
 import { Trove } from "@rbxts/trove";
-import { Events } from "client/networking";
+import { Events } from "client/network";
 import { BLOCK_WALK_SPEED } from "shared/configs";
-import { StateMachine } from "shared/state-machine";
+import { StateMachine } from "shared/modules/state-machine";
 import { Character } from "../components/character";
 import { AnimationController } from "../controllers/animation-controller";
 import { KeybindController } from "../controllers/keybind-controller";

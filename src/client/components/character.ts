@@ -1,7 +1,7 @@
 import { Component } from "@flamework/components";
 import { Workspace } from "@rbxts/services";
-import { SharedComponents } from "shared/components/character";
-import { Events } from "../networking";
+import { AbstractCharacter } from "shared/components/abstract-character";
+import { Events } from "../network";
 
 @Component({
 	defaults: {
@@ -9,7 +9,7 @@ import { Events } from "../networking";
 		isAlive: true,
 	},
 })
-export class Character extends SharedComponents.Character {
+export class Character extends AbstractCharacter {
 	public override onStart(): void {
 		super.onStart();
 

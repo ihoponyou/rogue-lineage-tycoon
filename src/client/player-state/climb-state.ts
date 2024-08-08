@@ -6,8 +6,8 @@ import {
 } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
 import { store } from "client/store";
-import { hasLineOfSight } from "shared/line-of-sight";
-import { StateMachine } from "shared/state-machine";
+import { hasLineOfSight } from "shared/modules/line-of-sight";
+import { StateMachine } from "shared/modules/state-machine";
 import { selectManaAmount } from "shared/store/slices/mana/selectors";
 import { Character } from "../components/character";
 import { AnimationController } from "../controllers/animation-controller";
@@ -102,7 +102,7 @@ export class ClimbState extends CharacterState {
 			params,
 		);
 		if (floorCheck) {
-			print("too close to floor");
+			// print("too close to floor");
 			this.stateMachine.transitionTo("idle");
 			return;
 		}
@@ -157,7 +157,7 @@ export class ClimbState extends CharacterState {
 		);
 
 		if (!(blockForwardCast || diagonalIn || diagonalOut)) {
-			print("wall not found");
+			// print("wall not found");
 			this.stateMachine.transitionTo("idle");
 			return;
 		}
@@ -206,7 +206,7 @@ export class ClimbState extends CharacterState {
 					),
 				);
 			} else {
-				print("ledge not found");
+				// print("ledge not found");
 				this.stateMachine.transitionTo("idle");
 				return;
 			}

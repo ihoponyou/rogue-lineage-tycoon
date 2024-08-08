@@ -3,7 +3,7 @@ import { OnTick } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
-import { Events } from "server/networking";
+import { Events } from "server/network";
 import { DataService } from "server/services/data-service";
 import { store } from "server/store";
 import {
@@ -12,11 +12,11 @@ import {
 	selectPlayerHealth,
 	selectPlayerTransform,
 } from "server/store/selectors";
-import { SharedComponents } from "shared/components/character";
+import { AbstractCharacter } from "shared/components/abstract-character";
 import {
 	deserializeVector3,
 	serializeVector3,
-} from "shared/serialized-vector3";
+} from "shared/modules/serialized-vector3";
 import { PlayerServer } from "../player-server";
 import { RagdollServer } from "./ragdoll-server";
 
@@ -41,7 +41,7 @@ const EVENTS = Events.character;
 		lightAttackCooldown: false,
 	},
 })
-export class Character extends SharedComponents.Character implements OnTick {
+export class Character extends AbstractCharacter implements OnTick {
 	public constructor(
 		private ragdoll: RagdollServer,
 		private components: Components,

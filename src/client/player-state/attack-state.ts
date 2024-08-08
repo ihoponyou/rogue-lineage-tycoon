@@ -1,8 +1,8 @@
 import { Debris, Workspace } from "@rbxts/services";
 import { Character } from "client/components/character";
 import { AnimationController } from "client/controllers/animation-controller";
-import { Events } from "client/networking";
-import { StateMachine } from "shared/state-machine";
+import { Events } from "client/network";
+import { StateMachine } from "shared/modules/state-machine";
 import { InputController } from "../controllers/input-controller";
 import { CharacterState } from "./character-state";
 

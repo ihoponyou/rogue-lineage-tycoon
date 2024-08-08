@@ -3,11 +3,11 @@ import { OnStart } from "@flamework/core";
 import { Touchable } from ".";
 
 type TouchableModelInstance = Model & {
-	Collider: Part;
+	Collider?: BasePart;
 };
 
 @Component({
-	tag: "TouchableModel",
+	tag: TouchableModel.TAG,
 })
 export class TouchableModel<
 		A extends {} = {},
@@ -16,8 +16,16 @@ export class TouchableModel<
 	extends Touchable<A, I>
 	implements OnStart
 {
+	public static readonly TAG = "TouchableModel";
+
 	public onStart(): void {
-		this.trove.connect(this.instance.Collider.Touched, (otherPart) =>
+		const collider =
+			(this.instance.FindFirstChild("Collider") as
+				| BasePart
+				| undefined) ?? this.instance.PrimaryPart;
+		if (collider === undefined)
+			error(`must have a dedicated collider or defined PrimaryPart`);
+		this.trove.connect(collider.Touched, (otherPart) =>
 			this.tryInteraction(otherPart),
 		);
 	}

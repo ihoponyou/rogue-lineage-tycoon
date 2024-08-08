@@ -1,6 +1,6 @@
 import { Trove } from "@rbxts/trove";
 import { Character } from "client/components/character";
-import { StateMachine } from "shared/state-machine";
+import { StateMachine } from "shared/modules/state-machine";
 import { InputController } from "../controllers/input-controller";
 import { CharacterState } from "./character-state";
 import {

@@ -54,7 +54,7 @@ export class Grippable
 			player.Character,
 		);
 		if (!characterComponent) return;
-		print(this.attributes.gettingGripped);
+		// print(this.attributes.gettingGripped);
 		this.attributes.gettingGripped
 			? this.release(characterComponent)
 			: this.grip(characterComponent);
@@ -94,7 +94,7 @@ export class Grippable
 		const torso = this.character.getTorso();
 		const head = this.character.getHead();
 		const hitSound = this.gripTrove.clone(SFX.PunchHit);
-		const hitParticle = this.gripTrove.clone(VFX.PunchHit);
+		const hitParticle = this.gripTrove.clone(VFX.Torso.PunchHit);
 		hitSound.Parent = torso;
 		hitParticle.Parent = head;
 

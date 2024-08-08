@@ -6,12 +6,14 @@ type TransparentInstance = BasePart | Decal;
 type ToggleableInstance = ParticleEmitter | Light | LayerCollector;
 
 @Component({
-	tag: "Model",
+	tag: ModelComponent.TAG,
 })
 export class ModelComponent
 	extends BaseComponent<{}, Model>
 	implements OnStart, Hideable
 {
+	public static readonly TAG = "Model";
+
 	private parts = new Array<BasePart>();
 	private decals = new Array<Decal>();
 	private toggleables = new Array<ToggleableInstance>();

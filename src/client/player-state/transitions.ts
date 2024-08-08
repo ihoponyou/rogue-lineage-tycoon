@@ -1,6 +1,6 @@
 import { Character } from "client/components/character";
 import { InputController } from "client/controllers/input-controller";
-import { StateMachine } from "shared/state-machine";
+import { StateMachine } from "shared/modules/state-machine";
 
 export function createRunTransition(
 	stateMachine: StateMachine,

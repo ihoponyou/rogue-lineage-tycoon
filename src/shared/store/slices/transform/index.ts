@@ -1,5 +1,8 @@
 import { createProducer } from "@rbxts/reflex";
-import { SerializedVector3, serializeVector3 } from "shared/serialized-vector3";
+import {
+	SerializedVector3,
+	serializeVector3,
+} from "shared/modules/serialized-vector3";
 import { PlayerData } from "../player-data";
 
 export interface TransformData {

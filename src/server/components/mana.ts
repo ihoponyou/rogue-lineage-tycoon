@@ -1,6 +1,6 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart, OnTick } from "@flamework/core";
-import { Events } from "server/networking";
+import { Events } from "server/network";
 import { store } from "server/store";
 import { selectPlayerIdentity } from "server/store/selectors";
 

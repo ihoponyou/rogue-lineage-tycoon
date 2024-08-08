@@ -1,10 +1,6 @@
 import { Components } from "@flamework/components";
 import { Controller, Dependency, OnStart, OnTick } from "@flamework/core";
-import {
-	ContextActionService,
-	UserInputService,
-	Workspace,
-} from "@rbxts/services";
+import { UserInputService, Workspace } from "@rbxts/services";
 import Signal from "@rbxts/signal";
 import { store } from "client/store";
 import {
@@ -13,6 +9,7 @@ import {
 } from "shared/store/slices/mana/selectors";
 import { OnLocalCharacterAdded } from "../../../types/lifecycles";
 import { Character } from "../components/character";
+import { InventoryController } from "./inventory-controller";
 import { KeybindController } from "./keybind-controller";
 
 const BEGIN = Enum.UserInputState.Begin;
@@ -43,44 +40,145 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private lightAttackTriggered = new Signal();
 	private blockTriggered = new Signal();
 
-	public constructor(private keybindController: KeybindController) {}
+	public constructor(
+		private keybindController: KeybindController,
+		private inventoryController: InventoryController,
+	) {}
 
 	public onStart(): void {
-		ContextActionService.BindAction(
-			"input_forward",
-			(_, state) => this.handleForwardInput(state),
-			false,
+		this.keybindController.loadKeybind(
+			"forward",
 			this.keybindController.keybinds.forward,
+			(state) => this.handleForwardInput(state),
 		);
-		ContextActionService.BindAction(
-			"input_dash",
-			(_, state) => this.handleDashInput(state),
-			true,
+		this.keybindController.loadKeybind(
+			"dash",
 			this.keybindController.keybinds.dash,
+			(state) => this.handleDashInput(state),
 		);
-		ContextActionService.BindAction(
-			"input_jump",
-			(_, state) => this.handleJumpInput(state),
-			false,
+		this.keybindController.loadKeybind(
+			"jump",
 			this.keybindController.keybinds.jump,
+			(state) => this.handleJumpInput(state),
 		);
-		ContextActionService.BindAction(
-			"input_mana",
-			(_, state) => this.handleManaInput(state),
-			true,
+		this.keybindController.loadKeybind(
+			"chargeMana",
 			this.keybindController.keybinds.chargeMana,
+			(state) => this.handleManaInput(state),
 		);
-		ContextActionService.BindAction(
-			"input_light_attack",
-			(_, state) => this.handleLightAttackInput(state),
-			true,
+		this.keybindController.loadKeybind(
+			"lightAttack",
 			this.keybindController.keybinds.lightAttack,
+			(state) => this.handleLightAttackInput(state),
 		);
-		ContextActionService.BindAction(
-			"input_block",
-			(_, state) => this.handleBlockInput(state),
-			true,
+		this.keybindController.loadKeybind(
+			"block",
 			this.keybindController.keybinds.block,
+			(state) => this.handleBlockInput(state),
+		);
+		this.keybindController.loadKeybind(
+			"toggleBackpack",
+			this.keybindController.keybinds.toggleBackpack,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				store.toggleBackpack();
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot1",
+			this.keybindController.keybinds.slot1,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(0);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot2",
+			this.keybindController.keybinds.slot2,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(1);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot3",
+			this.keybindController.keybinds.slot3,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(2);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot4",
+			this.keybindController.keybinds.slot4,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(3);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot5",
+			this.keybindController.keybinds.slot5,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(4);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot6",
+			this.keybindController.keybinds.slot6,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(5);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot7",
+			this.keybindController.keybinds.slot7,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(6);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot8",
+			this.keybindController.keybinds.slot8,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(7);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot9",
+			this.keybindController.keybinds.slot9,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(8);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot10",
+			this.keybindController.keybinds.slot10,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(9);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot11",
+			this.keybindController.keybinds.slot11,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(10);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot12",
+			this.keybindController.keybinds.slot12,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(11);
+			},
 		);
 	}
 

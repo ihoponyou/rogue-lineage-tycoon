@@ -1,8 +1,8 @@
 import { Workspace } from "@rbxts/services";
 import { store } from "client/store";
 import { SFX, VFX } from "shared/constants";
-import { deserializeColor3 } from "shared/serialized-color3";
-import { StateMachine } from "shared/state-machine";
+import { deserializeColor3 } from "shared/modules/serialized-color3";
+import { StateMachine } from "shared/modules/state-machine";
 import { selectManaColor } from "shared/store/slices/identity/selectors";
 import { selectMana } from "shared/store/slices/mana/selectors";
 import { Character } from "../components/character";

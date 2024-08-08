@@ -1,6 +1,7 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { getDigit } from "shared/get-digit";
+import { selectBackpackOpen } from "client/store/slices/gui/selectors";
+import { getDigit } from "shared/modules/get-digit";
 import {
 	selectHealth,
 	selectToxicity,
@@ -16,6 +17,7 @@ export function Stats() {
 	const stats = useSelector(selectStats());
 	const healthAmount = useSelector(selectHealth()) ?? -1;
 	const toxicity = useSelector(selectToxicity()) ?? 0;
+	const backpackOpen = useSelector(selectBackpackOpen());
 
 	return (
 		<frame
@@ -25,6 +27,7 @@ export function Stats() {
 			Position={new UDim2(0.5, 0, 1, -105)}
 			Size={new UDim2(0, 400, 0, 40)}
 			ZIndex={4}
+			Visible={!backpackOpen}
 		>
 			<frame
 				key="WidthFrame"

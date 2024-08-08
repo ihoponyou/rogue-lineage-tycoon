@@ -1,6 +1,7 @@
 import { conditionsSlice } from "./conditions";
 import { currenciesSlice } from "./currencies";
 import { identitySlice } from "./identity";
+import { inventorySlice } from "./inventory";
 import { manaSlice } from "./mana";
 import { resourcesSlice } from "./resources";
 import { statsSlice } from "./stats";
@@ -14,4 +15,5 @@ export = {
 	resources: resourcesSlice,
 	stats: statsSlice,
 	transform: transformSlice,
+	inventory: inventorySlice,
 };
