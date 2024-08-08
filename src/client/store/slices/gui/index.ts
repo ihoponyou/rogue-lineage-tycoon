@@ -4,13 +4,13 @@ import { MAX_HOTBAR_SLOTS } from "client/constants";
 
 interface GuiState {
 	readonly backpackOpen: boolean;
-	readonly hotbar: ReadonlyArray<Tool>;
+	readonly hotbar: ReadonlyMap<number, Tool>; // map so that rbxts wont FUCK WITH MY ARRAY INDICES
 	readonly activeTool: Tool | undefined;
 }
 
 const initialState: GuiState = {
 	backpackOpen: false,
-	hotbar: [],
+	hotbar: new Map(),
 	activeTool: undefined,
 };
 
@@ -27,34 +27,40 @@ export const guiSlice = createProducer(initialState, {
 			warn(`invalid hotbar slot index of ${slot}`);
 			return state;
 		}
-		// is the given tool in the hotbar?
-		const oldSlot = state.hotbar.indexOf(tool);
-		if (slot === oldSlot) {
-			// yes, and it exists at the given slot
-			return state;
+		let oldSlot = -1;
+		for (const [index, value] of state.hotbar) {
+			if (tool === value) {
+				oldSlot = index;
+				break;
+			}
 		}
-		// no, the given tool is not in the hotbar
-
-		// is there something at the given slot?
-		const toolAtSlot = state.hotbar[slot];
-
+		if (slot === oldSlot) return state;
+		const toolAtNewSlot = state.hotbar.get(slot);
 		return Immut.produce(state, (draft) => {
-			if (toolAtSlot !== undefined) {
-				if (oldSlot !== -1) {
-					draft.hotbar[oldSlot] = toolAtSlot;
+			draft.hotbar.set(slot, tool);
+			if (oldSlot > -1) {
+				if (toolAtNewSlot !== undefined) {
+					draft.hotbar.set(oldSlot, toolAtNewSlot);
+				} else {
+					draft.hotbar.delete(oldSlot);
 				}
 			}
-			draft.hotbar[slot] = tool;
 		});
 	},
 
 	removeFromHotbar: (state, tool: Tool) => {
-		const slot = state.hotbar.indexOf(tool);
+		let slot = -1;
+		for (const [index, value] of state.hotbar) {
+			if (tool === value) {
+				slot = index;
+				break;
+			}
+		}
 		if (slot === -1) {
 			return state;
 		}
 		return Immut.produce(state, (draft) => {
-			draft.hotbar = draft.hotbar.filter((value) => value !== tool);
+			draft.hotbar.delete(slot);
 		});
 	},
 

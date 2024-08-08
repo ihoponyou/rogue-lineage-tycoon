@@ -28,7 +28,7 @@ export class InventoryController implements OnStart {
 
 	public switchSlot(slot: number) {
 		const guiState = store.getState(selectGui());
-		const toolAtSlot = guiState.hotbar[slot];
+		const toolAtSlot = guiState.hotbar.get(slot);
 		if (toolAtSlot === undefined) return;
 		store.setActiveTool(
 			toolAtSlot === guiState.activeTool ? undefined : toolAtSlot,

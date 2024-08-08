@@ -14,7 +14,12 @@ export function selectHotbar() {
 }
 
 export function selectHotbarHasTool(tool: Tool) {
-	return createSelector(selectHotbar(), (tools) => tools.includes(tool));
+	return createSelector(selectHotbar(), (tools) => {
+		for (const [_, value] of tools) {
+			if (tool === value) return true;
+		}
+		return false;
+	});
 }
 
 export function selectActiveTool() {

@@ -17,7 +17,9 @@ export function Backpack() {
 	const backpackButtons = new Array<JSX.Element>();
 	const emptySlots = new Array<JSX.Element>();
 	items.forEach((quantity, tool) => {
-		if (hotbarItems.includes(tool)) return;
+		for (const [_, value] of hotbarItems) {
+			if (tool === value) return;
+		}
 		backpackButtons.push(
 			<DraggableItemButton tool={tool} quantity={quantity} />,
 		);

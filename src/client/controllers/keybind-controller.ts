@@ -21,6 +21,17 @@ export interface Keybinds {
 	forceFeed: Enum.KeyCode;
 	toggleBackpack: Enum.KeyCode;
 	slot1: Enum.KeyCode;
+	slot2: Enum.KeyCode;
+	slot3: Enum.KeyCode;
+	slot4: Enum.KeyCode;
+	slot5: Enum.KeyCode;
+	slot6: Enum.KeyCode;
+	slot7: Enum.KeyCode;
+	slot8: Enum.KeyCode;
+	slot9: Enum.KeyCode;
+	slot10: Enum.KeyCode;
+	slot11: Enum.KeyCode;
+	slot12: Enum.KeyCode;
 }
 
 const DEFAULT_KEYBINDS: Keybinds = {
@@ -41,6 +52,17 @@ const DEFAULT_KEYBINDS: Keybinds = {
 	forceFeed: Enum.KeyCode.P,
 	toggleBackpack: Enum.KeyCode.Backquote,
 	slot1: Enum.KeyCode.One,
+	slot2: Enum.KeyCode.Two,
+	slot3: Enum.KeyCode.Three,
+	slot4: Enum.KeyCode.Four,
+	slot5: Enum.KeyCode.Five,
+	slot6: Enum.KeyCode.Six,
+	slot7: Enum.KeyCode.Seven,
+	slot8: Enum.KeyCode.Eight,
+	slot9: Enum.KeyCode.Nine,
+	slot10: Enum.KeyCode.Zero,
+	slot11: Enum.KeyCode.Minus,
+	slot12: Enum.KeyCode.Equals,
 };
 
 export enum InputAxis {
@@ -88,7 +110,7 @@ export class KeybindController {
 
 	public loadKeybind(
 		actionName: keyof Keybinds,
-		keybind: valueof<Keybinds>,
+		keybind: Enum.KeyCode | Enum.UserInputType,
 		action: Action,
 	) {
 		ContextActionService.UnbindAction(`input_${actionName}`);
