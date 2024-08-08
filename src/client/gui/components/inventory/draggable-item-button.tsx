@@ -55,17 +55,17 @@ export function DraggableItemButton(props: ItemButtonProps) {
 						const object = hoveredObjects[index];
 						let transferred = false;
 						if (object === undefined) {
-							store.removeFromHotbar(props.tool);
 							transferred = hasTool;
+							store.removeFromHotbar(props.tool);
 						} else {
-							store.addToHotbar(object.LayoutOrder, props.tool);
 							transferred = !hasTool;
+							store.addToHotbar(object.LayoutOrder, props.tool);
 						}
 						if (!transferred) {
 							const newTool =
-								props.tool !== activeTool
-									? props.tool
-									: undefined;
+								props.tool === activeTool
+									? undefined
+									: props.tool;
 							store.setActiveTool(newTool);
 						}
 					},

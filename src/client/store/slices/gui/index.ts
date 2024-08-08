@@ -1,15 +1,16 @@
 import Immut from "@rbxts/immut";
 import { createProducer } from "@rbxts/reflex";
+import { MAX_HOTBAR_SLOTS } from "client/constants";
 
 interface GuiState {
 	readonly backpackOpen: boolean;
-	readonly hotbar: ReadonlyMap<Tool, number>;
+	readonly hotbar: ReadonlyArray<Tool>;
 	readonly activeTool: Tool | undefined;
 }
 
 const initialState: GuiState = {
 	backpackOpen: false,
-	hotbar: new Map(),
+	hotbar: [],
 	activeTool: undefined,
 };
 
@@ -22,8 +23,12 @@ export const guiSlice = createProducer(initialState, {
 	},
 
 	addToHotbar: (state, slot: number, tool: Tool) => {
+		if (slot < 0 || slot > MAX_HOTBAR_SLOTS) {
+			warn(`invalid hotbar slot index of ${slot}`);
+			return state;
+		}
 		// is the given tool in the hotbar?
-		const oldSlot = state.hotbar.get(tool);
+		const oldSlot = state.hotbar.indexOf(tool);
 		if (slot === oldSlot) {
 			// yes, and it exists at the given slot
 			return state;
@@ -31,32 +36,25 @@ export const guiSlice = createProducer(initialState, {
 		// no, the given tool is not in the hotbar
 
 		// is there something at the given slot?
-		let toolAtSlot: Tool | undefined;
-		for (const [toolAtIndex, slotIndex] of state.hotbar) {
-			if (slot !== slotIndex) continue;
-			// yes, and this is the tool
-			toolAtSlot = toolAtIndex;
-		}
-		// no, there is nothing at the given slot
+		const toolAtSlot = state.hotbar[slot];
 
 		return Immut.produce(state, (draft) => {
 			if (toolAtSlot !== undefined) {
-				if (oldSlot === undefined) {
-					draft.hotbar.delete(toolAtSlot);
-				} else {
-					draft.hotbar.set(toolAtSlot, oldSlot);
+				if (oldSlot !== -1) {
+					draft.hotbar[oldSlot] = toolAtSlot;
 				}
 			}
-			draft.hotbar.set(tool, slot);
+			draft.hotbar[slot] = tool;
 		});
 	},
 
 	removeFromHotbar: (state, tool: Tool) => {
-		if (!state.hotbar.has(tool)) {
+		const slot = state.hotbar.indexOf(tool);
+		if (slot === -1) {
 			return state;
 		}
 		return Immut.produce(state, (draft) => {
-			draft.hotbar.delete(tool);
+			draft.hotbar = draft.hotbar.filter((value) => value !== tool);
 		});
 	},
 

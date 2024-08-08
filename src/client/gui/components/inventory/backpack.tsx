@@ -17,21 +17,10 @@ export function Backpack() {
 	const backpackButtons = new Array<JSX.Element>();
 	const emptySlots = new Array<JSX.Element>();
 	items.forEach((quantity, tool) => {
-		const slot = hotbarItems.get(tool);
-		if (slot !== undefined) return;
-		const element = (
-			<DraggableItemButton
-				tool={tool}
-				quantity={quantity}
-				slot={slot}
-				position={
-					slot !== undefined
-						? UDim2.fromScale(slot / (MAX_HOTBAR_SLOTS - 1))
-						: undefined
-				}
-			/>
+		if (hotbarItems.includes(tool)) return;
+		backpackButtons.push(
+			<DraggableItemButton tool={tool} quantity={quantity} />,
 		);
-		backpackButtons.push(element);
 	});
 
 	for (let i = 0; i < MAX_HOTBAR_SLOTS; i++) {
@@ -43,6 +32,7 @@ export function Backpack() {
 			/>,
 		);
 	}
+
 	return (
 		<frame
 			key="Backpack"

@@ -55,7 +55,6 @@ const SLOT_LABELS = [
 ];
 
 export function ItemButton(props: ItemButtonProps) {
-	const quantity = 1;
 	const inHotbar = useSelector(selectHotbarHasTool(props.tool));
 	const activeTool = useSelector(selectActiveTool());
 	const [size, sizeMotion] = useMotion(SIZE.deselected);
@@ -145,11 +144,11 @@ export function ItemButton(props: ItemButtonProps) {
 				}
 				Position={new UDim2(0.5, 0, 1, 0)}
 				Size={new UDim2(0, 20, 0, 12)}
-				Text={`x${quantity}`}
+				Text={`x${props.quantity}`}
 				TextColor3={Color3.fromRGB(47, 44, 38)}
 				TextSize={14}
 				TextYAlignment={Enum.TextYAlignment.Bottom}
-				Visible={quantity > 1}
+				Visible={props.quantity > 1}
 				ZIndex={2}
 			>
 				<imagelabel

@@ -20,6 +20,7 @@ export interface Keybinds {
 	injure: Enum.KeyCode;
 	forceFeed: Enum.KeyCode;
 	toggleBackpack: Enum.KeyCode;
+	slot1: Enum.KeyCode;
 }
 
 const DEFAULT_KEYBINDS: Keybinds = {
@@ -39,6 +40,7 @@ const DEFAULT_KEYBINDS: Keybinds = {
 	injure: Enum.KeyCode.N,
 	forceFeed: Enum.KeyCode.P,
 	toggleBackpack: Enum.KeyCode.Backquote,
+	slot1: Enum.KeyCode.One,
 };
 
 export enum InputAxis {

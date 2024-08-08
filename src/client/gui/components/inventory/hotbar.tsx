@@ -21,7 +21,7 @@ export function Hotbar() {
 	const hotbarButtons = new Array<JSX.Element>();
 
 	let i = 1;
-	hotbarItems.forEach((slot, tool) => {
+	hotbarItems.forEach((tool, slot) => {
 		const quantity = items.get(tool) ?? -1;
 		const xScale =
 			hotbarItems.size() > 1 ? (i++ - 1) / (hotbarItems.size() - 1) : 0;
@@ -39,7 +39,7 @@ export function Hotbar() {
 				slot={slot}
 				position={UDim2.fromScale(xScale)}
 				onM1Down={() => {
-					const newTool = tool !== activeTool ? tool : undefined;
+					const newTool = tool === activeTool ? undefined : tool;
 					store.setActiveTool(newTool);
 				}}
 			/>

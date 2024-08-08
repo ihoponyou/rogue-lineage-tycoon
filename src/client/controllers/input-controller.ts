@@ -9,6 +9,7 @@ import {
 } from "shared/store/slices/mana/selectors";
 import { OnLocalCharacterAdded } from "../../../types/lifecycles";
 import { Character } from "../components/character";
+import { InventoryController } from "./inventory-controller";
 import { KeybindController } from "./keybind-controller";
 
 const BEGIN = Enum.UserInputState.Begin;
@@ -39,7 +40,10 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private lightAttackTriggered = new Signal();
 	private blockTriggered = new Signal();
 
-	public constructor(private keybindController: KeybindController) {}
+	public constructor(
+		private keybindController: KeybindController,
+		private inventoryController: InventoryController,
+	) {}
 
 	public onStart(): void {
 		this.keybindController.loadKeybind(
@@ -78,6 +82,14 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			(state) => {
 				if (state !== Enum.UserInputState.Begin) return;
 				store.toggleBackpack();
+			},
+		);
+		this.keybindController.loadKeybind(
+			"slot1",
+			this.keybindController.keybinds.slot1,
+			(state) => {
+				if (state !== Enum.UserInputState.Begin) return;
+				this.inventoryController.switchSlot(0);
 			},
 		);
 	}

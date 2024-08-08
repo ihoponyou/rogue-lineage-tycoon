@@ -1,6 +1,10 @@
 import { createSelector } from "@rbxts/reflex";
 import { RootState } from "client/store";
 
+export function selectGui() {
+	return (state: RootState) => state.gui;
+}
+
 export function selectBackpackOpen() {
 	return (state: RootState) => state.gui.backpackOpen;
 }
@@ -10,7 +14,7 @@ export function selectHotbar() {
 }
 
 export function selectHotbarHasTool(tool: Tool) {
-	return createSelector(selectHotbar(), (tools) => tools.has(tool));
+	return createSelector(selectHotbar(), (tools) => tools.includes(tool));
 }
 
 export function selectActiveTool() {
