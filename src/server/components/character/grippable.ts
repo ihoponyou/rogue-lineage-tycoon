@@ -54,7 +54,7 @@ export class Grippable
 			player.Character,
 		);
 		if (!characterComponent) return;
-		print(this.attributes.gettingGripped);
+		// print(this.attributes.gettingGripped);
 		this.attributes.gettingGripped
 			? this.release(characterComponent)
 			: this.grip(characterComponent);

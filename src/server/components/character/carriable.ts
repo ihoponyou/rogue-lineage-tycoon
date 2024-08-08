@@ -66,7 +66,7 @@ export class Carriable
 			this.carryTrove?.add(
 				ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
 					if (newValue) {
-						print("carrier got ragdolled");
+						// print("carrier got ragdolled");
 						this.drop(carrier);
 					}
 				}),

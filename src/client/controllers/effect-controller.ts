@@ -6,7 +6,7 @@ import { Events } from "client/network";
 export class EffectController implements OnStart {
 	public onStart(): void {
 		Events.playEffect.connect((name, ...args: unknown[]) => {
-			print(name, ...args);
+			// print(name, ...args);
 			EFFECTS[name](...args);
 		});
 	}

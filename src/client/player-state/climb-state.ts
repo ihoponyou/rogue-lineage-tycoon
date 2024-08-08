@@ -102,7 +102,7 @@ export class ClimbState extends CharacterState {
 			params,
 		);
 		if (floorCheck) {
-			print("too close to floor");
+			// print("too close to floor");
 			this.stateMachine.transitionTo("idle");
 			return;
 		}
@@ -157,7 +157,7 @@ export class ClimbState extends CharacterState {
 		);
 
 		if (!(blockForwardCast || diagonalIn || diagonalOut)) {
-			print("wall not found");
+			// print("wall not found");
 			this.stateMachine.transitionTo("idle");
 			return;
 		}
@@ -206,7 +206,7 @@ export class ClimbState extends CharacterState {
 					),
 				);
 			} else {
-				print("ledge not found");
+				// print("ledge not found");
 				this.stateMachine.transitionTo("idle");
 				return;
 			}
