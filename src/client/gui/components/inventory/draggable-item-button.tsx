@@ -58,7 +58,8 @@ export function DraggableItemButton(props: ItemButtonProps) {
 							transferred = hasTool;
 							store.removeFromHotbar(props.tool);
 						} else {
-							transferred = !hasTool;
+							transferred =
+								!hasTool || object.LayoutOrder !== props.slot;
 							store.addToHotbar(object.LayoutOrder, props.tool);
 						}
 						if (!transferred) {
