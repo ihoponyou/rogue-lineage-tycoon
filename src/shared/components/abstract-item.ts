@@ -1,8 +1,12 @@
 import { BaseComponent, Component } from "@flamework/components";
 
+export interface ItemAttributes {
+	isEquipped: boolean;
+}
+
 @Component()
 export abstract class AbstractItem<
-	A extends {} = {},
+	A extends ItemAttributes = ItemAttributes,
 	I extends Tool = Tool,
 > extends BaseComponent<A, I> {
 	public static readonly TAG = "Item";

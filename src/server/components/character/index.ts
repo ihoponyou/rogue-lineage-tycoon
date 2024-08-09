@@ -17,6 +17,7 @@ import {
 	deserializeVector3,
 	serializeVector3,
 } from "shared/modules/serialized-vector3";
+import { Item } from "../item";
 import { PlayerServer } from "../player-server";
 import { RagdollServer } from "./ragdoll-server";
 
@@ -42,6 +43,8 @@ const EVENTS = Events.character;
 	},
 })
 export class Character extends AbstractCharacter implements OnTick {
+	private heldItem?: Item;
+
 	public constructor(
 		private ragdoll: RagdollServer,
 		private components: Components,
@@ -234,6 +237,14 @@ export class Character extends AbstractCharacter implements OnTick {
 		const toThem = theirCFrame.Position.sub(position);
 		const dot = theirCFrame.LookVector.Dot(toThem.Unit);
 		return dot > 0;
+	}
+
+	public setHeldItem(item?: Item): void {
+		this.heldItem = item;
+	}
+
+	public getHeldItem(): Item | undefined {
+		return this.heldItem;
 	}
 
 	private onHealthChanged(health: number): void {

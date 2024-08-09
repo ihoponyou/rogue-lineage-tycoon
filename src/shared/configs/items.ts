@@ -26,7 +26,7 @@ export const DEFAULT_ROOT_JOINT_C0 = new CFrame(0, -1, 0).mul(
 );
 
 const SWORD_HOLSTER_C0 = new CFrame(0, 0, 0.552).mul(
-	cframeFromOrientationDeg(28.695, -90.001, -90),
+	cframeFromOrientationDeg(28.695, -90, -90),
 );
 
 export const ITEMS: { [name: string]: ItemConfig } = {

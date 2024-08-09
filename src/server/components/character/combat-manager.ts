@@ -17,43 +17,43 @@ export class CombatManager
 	private attackSpeed = 1;
 	private comboReset?: thread;
 
-	public constructor(private characterServer: Character) {
+	public constructor(private character: Character) {
 		super();
 	}
 
 	public onStart(): void {
 		this.trove.add(
 			Events.combat.lightAttack.connect((player) => {
-				if (player !== this.characterServer.getPlayer()) return;
+				if (player !== this.character.getPlayer()) return;
 				this.handleLightAttack();
 			}),
 		);
 		this.trove.add(
 			Events.combat.block.connect((player, blockUp) => {
-				if (player !== this.characterServer.getPlayer()) return;
+				if (player !== this.character.getPlayer()) return;
 				this.handleBlock(blockUp);
 			}),
 		);
 	}
 
 	private handleLightAttack(): void {
-		if (!this.characterServer.canLightAttack()) return;
-		Events.character.stopRun(this.characterServer.getPlayer());
+		if (!this.character.canLightAttack()) return;
+		Events.character.stopRun(this.character.getPlayer());
 
-		this.characterServer.attributes.lightAttackCooldown = true;
+		print(this.character.getHeldItem()?.instance.Name);
+
+		this.character.attributes.lightAttackCooldown = true;
 		this.trove.add(
 			task.delay(
 				0.475 / this.attackSpeed,
-				() =>
-					(this.characterServer.attributes.lightAttackCooldown =
-						false),
+				() => (this.character.attributes.lightAttackCooldown = false),
 			),
 		);
 
-		this.characterServer.toggleJump(false);
+		this.character.toggleJump(false);
 		this.trove.add(
 			task.delay(0.7 / this.attackSpeed, () =>
-				this.characterServer.toggleJump(true),
+				this.character.toggleJump(true),
 			),
 		);
 
@@ -63,22 +63,20 @@ export class CombatManager
 		}
 		this.comboReset = this.trove.add(
 			task.delay(M1_RESET_DELAY, () => {
-				this.characterServer.attributes.combo = 0;
+				this.character.attributes.combo = 0;
 				this.comboReset = undefined;
 			}),
 		);
 
-		if (++this.characterServer.attributes.combo >= this.maxCombo)
-			this.characterServer.attributes.combo = 0;
+		if (++this.character.attributes.combo >= this.maxCombo)
+			this.character.attributes.combo = 0;
 	}
 
 	private handleBlock(blockUp: boolean): void {
-		if (
-			this.characterServer.instance.GetAttribute("isRagdolled") === true
-		) {
-			Events.combat.unblock(this.characterServer.getPlayer());
+		if (this.character.instance.GetAttribute("isRagdolled") === true) {
+			Events.combat.unblock(this.character.getPlayer());
 			return;
 		}
-		this.characterServer.attributes.isBlocking = blockUp;
+		this.character.attributes.isBlocking = blockUp;
 	}
 }
