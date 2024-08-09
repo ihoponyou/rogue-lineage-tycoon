@@ -3,7 +3,6 @@ import { Character } from "client/components/character";
 import { AnimationController } from "client/controllers/animation-controller";
 import { Events } from "client/network";
 import { StateMachine } from "shared/modules/state-machine";
-import { InputController } from "../controllers/input-controller";
 import { CharacterState } from "./character-state";
 
 const VISUALIZE_HITBOXES = false;
@@ -18,7 +17,6 @@ export class AttackState extends CharacterState {
 	public constructor(
 		stateMachine: StateMachine,
 		character: Character,
-		private inputController: InputController,
 		private animationController: AnimationController,
 	) {
 		super(stateMachine, character);

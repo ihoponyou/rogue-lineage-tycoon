@@ -43,6 +43,19 @@ export class Item extends AbstractItem implements OnStart {
 			.waitForComponent<ModelComponent>(worldModel)
 			.expect();
 
+		if (worldModel.PrimaryPart === undefined) {
+			warn(`${this.config.worldModel} has unassigned PrimaryPart`);
+			worldModel.PrimaryPart =
+				worldModel.FindFirstChildWhichIsA("BasePart");
+			if (worldModel.PrimaryPart === undefined) {
+				error(
+					`could not assign temporary PrimaryPart for ${this.config.worldModel.Name}`,
+				);
+			}
+		}
+		// animations require Hilt part
+		worldModel.PrimaryPart.Name = "Hilt";
+
 		this.rootJoint = new Instance("Motor6D");
 		this.rootJoint.Name = "RootJoint";
 		this.rootJoint.Part1 = worldModel.PrimaryPart;

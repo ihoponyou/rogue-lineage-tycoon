@@ -66,7 +66,6 @@ export class CharacterStateMachine
 			new AttackState(
 				this.stateMachine,
 				this.character,
-				this.inputController,
 				this.animationController,
 			),
 			new BlockState(

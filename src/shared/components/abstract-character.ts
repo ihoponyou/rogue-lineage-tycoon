@@ -102,4 +102,13 @@ export abstract class AbstractCharacter
 	public canLightAttack(): boolean {
 		return this.canAttack() && !this.attributes.lightAttackCooldown;
 	}
+
+	public canBlock(): boolean {
+		return (
+			this.instance.GetAttribute("isRagdolled") === false &&
+			this.attributes.isAlive &&
+			!this.attributes.isStunned &&
+			!this.attributes.isKnocked
+		);
+	}
 }

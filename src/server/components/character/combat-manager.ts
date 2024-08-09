@@ -40,8 +40,6 @@ export class CombatManager
 		if (!this.character.canLightAttack()) return;
 		Events.character.stopRun(this.character.getPlayer());
 
-		print(this.character.getHeldItem()?.instance.Name);
-
 		this.character.attributes.lightAttackCooldown = true;
 		this.trove.add(
 			task.delay(
@@ -73,7 +71,7 @@ export class CombatManager
 	}
 
 	private handleBlock(blockUp: boolean): void {
-		if (this.character.instance.GetAttribute("isRagdolled") === true) {
+		if (!this.character.canBlock()) {
 			Events.combat.unblock(this.character.getPlayer());
 			return;
 		}
