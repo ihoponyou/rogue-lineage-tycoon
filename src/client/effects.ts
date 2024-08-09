@@ -1,3 +1,5 @@
+import { WeaponType } from "shared/configs/weapons";
+import { SFX } from "shared/constants";
 import { HitType } from "shared/enums";
 
 export const EFFECTS: { [name: string]: Callback } = {
@@ -32,5 +34,13 @@ export const EFFECTS: { [name: string]: Callback } = {
 			return;
 		}
 		sound.Play();
+	},
+	Swing: (character: Model, weaponType: WeaponType) => {
+		const torso = character.FindFirstChild("Torso");
+		if (torso === undefined) return;
+		const clone = SFX[`${weaponType}Swing`].Clone();
+		clone.PlayOnRemove = true;
+		clone.Parent = torso;
+		clone.Destroy();
 	},
 };

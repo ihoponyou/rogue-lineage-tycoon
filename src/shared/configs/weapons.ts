@@ -1,7 +1,7 @@
 export enum WeaponType {
-	Sword,
-	Spear,
-	Dagger,
+	Sword = "Sword",
+	Spear = "Spear",
+	Dagger = "Dagger",
 }
 
 interface WeaponConfig {
