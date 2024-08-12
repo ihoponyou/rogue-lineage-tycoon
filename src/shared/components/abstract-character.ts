@@ -94,9 +94,12 @@ export abstract class AbstractCharacter
 		this.humanoid.WalkSpeed = speed;
 	}
 
-	// not in combat manager so that state machine can use this
 	public canAttack(): boolean {
-		return !this.attributes.isStunned;
+		return (
+			this.instance.GetAttribute("isRagdolled") === false &&
+			!this.attributes.isStunned &&
+			!this.attributes.isBlocking
+		);
 	}
 
 	public canLightAttack(): boolean {

@@ -1,27 +1,20 @@
 import { Components } from "@flamework/components";
-import { OnStart, Service } from "@flamework/core";
+import { Service } from "@flamework/core";
 import { Character } from "server/components/character";
 import { Events } from "server/network";
+import { WeaponConfig } from "shared/configs/weapons";
 
 @Service()
-export class HitService implements OnStart {
+export class HitService {
 	public constructor(private components: Components) {}
 
-	public onStart(): void {
-		Events.combat.damage.connect((player, characters) =>
-			characters.forEach((character) =>
-				this.registerHit(player, character),
-			),
-		);
-	}
-
-	private registerHit(player: Player, character: Model): void {
-		if (player.Character === undefined) return;
-		const hitter = this.components.getComponent<Character>(
-			player.Character,
-		);
+	public registerHit(
+		hitter: Character,
+		victimInstance: Model,
+		weaponConfig: WeaponConfig,
+	): void {
 		if (hitter === undefined) return;
-		const victim = this.components.getComponent<Character>(character);
+		const victim = this.components.getComponent<Character>(victimInstance);
 		if (victim === undefined) return;
 		if (!this.canHit(hitter, victim)) return;
 
@@ -32,12 +25,16 @@ export class HitService implements OnStart {
 			!hitter.isBehind(victim);
 		if (blocked) {
 			Events.combat.blockHit(victim.getPlayer());
-			Events.playEffect.broadcast(`BlockHit`, character, "Blunt");
+			Events.playEffect.broadcast(
+				`BlockHit`,
+				victimInstance,
+				weaponConfig.type,
+			);
 			return;
 		}
 
-		Events.playEffect.broadcast(`Hit`, character, "Blunt");
-		victim.takeDamage(10);
+		Events.playEffect.broadcast(`Hit`, victimInstance, weaponConfig.type);
+		victim.takeDamage(weaponConfig.damage);
 	}
 
 	private canHit(hitter: Character, victim: Character): boolean {

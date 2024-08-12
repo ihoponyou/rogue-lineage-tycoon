@@ -1,9 +1,15 @@
 import { WeaponType } from "shared/configs/weapons";
 import { SFX } from "shared/constants";
-import { HitType } from "shared/enums";
+
+function getHitType(weaponType: WeaponType) {
+	const hitType = weaponType === WeaponType.Fists ? "Blunt" : "Sharp";
+	print(hitType);
+	return hitType;
+}
 
 export const EFFECTS: { [name: string]: Callback } = {
-	Hit: (character: Model, hitType: HitType) => {
+	Hit: (character: Model, weaponType: WeaponType) => {
+		const hitType = getHitType(weaponType);
 		const torso = character.FindFirstChild("Torso");
 		if (torso === undefined) return;
 		const emitter = torso.FindFirstChild(`${hitType}HitParticle`);
@@ -12,14 +18,15 @@ export const EFFECTS: { [name: string]: Callback } = {
 			return;
 		}
 		emitter.Emit(5);
-		const sound = torso.FindFirstChild(`${hitType}HitSound`);
+		const sound = torso.FindFirstChild(`${weaponType}Hit`);
 		if (sound === undefined || !sound.IsA("Sound")) {
-			warn(`${hitType}HitSound`);
+			warn(`${weaponType}Hit`);
 			return;
 		}
 		sound.Play();
 	},
-	BlockHit: (character: Model, hitType: HitType) => {
+	BlockHit: (character: Model, weaponType: WeaponType) => {
+		const hitType = getHitType(weaponType);
 		const torso = character.FindFirstChild("Torso");
 		if (torso === undefined) return;
 		const emitter = torso.FindFirstChild(`BlockParticle`);
@@ -35,7 +42,7 @@ export const EFFECTS: { [name: string]: Callback } = {
 		}
 		sound.Play();
 	},
-	Swing: (character: Model, weaponType: WeaponType) => {
+	Swing: (character: Model, weaponType: WeaponType = WeaponType.Fists) => {
 		const torso = character.FindFirstChild("Torso");
 		if (torso === undefined) return;
 		const clone = SFX[`${weaponType}Swing`].Clone();

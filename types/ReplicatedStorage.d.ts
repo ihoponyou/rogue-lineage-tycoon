@@ -1404,33 +1404,33 @@ interface ReplicatedStorage extends Instance {
 				ClimbLeft: Animation;
 			};
 			Combat: Folder & {
-				Sword2: Animation;
+				Fists2: Animation;
+				Fists5: Animation;
 				Carrying: Animation;
-				Punch5: Animation;
 				Gripping: Animation;
 				Sword4: Animation;
-				BlockHit3: Animation;
+				DefaultBlock: Animation;
 				Gripped: Animation;
-				Punch2: Animation;
-				Punch1: Animation;
-				Carried: Animation;
+				Fists4: Animation;
 				Sword5: Animation;
+				Carried: Animation;
+				Sword3: Animation;
 				BlockHit1: Animation;
 				PickUp: Animation;
-				Sword3: Animation;
-				Sword1: Animation;
+				Sword2: Animation;
+				Fists3: Animation;
 				Throw: Animation;
-				DefaultBlock: Animation;
-				Punch4: Animation;
+				Sword1: Animation;
+				BlockHit3: Animation;
 				BlockHit2: Animation;
-				Punch3: Animation;
+				Fists1: Animation;
 			};
 		};
 		Effects: Folder & {
 			Sounds: Folder & {
+				FistsHit: Sound;
 				Greatspearhit: Sound;
 				SoulRipped: Sound;
-				PunchHit: Sound;
 				Died: Sound;
 				PerfectCast: Sound;
 				DaggerHit2: Sound;
@@ -1455,7 +1455,7 @@ interface ReplicatedStorage extends Instance {
 					FlangeSoundEffect: FlangeSoundEffect;
 				};
 				Erase: Sound;
-				Swing: Sound;
+				FistsSwing: Sound;
 				ManaDash: Sound;
 				Extinguish: Sound;
 				FlyingAssaulter: Sound;
@@ -1493,7 +1493,7 @@ interface ReplicatedStorage extends Instance {
 				Torso: Folder & {
 					OrangeFire: ParticleEmitter;
 					BlockParticle: ParticleEmitter;
-					PunchHit: ParticleEmitter;
+					FistsHit: ParticleEmitter;
 					Injure: ParticleEmitter;
 					BloodHit: ParticleEmitter;
 				};
@@ -1557,10 +1557,12 @@ interface ReplicatedStorage extends Instance {
 				["character-from-body-part"]: ModuleScript;
 				["get-digit"]: ModuleScript;
 				["on-player-removing"]: ModuleScript;
+				hitbox: ModuleScript;
 				["char-at"]: ModuleScript;
 				["state-machine"]: ModuleScript & {
 					state: ModuleScript;
 				};
+				["animation-manager"]: ModuleScript;
 				graph: ModuleScript & {
 					node: ModuleScript;
 				};
@@ -1574,7 +1576,6 @@ interface ReplicatedStorage extends Instance {
 				item: ModuleScript;
 				reflex: ModuleScript;
 			};
-			enums: ModuleScript;
 			components: Folder & {
 				toggleable: ModuleScript;
 				["abstract-player"]: ModuleScript;

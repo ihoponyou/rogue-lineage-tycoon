@@ -7,7 +7,7 @@ import { AbstractItem } from "./abstract-item";
 export abstract class AbstractWeapon extends BaseComponent implements Useable {
 	public static readonly TAG = "Weapon";
 
-	protected config = getWeaponConfig(this.instance.Name);
+	public readonly config = getWeaponConfig(this.instance.Name);
 	protected abstract item: AbstractItem;
 
 	public abstract use(): void;

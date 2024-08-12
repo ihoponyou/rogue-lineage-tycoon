@@ -13,6 +13,9 @@ import {
 	selectPlayerTransform,
 } from "server/store/selectors";
 import { AbstractCharacter } from "shared/components/abstract-character";
+import { AbstractWeapon } from "shared/components/abstract-weapon";
+import { ANIMATIONS } from "shared/constants";
+import { AnimationManager } from "shared/modules/animation-manager";
 import {
 	deserializeVector3,
 	serializeVector3,
@@ -44,6 +47,7 @@ const EVENTS = Events.character;
 })
 export class Character extends AbstractCharacter implements OnTick {
 	private heldItem?: Item;
+	private animationManager!: AnimationManager;
 
 	public constructor(
 		private ragdoll: RagdollServer,
@@ -51,6 +55,11 @@ export class Character extends AbstractCharacter implements OnTick {
 		private dataService: DataService,
 	) {
 		super();
+
+		const character = promiseR6(this.instance).expect();
+		this.animationManager = new AnimationManager(
+			character.Humanoid.Animator,
+		);
 	}
 
 	public override onStart(): void {
@@ -58,6 +67,8 @@ export class Character extends AbstractCharacter implements OnTick {
 
 		this.instance.AddTag("FallDamage");
 		this.instance.AddTag("CombatManager");
+
+		this.loadAnimations(ANIMATIONS);
 
 		const player = this.getPlayer();
 		this.trove.add(
@@ -245,6 +256,43 @@ export class Character extends AbstractCharacter implements OnTick {
 
 	public getHeldItem(): Item | undefined {
 		return this.heldItem;
+	}
+
+	public getHeldWeapon(): AbstractWeapon | undefined {
+		const heldItem = this.getHeldItem();
+		if (heldItem !== undefined) {
+			return this.components.getComponents<AbstractWeapon>(
+				heldItem.instance,
+			)[0];
+		}
+		return;
+	}
+
+	public loadAnimations(animationFolder: Folder) {
+		const anims = animationFolder
+			.GetDescendants()
+			.filter((value) => value.IsA("Animation"));
+		this.animationManager.loadAnimations(anims as Animation[]);
+	}
+
+	public playAnimation(name: string) {
+		this.animationManager.playTrack(name);
+	}
+
+	public connectToAnimationMarker(
+		trackName: string,
+		markerName: string,
+		callback: (param?: string) => void,
+	) {
+		return this.animationManager.connectToTrackMarker(
+			trackName,
+			markerName,
+			callback,
+		);
+	}
+
+	public connectToAnimationStopped(name: string, callback: () => void) {
+		return this.animationManager.getTrack(name)?.Stopped.Connect(callback);
 	}
 
 	private onHealthChanged(health: number): void {

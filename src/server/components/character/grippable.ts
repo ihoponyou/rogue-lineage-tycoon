@@ -93,8 +93,8 @@ export class Grippable
 
 		const torso = this.character.getTorso();
 		const head = this.character.getHead();
-		const hitSound = this.gripTrove.clone(SFX.PunchHit);
-		const hitParticle = this.gripTrove.clone(VFX.Torso.PunchHit);
+		const hitSound = this.gripTrove.clone(SFX.FistsHit);
+		const hitParticle = this.gripTrove.clone(VFX.Torso.FistsHit);
 		hitSound.Parent = torso;
 		hitParticle.Parent = head;
 
