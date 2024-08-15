@@ -6,11 +6,7 @@ import { Events } from "server/network";
 import { store } from "server/store";
 import { AbstractItem } from "shared/components/abstract-item";
 import { ModelComponent } from "shared/components/model";
-import {
-	BodyPart,
-	DEFAULT_ROOT_JOINT_C0,
-	getItemConfig,
-} from "shared/configs/items";
+import { BodyPart, getItemConfig } from "shared/configs/items";
 import { TouchableModel } from "./interactable/touchable/touchable-model";
 import { PlayerServer } from "./player-server";
 
@@ -120,7 +116,11 @@ export class Item extends AbstractItem implements OnStart {
 		if (this.attributes.isEquipped) return;
 		if (this.owner === undefined) return;
 
-		this.owner.getCharacter().setHeldItem(this);
+		const character = this.owner.getCharacter();
+		character.setHeldItem(this);
+		if (this.config.idleAnimation) {
+			character.playAnimation(this.config.idleAnimation.Name);
+		}
 
 		if (this.config.hideOnHolster) {
 			this.worldModel.show();
@@ -134,7 +134,11 @@ export class Item extends AbstractItem implements OnStart {
 		if (!this.attributes.isEquipped) return;
 		if (this.owner === undefined) return;
 
-		this.owner.getCharacter().setHeldItem(undefined);
+		const character = this.owner.getCharacter();
+		character.setHeldItem(this);
+		if (this.config.idleAnimation) {
+			character.stopAnimation(this.config.idleAnimation.Name);
+		}
 
 		if (this.config.hideOnHolster) {
 			this.worldModel.hide();
@@ -144,10 +148,7 @@ export class Item extends AbstractItem implements OnStart {
 		this.attributes.isEquipped = false;
 	}
 
-	private rigToLimb(
-		limb: BodyPart,
-		c0: CFrame = DEFAULT_ROOT_JOINT_C0,
-	): void {
+	private rigToLimb(limb: BodyPart, c0: CFrame = new CFrame()): void {
 		if (this.owner === undefined) return;
 		const character = this.owner.getCharacter();
 		this.worldModel.instance.Parent = character.instance;

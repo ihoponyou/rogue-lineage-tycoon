@@ -14,6 +14,8 @@ export interface CharacterAttributes {
 	lightAttackCooldown: boolean;
 }
 
+const DEFAULT_JUMP_POWER = 50;
+
 @Component()
 export abstract class AbstractCharacter
 	extends DisposableComponent<CharacterAttributes, Model>
@@ -33,6 +35,16 @@ export abstract class AbstractCharacter
 		this.raycastParams.AddToFilter(this.instance);
 
 		this.humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
+
+		this.onAttributeChanged("isStunned", (stunned, _wasStunned) => {
+			if (stunned) {
+				this.setWalkSpeed(0);
+				this.toggleJump(false);
+			} else {
+				this.resetWalkSpeed();
+				this.toggleJump(true);
+			}
+		});
 	}
 
 	public getHumanoid(): Humanoid {
@@ -113,5 +125,9 @@ export abstract class AbstractCharacter
 			!this.attributes.isStunned &&
 			!this.attributes.isKnocked
 		);
+	}
+
+	public toggleJump(enable: boolean): void {
+		this.humanoid.JumpPower = enable ? DEFAULT_JUMP_POWER : 0;
 	}
 }

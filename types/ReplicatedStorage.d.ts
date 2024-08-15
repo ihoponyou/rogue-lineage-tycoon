@@ -231,17 +231,29 @@ interface ReplicatedStorage extends Instance {
 				Sound: Sound;
 			};
 			Weapons: Folder & {
-				["Bronze Sword"]: Model & {
-					["Bronze Sword"]: MeshPart & {
-						Stats: Folder & {
-							Speed: NumberValue;
-							Length: IntValue;
-							Damage: NumberValue;
-						};
+				["Bronze Spear"]: Model & {
+					["Bronze Spear"]: MeshPart & {
+						Trail: Trail;
 						Attachment2: Attachment;
 						PropWeld: Weld;
 						Weld: Weld;
-						TestTrail: Trail;
+						Attachment1: Attachment;
+					};
+				};
+				["Bronze Sword"]: Model & {
+					["Bronze Sword"]: MeshPart & {
+						Trail: Trail;
+						Attachment2: Attachment;
+						PropWeld: Weld;
+						Weld: Weld;
+						Attachment1: Attachment;
+					};
+				};
+				["Bronze Dagger"]: Model & {
+					["Bronze Dagger"]: MeshPart & {
+						PropWeld: Weld;
+						Trail: Trail;
+						Attachment2: Attachment;
 						Attachment1: Attachment;
 					};
 				};
@@ -1404,23 +1416,35 @@ interface ReplicatedStorage extends Instance {
 				ClimbLeft: Animation;
 			};
 			Combat: Folder & {
+				SpearBlock: Animation;
 				Fists2: Animation;
 				Fists5: Animation;
 				Carrying: Animation;
+				SpearIdle: Animation;
+				Dagger5: Animation;
+				Dagger2: Animation;
+				Spear4: Animation;
+				Sword1: Animation;
 				Gripping: Animation;
 				Sword4: Animation;
 				DefaultBlock: Animation;
+				Spear1: Animation;
 				Gripped: Animation;
+				Spear3: Animation;
+				Dagger1: Animation;
+				Sword3: Animation;
 				Fists4: Animation;
+				Dagger4: Animation;
+				SwordBlock: Animation;
 				Sword5: Animation;
 				Carried: Animation;
-				Sword3: Animation;
+				Dagger3: Animation;
 				BlockHit1: Animation;
 				PickUp: Animation;
 				Sword2: Animation;
 				Fists3: Animation;
 				Throw: Animation;
-				Sword1: Animation;
+				Spear2: Animation;
 				BlockHit3: Animation;
 				BlockHit2: Animation;
 				Fists1: Animation;

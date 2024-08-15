@@ -30,7 +30,6 @@ const BASE_REGEN_RATE = 0.5;
 const MINIMUM_TEMPERATURE = 0;
 const MAXIMUM_TEMPERATURE = 100;
 const KNOCK_PERCENT_THRESHOLD = 0.15;
-const DEFAULT_JUMP_POWER = 50;
 
 const EVENTS = Events.character;
 
@@ -234,10 +233,6 @@ export class Character extends AbstractCharacter implements OnTick {
 			this.instance.AddTag("BurnScar");
 	}
 
-	public toggleJump(enable: boolean): void {
-		this.humanoid.JumpPower = enable ? DEFAULT_JUMP_POWER : 0;
-	}
-
 	public takeDamage(amount: number): void {
 		this.humanoid.TakeDamage(math.min(this.humanoid.Health, amount));
 	}
@@ -275,8 +270,12 @@ export class Character extends AbstractCharacter implements OnTick {
 		this.animationManager.loadAnimations(anims as Animation[]);
 	}
 
-	public playAnimation(name: string) {
-		this.animationManager.playTrack(name);
+	public playAnimation(name: string, speed?: number) {
+		this.animationManager.playTrack(name, undefined, undefined, speed);
+	}
+
+	public stopAnimation(name: string, fadeTime?: number) {
+		this.animationManager.stopTrack(name, fadeTime);
 	}
 
 	public connectToAnimationMarker(
