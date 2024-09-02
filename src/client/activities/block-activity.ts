@@ -1,31 +1,30 @@
+import { RunService } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
+import { Character } from "client/components/character";
+import { AnimationController } from "client/controllers/animation-controller";
+import { KeybindController } from "client/controllers/keybind-controller";
 import { Events } from "client/network";
 import { store } from "client/store";
 import { selectActiveTool } from "client/store/slices/gui/selectors";
 import { BLOCK_WALK_SPEED } from "shared/configs";
-import { getWeaponConfig, WeaponConfig } from "shared/configs/weapons";
-import { StateMachine } from "shared/modules/state-machine";
-import { Character } from "../components/character";
-import { AnimationController } from "../controllers/animation-controller";
-import { KeybindController } from "../controllers/keybind-controller";
-import { CharacterState } from "./character-state";
+import { WeaponConfig, getWeaponConfig } from "shared/configs/weapons";
+import { CharacterActivity } from "./character-activity";
 
-export class BlockState extends CharacterState {
-	public readonly name = "Block";
-
+export class BlockActivity extends CharacterActivity {
 	private blockAnimationName = "";
 	private trove = new Trove();
 
 	public constructor(
-		stateMachine: StateMachine,
 		character: Character,
-		private keybindController: KeybindController,
 		private animationController: AnimationController,
+		private keybindController: KeybindController,
 	) {
-		super(stateMachine, character);
+		super(character);
 	}
 
-	public override enter(): void {
+	public override start(): void {
+		super.start();
+
 		const equippedTool = store.getState(selectActiveTool());
 		let config: WeaponConfig | undefined;
 		if (equippedTool !== undefined) {
@@ -42,27 +41,24 @@ export class BlockState extends CharacterState {
 
 		Events.combat.block(true);
 
-		this.trove.add(
-			Events.combat.unblock.connect(() =>
-				this.stateMachine.transitionTo("idle"),
-			),
-		);
+		this.trove.add(Events.combat.unblock.connect(() => this.stop()));
 
 		this.trove.add(
 			Events.combat.blockHit.connect(() => {
 				this.animationController.play(`BlockHit${math.random(1, 3)}`);
 			}),
 		);
+
+		this.trove.connect(RunService.RenderStepped, () => {
+			if (this.keybindController.isKeyDown("block")) return;
+			this.stop();
+		});
 	}
 
-	public override update(): void {
-		if (!this.keybindController.isKeyDown("block")) {
-			this.stateMachine.transitionTo("idle");
-			Events.combat.block(false);
-		}
-	}
+	public override stop(): void {
+		super.stop();
 
-	public override exit(): void {
+		Events.combat.block(false);
 		this.animationController.stop(this.blockAnimationName);
 		this.character.resetWalkSpeed();
 

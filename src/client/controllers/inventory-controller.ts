@@ -1,10 +1,8 @@
 import { Components } from "@flamework/components";
 import { Controller, OnStart } from "@flamework/core";
-import { ContextActionService } from "@rbxts/services";
 import { Item } from "client/components/item";
 import { store } from "client/store";
 import { selectActiveTool, selectGui } from "client/store/slices/gui/selectors";
-import { Useable } from "../../../types/useable";
 
 @Controller()
 export class InventoryController implements OnStart {
@@ -29,7 +27,6 @@ export class InventoryController implements OnStart {
 
 	private switchItem(tool?: Tool) {
 		this.selectedItem?.unequip();
-		ContextActionService.UnbindAction("USE");
 
 		if (tool === undefined) {
 			this.selectedItem = undefined;
@@ -42,21 +39,5 @@ export class InventoryController implements OnStart {
 		}
 		item.equip();
 		this.selectedItem = item;
-
-		const useables = this.components.getComponents<Useable>(tool);
-		if (useables !== undefined) {
-			ContextActionService.BindActionAtPriority(
-				"USE",
-				(_, state) => {
-					if (state !== Enum.UserInputState.Begin)
-						return Enum.ContextActionResult.Pass;
-					useables.forEach((value) => value.use());
-					return Enum.ContextActionResult.Sink;
-				},
-				false,
-				Enum.ContextActionPriority.High.Value,
-				Enum.UserInputType.MouseButton1,
-			);
-		}
 	}
 }

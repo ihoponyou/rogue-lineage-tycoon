@@ -63,15 +63,12 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		droppable: false,
 		maxStackSize: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Dagger"],
-		hideOnHolster: false,
+		hideOnHolster: true,
 		equipLimb: "Right Arm",
 		equipC0: new CFrame(0, -0.75, 0.97).mul(
 			cframeFromOrientationDeg(0, 0, -90),
 		),
-		holsterLimb: "Right Leg",
-		holsterC0: new CFrame(0.56, 0.8, 0).mul(
-			cframeFromOrientationDeg(40, 0, -90),
-		),
+		holsterLimb: "Torso",
 	},
 };
 

@@ -9,6 +9,10 @@ import { AbstractItem } from "shared/components/abstract-item";
 	},
 })
 export class Item extends AbstractItem {
+	public constructor() {
+		super();
+	}
+
 	public equip(): void {
 		Events.item.equip(this.instance);
 	}

@@ -24,7 +24,9 @@
 		"experimentalDecorators": true,
 		"plugins": [
 			{ "transform": "rbxts-transformer-flamework" }
-		]
+		],
+
+		"noImplicitOverride": true
 	},
 	"include": ["src/**/*", "types/*"]
 }

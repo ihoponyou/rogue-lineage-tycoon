@@ -5,7 +5,6 @@ import { APPEARANCE } from "shared/constants";
 
 import { selectPlayer } from "server/store/selectors";
 import { BaseInjury } from ".";
-import { Character } from "../character";
 
 const LOWER_TEMPERATURE_THRESHOLD = 95;
 
@@ -14,10 +13,6 @@ const LOWER_TEMPERATURE_THRESHOLD = 95;
 })
 export class BurnScar extends BaseInjury implements OnStart, OnTick {
 	public readonly name = "BurnScar";
-
-	public constructor(protected character: Character) {
-		super(character);
-	}
 
 	public onStart(): void {
 		this.inflict();
