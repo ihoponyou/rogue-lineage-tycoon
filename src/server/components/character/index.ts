@@ -13,10 +13,14 @@ import {
 	selectPlayerTransform,
 } from "server/store/selectors";
 import { AbstractCharacter } from "shared/components/abstract-character";
+import { AbstractWeapon } from "shared/components/abstract-weapon";
+import { ANIMATIONS } from "shared/constants";
+import { AnimationManager } from "shared/modules/animation-manager";
 import {
 	deserializeVector3,
 	serializeVector3,
 } from "shared/modules/serialized-vector3";
+import { Item } from "../item";
 import { PlayerServer } from "../player-server";
 import { RagdollServer } from "./ragdoll-server";
 
@@ -26,7 +30,6 @@ const BASE_REGEN_RATE = 0.5;
 const MINIMUM_TEMPERATURE = 0;
 const MAXIMUM_TEMPERATURE = 100;
 const KNOCK_PERCENT_THRESHOLD = 0.15;
-const DEFAULT_JUMP_POWER = 50;
 
 const EVENTS = Events.character;
 
@@ -42,12 +45,20 @@ const EVENTS = Events.character;
 	},
 })
 export class Character extends AbstractCharacter implements OnTick {
+	private heldItem?: Item;
+	private animationManager!: AnimationManager;
+
 	public constructor(
 		private ragdoll: RagdollServer,
 		private components: Components,
 		private dataService: DataService,
 	) {
 		super();
+
+		const character = promiseR6(this.instance).expect();
+		this.animationManager = new AnimationManager(
+			character.Humanoid.Animator,
+		);
 	}
 
 	public override onStart(): void {
@@ -55,6 +66,8 @@ export class Character extends AbstractCharacter implements OnTick {
 
 		this.instance.AddTag("FallDamage");
 		this.instance.AddTag("CombatManager");
+
+		this.loadAnimations(ANIMATIONS);
 
 		const player = this.getPlayer();
 		this.trove.add(
@@ -220,10 +233,6 @@ export class Character extends AbstractCharacter implements OnTick {
 			this.instance.AddTag("BurnScar");
 	}
 
-	public toggleJump(enable: boolean): void {
-		this.humanoid.JumpPower = enable ? DEFAULT_JUMP_POWER : 0;
-	}
-
 	public takeDamage(amount: number): void {
 		this.humanoid.TakeDamage(math.min(this.humanoid.Health, amount));
 	}
@@ -234,6 +243,55 @@ export class Character extends AbstractCharacter implements OnTick {
 		const toThem = theirCFrame.Position.sub(position);
 		const dot = theirCFrame.LookVector.Dot(toThem.Unit);
 		return dot > 0;
+	}
+
+	public setHeldItem(item?: Item): void {
+		this.heldItem = item;
+	}
+
+	public getHeldItem(): Item | undefined {
+		return this.heldItem;
+	}
+
+	public getHeldWeapon(): AbstractWeapon | undefined {
+		const heldItem = this.getHeldItem();
+		if (heldItem !== undefined) {
+			return this.components.getComponents<AbstractWeapon>(
+				heldItem.instance,
+			)[0];
+		}
+		return;
+	}
+
+	public loadAnimations(animationFolder: Folder) {
+		const anims = animationFolder
+			.GetDescendants()
+			.filter((value) => value.IsA("Animation"));
+		this.animationManager.loadAnimations(anims as Animation[]);
+	}
+
+	public playAnimation(name: string, speed?: number) {
+		this.animationManager.playTrack(name, undefined, undefined, speed);
+	}
+
+	public stopAnimation(name: string, fadeTime?: number) {
+		this.animationManager.stopTrack(name, fadeTime);
+	}
+
+	public connectToAnimationMarker(
+		trackName: string,
+		markerName: string,
+		callback: (param?: string) => void,
+	) {
+		return this.animationManager.connectToTrackMarker(
+			trackName,
+			markerName,
+			callback,
+		);
+	}
+
+	public connectToAnimationStopped(name: string, callback: () => void) {
+		return this.animationManager.getTrack(name)?.Stopped.Connect(callback);
 	}
 
 	private onHealthChanged(health: number): void {

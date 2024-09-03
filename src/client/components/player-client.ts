@@ -1,11 +1,13 @@
 import { Component, Components } from "@flamework/components";
 
+import { LOCAL_PLAYER } from "client/constants";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { OnLocalCharacterAdded } from "../../../types/lifecycles";
 import { Character } from "./character";
 
 @Component({
 	tag: "Player",
+	predicate: (instance) => instance === LOCAL_PLAYER,
 })
 export class PlayerClient
 	extends AbstractPlayer

@@ -1,6 +1,9 @@
 import { Trove } from "@rbxts/trove";
 import { Events } from "client/network";
+import { store } from "client/store";
+import { selectActiveTool } from "client/store/slices/gui/selectors";
 import { BLOCK_WALK_SPEED } from "shared/configs";
+import { getWeaponConfig, WeaponConfig } from "shared/configs/weapons";
 import { StateMachine } from "shared/modules/state-machine";
 import { Character } from "../components/character";
 import { AnimationController } from "../controllers/animation-controller";
@@ -10,6 +13,7 @@ import { CharacterState } from "./character-state";
 export class BlockState extends CharacterState {
 	public readonly name = "Block";
 
+	private blockAnimationName = "";
 	private trove = new Trove();
 
 	public constructor(
@@ -22,7 +26,18 @@ export class BlockState extends CharacterState {
 	}
 
 	public override enter(): void {
-		this.animationController.play("DefaultBlock");
+		const equippedTool = store.getState(selectActiveTool());
+		let config: WeaponConfig | undefined;
+		if (equippedTool !== undefined) {
+			try {
+				config = getWeaponConfig(equippedTool?.Name);
+			} catch (e) {
+				// oops!
+			}
+		}
+		this.blockAnimationName =
+			config?.blockAnimation?.Name ?? "DefaultBlock";
+		this.animationController.play(this.blockAnimationName);
 		this.character.setWalkSpeed(BLOCK_WALK_SPEED);
 
 		Events.combat.block(true);
@@ -48,7 +63,7 @@ export class BlockState extends CharacterState {
 	}
 
 	public override exit(): void {
-		this.animationController.stop("DefaultBlock");
+		this.animationController.stop(this.blockAnimationName);
 		this.character.resetWalkSpeed();
 
 		this.trove.clean();

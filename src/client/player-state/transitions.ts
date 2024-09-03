@@ -52,7 +52,6 @@ export function createAttackTransition(
 	character: Character,
 ) {
 	return inputController.onLightAttackTriggered(() => {
-		if (character.instance.GetAttribute("isRagdolled") === true) return;
 		if (character.canLightAttack()) stateMachine.transitionTo("attack");
 	});
 }

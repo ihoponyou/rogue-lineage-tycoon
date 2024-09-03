@@ -231,19 +231,28 @@ interface ReplicatedStorage extends Instance {
 				Sound: Sound;
 			};
 			Weapons: Folder & {
+				["Bronze Spear"]: Model & {
+					["Bronze Spear"]: MeshPart & {
+						Trail: Trail;
+						Attachment2: Attachment;
+						PropWeld: Weld;
+						Weld: Weld;
+						Attachment1: Attachment;
+					};
+				};
 				["Bronze Sword"]: Model & {
 					["Bronze Sword"]: MeshPart & {
-						Stats: Folder & {
-							Speed: NumberValue;
-							Length: IntValue;
-							Damage: NumberValue;
-						};
-						TestTrail: Trail;
+						Trail: Trail;
+						Attachment2: Attachment;
 						PropWeld: Weld;
-						Sword: Folder;
-						Prop: Folder;
 						Weld: Weld;
-						Hit1: ParticleEmitter;
+						Attachment1: Attachment;
+					};
+				};
+				["Bronze Dagger"]: Model & {
+					["Bronze Dagger"]: MeshPart & {
+						PropWeld: Weld;
+						Trail: Trail;
 						Attachment2: Attachment;
 						Attachment1: Attachment;
 					};
@@ -1407,61 +1416,81 @@ interface ReplicatedStorage extends Instance {
 				ClimbLeft: Animation;
 			};
 			Combat: Folder & {
-				DefaultBlock: Animation;
-				Punch3: Animation;
+				SpearBlock: Animation;
+				Fists2: Animation;
+				Fists5: Animation;
 				Carrying: Animation;
-				Punch1: Animation;
+				SpearIdle: Animation;
+				Dagger5: Animation;
+				Dagger2: Animation;
+				Spear4: Animation;
+				Sword1: Animation;
+				Gripping: Animation;
+				Sword4: Animation;
+				DefaultBlock: Animation;
+				Spear1: Animation;
+				Gripped: Animation;
+				Spear3: Animation;
+				Dagger1: Animation;
+				Sword3: Animation;
+				Fists4: Animation;
+				Dagger4: Animation;
+				SwordBlock: Animation;
+				Sword5: Animation;
 				Carried: Animation;
-				BlockHit3: Animation;
+				Dagger3: Animation;
 				BlockHit1: Animation;
 				PickUp: Animation;
-				Gripping: Animation;
-				Punch5: Animation;
+				Sword2: Animation;
+				Fists3: Animation;
 				Throw: Animation;
-				Punch4: Animation;
-				Gripped: Animation;
+				Spear2: Animation;
+				BlockHit3: Animation;
 				BlockHit2: Animation;
-				Punch2: Animation;
+				Fists1: Animation;
 			};
 		};
 		Effects: Folder & {
 			Sounds: Folder & {
+				FistsHit: Sound;
 				Greatspearhit: Sound;
 				SoulRipped: Sound;
-				PunchHit: Sound;
 				Died: Sound;
 				PerfectCast: Sound;
+				DaggerHit2: Sound;
 				FinishedCharging: Sound;
 				CounterSpell: Sound;
 				FreeFalling: Sound;
 				SilverDischarge: Sound;
+				SwordSwing: Sound;
 				SwordHit: Sound;
-				DaggerSlash2: Sound;
 				DaggerCharge: Sound;
 				Diffusion: Sound;
 				Lannis: Sound;
+				SpearHit: Sound;
 				Blink: Sound;
 				WingFlap: Sound;
 				Injured: Sound;
+				DaggerSwing: Sound;
 				Stealth: Sound;
 				Charging: Sound;
-				Swing: Sound;
+				SpearSwing: Sound;
 				Pondus: Sound & {
 					FlangeSoundEffect: FlangeSoundEffect;
 				};
 				Erase: Sound;
-				Extinguish: Sound;
+				FistsSwing: Sound;
 				ManaDash: Sound;
-				DaggerHit: Sound;
+				Extinguish: Sound;
 				FlyingAssaulter: Sound;
-				ShadowrushCharge: Sound;
-				SpearSpin: Sound;
+				DaggerHit: Sound;
+				EtherealStrike: Sound;
 				EpicDemon: Sound;
 				Running: Sound;
-				EtherealStrike: Sound;
+				SpearSpin: Sound;
 				Splash: Sound;
 				BaneDischarge: Sound;
-				DaggerHit3: Sound;
+				ShadowrushCharge: Sound;
 				Shadowrush: Sound;
 				Roar: Sound;
 				OwlSlash: Sound;
@@ -1475,7 +1504,7 @@ interface ReplicatedStorage extends Instance {
 				LightningHit: Sound;
 				GettingUp: Sound;
 				CounterSpellOff: Sound;
-				DaggerSlash1: Sound;
+				DaggerSwing2: Sound;
 				Dash: Sound;
 				GrappleNoise: Sound;
 				Snap: Sound;
@@ -1488,7 +1517,7 @@ interface ReplicatedStorage extends Instance {
 				Torso: Folder & {
 					OrangeFire: ParticleEmitter;
 					BlockParticle: ParticleEmitter;
-					PunchHit: ParticleEmitter;
+					FistsHit: ParticleEmitter;
 					Injure: ParticleEmitter;
 					BloodHit: ParticleEmitter;
 				};
@@ -1535,35 +1564,53 @@ interface ReplicatedStorage extends Instance {
 	};
 	src: Folder & {
 		shared: Folder & {
-			["serialized-vector3"]: ModuleScript;
-			["serialized-color3"]: ModuleScript;
-			networking: ModuleScript & {
-				currency: ModuleScript;
-				combat: ModuleScript;
-				dialogue: ModuleScript;
-				mana: ModuleScript;
-				character: ModuleScript;
-				reflex: ModuleScript;
-			};
-			charAt: ModuleScript;
+			toggleable: ModuleScript;
+			hideable: ModuleScript;
 			configs: ModuleScript & {
-				group: ModuleScript;
-				character: ModuleScript;
 				items: ModuleScript;
+				character: ModuleScript;
+				group: ModuleScript;
 				conditions: ModuleScript;
+				weapons: ModuleScript;
 			};
 			constants: ModuleScript;
-			getCharacterFromBodyPart: ModuleScript;
-			toggleable: ModuleScript;
-			graph: ModuleScript & {
-				node: ModuleScript;
+			modules: Folder & {
+				["serialized-vector3"]: ModuleScript;
+				["serialized-color3"]: ModuleScript;
+				["line-of-sight"]: ModuleScript;
+				["character-from-body-part"]: ModuleScript;
+				["get-digit"]: ModuleScript;
+				["on-player-removing"]: ModuleScript;
+				hitbox: ModuleScript;
+				["char-at"]: ModuleScript;
+				["state-machine"]: ModuleScript & {
+					state: ModuleScript;
+				};
+				["animation-manager"]: ModuleScript;
+				graph: ModuleScript & {
+					node: ModuleScript;
+				};
 			};
-			hideable: ModuleScript;
-			["line-of-sight"]: ModuleScript;
-			["get-digit"]: ModuleScript;
+			network: ModuleScript & {
+				currency: ModuleScript;
+				combat: ModuleScript;
+				character: ModuleScript;
+				dialogue: ModuleScript;
+				mana: ModuleScript;
+				item: ModuleScript;
+				reflex: ModuleScript;
+			};
+			components: Folder & {
+				toggleable: ModuleScript;
+				["abstract-player"]: ModuleScript;
+				["abstract-weapon"]: ModuleScript;
+				["disposable-component"]: ModuleScript;
+				["abstract-item"]: ModuleScript;
+				ragdoll: ModuleScript;
+				["abstract-character"]: ModuleScript;
+				model: ModuleScript;
+			};
 			inject: ModuleScript;
-			["on-player-removing"]: ModuleScript;
-			enums: ModuleScript;
 			store: ModuleScript & {
 				slices: ModuleScript & {
 					inventory: ModuleScript & {
@@ -1593,27 +1640,25 @@ interface ReplicatedStorage extends Instance {
 					["player-data"]: ModuleScript;
 				};
 			};
-			["state-machine"]: ModuleScript & {
-				state: ModuleScript;
-			};
 			cmdr: Folder & {
 				hooks: Folder & {
 					["before-run"]: ModuleScript;
 				};
 			};
-			components: Folder & {
-				toggleable: ModuleScript;
-				character: ModuleScript;
-				["disposable-component"]: ModuleScript;
-				ragdoll: ModuleScript;
-				model: ModuleScript;
-				["abstract-player"]: ModuleScript;
-			};
 		};
 		client: Folder & {
-			networking: ModuleScript;
+			network: ModuleScript;
 			configs: Folder;
-			effects: ModuleScript;
+			controllers: Folder & {
+				["lifecycle-controller"]: ModuleScript;
+				["inventory-controller"]: ModuleScript;
+				["input-controller"]: ModuleScript;
+				["keybind-controller"]: ModuleScript;
+				["effect-controller"]: ModuleScript;
+				["chat-controller"]: ModuleScript;
+				["animation-controller"]: ModuleScript;
+				["gui-controller"]: ModuleScript;
+			};
 			["player-state"]: Folder & {
 				["block-state"]: ModuleScript;
 				["climb-state"]: ModuleScript;
@@ -1625,22 +1670,15 @@ interface ReplicatedStorage extends Instance {
 				transitions: ModuleScript;
 				["run-state"]: ModuleScript;
 			};
+			effects: ModuleScript;
 			constants: ModuleScript;
 			components: Folder & {
-				["player-client"]: ModuleScript;
-				["character-state-machine"]: ModuleScript;
-				["ragdoll-client"]: ModuleScript;
 				character: ModuleScript;
-			};
-			controllers: Folder & {
-				["lifecycle-controller"]: ModuleScript;
-				["inventory-controller"]: ModuleScript;
-				["input-controller"]: ModuleScript;
-				["keybind-controller"]: ModuleScript;
-				["effect-controller"]: ModuleScript;
-				["chat-controller"]: ModuleScript;
-				["animation-controller"]: ModuleScript;
-				["gui-controller"]: ModuleScript;
+				["ragdoll-client"]: ModuleScript;
+				["character-state-machine"]: ModuleScript;
+				item: ModuleScript;
+				["player-client"]: ModuleScript;
+				weapon: ModuleScript;
 			};
 			store: ModuleScript & {
 				middleware: Folder & {
@@ -1656,33 +1694,35 @@ interface ReplicatedStorage extends Instance {
 				};
 			};
 			gui: Folder & {
+				hooks: Folder & {
+					["use-motion"]: ModuleScript;
+					["reflex-hooks"]: ModuleScript;
+				};
+				stories: Folder;
 				components: Folder & {
 					["dialogue-box"]: ModuleScript & {
 						["dialogue-option"]: ModuleScript;
 						["char-label"]: ModuleScript;
 					};
-					stats: ModuleScript;
-					["silver-logo"]: ModuleScript;
-					layer: ModuleScript;
-					digit: ModuleScript;
 					["name-plate"]: ModuleScript;
 					inventory: Folder & {
-						HotbarFrame: ModuleScript;
-						Backpack: ModuleScript;
-						ItemButton: ModuleScript;
-						EmptyHotbarSlot: ModuleScript;
+						["draggable-item-button"]: ModuleScript;
+						backpack: ModuleScript;
+						hotbar: ModuleScript;
+						["item-button"]: ModuleScript;
+						["empty-hotbar-slot"]: ModuleScript;
 					};
 					app: ModuleScript;
+					["silver-logo"]: ModuleScript;
 					["fill-bar"]: ModuleScript & {
 						["mana-bar"]: ModuleScript;
 						["temperature-bar"]: ModuleScript;
 						["stomach-bar"]: ModuleScript;
 					};
+					stats: ModuleScript;
+					digit: ModuleScript;
 				};
-				hooks: Folder & {
-					["use-motion"]: ModuleScript;
-					["reflex-hooks"]: ModuleScript;
-				};
+				context: ModuleScript;
 			};
 		};
 	};
@@ -2021,6 +2061,21 @@ interface ReplicatedStorage extends Instance {
 						ExpectationContext: ModuleScript;
 						Context: ModuleScript;
 						Expectation: ModuleScript;
+					};
+				};
+				["ui-labs"]: Folder & {
+					src: ModuleScript & {
+						Controls: Folder & {
+							Utils: ModuleScript;
+							PrimitiveControls: ModuleScript;
+							ControlUtils: ModuleScript;
+							DatatypeControls: ModuleScript;
+							AdvancedControls: ModuleScript;
+						};
+						Libraries: Folder;
+						Enviroment: ModuleScript;
+						ControlTypings: Folder;
+						StoryCreators: ModuleScript;
 					};
 				};
 				sift: Folder & {

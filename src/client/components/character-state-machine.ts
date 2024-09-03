@@ -63,12 +63,7 @@ export class CharacterStateMachine
 				this.keybindController,
 				this.inputController,
 			),
-			new AttackState(
-				this.stateMachine,
-				this.character,
-				this.inputController,
-				this.animationController,
-			),
+			new AttackState(this.stateMachine, this.character),
 			new BlockState(
 				this.stateMachine,
 				this.character,

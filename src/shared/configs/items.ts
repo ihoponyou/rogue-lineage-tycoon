@@ -1,16 +1,17 @@
 import { ReplicatedStorage } from "@rbxts/services";
 
-export type BodyPart = "Right Arm" | "Torso";
+export type BodyPart = "Right Arm" | "Torso" | "Right Leg";
 
 interface ItemConfig {
-	droppable: boolean;
-	maxStackSize: number;
-	worldModel: Model;
-	hideOnHolster: boolean;
-	equipLimb: BodyPart;
-	equipC0?: CFrame;
-	holsterLimb: BodyPart;
-	holsterC0?: CFrame;
+	readonly droppable: boolean;
+	readonly maxStackSize: number;
+	readonly worldModel: Model;
+	readonly hideOnHolster: boolean;
+	readonly equipLimb: BodyPart;
+	readonly equipC0?: CFrame;
+	readonly holsterLimb: BodyPart;
+	readonly holsterC0?: CFrame;
+	readonly idleAnimation?: Animation;
 }
 
 function cframeFromOrientationDeg(
@@ -21,12 +22,8 @@ function cframeFromOrientationDeg(
 	return CFrame.fromOrientation(math.rad(x), math.rad(y), math.rad(z));
 }
 
-export const DEFAULT_ROOT_JOINT_C0 = new CFrame(0, -1, 0).mul(
-	cframeFromOrientationDeg(-90),
-);
-
 const SWORD_HOLSTER_C0 = new CFrame(0, 0, 0.552).mul(
-	cframeFromOrientationDeg(28.695, -90.001, -90),
+	cframeFromOrientationDeg(28.695, -90, -90),
 );
 
 export const ITEMS: { [name: string]: ItemConfig } = {
@@ -49,6 +46,32 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		),
 		holsterLimb: "Torso",
 		holsterC0: SWORD_HOLSTER_C0,
+	},
+	"Bronze Spear": {
+		droppable: false,
+		maxStackSize: 1,
+		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Spear"],
+		hideOnHolster: false,
+		equipLimb: "Right Arm",
+		holsterLimb: "Torso",
+		holsterC0: new CFrame(0, 0, 0.65).mul(
+			cframeFromOrientationDeg(25, -90, -90),
+		),
+		idleAnimation: ReplicatedStorage.Assets.Animations.Combat.SpearIdle,
+	},
+	"Bronze Dagger": {
+		droppable: false,
+		maxStackSize: 1,
+		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Dagger"],
+		hideOnHolster: false,
+		equipLimb: "Right Arm",
+		equipC0: new CFrame(0, -0.75, 0.97).mul(
+			cframeFromOrientationDeg(0, 0, -90),
+		),
+		holsterLimb: "Right Leg",
+		holsterC0: new CFrame(0.56, 0.8, 0).mul(
+			cframeFromOrientationDeg(40, 0, -90),
+		),
 	},
 };
 

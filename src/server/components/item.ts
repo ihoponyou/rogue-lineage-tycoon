@@ -6,16 +6,15 @@ import { Events } from "server/network";
 import { store } from "server/store";
 import { AbstractItem } from "shared/components/abstract-item";
 import { ModelComponent } from "shared/components/model";
-import {
-	BodyPart,
-	DEFAULT_ROOT_JOINT_C0,
-	getItemConfig,
-} from "shared/configs/items";
+import { BodyPart, getItemConfig } from "shared/configs/items";
 import { TouchableModel } from "./interactable/touchable/touchable-model";
 import { PlayerServer } from "./player-server";
 
 @Component({
 	tag: Item.TAG,
+	defaults: {
+		isEquipped: false,
+	},
 })
 export class Item extends AbstractItem implements OnStart {
 	private config = getItemConfig(this.instance.Name);
@@ -23,8 +22,6 @@ export class Item extends AbstractItem implements OnStart {
 	private rootJoint!: Motor6D;
 	private touchable!: TouchableModel;
 	private owner?: PlayerServer;
-
-	private equipped = false;
 
 	public constructor(private components: Components) {
 		super();
@@ -35,17 +32,30 @@ export class Item extends AbstractItem implements OnStart {
 		this.instance.ManualActivationOnly = true;
 
 		const worldModel = this.config.worldModel.Clone();
-		worldModel.Parent = this.instance;
 		worldModel.Name = "WorldModel";
 		worldModel.AddTag(ModelComponent.TAG);
+		worldModel.Parent = this.instance;
 		this.worldModel = this.components
 			.waitForComponent<ModelComponent>(worldModel)
 			.expect();
 
+		if (worldModel.PrimaryPart === undefined) {
+			warn(`${this.config.worldModel} has unassigned PrimaryPart`);
+			worldModel.PrimaryPart =
+				worldModel.FindFirstChildWhichIsA("BasePart");
+			if (worldModel.PrimaryPart === undefined) {
+				error(
+					`could not assign temporary PrimaryPart for ${this.config.worldModel.Name}`,
+				);
+			}
+		}
+		// animations require Hilt part
+		worldModel.PrimaryPart.Name = "Hilt";
+
 		this.rootJoint = new Instance("Motor6D");
-		this.rootJoint.Parent = worldModel.PrimaryPart;
 		this.rootJoint.Name = "RootJoint";
 		this.rootJoint.Part1 = worldModel.PrimaryPart;
+		this.rootJoint.Parent = worldModel.PrimaryPart;
 
 		worldModel.AddTag(TouchableModel.TAG);
 		this.touchable = this.components
@@ -93,7 +103,7 @@ export class Item extends AbstractItem implements OnStart {
 	}
 
 	public drop(): void {
-		if (this.equipped) this.unequip();
+		if (this.attributes.isEquipped) this.unequip();
 
 		this.owner = undefined;
 		this.instance.Parent = Workspace;
@@ -103,33 +113,42 @@ export class Item extends AbstractItem implements OnStart {
 	}
 
 	public equip(): void {
-		if (this.equipped) return;
+		if (this.attributes.isEquipped) return;
 		if (this.owner === undefined) return;
+
+		const character = this.owner.getCharacter();
+		character.setHeldItem(this);
+		if (this.config.idleAnimation) {
+			character.playAnimation(this.config.idleAnimation.Name);
+		}
 
 		if (this.config.hideOnHolster) {
 			this.worldModel.show();
 		}
 		this.rigToLimb(this.config.equipLimb, this.config.equipC0);
 
-		this.equipped = true;
+		this.attributes.isEquipped = true;
 	}
 
 	public unequip(): void {
-		if (!this.equipped) return;
+		if (!this.attributes.isEquipped) return;
 		if (this.owner === undefined) return;
+
+		const character = this.owner.getCharacter();
+		character.setHeldItem(this);
+		if (this.config.idleAnimation) {
+			character.stopAnimation(this.config.idleAnimation.Name);
+		}
 
 		if (this.config.hideOnHolster) {
 			this.worldModel.hide();
 		}
 		this.rigToLimb(this.config.holsterLimb, this.config.holsterC0);
 
-		this.equipped = false;
+		this.attributes.isEquipped = false;
 	}
 
-	private rigToLimb(
-		limb: BodyPart,
-		c0: CFrame = DEFAULT_ROOT_JOINT_C0,
-	): void {
+	private rigToLimb(limb: BodyPart, c0: CFrame = new CFrame()): void {
 		if (this.owner === undefined) return;
 		const character = this.owner.getCharacter();
 		this.worldModel.instance.Parent = character.instance;
