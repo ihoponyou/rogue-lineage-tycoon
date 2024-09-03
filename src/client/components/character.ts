@@ -105,6 +105,7 @@ export class Character extends AbstractCharacter {
 	}
 
 	private tryBlock(): void {
+		// TODO: check if currently attacking
 		if (!this.canBlock() || this.dash.isActive()) return;
 		this.run.stop();
 		this.block.start();
