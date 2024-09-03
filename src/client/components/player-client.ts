@@ -29,7 +29,7 @@ export class PlayerClient
 	}
 
 	public getCharacter(): Character {
-		if (this.character === undefined) error("character unavailable");
+		if (this.character === undefined) error("character is undefined");
 		return this.character;
 	}
 }

@@ -58,15 +58,16 @@ export class Item extends AbstractItem implements OnStart {
 		this.rootJoint.Parent = worldModel.PrimaryPart;
 
 		worldModel.AddTag(TouchableModel.TAG);
-		this.touchable = this.components
+		this.components
 			.waitForComponent<TouchableModel>(worldModel)
-			.expect();
-
-		this.touchable.onInteracted((player) => {
-			if (this.owner !== undefined) return;
-			this.pickUp(player);
-		});
-		this.touchable.enable();
+			.andThen((component) => {
+				this.touchable = component;
+				component.onInteracted((player) => {
+					if (this.owner !== undefined) return;
+					this.pickUp(player);
+				});
+				component.enable();
+			});
 
 		Events.item.equip.connect((player, tool) => {
 			if (tool !== this.instance) return;

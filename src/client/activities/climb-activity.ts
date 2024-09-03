@@ -1,23 +1,25 @@
 import {
 	ContextActionService,
+	RunService,
 	TweenService,
 	UserInputService,
 	Workspace,
 } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
+import { Character } from "client/components/character";
+import { AnimationController } from "client/controllers/animation-controller";
+import {
+	Direction,
+	InputController,
+} from "client/controllers/input-controller";
+import { KeybindController } from "client/controllers/keybind-controller";
 import { store } from "client/store";
 import { hasLineOfSight } from "shared/modules/line-of-sight";
-import { StateMachine } from "shared/modules/state-machine";
 import { selectManaAmount } from "shared/store/slices/mana/selectors";
-import { Character } from "../components/character";
-import { AnimationController } from "../controllers/animation-controller";
-import { Direction, InputController } from "../controllers/input-controller";
-import { KeybindController } from "../controllers/keybind-controller";
-import { CharacterState } from "./character-state";
+import { CharacterActivity } from "./character-activity";
 
 const BASE_CLIMB_SPEED = 10;
 const TRAINED_CLIMB_BONUS_DURATION = 10;
-
 const CLIMB_DIRECTION_TO_ANIMATION_NAME = {
 	forward: "ClimbUp",
 	backward: "ClimbDown",
@@ -25,26 +27,26 @@ const CLIMB_DIRECTION_TO_ANIMATION_NAME = {
 	right: "ClimbRight",
 };
 
-export class ClimbState extends CharacterState {
-	public readonly name = "Climb";
+export class ClimbActivity extends CharacterActivity {
+	private trove = new Trove();
 
 	private goalPart = this.newGoalPart();
 	private goalAttachment = this.newGoalAttachment();
 	private climbForce = this.newClimbForce();
 	private climbConstraint = this.newClimbConstraint();
 
-	private trove = new Trove();
-
 	public constructor(
-		stateMachine: StateMachine,
 		character: Character,
-		private keybindController: KeybindController,
 		private animationController: AnimationController,
+		private inputController: InputController,
+		private keybindController: KeybindController,
 	) {
-		super(stateMachine, character);
+		super(character);
 	}
 
-	public override enter(wallCastResult: RaycastResult): void {
+	public override start(wallCastResult: RaycastResult): void {
+		super.start();
+
 		const humanoid = this.character.getHumanoid();
 		humanoid.AutoRotate = false;
 		humanoid.SetStateEnabled(Enum.HumanoidStateType.Freefall, false);
@@ -56,7 +58,7 @@ export class ClimbState extends CharacterState {
 
 		this.alignCharacterToWall(0, wallCastResult);
 
-		const input = InputController.inputVector;
+		const input = this.inputController.getInputVector();
 		if (input.Y !== 0) {
 			this.animationController.play("ClimbUp");
 		} else if (input.X === 1) {
@@ -70,8 +72,9 @@ export class ClimbState extends CharacterState {
 		ContextActionService.BindAction(
 			"input_cancel_climb",
 			(_, state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.stateMachine.transitionTo("idle");
+				if (state !== Enum.UserInputState.Begin)
+					return Enum.ContextActionResult.Pass;
+				this.stop();
 			},
 			false,
 			this.keybindController.keybinds.jump,
@@ -83,12 +86,38 @@ export class ClimbState extends CharacterState {
 		this.trove.connect(UserInputService.InputEnded, (input, gpe) =>
 			this.handleClimbAnimations(input, gpe),
 		);
+
+		this.trove.connect(RunService.RenderStepped, (deltaTime) =>
+			this.update(deltaTime),
+		);
 	}
 
-	public override update(deltaTime: number): void {
+	public override stop(): void {
+		super.stop();
+
+		const humanoid = this.character.getHumanoid();
+		humanoid.AutoRotate = true;
+		humanoid.SetStateEnabled(Enum.HumanoidStateType.Freefall, true);
+		humanoid.SetStateEnabled(Enum.HumanoidStateType.Running, true);
+
+		this.climbConstraint.Enabled = false;
+		this.climbForce.Enabled = false;
+
+		this.animationController.stop("ClimbUp");
+		this.animationController.stop("ClimbDown");
+		this.animationController.stop("ClimbLeft");
+		this.animationController.stop("ClimbRight");
+		this.animationController.stop("ClimbIdle");
+
+		ContextActionService.UnbindAction("input_cancel_climb");
+
+		this.trove.clean();
+	}
+
+	private update(deltaTime: number): void {
 		const manaAmount = store.getState(selectManaAmount()) ?? 0;
 		if (manaAmount <= 0) {
-			this.stateMachine.transitionTo("idle");
+			this.stop();
 			return;
 		}
 
@@ -103,11 +132,11 @@ export class ClimbState extends CharacterState {
 		);
 		if (floorCheck) {
 			// print("too close to floor");
-			this.stateMachine.transitionTo("idle");
+			this.stop();
 			return;
 		}
 
-		const inputVector = InputController.inputVector;
+		const inputVector = this.inputController.getInputVector();
 		const lookVector = humanoidRootPart.CFrame.LookVector;
 		const rightVector = humanoidRootPart.CFrame.RightVector;
 
@@ -158,7 +187,7 @@ export class ClimbState extends CharacterState {
 
 		if (!(blockForwardCast || diagonalIn || diagonalOut)) {
 			// print("wall not found");
-			this.stateMachine.transitionTo("idle");
+			this.stop();
 			return;
 		}
 
@@ -188,28 +217,7 @@ export class ClimbState extends CharacterState {
 		);
 
 		if (seesTop) {
-			const ledgeCastOrigin = humanoidRootPart.CFrame.mul(
-				CFrame.Angles(math.rad(-10), 0, 0),
-			).add(Vector3.yAxis);
-			const ledgeCastSize = new Vector3(0.01, 2, 0.01);
-			const ledgeCast = Workspace.Blockcast(
-				ledgeCastOrigin,
-				ledgeCastSize,
-				lookVector,
-				params,
-			);
-
-			if (ledgeCast) {
-				this.climbUp(
-					new CFrame(ledgeCast.Position).mul(
-						humanoidRootPart.CFrame.Rotation,
-					),
-				);
-			} else {
-				// print("ledge not found");
-				this.stateMachine.transitionTo("idle");
-				return;
-			}
+			this.tryLedgeClimb(humanoidRootPart, lookVector, params);
 		} else if (diagonalIn && !diagonalOut) {
 			this.alignCharacterToWall(deltaTime, diagonalIn);
 		} else if (sideways) {
@@ -227,26 +235,33 @@ export class ClimbState extends CharacterState {
 		); // TODO: fix this
 	}
 
-	public override exit(): void {
-		const humanoid = this.character.getHumanoid();
-		humanoid.AutoRotate = true;
-		humanoid.SetStateEnabled(Enum.HumanoidStateType.Freefall, true);
-		humanoid.SetStateEnabled(Enum.HumanoidStateType.Running, true);
+	private tryLedgeClimb(
+		humanoidRootPart: Part,
+		lookVector: Vector3,
+		params: RaycastParams,
+	): void {
+		const ledgeCastOrigin = humanoidRootPart.CFrame.mul(
+			CFrame.Angles(math.rad(-10), 0, 0),
+		).add(Vector3.yAxis);
+		const ledgeCastSize = new Vector3(0.01, 2, 0.01);
+		const ledgeCast = Workspace.Blockcast(
+			ledgeCastOrigin,
+			ledgeCastSize,
+			lookVector,
+			params,
+		);
 
-		this.climbConstraint.Enabled = false;
-		this.climbForce.Enabled = false;
-
-		this.animationController.stop("ClimbUp");
-		this.animationController.stop("ClimbDown");
-		this.animationController.stop("ClimbLeft");
-		this.animationController.stop("ClimbRight");
-		this.animationController.stop("ClimbIdle");
-
-		this.trove.clean();
-
-		ContextActionService.UnbindAction("input_cancel_climb");
-
-		// TODO: cooldown
+		if (ledgeCast) {
+			this.climbUp(
+				new CFrame(ledgeCast.Position).mul(
+					humanoidRootPart.CFrame.Rotation,
+				),
+			);
+		} else {
+			// print("ledge not found");
+			this.stop();
+			return;
+		}
 	}
 
 	private newGoalPart(): Part {
@@ -351,7 +366,7 @@ export class ClimbState extends CharacterState {
 		tween.Completed.Once(() => {
 			humanoidRootPart.Anchored = false;
 			// print("climbed up");
-			this.stateMachine.transitionTo("idle");
+			this.stop();
 		});
 		tween.Play();
 		this.animationController.play("LedgeClimbUp");

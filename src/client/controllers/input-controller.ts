@@ -1,5 +1,5 @@
 import { Components } from "@flamework/components";
-import { Controller, Dependency, OnStart, OnTick } from "@flamework/core";
+import { Controller, OnStart, OnTick } from "@flamework/core";
 import { UserInputService, Workspace } from "@rbxts/services";
 import Signal from "@rbxts/signal";
 import { store } from "client/store";
@@ -23,24 +23,24 @@ export enum InputAxis {
 
 export type Direction = "forward" | "backward" | "left" | "right";
 
+type ChargeManaCallback = (bool: boolean) => void;
+type DashCallback = (direction: Direction) => void;
+type ClimbCallback = (wallCastResult: RaycastResult) => void;
+
 @Controller()
 export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
-	public static inputVector = new Vector2();
-	public readonly runTriggered = new Signal();
-	public readonly dashTriggered = new Signal<
-		(direction: Direction) => void
-	>();
-	public readonly climbTriggered = new Signal<
-		(wallCastResult: RaycastResult) => void
-	>();
-	public readonly chargeManaTriggered = new Signal<(bool: boolean) => void>();
-
-	private character?: Character;
-	private lastForwardInputTick = 0;
+	private inputVector = Vector2.zero;
+	private runTriggered = new Signal();
+	private dashTriggered = new Signal();
+	private climbTriggered = new Signal<ClimbCallback>();
+	private chargeManaTriggered = new Signal<ChargeManaCallback>();
 	private lightAttackTriggered = new Signal();
 	private blockTriggered = new Signal();
+	private lastForwardInputTick = 0;
+	private character?: Character;
 
 	public constructor(
+		private components: Components,
 		private keybindController: KeybindController,
 		private inventoryController: InventoryController,
 	) {}
@@ -183,12 +183,14 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	}
 
 	public onTick(): void {
-		InputController.inputVector = this.getInputVector();
+		this.inputVector = new Vector2(
+			this.getAxis(InputAxis.Horizontal),
+			this.getAxis(InputAxis.Vertical),
+		);
 	}
 
 	public onLocalCharacterAdded(character: Model): void {
-		const components = Dependency<Components>();
-		components
+		this.components
 			.waitForComponent<Character>(character)
 			.andThen((component) => (this.character = component));
 	}
@@ -221,11 +223,22 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 		}
 	}
 
-	public getInputVector(): Vector2 {
-		return new Vector2(
-			this.getAxis(InputAxis.Horizontal),
-			this.getAxis(InputAxis.Vertical),
-		);
+	public onRunTriggered(callback: Callback): RBXScriptConnection {
+		return this.runTriggered.Connect(callback);
+	}
+
+	public onChargeManaTriggered(
+		callback: ChargeManaCallback,
+	): RBXScriptConnection {
+		return this.chargeManaTriggered.Connect(callback);
+	}
+
+	public onDashTriggered(callback: Callback): RBXScriptConnection {
+		return this.dashTriggered.Connect(callback);
+	}
+
+	public onClimbTriggered(callback: ClimbCallback): RBXScriptConnection {
+		return this.climbTriggered.Connect(callback);
 	}
 
 	public onLightAttackTriggered(callback: () => void): RBXScriptConnection {
@@ -234,6 +247,10 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 
 	public onBlockTriggered(callback: () => void): RBXScriptConnection {
 		return this.blockTriggered.Connect(callback);
+	}
+
+	public getInputVector(): Vector2 {
+		return this.inputVector;
 	}
 
 	private handleForwardInput(state: Enum.UserInputState) {
@@ -249,18 +266,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private handleDashInput(state: Enum.UserInputState) {
 		if (state !== Enum.UserInputState.Begin)
 			return Enum.ContextActionResult.Pass;
-
-		let direction: Direction = "backward";
-		if (this.keybindController.isKeyDown("forward")) {
-			direction = "forward";
-		} else if (this.keybindController.isKeyDown("left")) {
-			direction = "left";
-		} else if (this.keybindController.isKeyDown("right")) {
-			direction = "right";
-		}
-
-		this.dashTriggered.Fire(direction);
-
+		this.dashTriggered.Fire();
 		return Enum.ContextActionResult.Pass;
 	}
 
