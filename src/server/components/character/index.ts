@@ -294,6 +294,10 @@ export class Character extends AbstractCharacter implements OnTick {
 		return this.animationManager.getTrack(name)?.Stopped.Connect(callback);
 	}
 
+	public toggleRagdoll(on: boolean): void {
+		this.ragdoll.toggle(on);
+	}
+
 	private onHealthChanged(health: number): void {
 		store.setHealth(this.getPlayer(), health);
 		const percentHealth = health / this.humanoid.MaxHealth;
