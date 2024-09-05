@@ -1,4 +1,5 @@
 import { Component } from "@flamework/components";
+import { OnTick } from "@flamework/core";
 import { Workspace } from "@rbxts/services";
 import { BlockActivity } from "client/activities/block-activity";
 import { ChargeManaActivity } from "client/activities/charge-mana-activity";
@@ -14,7 +15,7 @@ import { RagdollClient } from "./ragdoll-client";
 
 // manually created by the local player's Player component
 @Component()
-export class Character extends AbstractCharacter {
+export class Character extends AbstractCharacter implements OnTick {
 	private run!: RunActivity;
 	private dash!: DashActivity;
 	private climb!: ClimbActivity;
@@ -73,6 +74,16 @@ export class Character extends AbstractCharacter {
 		);
 	}
 
+	public override canBlock(): boolean {
+		return super.canBlock() && !this.dash.isActive();
+	}
+
+	public onTick(_dt: number): void {
+		if (!this.keybindController.isKeyDown("block")) return;
+		if (this.block.isActive()) return;
+		this.tryBlock();
+	}
+
 	private onKilled(): void {
 		const camera = Workspace.CurrentCamera;
 		if (!camera) return;
@@ -102,8 +113,7 @@ export class Character extends AbstractCharacter {
 	}
 
 	private tryBlock(): void {
-		// TODO: check if currently attacking
-		if (!this.canBlock() || this.dash.isActive()) return;
+		if (!this.canBlock()) return;
 		this.run.stop();
 		this.block.start();
 	}
