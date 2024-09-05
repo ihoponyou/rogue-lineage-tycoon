@@ -5,7 +5,10 @@ export interface RagdollAttributes {
 }
 
 @Component()
-export abstract class Ragdoll extends BaseComponent<RagdollAttributes, Model> {
+export abstract class AbstractRagdoll extends BaseComponent<
+	RagdollAttributes,
+	Model
+> {
 	protected humanoid = this.instance.WaitForChild("Humanoid") as Humanoid;
 
 	protected configureHumanoid(): void {

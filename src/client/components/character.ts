@@ -10,14 +10,10 @@ import { InputController } from "client/controllers/input-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
 import { AbstractCharacter } from "shared/components/abstract-character";
 import { Events } from "../network";
+import { RagdollClient } from "./ragdoll-client";
 
 // manually created by the local player's Player component
-@Component({
-	defaults: {
-		isKnocked: false,
-		isAlive: true,
-	},
-})
+@Component()
 export class Character extends AbstractCharacter {
 	private run!: RunActivity;
 	private dash!: DashActivity;
@@ -26,6 +22,7 @@ export class Character extends AbstractCharacter {
 	private block!: BlockActivity;
 
 	public constructor(
+		protected ragdoll: RagdollClient,
 		private animationController: AnimationController,
 		private keybindController: KeybindController,
 		private inputController: InputController,

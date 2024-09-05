@@ -4,12 +4,14 @@ import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
 import { BASE_WALK_SPEED } from "shared/configs";
 import { DisposableComponent } from "./disposable-component";
+import { AbstractRagdoll } from "./ragdoll";
 
 export interface CharacterAttributes {
 	isKnocked: boolean;
 	isAlive: boolean;
 	isStunned: boolean;
 	isBlocking: boolean;
+	isAttacking: boolean;
 	combo: number;
 	lightAttackCooldown: boolean;
 }
@@ -23,6 +25,7 @@ export abstract class AbstractCharacter
 {
 	protected raycastParams = new RaycastParams();
 	protected humanoid!: Humanoid;
+	protected abstract ragdoll: AbstractRagdoll;
 
 	public onStart(): void {
 		const character = promiseR6(this.instance).expect();
@@ -108,9 +111,13 @@ export abstract class AbstractCharacter
 
 	public canAttack(): boolean {
 		return (
-			this.instance.GetAttribute("isRagdolled") === false &&
-			!this.attributes.isStunned &&
-			!this.attributes.isBlocking
+			this.attributes.isAlive &&
+			!(
+				this.attributes.isStunned ||
+				this.attributes.isBlocking ||
+				this.attributes.isAttacking ||
+				this.ragdoll.attributes.isRagdolled
+			)
 		);
 	}
 
@@ -120,10 +127,13 @@ export abstract class AbstractCharacter
 
 	public canBlock(): boolean {
 		return (
-			this.instance.GetAttribute("isRagdolled") === false &&
 			this.attributes.isAlive &&
-			!this.attributes.isStunned &&
-			!this.attributes.isKnocked
+			!(
+				this.attributes.isStunned ||
+				this.attributes.isBlocking ||
+				this.attributes.isAttacking ||
+				this.ragdoll.attributes.isRagdolled
+			)
 		);
 	}
 

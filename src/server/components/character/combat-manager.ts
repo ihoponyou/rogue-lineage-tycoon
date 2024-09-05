@@ -74,6 +74,8 @@ export class CombatManager
 	private handleLightAttack(): void {
 		if (!this.character.canLightAttack()) return;
 
+		this.character.attributes.isAttacking = true;
+
 		const weaponConfig =
 			this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
 
@@ -129,6 +131,8 @@ export class CombatManager
 				contactConn?.Disconnect();
 				stoppedConn?.Disconnect();
 
+				this.character.attributes.isAttacking = false;
+
 				if (this.comboReset !== undefined) {
 					task.cancel(this.comboReset);
 					this.trove.remove(this.comboReset);
@@ -160,7 +164,7 @@ export class CombatManager
 	}
 
 	private handleBlock(blockUp: boolean): void {
-		if (!this.character.canBlock()) {
+		if (blockUp && !this.character.canBlock()) {
 			Events.combat.unblock(this.character.getPlayer());
 			return;
 		}
