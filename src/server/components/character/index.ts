@@ -40,6 +40,7 @@ const EVENTS = Events.character;
 		isAlive: true,
 		isStunned: false,
 		isBlocking: false,
+		isAttacking: false,
 		combo: 0,
 		lightAttackCooldown: false,
 	},
@@ -49,7 +50,7 @@ export class Character extends AbstractCharacter implements OnTick {
 	private animationManager!: AnimationManager;
 
 	public constructor(
-		private ragdoll: RagdollServer,
+		protected ragdoll: RagdollServer,
 		private components: Components,
 		private dataService: DataService,
 	) {
@@ -292,6 +293,10 @@ export class Character extends AbstractCharacter implements OnTick {
 
 	public connectToAnimationStopped(name: string, callback: () => void) {
 		return this.animationManager.getTrack(name)?.Stopped.Connect(callback);
+	}
+
+	public toggleRagdoll(on: boolean): void {
+		this.ragdoll.toggle(on);
 	}
 
 	private onHealthChanged(health: number): void {

@@ -1,7 +1,7 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Trove } from "@rbxts/trove";
-import { Ragdoll } from "shared/components/ragdoll";
+import { AbstractRagdoll } from "shared/components/ragdoll";
 
 type SocketType = "Hip" | "Shoulder" | "Neck";
 
@@ -42,7 +42,7 @@ function getSocketTypeFromMotorName(name: string): SocketType {
 		isRagdolled: false,
 	},
 })
-export class RagdollServer extends Ragdoll implements OnStart {
+export class RagdollServer extends AbstractRagdoll implements OnStart {
 	private trove = new Trove();
 	private joints = new Map<string, RagdollJoint>();
 

@@ -1,6 +1,6 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { Ragdoll } from "shared/components/ragdoll";
+import { AbstractRagdoll } from "shared/components/ragdoll";
 
 // TODO: local player exclusivity
 @Component({
@@ -9,7 +9,7 @@ import { Ragdoll } from "shared/components/ragdoll";
 		isRagdolled: false,
 	},
 })
-export class RagdollClient extends Ragdoll implements OnStart {
+export class RagdollClient extends AbstractRagdoll implements OnStart {
 	private animator = this.humanoid.WaitForChild("Animator") as Animator;
 
 	public onStart(): void {

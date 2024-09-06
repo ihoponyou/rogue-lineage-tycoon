@@ -6,6 +6,7 @@ import { DisposableComponent } from "shared/components/disposable-component";
 import { getWeaponConfig, WeaponConfig } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
 import { Character } from ".";
+import { AttackData } from "../../../../types/AttackData";
 
 const M1_RESET_DELAY = 2;
 const FISTS_CONFIG = getWeaponConfig("Fists");
@@ -43,7 +44,10 @@ export class CombatManager
 		);
 	}
 
-	private spawnHitbox(weaponConfig: WeaponConfig): void {
+	private spawnHitbox(
+		weaponConfig: WeaponConfig,
+		attackData: AttackData,
+	): void {
 		const size = weaponConfig.hitboxSize;
 		const rootPartCFrame = this.character.getHumanoidRootPart().CFrame;
 		const hitboxCFrame = rootPartCFrame.add(
@@ -61,6 +65,7 @@ export class CombatManager
 					this.character,
 					model,
 					weaponConfig,
+					attackData,
 				),
 			);
 		}
@@ -68,6 +73,8 @@ export class CombatManager
 
 	private handleLightAttack(): void {
 		if (!this.character.canLightAttack()) return;
+
+		this.character.attributes.isAttacking = true;
 
 		const weaponConfig =
 			this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
@@ -96,7 +103,14 @@ export class CombatManager
 			animationName,
 			"contact",
 			() => {
-				this.spawnHitbox(weaponConfig);
+				const isLastHit =
+					this.character.attributes.combo >=
+					weaponConfig.maxLightAttacks;
+				this.spawnHitbox(weaponConfig, {
+					ragdollDuration: isLastHit ? 1 : 0,
+					knockbackForce: isLastHit ? 35 : 15,
+					knockbackDuration: isLastHit ? 0.5 : 1 / 6,
+				});
 
 				if (
 					this.character.attributes.combo >=
@@ -116,6 +130,8 @@ export class CombatManager
 				swingConn?.Disconnect();
 				contactConn?.Disconnect();
 				stoppedConn?.Disconnect();
+
+				this.character.attributes.isAttacking = false;
 
 				if (this.comboReset !== undefined) {
 					task.cancel(this.comboReset);
@@ -148,7 +164,7 @@ export class CombatManager
 	}
 
 	private handleBlock(blockUp: boolean): void {
-		if (!this.character.canBlock()) {
+		if (blockUp && !this.character.canBlock()) {
 			Events.combat.unblock(this.character.getPlayer());
 			return;
 		}
