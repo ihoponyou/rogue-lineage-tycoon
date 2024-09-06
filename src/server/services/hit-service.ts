@@ -27,13 +27,18 @@ export class HitService {
 			!blockable360 &&
 			!hitter.isBehind(victim);
 		if (blocked) {
-			Events.combat.blockHit(victim.getPlayer());
-			Events.playEffect.broadcast(
-				`BlockHit`,
-				victimInstance,
-				weaponConfig.type,
-			);
-			return;
+			if (attackData.breaksBlock) {
+				print("broke block");
+				Events.combat.unblock(victim.getPlayer());
+			} else {
+				Events.combat.blockHit(victim.getPlayer());
+				Events.playEffect.broadcast(
+					`BlockHit`,
+					victimInstance,
+					weaponConfig.type,
+				);
+				return;
+			}
 		}
 
 		Events.playEffect.broadcast(`Hit`, victimInstance, weaponConfig.type);

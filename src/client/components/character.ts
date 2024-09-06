@@ -62,7 +62,12 @@ export class Character extends AbstractCharacter implements OnTick {
 			charging ? this.chargeMana.start() : this.chargeMana.stop();
 		});
 		this.inputController.onBlockTriggered(() => this.tryBlock());
-		this.inputController.onLightAttackTriggered(() => this.tryAttack());
+		this.inputController.onLightAttackTriggered(() =>
+			this.tryLightAttack(),
+		);
+		this.inputController.onHeavyAttackTriggered(() =>
+			this.tryHeavyAttack(),
+		);
 
 		this.trove.add(Events.character.killed.connect(() => this.onKilled()));
 	}
@@ -105,7 +110,7 @@ export class Character extends AbstractCharacter implements OnTick {
 		this.dash.start();
 	}
 
-	private tryAttack(): void {
+	private tryLightAttack(): void {
 		if (!this.canLightAttack()) return;
 		this.chargeMana.stop();
 		this.run.stop();
@@ -116,5 +121,12 @@ export class Character extends AbstractCharacter implements OnTick {
 		if (!this.canBlock()) return;
 		this.run.stop();
 		this.block.start();
+	}
+
+	private tryHeavyAttack() {
+		if (!this.canHeavyAttack()) return;
+		this.chargeMana.stop();
+		this.run.stop();
+		Events.combat.heavyAttack();
 	}
 }

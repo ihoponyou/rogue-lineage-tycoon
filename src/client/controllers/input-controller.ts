@@ -24,7 +24,6 @@ export enum InputAxis {
 export type Direction = "forward" | "backward" | "left" | "right";
 
 type ChargeManaCallback = (bool: boolean) => void;
-type DashCallback = (direction: Direction) => void;
 type ClimbCallback = (wallCastResult: RaycastResult) => void;
 
 @Controller()
@@ -35,6 +34,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private climbTriggered = new Signal<ClimbCallback>();
 	private chargeManaTriggered = new Signal<ChargeManaCallback>();
 	private lightAttackTriggered = new Signal();
+	private heavyAttackTriggered = new Signal();
 	private blockTriggered = new Signal();
 	private lastForwardInputTick = 0;
 	private character?: Character;
@@ -70,6 +70,11 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"lightAttack",
 			this.keybindController.keybinds.lightAttack,
 			(state) => this.handleLightAttackInput(state),
+		);
+		this.keybindController.loadKeybind(
+			"heavyAttack",
+			this.keybindController.keybinds.heavyAttack,
+			(state) => this.handleHeavyAttackInput(state),
 		);
 		this.keybindController.loadKeybind(
 			"block",
@@ -249,6 +254,10 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 		return this.blockTriggered.Connect(callback);
 	}
 
+	public onHeavyAttackTriggered(callback: Callback): RBXScriptConnection {
+		return this.heavyAttackTriggered.Connect(callback);
+	}
+
 	public getInputVector(): Vector2 {
 		return this.inputVector;
 	}
@@ -312,12 +321,19 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private handleLightAttackInput(state: Enum.UserInputState) {
 		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		this.lightAttackTriggered.Fire();
+		// pass instead of sink to allow click detectors to function
 		return Enum.ContextActionResult.Pass;
 	}
 
 	private handleBlockInput(state: Enum.UserInputState) {
 		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		this.blockTriggered.Fire();
+		return Enum.ContextActionResult.Sink;
+	}
+
+	private handleHeavyAttackInput(state: Enum.UserInputState) {
+		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
+		this.heavyAttackTriggered.Fire();
 		return Enum.ContextActionResult.Sink;
 	}
 }

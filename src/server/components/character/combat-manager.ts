@@ -8,7 +8,8 @@ import { spawnHitbox } from "shared/modules/hitbox";
 import { Character } from ".";
 import { AttackData } from "../../../../types/AttackData";
 
-const M1_RESET_DELAY = 2;
+const COMBO_RESET_DELAY = 2;
+const HEAVY_ATTACK_COOLDOWN = 3;
 const FISTS_CONFIG = getWeaponConfig("Fists");
 
 @Component({
@@ -40,6 +41,12 @@ export class CombatManager
 			Events.combat.block.connect((player, blockUp) => {
 				if (player !== this.character.getPlayer()) return;
 				this.handleBlock(blockUp);
+			}),
+		);
+		this.trove.add(
+			Events.combat.heavyAttack.connect((player) => {
+				if (player !== this.character.getPlayer()) return;
+				this.handleHeavyAttack();
 			}),
 		);
 	}
@@ -110,6 +117,7 @@ export class CombatManager
 					ragdollDuration: isLastHit ? 1 : 0,
 					knockbackForce: isLastHit ? 35 : 15,
 					knockbackDuration: isLastHit ? 0.5 : 1 / 6,
+					breaksBlock: false,
 				});
 
 				if (
@@ -138,7 +146,7 @@ export class CombatManager
 					this.trove.remove(this.comboReset);
 				}
 				this.comboReset = this.trove.add(
-					task.delay(M1_RESET_DELAY, () => {
+					task.delay(COMBO_RESET_DELAY, () => {
 						this.character.attributes.combo = 0;
 						this.comboReset = undefined;
 					}),
@@ -147,11 +155,11 @@ export class CombatManager
 		);
 		this.character.playAnimation(animationName, this.attackSpeed);
 
-		this.character.attributes.lightAttackCooldown = true;
+		this.character.attributes.lightAttackDebounce = true;
 		this.trove.add(
 			task.delay(
 				weaponConfig.lightAttackCooldown / this.attackSpeed,
-				() => (this.character.attributes.lightAttackCooldown = false),
+				() => (this.character.attributes.lightAttackDebounce = false),
 			),
 		);
 
@@ -169,5 +177,73 @@ export class CombatManager
 			return;
 		}
 		this.character.attributes.isBlocking = blockUp;
+	}
+
+	private handleHeavyAttack() {
+		if (!this.character.canHeavyAttack()) return;
+
+		this.character.attributes.isAttacking = true;
+
+		const weaponConfig =
+			this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
+
+		Events.character.stopRun(this.character.getPlayer());
+
+		const animationName = `${weaponConfig.type}Heavy`;
+
+		const swingConn = this.character.connectToAnimationMarker(
+			animationName,
+			"swing",
+			() => {
+				Events.playEffect.broadcast(
+					"Swing",
+					this.character.instance,
+					weaponConfig.type,
+				);
+			},
+		);
+		const contactConn = this.character.connectToAnimationMarker(
+			animationName,
+			"contact",
+			() => {
+				this.spawnHitbox(weaponConfig, {
+					ragdollDuration: 1,
+					knockbackForce: 35,
+					knockbackDuration: 0.5,
+					breaksBlock: true,
+				});
+
+				// TODO: no endlag if hit something
+			},
+		);
+		const stoppedConn = this.character.connectToAnimationStopped(
+			animationName,
+			() => {
+				swingConn?.Disconnect();
+				contactConn?.Disconnect();
+				stoppedConn?.Disconnect();
+
+				this.character.attributes.isAttacking = false;
+
+				this.character.attributes.isStunned = true;
+				task.delay((weaponConfig.endlag * 2) / this.attackSpeed, () => {
+					this.character.attributes.isStunned = false;
+					this.character.toggleJump(true);
+					this.character.resetWalkSpeed();
+				});
+			},
+		);
+		this.character.playAnimation(animationName, this.attackSpeed);
+
+		this.character.attributes.heavyAttackDebounce = true;
+		this.trove.add(
+			task.delay(
+				HEAVY_ATTACK_COOLDOWN / this.attackSpeed,
+				() => (this.character.attributes.heavyAttackDebounce = false),
+			),
+		);
+
+		this.character.toggleJump(false);
+		this.character.setWalkSpeed(this.character.getWalkSpeed() * 0.2);
 	}
 }
