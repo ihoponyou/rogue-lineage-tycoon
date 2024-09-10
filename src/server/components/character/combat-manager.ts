@@ -189,6 +189,12 @@ export class CombatManager
 
 		Events.character.stopRun(this.character.getPlayer());
 
+		Events.playEffect.broadcast(
+			"HeavyCharge",
+			this.character.instance,
+			weaponConfig.type,
+		);
+
 		const animationName = `${weaponConfig.type}Heavy`;
 
 		const swingConn = this.character.connectToAnimationMarker(
@@ -196,7 +202,11 @@ export class CombatManager
 			"swing",
 			() => {
 				Events.playEffect.broadcast(
-					"Swing",
+					"StopHeavyCharge",
+					this.character.instance,
+				);
+				Events.playEffect.broadcast(
+					"HeavySwing",
 					this.character.instance,
 					weaponConfig.type,
 				);

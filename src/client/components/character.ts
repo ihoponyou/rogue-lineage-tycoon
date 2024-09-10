@@ -96,6 +96,13 @@ export class Character extends AbstractCharacter implements OnTick {
 	}
 
 	private tryRun(): void {
+		if (
+			this.attributes.isAttacking ||
+			this.attributes.isBlocking ||
+			this.attributes.isKnocked ||
+			this.attributes.isStunned
+		)
+			return;
 		this.run.start();
 	}
 
@@ -106,6 +113,12 @@ export class Character extends AbstractCharacter implements OnTick {
 	}
 
 	private tryDash(): void {
+		if (
+			this.attributes.isBlocking ||
+			this.attributes.isKnocked ||
+			this.attributes.isStunned
+		)
+			return;
 		this.run.stop();
 		this.dash.start();
 	}
