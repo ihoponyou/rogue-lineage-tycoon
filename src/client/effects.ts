@@ -96,4 +96,12 @@ export const EFFECTS: { [name: string]: Callback } = {
 		const emitter = rightArm.FindFirstChild(`HeavyCharge`);
 		if (emitter?.IsA("ParticleEmitter")) emitter.Enabled = false;
 	},
+	BlockBreak: (character: Model) => {
+		const torso = character.FindFirstChild("Torso");
+		if (torso === undefined) return;
+		const clone = SFX.BlockBreak.Clone();
+		clone.PlayOnRemove = true;
+		clone.Parent = torso;
+		clone.Destroy();
+	},
 };

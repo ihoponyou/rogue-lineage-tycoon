@@ -1469,6 +1469,7 @@ interface ReplicatedStorage extends Instance {
 				FinishedCharging: Sound;
 				CounterSpell: Sound;
 				FreeFalling: Sound;
+				SpearHit: Sound;
 				SilverDischarge: Sound;
 				SwordSwing: Sound;
 				SwordHit: Sound;
@@ -1484,7 +1485,7 @@ interface ReplicatedStorage extends Instance {
 				DaggerSwing: Sound;
 				Stealth: Sound;
 				Charging: Sound;
-				SpearHit: Sound;
+				BlockBreak: Sound;
 				Pondus: Sound & {
 					FlangeSoundEffect: FlangeSoundEffect;
 				};

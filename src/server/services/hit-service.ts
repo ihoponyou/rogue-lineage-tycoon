@@ -26,8 +26,10 @@ export class HitService {
 			victim.attributes.isBlocking &&
 			!blockable360 &&
 			!hitter.isBehind(victim);
+		const blockBroken = blocked && attackData.breaksBlock;
+
 		if (blocked) {
-			if (attackData.breaksBlock) {
+			if (blockBroken) {
 				print("broke block");
 				Events.combat.unblock(victim.getPlayer());
 			} else {
@@ -37,27 +39,39 @@ export class HitService {
 					victimInstance,
 					weaponConfig.type,
 				);
+				this.doKnockback(
+					hitter,
+					victim,
+					attackData.knockbackForce / 2,
+					attackData.knockbackDuration / 2,
+				);
 				return;
 			}
 		}
 
 		Events.playEffect.broadcast(`Hit`, victimInstance, weaponConfig.type);
 		victim.takeDamage(weaponConfig.damage);
+		if (blockBroken) {
+			Events.playEffect.broadcast(`BlockBreak`, victimInstance);
+		}
 
 		victim.playAnimation(`Stunned${math.random(1, 3)}`);
 
-		if (attackData.ragdollDuration > 0) {
+		if (attackData.ragdollDuration > 0 && !blockBroken) {
 			victim.toggleRagdoll(true);
 			task.delay(attackData.ragdollDuration, () => {
 				victim.toggleRagdoll(false);
 			});
 		}
-		this.doKnockback(
-			hitter,
-			victim,
-			attackData.knockbackForce,
-			attackData.knockbackDuration,
-		);
+
+		if (!blockBroken) {
+			this.doKnockback(
+				hitter,
+				victim,
+				attackData.knockbackForce,
+				attackData.knockbackDuration,
+			);
+		}
 	}
 
 	private canHit(hitter: Character, victim: Character): boolean {
