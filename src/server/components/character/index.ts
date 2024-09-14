@@ -42,7 +42,8 @@ const EVENTS = Events.character;
 		isBlocking: false,
 		isAttacking: false,
 		combo: 0,
-		lightAttackCooldown: false,
+		lightAttackDebounce: false,
+		heavyAttackDebounce: false,
 	},
 })
 export class Character extends AbstractCharacter implements OnTick {

@@ -1416,42 +1416,50 @@ interface ReplicatedStorage extends Instance {
 				ClimbLeft: Animation;
 			};
 			Combat: Folder & {
-				SpearBlock: Animation;
 				Fists2: Animation;
 				Fists5: Animation;
-				Carrying: Animation;
-				SpearIdle: Animation;
 				Dagger5: Animation;
-				Dagger2: Animation;
+				DaggerHeavy: Animation;
 				Spear4: Animation;
-				Sword1: Animation;
 				Gripping: Animation;
 				Sword4: Animation;
-				DefaultBlock: Animation;
-				Spear1: Animation;
-				Gripped: Animation;
-				Spear3: Animation;
-				Dagger1: Animation;
 				Sword3: Animation;
-				Fists4: Animation;
+				Spear3: Animation;
 				Dagger4: Animation;
-				SwordBlock: Animation;
 				Sword5: Animation;
 				Carried: Animation;
-				Dagger3: Animation;
+				Stunned3: Animation;
 				BlockHit1: Animation;
-				PickUp: Animation;
+				Fists1: Animation;
+				FistsHeavy: Animation;
+				Spear1: Animation;
+				Spear2: Animation;
 				Sword2: Animation;
+				SpearIdle: Animation;
+				Carrying: Animation;
+				Dagger2: Animation;
+				BlockHit3: Animation;
+				SpearBlock: Animation;
+				Fists4: Animation;
+				Stunned1: Animation;
+				Stunned2: Animation;
+				SpearHeavy: Animation;
+				SwordHeavy: Animation;
+				Dagger3: Animation;
+				Sword1: Animation;
+				DefaultBlock: Animation;
+				Gripped: Animation;
 				Fists3: Animation;
 				Throw: Animation;
-				Spear2: Animation;
-				BlockHit3: Animation;
+				Dagger1: Animation;
+				SwordBlock: Animation;
 				BlockHit2: Animation;
-				Fists1: Animation;
+				PickUp: Animation;
 			};
 		};
 		Effects: Folder & {
 			Sounds: Folder & {
+				HeavySpearSwing: Sound;
 				FistsHit: Sound;
 				Greatspearhit: Sound;
 				SoulRipped: Sound;
@@ -1461,38 +1469,41 @@ interface ReplicatedStorage extends Instance {
 				FinishedCharging: Sound;
 				CounterSpell: Sound;
 				FreeFalling: Sound;
+				SpearHit: Sound;
 				SilverDischarge: Sound;
 				SwordSwing: Sound;
 				SwordHit: Sound;
+				FistsCharge: Sound;
 				DaggerCharge: Sound;
 				Diffusion: Sound;
 				Lannis: Sound;
-				SpearHit: Sound;
+				Roar: Sound;
+				Heavy: Sound;
 				Blink: Sound;
 				WingFlap: Sound;
 				Injured: Sound;
 				DaggerSwing: Sound;
 				Stealth: Sound;
 				Charging: Sound;
-				SpearSwing: Sound;
+				BlockBreak: Sound;
 				Pondus: Sound & {
 					FlangeSoundEffect: FlangeSoundEffect;
 				};
 				Erase: Sound;
-				FistsSwing: Sound;
+				SpearSwing: Sound;
 				ManaDash: Sound;
-				Extinguish: Sound;
+				FistsSwing: Sound;
 				FlyingAssaulter: Sound;
+				Extinguish: Sound;
 				DaggerHit: Sound;
-				EtherealStrike: Sound;
 				EpicDemon: Sound;
 				Running: Sound;
-				SpearSpin: Sound;
+				EtherealStrike: Sound;
 				Splash: Sound;
 				BaneDischarge: Sound;
 				ShadowrushCharge: Sound;
 				Shadowrush: Sound;
-				Roar: Sound;
+				FistsChargeFinish: Sound;
 				OwlSlash: Sound;
 				Ordersound: Sound;
 				BaneCharge: Sound;
@@ -1577,16 +1588,18 @@ interface ReplicatedStorage extends Instance {
 			modules: Folder & {
 				["serialized-vector3"]: ModuleScript;
 				["serialized-color3"]: ModuleScript;
+				["abstract-activity"]: ModuleScript;
 				["line-of-sight"]: ModuleScript;
 				["character-from-body-part"]: ModuleScript;
 				["get-digit"]: ModuleScript;
 				["on-player-removing"]: ModuleScript;
+				["animation-manager"]: ModuleScript;
 				hitbox: ModuleScript;
 				["char-at"]: ModuleScript;
 				["state-machine"]: ModuleScript & {
 					state: ModuleScript;
 				};
-				["animation-manager"]: ModuleScript;
+				["uppercase-first-char"]: ModuleScript;
 				graph: ModuleScript & {
 					node: ModuleScript;
 				};
@@ -1649,6 +1662,23 @@ interface ReplicatedStorage extends Instance {
 		client: Folder & {
 			network: ModuleScript;
 			configs: Folder;
+			effects: ModuleScript;
+			activities: Folder & {
+				["block-activity"]: ModuleScript;
+				["charge-mana-activity"]: ModuleScript;
+				["character-activity"]: ModuleScript;
+				["run-activity"]: ModuleScript;
+				["dash-activity"]: ModuleScript;
+				["climb-activity"]: ModuleScript;
+			};
+			constants: ModuleScript;
+			components: Folder & {
+				["player-client"]: ModuleScript;
+				["ragdoll-client"]: ModuleScript;
+				character: ModuleScript;
+				item: ModuleScript;
+				weapon: ModuleScript;
+			};
 			controllers: Folder & {
 				["lifecycle-controller"]: ModuleScript;
 				["inventory-controller"]: ModuleScript;
@@ -1658,27 +1688,6 @@ interface ReplicatedStorage extends Instance {
 				["chat-controller"]: ModuleScript;
 				["animation-controller"]: ModuleScript;
 				["gui-controller"]: ModuleScript;
-			};
-			["player-state"]: Folder & {
-				["block-state"]: ModuleScript;
-				["climb-state"]: ModuleScript;
-				["attack-state"]: ModuleScript;
-				["idle-state"]: ModuleScript;
-				["character-state"]: ModuleScript;
-				["charge-mana-state"]: ModuleScript;
-				["dash-state"]: ModuleScript;
-				transitions: ModuleScript;
-				["run-state"]: ModuleScript;
-			};
-			effects: ModuleScript;
-			constants: ModuleScript;
-			components: Folder & {
-				character: ModuleScript;
-				["ragdoll-client"]: ModuleScript;
-				["character-state-machine"]: ModuleScript;
-				item: ModuleScript;
-				["player-client"]: ModuleScript;
-				weapon: ModuleScript;
 			};
 			store: ModuleScript & {
 				middleware: Folder & {

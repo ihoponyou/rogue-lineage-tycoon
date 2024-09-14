@@ -13,7 +13,8 @@ export interface CharacterAttributes {
 	isBlocking: boolean;
 	isAttacking: boolean;
 	combo: number;
-	lightAttackCooldown: boolean;
+	lightAttackDebounce: boolean;
+	heavyAttackDebounce: boolean;
 }
 
 const DEFAULT_JUMP_POWER = 50;
@@ -122,7 +123,11 @@ export abstract class AbstractCharacter
 	}
 
 	public canLightAttack(): boolean {
-		return this.canAttack() && !this.attributes.lightAttackCooldown;
+		return this.canAttack() && !this.attributes.lightAttackDebounce;
+	}
+
+	public canHeavyAttack(): boolean {
+		return this.canAttack() && !this.attributes.heavyAttackDebounce;
 	}
 
 	public canBlock(): boolean {
