@@ -19,7 +19,7 @@ import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 
 const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Testing" : "Production";
 const PROFILE_KEY_TEMPLATE = "Player%d";
-const WIPE_DATA_ON_JOIN = true;
+const WIPE_DATA_ON_JOIN = false;
 
 type PlayerProfile = Profile<PlayerData>;
 

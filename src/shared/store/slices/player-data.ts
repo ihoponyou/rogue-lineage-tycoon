@@ -14,6 +14,8 @@ export interface PlayerData {
 	conditions: Array<Condition>;
 	identity: Identity;
 	transform: TransformData;
+	skills: ReadonlyArray<string>;
+	classes: ReadonlyArray<string>;
 }
 
 export const DEFAULT_PLAYER_DATA: PlayerData = {
@@ -24,6 +26,8 @@ export const DEFAULT_PLAYER_DATA: PlayerData = {
 	conditions: [],
 	identity: DEFAULT_IDENTITY,
 	transform: DEFAULT_TRANSFORM_DATA,
+	skills: [],
+	classes: [],
 	// player
 	// IsBanned: false,
 	// Rebirths: 0,
