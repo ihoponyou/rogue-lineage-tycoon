@@ -1,8 +1,9 @@
 import { Component, Components } from "@flamework/components";
+import { OnStart } from "@flamework/core";
 import { Workspace } from "@rbxts/services";
 import { getAssetConfig, getSkillConfig } from "server/configs/tycoon";
 import { store } from "server/store";
-import { selectPlayer } from "server/store/selectors";
+import { selectPlayer, selectPlayerSkills } from "server/store/selectors";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { Inject } from "shared/inject";
 import { deserializeVector3 } from "shared/modules/serialized-vector3";
@@ -13,11 +14,25 @@ const TYCOON_FOLDER = Workspace.Tycoons;
 @Component({
 	tag: "Player",
 })
-export class PlayerServer extends AbstractPlayer {
+export class PlayerServer extends AbstractPlayer implements OnStart {
 	private assets = new Array<string>();
 
 	@Inject
 	private components!: Components;
+
+	public onStart(): void {
+		store.subscribe(selectPlayerSkills(this.instance), print);
+		store.subscribe(
+			selectPlayerSkills(this.instance),
+			(skills, previousSkills) => {
+				if (skills === undefined) return;
+				for (const skillName of skills) {
+					if (previousSkills?.includes(skillName)) continue;
+					getSkillConfig(skillName).teach(this.instance);
+				}
+			},
+		);
+	}
 
 	public hasAsset(assetName: string): boolean {
 		getAssetConfig(assetName);

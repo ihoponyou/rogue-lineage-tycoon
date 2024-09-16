@@ -12,7 +12,5 @@ export function selectManaAmount() {
 }
 
 export function selectManaEnabled() {
-	return createSelector(selectMana(), (manaData) => {
-		return manaData && manaData.enabled;
-	});
+	return (state: SharedState) => state.mana.enabled;
 }

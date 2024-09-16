@@ -11,6 +11,7 @@ import { Stats } from "./stats";
 
 export function App() {
 	const manaEnabled = useSelector(selectManaEnabled());
+	print(manaEnabled);
 	const ref = useRef<ScreenGui>();
 
 	return (
