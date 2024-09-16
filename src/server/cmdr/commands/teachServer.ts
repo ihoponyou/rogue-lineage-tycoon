@@ -1,8 +1,12 @@
+import { Components } from "@flamework/components";
+import { Dependency } from "@flamework/core";
 import { CommandContext } from "@rbxts/cmdr";
-import { SKILLS } from "server/configs/tycoon";
+import { PlayerServer } from "server/components/player-server";
 
 export = function (context: CommandContext, player: Player, skillName: string) {
-	const skill = SKILLS[skillName];
-	if (skill === undefined) return `Skill "${skillName}" does not exist`;
-	skill.teach(player);
+	const components = Dependency<Components>();
+	const playerServer = components.getComponent<PlayerServer>(player);
+	if (playerServer === undefined)
+		return `Could not get PlayerServer on ${player}`;
+	playerServer.teach(skillName);
 };

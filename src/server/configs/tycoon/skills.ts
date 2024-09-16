@@ -4,6 +4,12 @@ interface SkillConfig {
 	readonly teach: (player: Player) => void;
 }
 
+export function getSkillConfig(name: string): SkillConfig {
+	const skill = SKILLS[name];
+	if (skill === undefined) error(`Skill "${name}" does not exist`);
+	return skill;
+}
+
 export const SKILLS: { [name: string]: SkillConfig } = {
 	Mana: {
 		teach: (player) => {

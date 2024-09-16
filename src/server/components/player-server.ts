@@ -1,6 +1,6 @@
 import { Component, Components } from "@flamework/components";
 import { Workspace } from "@rbxts/services";
-import { getAssetConfig } from "server/configs/tycoon";
+import { getAssetConfig, getSkillConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { selectPlayer } from "server/store/selectors";
 import { AbstractPlayer } from "shared/components/abstract-player";
@@ -112,6 +112,11 @@ export class PlayerServer extends AbstractPlayer {
 				`${this.instance.Name}'s character missing character component`,
 			);
 		return character;
+	}
+
+	public teach(skillName: string): void {
+		getSkillConfig(skillName).teach(this.instance);
+		store.addSkill(this.instance, skillName);
 	}
 
 	private isInsideTycoon(position: Vector3): boolean {
