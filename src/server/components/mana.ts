@@ -40,7 +40,14 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 	}
 
 	public onTick(dt: number): void {
-		this.charging ? this.chargeMana(dt) : this.decayMana(dt);
+		const prevAmount = this.amount;
+		if (this.charging) {
+			this.chargeMana(dt);
+		} else if (this.amount > 0) {
+			this.decayMana(dt);
+		}
+
+		if (prevAmount === this.amount) return;
 		store.setManaAmount(this.instance, this.amount);
 	}
 

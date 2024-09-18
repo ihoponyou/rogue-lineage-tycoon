@@ -44,7 +44,7 @@ export class ArmorPortal
 		if (this.debounce.includes(player)) return;
 
 		const index = this.debounce.push(player) - 1;
-		this.identityService.setArmor(character, this.attributes.armorToSet);
+		this.identityService.applyArmor(character, this.attributes.armorToSet);
 
 		task.delay(2, () => this.debounce.remove(index));
 	}

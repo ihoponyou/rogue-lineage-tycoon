@@ -1,5 +1,7 @@
 import { ContentProvider, ReplicatedStorage } from "@rbxts/services";
 
+const VERBOSE = false;
+
 let animations = 0;
 let sounds = 0;
 const assets = new Array<Instance>();
@@ -17,5 +19,5 @@ for (const asset of ReplicatedStorage.GetDescendants()) {
 }
 
 ContentProvider.PreloadAsync(assets);
-print(`${animations} animations loaded`);
-print(`${sounds} sounds loaded`);
+if (VERBOSE) print(`${animations} animations loaded`);
+if (VERBOSE) print(`${sounds} sounds loaded`);
