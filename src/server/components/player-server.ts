@@ -21,7 +21,6 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 	private components!: Components;
 
 	public onStart(): void {
-		store.subscribe(selectPlayerSkills(this.instance), print);
 		store.subscribe(
 			selectPlayerSkills(this.instance),
 			(skills, previousSkills) => {

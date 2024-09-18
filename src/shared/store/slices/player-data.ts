@@ -11,7 +11,7 @@ export interface PlayerData {
 	currencies: Currencies;
 	resources: Resources;
 	mana: ManaData;
-	conditions: Array<Condition>;
+	conditions: ReadonlyArray<Condition>;
 	identity: Identity;
 	transform: TransformData;
 	skills: ReadonlyArray<string>;

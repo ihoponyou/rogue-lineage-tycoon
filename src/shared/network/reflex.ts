@@ -9,6 +9,6 @@ export interface ReflexServerEvents {
 
 export interface ReflexClientEvents {
 	dispatch: (actions: Array<BroadcastAction>) => void;
-	hydrate: (actions: PlayerData) => void;
+	hydrate: (state: PlayerData) => void;
 	start: () => void;
 }

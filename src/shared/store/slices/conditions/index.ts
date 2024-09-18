@@ -2,9 +2,7 @@ import { createProducer } from "@rbxts/reflex";
 import { Condition } from "shared/configs/conditions";
 import { PlayerData } from "../player-data";
 
-export type ConditionsState = ReadonlyArray<Condition>;
-
-export const conditionsSlice = createProducer([] as ConditionsState, {
+export const conditionsSlice = createProducer([] as ReadonlyArray<Condition>, {
 	loadPlayerData: (_state, data: PlayerData) => {
 		return data.conditions;
 	},
