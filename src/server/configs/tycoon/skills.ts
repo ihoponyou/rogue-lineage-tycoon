@@ -31,4 +31,12 @@ export const SKILLS: { [name: string]: SkillConfig } = {
 			store.toggleManaClimbEnabled(player, true);
 		},
 	},
+
+	// warrior
+	["Pommel Strike"]: {
+		teach: (player) => {
+			print(`${player.Name} learned Pommel Strike!`);
+			print(debug.traceback());
+		},
+	},
 };

@@ -1,6 +1,8 @@
 import { Dialogue } from "server/components/dialogue";
+import { PlayerServer } from "server/components/player-server";
 import dorgen from "./dorgen";
 import ferryman from "./ferryman";
+import warriorTrainer from "./warrior-trainer";
 
 export interface TopicConfig {
 	speech: string;
@@ -13,7 +15,7 @@ export interface DialogueConfig {
 
 interface DialogueOptionConfig {
 	label: string;
-	onClick: (dialogue: Dialogue, player: Player) => void;
+	onClick: (dialogue: Dialogue, player: PlayerServer) => void;
 }
 
 export const DIALOGUE: {
@@ -21,4 +23,5 @@ export const DIALOGUE: {
 } = {
 	Ferryman: ferryman,
 	Dorgen: dorgen,
+	Alfric: warriorTrainer,
 };

@@ -12,22 +12,22 @@ export = {
 				onClick: (dialogue, player) => {
 					const plotInstance = dialogue.instance.Parent;
 					if (plotInstance === undefined) {
-						dialogue.close(player);
+						dialogue.close(player.instance);
 						return;
 					}
 					const components = Dependency<Components>();
 					const plot = components.getComponent<Plot>(plotInstance);
 					if (plot === undefined) {
-						dialogue.close(player);
+						dialogue.close(player.instance);
 						return;
 					}
-					plot.claim(player);
-					dialogue.speak(player, "Congratulate");
+					plot.claim(player.instance);
+					dialogue.speak(player.instance, "Congratulate");
 				},
 			},
 			{
 				label: "No.",
-				onClick: (dialogue, player) => dialogue.close(player),
+				onClick: (dialogue, player) => dialogue.close(player.instance),
 			},
 		],
 	},
@@ -41,7 +41,7 @@ export = {
 					dorgenModel.PivotTo(
 						dorgenModel.GetPivot().sub(Vector3.yAxis.mul(50)),
 					);
-					dialogue.close(player);
+					dialogue.close(player.instance);
 				},
 			},
 		],

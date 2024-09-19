@@ -23,7 +23,10 @@ function broadcasterMiddleware(): ProducerMiddleware {
 		},
 		hydrate: (player, _state) => {
 			const state = store.getState().get(tostring(player.UserId));
-			if (state === undefined) error("OH MY GOOOOOOD");
+			if (state === undefined)
+				error(
+					`hydration aborted: state does not contain ${player}'s data`,
+				);
 			Events.reflex.hydrate(player, state);
 		},
 	});

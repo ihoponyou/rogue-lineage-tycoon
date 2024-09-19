@@ -10,12 +10,12 @@ export = {
 			{
 				label: "Make it so.",
 				onClick: (dialogue, player) => {
-					dialogue.speak(player, "Confirm");
+					dialogue.speak(player.instance, "Confirm");
 				},
 			},
 			{
 				label: "Bye.",
-				onClick: (dialogue, player) => dialogue.close(player),
+				onClick: (dialogue, player) => dialogue.close(player.instance),
 			},
 		],
 	},
@@ -25,12 +25,12 @@ export = {
 			{
 				label: "Kill me.",
 				onClick: (dialogue, player) => {
-					dialogue.speak(player, "Goodbye");
+					dialogue.speak(player.instance, "Goodbye");
 					task.wait(1);
-					dialogue.close(player);
+					dialogue.close(player.instance);
 					const components = Dependency<Components>();
 					components
-						.waitForComponent<PlayerServer>(player)
+						.waitForComponent<PlayerServer>(player.instance)
 						.andThen((playerServer) =>
 							playerServer.loadCharacter(true),
 						);
@@ -38,7 +38,7 @@ export = {
 			},
 			{
 				label: "Let me think.",
-				onClick: (dialogue, player) => dialogue.close(player),
+				onClick: (dialogue, player) => dialogue.close(player.instance),
 			},
 		],
 	},

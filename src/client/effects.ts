@@ -3,7 +3,6 @@ import { SFX } from "shared/constants";
 
 function getHitType(weaponType: WeaponType) {
 	const hitType = weaponType === WeaponType.Fists ? "Blunt" : "Sharp";
-	print(hitType);
 	return hitType;
 }
 
