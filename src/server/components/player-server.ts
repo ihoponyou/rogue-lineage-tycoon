@@ -3,7 +3,7 @@ import { OnStart } from "@flamework/core";
 import { Workspace } from "@rbxts/services";
 import { getAssetConfig, getSkillConfig } from "server/configs/tycoon";
 import { store } from "server/store";
-import { selectPlayer, selectPlayerSkills } from "server/store/selectors";
+import { selectPlayer } from "server/store/selectors";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { Inject } from "shared/inject";
 import { deserializeVector3 } from "shared/modules/serialized-vector3";
@@ -21,16 +21,12 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 	private components!: Components;
 
 	public onStart(): void {
-		store.subscribe(
-			selectPlayerSkills(this.instance),
-			(skills, previousSkills) => {
-				if (skills === undefined) return;
-				for (const skillName of skills) {
-					if (previousSkills?.includes(skillName)) continue;
-					getSkillConfig(skillName).teach(this.instance);
-				}
-			},
-		);
+		const knownSkills = store.getState().get(tostring(this.UserId))?.skills;
+		if (knownSkills) {
+			for (const skillName of knownSkills) {
+				getSkillConfig(skillName).teach(this.instance);
+			}
+		}
 	}
 
 	public hasAsset(assetName: string): boolean {
@@ -129,8 +125,18 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 	}
 
 	public teach(skillName: string): void {
+		if (this.hasSkill(skillName)) return;
 		getSkillConfig(skillName).teach(this.instance);
 		store.addSkill(this.instance, skillName);
+	}
+
+	public hasSkill(skillName: string): boolean {
+		return (
+			store
+				.getState()
+				?.get(tostring(this.UserId))
+				?.skills.includes(skillName) ?? false
+		);
 	}
 
 	private isInsideTycoon(position: Vector3): boolean {
