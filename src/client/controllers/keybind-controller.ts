@@ -32,6 +32,7 @@ export interface Keybinds {
 	slot10: Enum.KeyCode;
 	slot11: Enum.KeyCode;
 	slot12: Enum.KeyCode;
+	drop: Enum.KeyCode;
 }
 
 const DEFAULT_KEYBINDS: Keybinds = {
@@ -63,6 +64,7 @@ const DEFAULT_KEYBINDS: Keybinds = {
 	slot10: Enum.KeyCode.Zero,
 	slot11: Enum.KeyCode.Minus,
 	slot12: Enum.KeyCode.Equals,
+	drop: Enum.KeyCode.Backspace,
 };
 
 export enum InputAxis {

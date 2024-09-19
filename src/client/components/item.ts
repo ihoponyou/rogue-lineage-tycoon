@@ -20,4 +20,8 @@ export class Item extends AbstractItem {
 	public unequip(): void {
 		Events.item.unequip(this.instance);
 	}
+
+	public drop(): void {
+		Events.item.drop(this.instance);
+	}
 }

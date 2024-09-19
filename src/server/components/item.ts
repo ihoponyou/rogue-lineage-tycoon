@@ -82,6 +82,13 @@ export class Item extends AbstractItem implements OnStart {
 			if (this.owner.instance !== player) return;
 			this.unequip();
 		});
+
+		Events.item.drop.connect((player, tool) => {
+			if (tool !== this.instance) return;
+			if (this.owner === undefined) return;
+			if (this.owner.instance !== player) return;
+			this.drop();
+		});
 	}
 
 	public pickUp(player: Player): void {
@@ -106,8 +113,10 @@ export class Item extends AbstractItem implements OnStart {
 	public drop(): void {
 		if (this.attributes.isEquipped) this.unequip();
 
+		if (this.owner) store.takeItem(this.owner.instance, this.instance);
 		this.owner = undefined;
 		this.instance.Parent = Workspace;
+		this.worldModel.instance.Parent = this.instance;
 		this.worldModel.instance.PrimaryPart!.CanCollide = true;
 
 		this.rootJoint.Part0 = undefined;
@@ -136,7 +145,7 @@ export class Item extends AbstractItem implements OnStart {
 		if (this.owner === undefined) return;
 
 		const character = this.owner.getCharacter();
-		character.setHeldItem(this);
+		character.setHeldItem();
 		if (this.config.idleAnimation) {
 			character.stopAnimation(this.config.idleAnimation.Name);
 		}

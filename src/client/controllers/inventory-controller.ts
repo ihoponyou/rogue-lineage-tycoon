@@ -25,6 +25,10 @@ export class InventoryController implements OnStart {
 		);
 	}
 
+	public dropSelectedItem(): void {
+		this.selectedItem?.drop();
+	}
+
 	private switchItem(tool?: Tool) {
 		this.selectedItem?.unequip();
 

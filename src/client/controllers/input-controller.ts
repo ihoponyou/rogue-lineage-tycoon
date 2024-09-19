@@ -36,6 +36,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private lightAttackTriggered = new Signal();
 	private heavyAttackTriggered = new Signal();
 	private blockTriggered = new Signal();
+
 	private lastForwardInputTick = 0;
 	private character?: Character;
 
@@ -85,7 +86,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"toggleBackpack",
 			this.keybindController.keybinds.toggleBackpack,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				store.toggleBackpack();
 			},
 		);
@@ -93,7 +94,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot1",
 			this.keybindController.keybinds.slot1,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(0);
 			},
 		);
@@ -101,7 +102,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot2",
 			this.keybindController.keybinds.slot2,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(1);
 			},
 		);
@@ -109,7 +110,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot3",
 			this.keybindController.keybinds.slot3,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(2);
 			},
 		);
@@ -117,7 +118,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot4",
 			this.keybindController.keybinds.slot4,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(3);
 			},
 		);
@@ -125,7 +126,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot5",
 			this.keybindController.keybinds.slot5,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(4);
 			},
 		);
@@ -133,7 +134,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot6",
 			this.keybindController.keybinds.slot6,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(5);
 			},
 		);
@@ -141,7 +142,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot7",
 			this.keybindController.keybinds.slot7,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(6);
 			},
 		);
@@ -149,7 +150,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot8",
 			this.keybindController.keybinds.slot8,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(7);
 			},
 		);
@@ -157,7 +158,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot9",
 			this.keybindController.keybinds.slot9,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(8);
 			},
 		);
@@ -165,7 +166,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot10",
 			this.keybindController.keybinds.slot10,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(9);
 			},
 		);
@@ -173,7 +174,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot11",
 			this.keybindController.keybinds.slot11,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(10);
 			},
 		);
@@ -181,8 +182,16 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"slot12",
 			this.keybindController.keybinds.slot12,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
+				if (state !== BEGIN) return;
 				this.inventoryController.switchSlot(11);
+			},
+		);
+		this.keybindController.loadKeybind(
+			"drop",
+			Enum.KeyCode.Backspace,
+			(state) => {
+				if (state !== BEGIN) return;
+				this.inventoryController.dropSelectedItem();
 			},
 		);
 	}
@@ -263,8 +272,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	}
 
 	private handleForwardInput(state: Enum.UserInputState) {
-		if (state !== Enum.UserInputState.Begin)
-			return Enum.ContextActionResult.Pass;
+		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		if (tick() - this.lastForwardInputTick <= RUN_INTERVAL) {
 			this.runTriggered.Fire();
 		}
@@ -273,8 +281,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	}
 
 	private handleDashInput(state: Enum.UserInputState) {
-		if (state !== Enum.UserInputState.Begin)
-			return Enum.ContextActionResult.Pass;
+		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		this.dashTriggered.Fire();
 		return Enum.ContextActionResult.Pass;
 	}
