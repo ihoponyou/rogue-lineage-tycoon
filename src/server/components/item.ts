@@ -1,12 +1,11 @@
 import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { promiseR6 } from "@rbxts/promise-character";
 import { Workspace } from "@rbxts/services";
 import { Events } from "server/network";
 import { store } from "server/store";
 import { AbstractItem } from "shared/components/abstract-item";
 import { ModelComponent } from "shared/components/model";
-import { BodyPart, getItemConfig } from "shared/configs/items";
+import { getItemConfig } from "shared/configs/items";
 import { TouchableModel } from "./interactable/touchable/touchable-model";
 import { PlayerServer } from "./player-server";
 
@@ -113,21 +112,20 @@ export class Item extends AbstractItem implements OnStart {
 		if (this.config.hideOnHolster) {
 			this.worldModel.hide();
 		}
-		// this.rigToLimb(this.config.holsterLimb, this.config.holsterC0);
 
 		store.giveItem(player, this.instance);
 	}
 
 	public drop(): void {
 		if (this.attributes.isEquipped) this.unequip();
+		this.propWeld.Part0 = undefined;
+		this.propWeld.C0 = new CFrame();
 
 		if (this.owner) store.takeItem(this.owner.instance, this.instance);
 		this.owner = undefined;
 		this.instance.Parent = Workspace;
 		this.worldModel.instance.Parent = this.instance;
 		this.worldModel.instance.PrimaryPart!.CanCollide = true;
-
-		// this.rootJoint.Part0 = undefined;
 	}
 
 	public equip(): void {
@@ -136,14 +134,10 @@ export class Item extends AbstractItem implements OnStart {
 
 		const character = this.owner.getCharacter();
 		character.holdItem(this);
-		if (this.config.idleAnimation) {
-			character.playAnimation(this.config.idleAnimation.Name);
-		}
 
 		if (this.config.hideOnHolster) {
 			this.worldModel.show();
 		}
-		// this.rigToLimb(this.config.equipLimb, this.config.equipC0);
 
 		this.attributes.isEquipped = true;
 	}
@@ -154,9 +148,6 @@ export class Item extends AbstractItem implements OnStart {
 
 		const character = this.owner.getCharacter();
 		character.holsterItem(this);
-		if (this.config.idleAnimation) {
-			character.stopAnimation(this.config.idleAnimation.Name);
-		}
 
 		if (this.config.hideOnHolster) {
 			this.worldModel.hide();
@@ -169,14 +160,5 @@ export class Item extends AbstractItem implements OnStart {
 	public weldTo(part: BasePart, c0?: CFrame): void {
 		this.propWeld.Part0 = part;
 		if (c0 !== undefined) this.propWeld.C0 = c0;
-	}
-
-	private rigToLimb(limb: BodyPart, c0: CFrame = new CFrame()): void {
-		if (this.owner === undefined) return;
-		const character = this.owner.getCharacter();
-		this.worldModel.instance.Parent = character.instance;
-		const rig = promiseR6(character.instance).expect();
-		this.rootJoint.Part0 = rig[limb];
-		this.rootJoint.C0 = c0;
 	}
 }

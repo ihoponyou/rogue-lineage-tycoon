@@ -306,11 +306,17 @@ export class Character extends AbstractCharacter implements OnTick {
 	public holdItem(item: Item): void {
 		this.setHeldItem(item);
 		item.weldTo(this.hiltPart, item.config.equipC0);
+		if (item.config.idleAnimation) {
+			this.playAnimation(item.config.idleAnimation.Name);
+		}
 	}
 
 	public holsterItem(item: Item): void {
 		const rig = promiseR6(this.instance).expect();
 		item.weldTo(rig[item.config.holsterLimb], item.config.holsterC0);
+		if (item.config.idleAnimation) {
+			this.stopAnimation(item.config.idleAnimation.Name);
+		}
 	}
 
 	private onHealthChanged(health: number): void {

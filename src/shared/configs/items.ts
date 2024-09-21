@@ -41,9 +41,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Sword"],
 		hideOnHolster: false,
 		equipLimb: "Right Arm",
-		equipC0: new CFrame(0, -1, -1.85).mul(
-			cframeFromOrientationDeg(-90, 90),
-		),
+		equipC0: new CFrame(0, 0, -1.85).mul(cframeFromOrientationDeg(-90, 90)),
 		holsterLimb: "Torso",
 		holsterC0: SWORD_HOLSTER_C0,
 	},
