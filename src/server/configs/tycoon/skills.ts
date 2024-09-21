@@ -10,6 +10,11 @@ export function getSkillConfig(name: string): SkillConfig {
 	return skill;
 }
 
+// active skills function like items with cooldowns; weapons
+// active skills should use a tool to activate to be compatible with inventory
+// 		on teach, give the player a tool that activates the skill
+// 		when skill tool is equipped, rig a corresponding model if needed
+
 export const SKILLS: { [name: string]: SkillConfig } = {
 	Mana: {
 		teach: (player) => {
@@ -36,7 +41,21 @@ export const SKILLS: { [name: string]: SkillConfig } = {
 	["Pommel Strike"]: {
 		teach: (player) => {
 			print(`${player.Name} learned Pommel Strike!`);
-			print(debug.traceback());
+			const tool = new Instance("Tool");
+			tool.Parent = player;
+			const onEquip = tool.Equipped.Connect(() => print("equipped"));
+			const onUse = tool.Activated.Connect(() => "pommel strike");
+			const onUnequip = tool.Unequipped.Connect(() =>
+				print("unequipped"),
+			);
+			tool.Destroying.Once(() => {
+				onEquip.Disconnect();
+				onUnequip.Disconnect();
+				onUse.Disconnect();
+			});
+			print(tool, "was here");
+
+			store.giveItem(player, tool);
 		},
 	},
 };
