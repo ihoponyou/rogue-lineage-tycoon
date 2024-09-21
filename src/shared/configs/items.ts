@@ -41,7 +41,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Sword"],
 		hideOnHolster: false,
 		equipLimb: "Right Arm",
-		equipC0: new CFrame(0, -1, -1.75).mul(
+		equipC0: new CFrame(0, -1, -1.85).mul(
 			cframeFromOrientationDeg(-90, 90),
 		),
 		holsterLimb: "Torso",
@@ -53,6 +53,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Spear"],
 		hideOnHolster: false,
 		equipLimb: "Right Arm",
+		equipC0: new CFrame(0, 0, -2).mul(cframeFromOrientationDeg(90, -90, 0)),
 		holsterLimb: "Torso",
 		holsterC0: new CFrame(0, 0, 0.65).mul(
 			cframeFromOrientationDeg(25, -90, -90),
@@ -65,7 +66,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Dagger"],
 		hideOnHolster: true,
 		equipLimb: "Right Arm",
-		equipC0: new CFrame(0, -0.75, 0.97).mul(
+		equipC0: new CFrame(0, 0.25, 0.8).mul(
 			cframeFromOrientationDeg(0, 0, -90),
 		),
 		holsterLimb: "Torso",

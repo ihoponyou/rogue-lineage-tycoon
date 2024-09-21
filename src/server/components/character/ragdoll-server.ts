@@ -30,6 +30,8 @@ const SOCKET_ANGLES: { [key: string]: SocketAngles } = {
 	},
 };
 
+const VERBOSE = false;
+
 function getSocketTypeFromMotorName(name: string): SocketType {
 	return (name.match("Hip")[0] ??
 		name.match("Shoulder")[0] ??
@@ -113,8 +115,13 @@ export class RagdollServer extends AbstractRagdoll implements OnStart {
 			if (motor.Name === "RootJoint") continue;
 
 			const socketType = getSocketTypeFromMotorName(motor.Name);
-			if (!socketType)
-				error(`${motor.Name} does not contain "Hip"/"Shoulder"/"Neck"`);
+			if (!socketType) {
+				if (VERBOSE)
+					warn(
+						`${motor.Name} does not contain "Hip"/"Shoulder"/"Neck"`,
+					);
+				continue;
+			}
 
 			const jointName = motor.Name.gsub(" ", "")[0];
 			const newJoint = RagdollServer.newJoint(

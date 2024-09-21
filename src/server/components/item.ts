@@ -17,9 +17,10 @@ import { PlayerServer } from "./player-server";
 	},
 })
 export class Item extends AbstractItem implements OnStart {
-	private config = getItemConfig(this.instance.Name);
+	public readonly config = getItemConfig(this.instance.Name);
 	private worldModel!: ModelComponent;
 	private rootJoint!: Motor6D;
+	private propWeld!: Weld;
 	private touchable!: TouchableModel;
 	private owner?: PlayerServer;
 
@@ -49,13 +50,16 @@ export class Item extends AbstractItem implements OnStart {
 				);
 			}
 		}
-		// animations require Hilt part
-		worldModel.PrimaryPart.Name = "Hilt";
 
-		this.rootJoint = new Instance("Motor6D");
-		this.rootJoint.Name = "RootJoint";
-		this.rootJoint.Part1 = worldModel.PrimaryPart;
-		this.rootJoint.Parent = worldModel.PrimaryPart;
+		// this.rootJoint = new Instance("Motor6D");
+		// this.rootJoint.Name = "RootJoint";
+		// this.rootJoint.Part1 = worldModel.PrimaryPart;
+		// this.rootJoint.Parent = worldModel.PrimaryPart;
+
+		this.propWeld = new Instance("Weld");
+		this.propWeld.Name = "PropWeld";
+		this.propWeld.Part1 = worldModel.PrimaryPart;
+		this.propWeld.Parent = worldModel.PrimaryPart;
 
 		worldModel.AddTag(TouchableModel.TAG);
 		this.components
@@ -102,10 +106,14 @@ export class Item extends AbstractItem implements OnStart {
 		this.instance.Parent = player;
 		this.worldModel.instance.PrimaryPart!.CanCollide = false;
 
+		const character = playerServer.getCharacter();
+		this.worldModel.instance.Parent = character.instance;
+		character.holsterItem(this);
+
 		if (this.config.hideOnHolster) {
 			this.worldModel.hide();
 		}
-		this.rigToLimb(this.config.holsterLimb, this.config.holsterC0);
+		// this.rigToLimb(this.config.holsterLimb, this.config.holsterC0);
 
 		store.giveItem(player, this.instance);
 	}
@@ -119,7 +127,7 @@ export class Item extends AbstractItem implements OnStart {
 		this.worldModel.instance.Parent = this.instance;
 		this.worldModel.instance.PrimaryPart!.CanCollide = true;
 
-		this.rootJoint.Part0 = undefined;
+		// this.rootJoint.Part0 = undefined;
 	}
 
 	public equip(): void {
@@ -127,7 +135,7 @@ export class Item extends AbstractItem implements OnStart {
 		if (this.owner === undefined) return;
 
 		const character = this.owner.getCharacter();
-		character.setHeldItem(this);
+		character.holdItem(this);
 		if (this.config.idleAnimation) {
 			character.playAnimation(this.config.idleAnimation.Name);
 		}
@@ -135,7 +143,7 @@ export class Item extends AbstractItem implements OnStart {
 		if (this.config.hideOnHolster) {
 			this.worldModel.show();
 		}
-		this.rigToLimb(this.config.equipLimb, this.config.equipC0);
+		// this.rigToLimb(this.config.equipLimb, this.config.equipC0);
 
 		this.attributes.isEquipped = true;
 	}
@@ -145,7 +153,7 @@ export class Item extends AbstractItem implements OnStart {
 		if (this.owner === undefined) return;
 
 		const character = this.owner.getCharacter();
-		character.setHeldItem();
+		character.holsterItem(this);
 		if (this.config.idleAnimation) {
 			character.stopAnimation(this.config.idleAnimation.Name);
 		}
@@ -153,9 +161,14 @@ export class Item extends AbstractItem implements OnStart {
 		if (this.config.hideOnHolster) {
 			this.worldModel.hide();
 		}
-		this.rigToLimb(this.config.holsterLimb, this.config.holsterC0);
+		// this.rigToLimb(this.config.holsterLimb, this.config.holsterC0);
 
 		this.attributes.isEquipped = false;
+	}
+
+	public weldTo(part: BasePart, c0?: CFrame): void {
+		this.propWeld.Part0 = part;
+		if (c0 !== undefined) this.propWeld.C0 = c0;
 	}
 
 	private rigToLimb(limb: BodyPart, c0: CFrame = new CFrame()): void {

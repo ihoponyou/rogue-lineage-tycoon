@@ -49,6 +49,7 @@ const EVENTS = Events.character;
 export class Character extends AbstractCharacter implements OnTick {
 	private heldItem?: Item;
 	private animationManager!: AnimationManager;
+	private hiltPart!: Part;
 
 	public constructor(
 		protected ragdoll: RagdollServer,
@@ -98,6 +99,8 @@ export class Character extends AbstractCharacter implements OnTick {
 					.loadCharacter();
 			},
 		);
+
+		this.hiltPart = this.instance.WaitForChild("Hilt") as Part;
 	}
 
 	public onTick(dt: number): void {
@@ -298,6 +301,16 @@ export class Character extends AbstractCharacter implements OnTick {
 
 	public toggleRagdoll(on: boolean): void {
 		this.ragdoll.toggle(on);
+	}
+
+	public holdItem(item: Item): void {
+		this.setHeldItem(item);
+		item.weldTo(this.hiltPart, item.config.equipC0);
+	}
+
+	public holsterItem(item: Item): void {
+		const rig = promiseR6(this.instance).expect();
+		item.weldTo(rig[item.config.holsterLimb], item.config.holsterC0);
 	}
 
 	private onHealthChanged(health: number): void {
