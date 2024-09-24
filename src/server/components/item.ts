@@ -76,16 +76,6 @@ export class Item extends AbstractItem implements OnStart {
 				component.enable();
 			});
 
-		Events.item.equip.connect((player, tool) => {
-			if (tool !== this.instance) return;
-			this.equippable.equip(player);
-		});
-
-		Events.item.unequip.connect((player, tool) => {
-			if (tool !== this.instance) return;
-			this.equippable.unequip(player);
-		});
-
 		Events.item.drop.connect((player, tool) => {
 			if (tool !== this.instance) return;
 			if (!this.ownable.ownedBy(player)) return;
