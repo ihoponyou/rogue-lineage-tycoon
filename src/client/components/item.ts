@@ -1,6 +1,7 @@
 import { Component } from "@flamework/components";
 import { Events } from "client/network";
 import { AbstractItem } from "shared/components/abstract-item";
+import { Equippable } from "./equippable";
 
 @Component({
 	tag: Item.TAG,
@@ -9,7 +10,7 @@ import { AbstractItem } from "shared/components/abstract-item";
 	},
 })
 export class Item extends AbstractItem {
-	public constructor() {
+	public constructor(protected equippable: Equippable) {
 		super();
 	}
 

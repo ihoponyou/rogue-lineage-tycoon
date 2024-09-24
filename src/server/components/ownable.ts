@@ -9,7 +9,20 @@ export class Ownable extends BaseComponent {
 
 	private owner?: PlayerServer;
 
-	public setOwner(player: PlayerServer): void {
-		this.owner =
+	public setOwner(player?: PlayerServer): void {
+		this.owner = player;
+	}
+
+	public getOwner(): PlayerServer | undefined {
+		return this.owner;
+	}
+
+	public hasOwner(): boolean {
+		return this.owner !== undefined;
+	}
+
+	public ownedBy(player: Player): boolean {
+		if (!this.hasOwner()) return false;
+		return this.owner!.instance === player;
 	}
 }

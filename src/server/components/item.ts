@@ -8,6 +8,7 @@ import { ModelComponent } from "shared/components/model";
 import { getItemConfig } from "shared/configs/items";
 import { Equippable } from "./equippable";
 import { TouchableModel } from "./interactable/touchable/touchable-model";
+import { Ownable } from "./ownable";
 import { PlayerServer } from "./player-server";
 
 @Component({
@@ -26,6 +27,7 @@ export class Item extends AbstractItem implements OnStart {
 	public constructor(
 		private components: Components,
 		protected equippable: Equippable,
+		private ownable: Ownable,
 	) {
 		super();
 	}
@@ -69,7 +71,6 @@ export class Item extends AbstractItem implements OnStart {
 			.andThen((component) => {
 				this.touchable = component;
 				component.onInteracted((player) => {
-					if (this.equippable.owner !== undefined) return;
 					this.pickUp(player);
 				});
 				component.enable();
@@ -77,37 +78,35 @@ export class Item extends AbstractItem implements OnStart {
 
 		Events.item.equip.connect((player, tool) => {
 			if (tool !== this.instance) return;
-			if (this.owner === undefined) return;
-			if (this.owner.instance !== player) return;
-			this.equip();
+			this.equippable.equip(player);
 		});
 
 		Events.item.unequip.connect((player, tool) => {
 			if (tool !== this.instance) return;
-			if (this.owner === undefined) return;
-			if (this.owner.instance !== player) return;
-			this.unequip();
+			this.equippable.unequip(player);
 		});
 
 		Events.item.drop.connect((player, tool) => {
 			if (tool !== this.instance) return;
-			if (this.owner === undefined) return;
-			if (this.owner.instance !== player) return;
+			if (!this.ownable.ownedBy(player)) return;
 			this.drop();
 		});
+
+		this.equippable.onEquipped(() => this.onEquipped());
+		this.equippable.onUnequipped(() => this.onUnequipped());
 	}
 
 	public pickUp(player: Player): void {
-		if (this.owner !== undefined) return;
+		if (this.ownable.hasOwner()) return;
 		const playerServer = this.components.getComponent<PlayerServer>(player);
 		if (playerServer === undefined) return;
 
 		this.touchable.disable();
 
-		this.owner = playerServer;
+		this.ownable.setOwner(playerServer);
+
 		this.instance.Parent = player;
 		this.worldModel.instance.PrimaryPart!.CanCollide = false;
-
 		const character = playerServer.getCharacter();
 		this.worldModel.instance.Parent = character.instance;
 		character.holsterItem(this);
@@ -120,44 +119,39 @@ export class Item extends AbstractItem implements OnStart {
 	}
 
 	public drop(): void {
-		if (this.attributes.isEquipped) this.unequip();
+		if (this.equippable.attributes.isEquipped) this.onUnequipped();
 		this.propWeld.Part0 = undefined;
 		this.propWeld.C0 = new CFrame();
 
-		if (this.owner) store.takeItem(this.owner.instance, this.instance);
-		this.owner = undefined;
+		if (this.ownable.hasOwner())
+			store.takeItem(this.ownable.getOwner()!.instance, this.instance);
+		this.ownable.setOwner(undefined);
+
 		this.instance.Parent = Workspace;
 		this.worldModel.instance.Parent = this.instance;
 		this.worldModel.instance.PrimaryPart!.CanCollide = true;
 	}
 
-	public equip(): void {
-		if (this.attributes.isEquipped) return;
-		if (this.owner === undefined) return;
-
-		const character = this.owner.getCharacter();
+	public onEquipped(): void {
+		const owner = this.ownable.getOwner();
+		if (owner === undefined) return;
+		const character = owner.getCharacter();
 		character.holdItem(this);
 
 		if (this.config.hideOnHolster) {
 			this.worldModel.show();
 		}
-
-		this.attributes.isEquipped = true;
 	}
 
-	public unequip(): void {
-		if (!this.attributes.isEquipped) return;
-		if (this.owner === undefined) return;
-
-		const character = this.owner.getCharacter();
+	public onUnequipped(): void {
+		const owner = this.ownable.getOwner();
+		if (owner === undefined) return;
+		const character = owner.getCharacter();
 		character.holsterItem(this);
 
 		if (this.config.hideOnHolster) {
 			this.worldModel.hide();
 		}
-		// this.rigToLimb(this.config.holsterLimb, this.config.holsterC0);
-
-		this.attributes.isEquipped = false;
 	}
 
 	public weldTo(part: BasePart, c0?: CFrame): void {
