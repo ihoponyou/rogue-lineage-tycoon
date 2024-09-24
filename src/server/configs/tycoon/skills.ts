@@ -41,8 +41,11 @@ export const SKILLS: { [name: string]: SkillConfig } = {
 	["Pommel Strike"]: {
 		teach: (player) => {
 			print(`${player.Name} learned Pommel Strike!`);
+
 			const tool = new Instance("Tool");
+			tool.Name = "test_tool";
 			tool.Parent = player;
+
 			const onEquip = tool.Equipped.Connect(() => print("equipped"));
 			const onUse = tool.Activated.Connect(() => "pommel strike");
 			const onUnequip = tool.Unequipped.Connect(() =>

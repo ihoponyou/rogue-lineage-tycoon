@@ -112,6 +112,11 @@ interface ReplicatedStorage extends Instance {
 			DustPart: Part & {
 				DUST: ParticleEmitter;
 			};
+			MisogiParticle: Part & {
+				Attachment: Attachment & {
+					Particle: ParticleEmitter;
+				};
+			};
 			Bullet: Part & {
 				Trail: Trail;
 				Whiz: Sound;
@@ -214,10 +219,8 @@ interface ReplicatedStorage extends Instance {
 				};
 				Ring: MeshPart;
 			};
-			MisogiParticle: Part & {
-				Attachment: Attachment & {
-					Particle: ParticleEmitter;
-				};
+			test_tool: Model & {
+				yar: Part;
 			};
 			ParticleArm: Part & {
 				Attachment2: Attachment;
@@ -1576,7 +1579,15 @@ interface ReplicatedStorage extends Instance {
 	src: Folder & {
 		shared: Folder & {
 			toggleable: ModuleScript;
-			hideable: ModuleScript;
+			network: ModuleScript & {
+				currency: ModuleScript;
+				combat: ModuleScript;
+				character: ModuleScript;
+				dialogue: ModuleScript;
+				mana: ModuleScript;
+				item: ModuleScript;
+				reflex: ModuleScript;
+			};
 			configs: ModuleScript & {
 				items: ModuleScript;
 				character: ModuleScript;
@@ -1593,37 +1604,34 @@ interface ReplicatedStorage extends Instance {
 				["character-from-body-part"]: ModuleScript;
 				["get-digit"]: ModuleScript;
 				["on-player-removing"]: ModuleScript;
-				["animation-manager"]: ModuleScript;
+				graph: ModuleScript & {
+					node: ModuleScript;
+				};
 				hitbox: ModuleScript;
 				["char-at"]: ModuleScript;
 				["state-machine"]: ModuleScript & {
 					state: ModuleScript;
 				};
+				["animation-manager"]: ModuleScript;
 				["uppercase-first-char"]: ModuleScript;
-				graph: ModuleScript & {
-					node: ModuleScript;
-				};
 			};
-			network: ModuleScript & {
-				currency: ModuleScript;
-				combat: ModuleScript;
-				character: ModuleScript;
-				dialogue: ModuleScript;
-				mana: ModuleScript;
-				item: ModuleScript;
-				reflex: ModuleScript;
-			};
+			hideable: ModuleScript;
+			inject: ModuleScript;
 			components: Folder & {
 				toggleable: ModuleScript;
 				["abstract-player"]: ModuleScript;
-				["abstract-weapon"]: ModuleScript;
-				["disposable-component"]: ModuleScript;
-				["abstract-item"]: ModuleScript;
 				ragdoll: ModuleScript;
-				["abstract-character"]: ModuleScript;
+				["disposable-component"]: ModuleScript;
 				model: ModuleScript;
+				["abstract-weapon"]: ModuleScript;
+				["abstract-character"]: ModuleScript;
+				["abstract-item"]: ModuleScript;
 			};
-			inject: ModuleScript;
+			cmdr: Folder & {
+				hooks: Folder & {
+					["before-run"]: ModuleScript;
+				};
+			};
 			store: ModuleScript & {
 				slices: ModuleScript & {
 					inventory: ModuleScript & {
@@ -1641,6 +1649,12 @@ interface ReplicatedStorage extends Instance {
 					identity: ModuleScript & {
 						selectors: ModuleScript;
 					};
+					classes: ModuleScript & {
+						selectors: ModuleScript;
+					};
+					skills: ModuleScript & {
+						selectors: ModuleScript;
+					};
 					transform: ModuleScript & {
 						selectors: ModuleScript;
 					};
@@ -1652,47 +1666,23 @@ interface ReplicatedStorage extends Instance {
 					};
 					["player-data"]: ModuleScript;
 				};
-			};
-			cmdr: Folder & {
-				hooks: Folder & {
-					["before-run"]: ModuleScript;
+				middleware: Folder & {
+					logger: ModuleScript;
 				};
 			};
 		};
 		client: Folder & {
 			network: ModuleScript;
-			configs: Folder;
-			effects: ModuleScript;
+			constants: ModuleScript;
 			activities: Folder & {
-				["block-activity"]: ModuleScript;
+				["climb-activity"]: ModuleScript;
 				["charge-mana-activity"]: ModuleScript;
 				["character-activity"]: ModuleScript;
-				["run-activity"]: ModuleScript;
 				["dash-activity"]: ModuleScript;
-				["climb-activity"]: ModuleScript;
-			};
-			constants: ModuleScript;
-			components: Folder & {
-				["player-client"]: ModuleScript;
-				["ragdoll-client"]: ModuleScript;
-				character: ModuleScript;
-				item: ModuleScript;
-				weapon: ModuleScript;
-			};
-			controllers: Folder & {
-				["lifecycle-controller"]: ModuleScript;
-				["inventory-controller"]: ModuleScript;
-				["input-controller"]: ModuleScript;
-				["keybind-controller"]: ModuleScript;
-				["effect-controller"]: ModuleScript;
-				["chat-controller"]: ModuleScript;
-				["animation-controller"]: ModuleScript;
-				["gui-controller"]: ModuleScript;
+				["run-activity"]: ModuleScript;
+				["block-activity"]: ModuleScript;
 			};
 			store: ModuleScript & {
-				middleware: Folder & {
-					receiver: ModuleScript;
-				};
 				slices: Folder & {
 					dialogue: ModuleScript & {
 						selectors: ModuleScript;
@@ -1702,18 +1692,43 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 			};
+			effects: ModuleScript;
+			controllers: Folder & {
+				["lifecycle-controller"]: ModuleScript;
+				["chat-controller"]: ModuleScript;
+				["effect-controller"]: ModuleScript;
+				["keybind-controller"]: ModuleScript;
+				["animation-controller"]: ModuleScript;
+				["inventory-controller"]: ModuleScript;
+				["input-controller"]: ModuleScript;
+				["gui-controller"]: ModuleScript;
+			};
+			components: Folder & {
+				["player-client"]: ModuleScript;
+				item: ModuleScript;
+				character: ModuleScript;
+				["ragdoll-client"]: ModuleScript;
+				weapon: ModuleScript;
+			};
 			gui: Folder & {
 				hooks: Folder & {
 					["use-motion"]: ModuleScript;
 					["reflex-hooks"]: ModuleScript;
 				};
-				stories: Folder;
+				context: ModuleScript;
 				components: Folder & {
 					["dialogue-box"]: ModuleScript & {
-						["dialogue-option"]: ModuleScript;
 						["char-label"]: ModuleScript;
+						["dialogue-option"]: ModuleScript;
 					};
 					["name-plate"]: ModuleScript;
+					app: ModuleScript;
+					["fill-bar"]: ModuleScript & {
+						["mana-bar"]: ModuleScript;
+						["temperature-bar"]: ModuleScript;
+						["stomach-bar"]: ModuleScript;
+					};
+					["silver-logo"]: ModuleScript;
 					inventory: Folder & {
 						["draggable-item-button"]: ModuleScript;
 						backpack: ModuleScript;
@@ -1721,17 +1736,9 @@ interface ReplicatedStorage extends Instance {
 						["item-button"]: ModuleScript;
 						["empty-hotbar-slot"]: ModuleScript;
 					};
-					app: ModuleScript;
-					["silver-logo"]: ModuleScript;
-					["fill-bar"]: ModuleScript & {
-						["mana-bar"]: ModuleScript;
-						["temperature-bar"]: ModuleScript;
-						["stomach-bar"]: ModuleScript;
-					};
 					stats: ModuleScript;
 					digit: ModuleScript;
 				};
-				context: ModuleScript;
 			};
 		};
 	};
@@ -1739,9 +1746,6 @@ interface ReplicatedStorage extends Instance {
 		node_modules: Folder & {
 			["@rbxts"]: Folder & {
 				["reflex-class"]: Folder & {
-					node_modules: Folder & {
-						["@rbxts"]: Folder;
-					};
 					out: ModuleScript & {
 						source: Folder & {
 							["class-producer"]: ModuleScript;
@@ -1767,9 +1771,6 @@ interface ReplicatedStorage extends Instance {
 					src: ModuleScript;
 				};
 				["shared-components-flamework"]: Folder & {
-					node_modules: Folder & {
-						["@rbxts"]: Folder;
-					};
 					LICENSE: StringValue;
 					out: ModuleScript & {
 						utilities: ModuleScript;
@@ -2070,21 +2071,6 @@ interface ReplicatedStorage extends Instance {
 						ExpectationContext: ModuleScript;
 						Context: ModuleScript;
 						Expectation: ModuleScript;
-					};
-				};
-				["ui-labs"]: Folder & {
-					src: ModuleScript & {
-						Controls: Folder & {
-							Utils: ModuleScript;
-							PrimitiveControls: ModuleScript;
-							ControlUtils: ModuleScript;
-							DatatypeControls: ModuleScript;
-							AdvancedControls: ModuleScript;
-						};
-						Libraries: Folder;
-						Enviroment: ModuleScript;
-						ControlTypings: Folder;
-						StoryCreators: ModuleScript;
 					};
 				};
 				sift: Folder & {

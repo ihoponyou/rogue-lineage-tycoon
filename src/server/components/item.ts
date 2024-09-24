@@ -6,6 +6,7 @@ import { store } from "server/store";
 import { AbstractItem } from "shared/components/abstract-item";
 import { ModelComponent } from "shared/components/model";
 import { getItemConfig } from "shared/configs/items";
+import { Equippable } from "./equippable";
 import { TouchableModel } from "./interactable/touchable/touchable-model";
 import { PlayerServer } from "./player-server";
 
@@ -21,9 +22,11 @@ export class Item extends AbstractItem implements OnStart {
 	private rootJoint!: Motor6D;
 	private propWeld!: Weld;
 	private touchable!: TouchableModel;
-	private owner?: PlayerServer;
 
-	public constructor(private components: Components) {
+	public constructor(
+		private components: Components,
+		protected equippable: Equippable,
+	) {
 		super();
 	}
 
@@ -66,7 +69,7 @@ export class Item extends AbstractItem implements OnStart {
 			.andThen((component) => {
 				this.touchable = component;
 				component.onInteracted((player) => {
-					if (this.owner !== undefined) return;
+					if (this.equippable.owner !== undefined) return;
 					this.pickUp(player);
 				});
 				component.enable();

@@ -69,6 +69,14 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		),
 		holsterLimb: "Torso",
 	},
+	test_tool: {
+		droppable: false,
+		maxStackSize: 1,
+		worldModel: ReplicatedStorage.Assets.Models.test_tool,
+		hideOnHolster: true,
+		equipLimb: "Right Arm",
+		holsterLimb: "Torso",
+	},
 };
 
 export function getItemConfig(name: string): ItemConfig {

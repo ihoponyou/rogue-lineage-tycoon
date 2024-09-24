@@ -1,4 +1,5 @@
 import { BaseComponent, Component } from "@flamework/components";
+import { AbstractEquippable } from "./abstract-equippable";
 
 export interface ItemAttributes {
 	isEquipped: boolean;
@@ -10,6 +11,5 @@ export abstract class AbstractItem<
 	I extends Tool = Tool,
 > extends BaseComponent<A, I> {
 	public static readonly TAG = "Item";
-	public abstract equip(): void;
-	public abstract unequip(): void;
+	protected abstract equippable: AbstractEquippable;
 }
