@@ -105,7 +105,7 @@ export class Item extends AbstractItem implements OnStart {
 			this.worldModel.hide();
 		}
 
-		store.giveItem(player, this.instance);
+		store.giveTool(player, this.instance);
 	}
 
 	public drop(): void {
@@ -114,7 +114,7 @@ export class Item extends AbstractItem implements OnStart {
 		this.propWeld.C0 = new CFrame();
 
 		if (this.ownable.hasOwner())
-			store.takeItem(this.ownable.getOwner()!.instance, this.instance);
+			store.takeTool(this.ownable.getOwner()!.instance, this.instance);
 		this.ownable.setOwner(undefined);
 
 		this.instance.Parent = Workspace;

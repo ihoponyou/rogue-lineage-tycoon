@@ -46,19 +46,12 @@ export const SKILLS: { [name: string]: SkillConfig } = {
 			tool.Name = "test_tool";
 			tool.Parent = player;
 
-			const onEquip = tool.Equipped.Connect(() => print("equipped"));
-			const onUse = tool.Activated.Connect(() => "pommel strike");
-			const onUnequip = tool.Unequipped.Connect(() =>
-				print("unequipped"),
-			);
-			tool.Destroying.Once(() => {
-				onEquip.Disconnect();
-				onUnequip.Disconnect();
-				onUse.Disconnect();
-			});
+			tool.AddTag("Equippable");
+			tool.AddTag("Ownable");
+
 			print(tool, "was here");
 
-			store.giveItem(player, tool);
+			store.giveTool(player, tool);
 		},
 	},
 };

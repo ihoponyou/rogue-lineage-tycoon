@@ -11,7 +11,7 @@ const initialState: Inventory = {
 };
 
 export const inventorySlice = createProducer(initialState, {
-	giveItem: (state, item: Tool, quantity: number = 1) => {
+	giveTool: (state, item: Tool, quantity: number = 1) => {
 		const itemConfig = getItemConfig(item.Name);
 		const currentCount = state.items.get(item);
 		if (
@@ -28,7 +28,7 @@ export const inventorySlice = createProducer(initialState, {
 		});
 	},
 
-	takeItem: (state, item: Tool, quantity: number = 1) => {
+	takeTool: (state, item: Tool, quantity: number = 1) => {
 		const currentCount = state.items.get(item);
 		if (currentCount === undefined) {
 			return state;

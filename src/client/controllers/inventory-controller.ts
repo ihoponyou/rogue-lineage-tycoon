@@ -1,12 +1,13 @@
 import { Components } from "@flamework/components";
 import { Controller, OnStart } from "@flamework/core";
+import { Equippable } from "client/components/equippable";
 import { Item } from "client/components/item";
 import { store } from "client/store";
 import { selectActiveTool, selectGui } from "client/store/slices/gui/selectors";
 
 @Controller()
 export class InventoryController implements OnStart {
-	private selectedItem?: Item;
+	private selectedEquippable?: Equippable;
 
 	public constructor(private components: Components) {}
 
@@ -26,22 +27,26 @@ export class InventoryController implements OnStart {
 	}
 
 	public dropSelectedItem(): void {
-		this.selectedItem?.drop();
+		if (this.selectedEquippable === undefined) return;
+		const item = this.components.getComponent<Item>(
+			this.selectedEquippable.instance,
+		);
+		item?.drop();
 	}
 
 	private switchItem(tool?: Tool) {
-		this.selectedItem?.unequip();
+		this.selectedEquippable?.unequip();
 
 		if (tool === undefined) {
-			this.selectedItem = undefined;
+			this.selectedEquippable = undefined;
 			return;
 		}
 
-		const item = this.components.getComponent<Item>(tool);
-		if (item === undefined) {
+		const equippable = this.components.getComponent<Equippable>(tool);
+		if (equippable === undefined) {
 			error(`failed to get Item from ${tool}`);
 		}
-		item.equip();
-		this.selectedItem = item;
+		equippable.equip();
+		this.selectedEquippable = equippable;
 	}
 }
