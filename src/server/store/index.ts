@@ -22,12 +22,12 @@ function broadcasterMiddleware(): ProducerMiddleware {
 			Events.reflex.dispatch(player, actions);
 		},
 		hydrate: (player, _state) => {
-			const state = store.getState().get(tostring(player.UserId));
-			if (state === undefined)
-				error(
-					`hydration aborted: state does not contain ${player}'s data`,
-				);
-			Events.reflex.hydrate(player, state);
+			// const state = store.getState().get(tostring(player.UserId));
+			// if (state === undefined)
+			// 	error(
+			// 		`hydration aborted: state does not contain ${player}'s data`,
+			// 	);
+			// Events.reflex.hydrate(player, state);
 		},
 	});
 

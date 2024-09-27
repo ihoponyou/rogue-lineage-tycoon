@@ -21,8 +21,12 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 	private components!: Components;
 
 	public onStart(): void {
+		while (!this.instance.HasTag("DataLoaded")) {
+			task.wait();
+		}
+
 		const knownSkills = store.getState().get(tostring(this.UserId))?.skills;
-		if (knownSkills) {
+		if (knownSkills !== undefined) {
 			for (const skillName of knownSkills) {
 				getSkillConfig(skillName).teach(this.instance);
 			}

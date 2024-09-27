@@ -82,8 +82,9 @@ export class Item extends AbstractItem implements OnStart {
 			this.drop();
 		});
 
-		this.equippable.onEquipped(() => this.onEquipped());
-		this.equippable.onUnequipped(() => this.onUnequipped());
+		this.equippable.onAttributeChanged("isEquipped", (isEquipped) =>
+			isEquipped ? this.onEquipped() : this.onUnequipped(),
+		);
 	}
 
 	public pickUp(player: Player): void {

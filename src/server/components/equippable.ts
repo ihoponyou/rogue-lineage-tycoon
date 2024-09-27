@@ -30,14 +30,24 @@ export class Equippable extends AbstractEquippable implements OnStart {
 	// TODO: make new namespace or remove from item namespace
 	public override equip(player: Player): void {
 		if (this.attributes.isEquipped) return;
-		if (!this.ownable.ownedBy(player)) return;
+		if (!this.ownable.ownedBy(player)) {
+			warn(
+				`${this.instance.GetFullName()}: ${player.Name} requested equip, but does not own`,
+			);
+			return;
+		}
 
 		super.equip(player);
 	}
 
 	public override unequip(player: Player): void {
 		if (!this.attributes.isEquipped) return;
-		if (!this.ownable.ownedBy(player)) return;
+		if (!this.ownable.ownedBy(player)) {
+			warn(
+				`${this.instance.GetFullName()}: ${player.Name} requested equip, but does not own`,
+			);
+			return;
+		}
 
 		super.unequip(player);
 	}

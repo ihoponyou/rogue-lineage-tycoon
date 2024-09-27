@@ -13,7 +13,8 @@ export class InventoryController implements OnStart {
 
 	public onStart(): void {
 		store.subscribe(selectActiveTool(), (tool) => {
-			this.switchItem(tool);
+			print(tool?.Name);
+			this.switchTool(tool);
 		});
 	}
 
@@ -34,7 +35,7 @@ export class InventoryController implements OnStart {
 		item?.drop();
 	}
 
-	private switchItem(tool?: Tool) {
+	private switchTool(tool?: Tool) {
 		this.selectedEquippable?.unequip();
 
 		if (tool === undefined) {

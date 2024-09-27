@@ -100,9 +100,12 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 			onRelease.Disconnect();
 		});
 
+		store.loadPlayerData(player, profile.Data);
 		this.profiles.set(player.UserId, profile);
 		this.preReleaseListeners.set(player, []);
-		store.loadPlayerData(player, profile.Data);
+
+		player.AddTag("DataLoaded");
+
 		this.giveLeaderStatsFolder(player);
 
 		this.joinTicks.set(player, math.round(tick()));
