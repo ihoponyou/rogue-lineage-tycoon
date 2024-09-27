@@ -3,17 +3,17 @@ import { createProducer } from "@rbxts/reflex";
 import { getItemConfig } from "shared/configs/items";
 
 interface Inventory {
-	items: ReadonlyMap<Tool, number>;
+	tools: ReadonlyMap<Tool, number>;
 }
 
 const initialState: Inventory = {
-	items: new Map(),
+	tools: new Map(),
 };
 
 export const inventorySlice = createProducer(initialState, {
 	giveTool: (state, item: Tool, quantity: number = 1) => {
 		const itemConfig = getItemConfig(item.Name);
-		const currentCount = state.items.get(item);
+		const currentCount = state.tools.get(item);
 		if (
 			currentCount !== undefined &&
 			currentCount + quantity > itemConfig.maxStackSize
@@ -21,7 +21,7 @@ export const inventorySlice = createProducer(initialState, {
 			return state;
 
 		return Immut.produce(state, (draft) => {
-			draft.items.set(
+			draft.tools.set(
 				item,
 				currentCount === undefined ? quantity : currentCount + quantity,
 			);
@@ -29,7 +29,7 @@ export const inventorySlice = createProducer(initialState, {
 	},
 
 	takeTool: (state, item: Tool, quantity: number = 1) => {
-		const currentCount = state.items.get(item);
+		const currentCount = state.tools.get(item);
 		if (currentCount === undefined) {
 			return state;
 		}
@@ -37,9 +37,9 @@ export const inventorySlice = createProducer(initialState, {
 
 		return Immut.produce(state, (draft) => {
 			if (newCount > 0) {
-				draft.items.set(item, newCount);
+				draft.tools.set(item, newCount);
 			} else {
-				draft.items.delete(item);
+				draft.tools.delete(item);
 			}
 		});
 	},
