@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { MAX_HOTBAR_SLOTS } from "client/constants";
-import { store } from "client/store";
+import { useRootProducer } from "client/gui/hooks/reflex-hooks";
 import {
 	selectActiveTool,
 	selectBackpackOpen,
@@ -17,6 +17,8 @@ export function Hotbar() {
 	const items = useSelector(selectItems());
 	const hotbarItems = useSelector(selectHotbar());
 	const activeTool = useSelector(selectActiveTool());
+
+	const { setActiveTool } = useRootProducer();
 
 	const hotbarButtons = new Array<JSX.Element>();
 
@@ -40,7 +42,7 @@ export function Hotbar() {
 				position={UDim2.fromScale(xScale)}
 				onM1Down={() => {
 					const newTool = tool === activeTool ? undefined : tool;
-					store.setActiveTool(newTool);
+					setActiveTool(newTool);
 				}}
 			/>
 		);

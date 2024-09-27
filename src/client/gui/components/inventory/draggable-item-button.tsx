@@ -5,7 +5,7 @@ import { createPortal } from "@rbxts/react-roblox";
 import { GuiService, RunService, UserInputService } from "@rbxts/services";
 import { LOCAL_PLAYER_GUI } from "client/constants";
 import { appContext } from "client/gui/context";
-import { store } from "client/store";
+import { useRootProducer } from "client/gui/hooks/reflex-hooks";
 import {
 	selectActiveTool,
 	selectHotbarHasTool,
@@ -14,6 +14,7 @@ import { ItemButton, ItemButtonProps } from "./item-button";
 
 export function DraggableItemButton(props: ItemButtonProps) {
 	const app = useContext(appContext);
+	const { removeFromHotbar, addToHotbar, setActiveTool } = useRootProducer();
 
 	const activeTool = useSelector(selectActiveTool());
 	const hasTool = useSelector(selectHotbarHasTool(props.tool));
@@ -56,18 +57,18 @@ export function DraggableItemButton(props: ItemButtonProps) {
 						let transferred = false;
 						if (object === undefined) {
 							transferred = hasTool;
-							store.removeFromHotbar(props.tool);
+							removeFromHotbar(props.tool);
 						} else {
 							transferred =
 								!hasTool || object.LayoutOrder !== props.slot;
-							store.addToHotbar(object.LayoutOrder, props.tool);
+							addToHotbar(object.LayoutOrder, props.tool);
 						}
 						if (!transferred) {
 							const newTool =
 								props.tool === activeTool
 									? undefined
 									: props.tool;
-							store.setActiveTool(newTool);
+							setActiveTool(newTool);
 						}
 					},
 				}),
