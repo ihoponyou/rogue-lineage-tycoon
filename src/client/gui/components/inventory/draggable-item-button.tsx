@@ -6,18 +6,15 @@ import { GuiService, RunService, UserInputService } from "@rbxts/services";
 import { LOCAL_PLAYER_GUI } from "client/constants";
 import { appContext } from "client/gui/context";
 import { useRootProducer } from "client/gui/hooks/reflex-hooks";
-import {
-	selectActiveTool,
-	selectHotbarHasTool,
-} from "client/store/slices/gui/selectors";
-import { ItemButton, ItemButtonProps } from "./item-button";
+import { selectActiveEquippable } from "client/store/slices/gui/selectors";
+import { EquippableButtonProps, ItemButton } from "./item-button";
 
-export function DraggableItemButton(props: ItemButtonProps) {
+export function DraggableItemButton(props: EquippableButtonProps) {
 	const app = useContext(appContext);
-	const { removeFromHotbar, addToHotbar, setActiveTool } = useRootProducer();
+	const { removeFromHotbar, addToHotbar } = useRootProducer();
 
-	const activeTool = useSelector(selectActiveTool());
-	const hasTool = useSelector(selectHotbarHasTool(props.tool));
+	const activeTool = useSelector(selectActiveEquippable());
+	const hasTool = false; //useSelector(selectHotbarHasTool(props.equippable));
 
 	const [position, setPosition] = useBinding(new UDim2());
 	const [cursorOffset, setCursorOffset] = useState(Vector2.zero);
@@ -57,18 +54,18 @@ export function DraggableItemButton(props: ItemButtonProps) {
 						let transferred = false;
 						if (object === undefined) {
 							transferred = hasTool;
-							removeFromHotbar(props.tool);
+							// removeFromHotbar(props.equippable);
 						} else {
 							transferred =
 								!hasTool || object.LayoutOrder !== props.slot;
-							addToHotbar(object.LayoutOrder, props.tool);
+							// addToHotbar(object.LayoutOrder, props.equippable.instance);
 						}
 						if (!transferred) {
-							const newTool =
-								props.tool === activeTool
-									? undefined
-									: props.tool;
-							setActiveTool(newTool);
+							// const newTool =
+							// props.equippable === activeTool
+							// 	? undefined
+							// 	: props.equippable;
+							// setActiveTool(newTool);
 						}
 					},
 				}),

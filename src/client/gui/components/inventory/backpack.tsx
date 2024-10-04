@@ -6,7 +6,6 @@ import {
 	selectHotbar,
 } from "client/store/slices/gui/selectors";
 import { selectItems } from "shared/store/slices/inventory/selectors";
-import { DraggableItemButton } from "./draggable-item-button";
 import { EmptyHotbarSlot } from "./empty-hotbar-slot";
 
 export function Backpack() {
@@ -17,12 +16,13 @@ export function Backpack() {
 	const backpackButtons = new Array<JSX.Element>();
 	const emptySlots = new Array<JSX.Element>();
 	items.forEach((quantity, tool) => {
+		// if tool is in hotbar, do not render in backpack
 		for (const [_, value] of hotbarItems) {
-			if (tool === value) return;
+			if (tool === value.Name) return;
 		}
-		backpackButtons.push(
-			<DraggableItemButton tool={tool} quantity={quantity} />,
-		);
+		// backpackButtons.push(
+		// 	<DraggableItemButton equippable={} quantity={quantity} />,
+		// );
 	});
 
 	for (let i = 0; i < MAX_HOTBAR_SLOTS; i++) {

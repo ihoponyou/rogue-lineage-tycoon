@@ -5,7 +5,7 @@ import { AnimationController } from "client/controllers/animation-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
 import { Events } from "client/network";
 import { store } from "client/store";
-import { selectActiveTool } from "client/store/slices/gui/selectors";
+import { selectActiveEquippable } from "client/store/slices/gui/selectors";
 import { BLOCK_WALK_SPEED } from "shared/configs";
 import { WeaponConfig, getWeaponConfig } from "shared/configs/weapons";
 import { CharacterActivity } from "./character-activity";
@@ -25,7 +25,7 @@ export class BlockActivity extends CharacterActivity {
 	public override start(): void {
 		super.start();
 
-		const equippedTool = store.getState(selectActiveTool());
+		const equippedTool = store.getState(selectActiveEquippable());
 		let config: WeaponConfig | undefined;
 		if (equippedTool !== undefined) {
 			try {

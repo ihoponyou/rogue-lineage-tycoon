@@ -1,9 +1,11 @@
+import { Components } from "@flamework/components";
+import { Dependency } from "@flamework/core";
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
+import { Equippable } from "client/components/equippable";
 import { MAX_HOTBAR_SLOTS } from "client/constants";
-import { useRootProducer } from "client/gui/hooks/reflex-hooks";
 import {
-	selectActiveTool,
+	selectActiveEquippable,
 	selectBackpackOpen,
 	selectHotbar,
 } from "client/store/slices/gui/selectors";
@@ -16,33 +18,36 @@ export function Hotbar() {
 	const backpackOpen = useSelector(selectBackpackOpen());
 	const items = useSelector(selectItems());
 	const hotbarItems = useSelector(selectHotbar());
-	const activeTool = useSelector(selectActiveTool());
+	const activeTool = useSelector(selectActiveEquippable());
 
-	const { setActiveTool } = useRootProducer();
+	// const { setActiveTool } = useRootProducer();
 
 	const hotbarButtons = new Array<JSX.Element>();
 
 	let i = 1;
 	hotbarItems.forEach((tool, slot) => {
-		const quantity = items.get(tool) ?? -1;
+		const equippable =
+			Dependency<Components>().getComponent<Equippable>(tool);
+		if (equippable === undefined) return;
+		const quantity = items.get(tool.Name) ?? -1;
 		const xScale =
 			hotbarItems.size() > 1 ? (i++ - 1) / (hotbarItems.size() - 1) : 0;
 		const element = backpackOpen ? (
 			<DraggableItemButton
-				tool={tool}
+				equippable={equippable}
 				quantity={quantity}
 				slot={slot}
 				position={UDim2.fromScale(slot / (MAX_HOTBAR_SLOTS - 1))}
 			/>
 		) : (
 			<ItemButton
-				tool={tool}
+				equippable={equippable}
 				quantity={quantity}
 				slot={slot}
 				position={UDim2.fromScale(xScale)}
 				onM1Down={() => {
 					const newTool = tool === activeTool ? undefined : tool;
-					setActiveTool(newTool);
+					// setActiveTool(newTool);
 				}}
 			/>
 		);

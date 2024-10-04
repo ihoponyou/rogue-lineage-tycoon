@@ -1,17 +1,18 @@
 import Immut from "@rbxts/immut";
 import { createProducer } from "@rbxts/reflex";
+import { Equippable } from "client/components/equippable";
 import { MAX_HOTBAR_SLOTS } from "client/constants";
 
 interface GuiState {
 	readonly backpackOpen: boolean;
-	readonly hotbar: ReadonlyMap<number, Tool>; // map so that rbxts wont FUCK WITH MY ARRAY INDICES
-	readonly activeTool: Tool | undefined;
+	readonly hotbar: ReadonlyMap<number, Equippable>; // map so that rbxts wont MESS :) WITH MY ARRAY INDICES
+	readonly activeEquippable: Equippable | undefined;
 }
 
 const initialState: GuiState = {
 	backpackOpen: false,
 	hotbar: new Map(),
-	activeTool: undefined,
+	activeEquippable: undefined,
 };
 
 export const guiSlice = createProducer(initialState, {
@@ -22,7 +23,7 @@ export const guiSlice = createProducer(initialState, {
 		};
 	},
 
-	addToHotbar: (state, slot: number, tool: Tool) => {
+	addToHotbar: (state, slot: number, equippable: Equippable) => {
 		if (slot < 0 || slot > MAX_HOTBAR_SLOTS) {
 			warn(`invalid hotbar slot index of ${slot}`);
 			return state;
@@ -61,13 +62,6 @@ export const guiSlice = createProducer(initialState, {
 		}
 		return Immut.produce(state, (draft) => {
 			draft.hotbar.delete(slot);
-		});
-	},
-
-	setActiveTool: (state, tool?: Tool) => {
-		if (state.activeTool === tool) return state;
-		return Immut.produce(state, (draft) => {
-			draft.activeTool = tool;
 		});
 	},
 });

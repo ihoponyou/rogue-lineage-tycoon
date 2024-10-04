@@ -22,6 +22,6 @@ export function selectHotbarHasTool(tool: Tool) {
 	});
 }
 
-export function selectActiveTool() {
-	return (state: RootState) => state.gui.activeTool;
+export function selectActiveEquippable() {
+	return (state: RootState) => state.gui.activeEquippable;
 }

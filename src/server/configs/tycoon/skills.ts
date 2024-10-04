@@ -67,7 +67,7 @@ export const SKILLS: { [name: string]: SkillConfig } = {
 
 			print(tool, "was here");
 
-			store.giveTool(player, tool);
+			store.addSkill(player, "Pommel Strike");
 		},
 	},
 };

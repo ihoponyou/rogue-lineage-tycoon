@@ -1,15 +1,11 @@
 import React from "@rbxts/react";
-import { useSelector } from "@rbxts/react-reflex";
 import Ripple from "@rbxts/ripple";
 import { GuiService } from "@rbxts/services";
+import { Equippable } from "client/components/equippable";
 import { useMotion } from "client/gui/hooks/use-motion";
-import {
-	selectActiveTool,
-	selectHotbarHasTool,
-} from "client/store/slices/gui/selectors";
 
-export interface ItemButtonProps {
-	tool: Tool;
+export interface EquippableButtonProps {
+	equippable: Equippable;
 	quantity: number;
 	position?: UDim2;
 	positionBinding?: React.Binding<UDim2>;
@@ -54,14 +50,14 @@ const SLOT_LABELS = [
 	"=",
 ];
 
-export function ItemButton(props: ItemButtonProps) {
-	const inHotbar = useSelector(selectHotbarHasTool(props.tool));
-	const activeTool = useSelector(selectActiveTool());
+export function ItemButton(props: EquippableButtonProps) {
+	const inHotbar = false; //useSelector(selectHotbarHasTool(props.equippable));
+	const activeTool = undefined; //useSelector(selectActiveTool());
 	const [size, sizeMotion] = useMotion(SIZE.deselected);
 	const [textTransparency, textTransparencyMotion] = useMotion(0);
 	const [color, colorMotion] = useMotion(COLOR.deselected);
 
-	const selected = props.tool === activeTool;
+	const selected = props.equippable === activeTool;
 	sizeMotion.tween(selected ? SIZE.selected : SIZE.deselected, {
 		...TWEEN_OPTIONS,
 		style: selected ? Enum.EasingStyle.Back : undefined,
@@ -77,7 +73,7 @@ export function ItemButton(props: ItemButtonProps) {
 
 	return (
 		<textbutton
-			key={props.tool.Name}
+			key={props.equippable.instance.Name}
 			Active={false}
 			AnchorPoint={new Vector2(0.5, 0)}
 			AutoButtonColor={false}
@@ -93,7 +89,7 @@ export function ItemButton(props: ItemButtonProps) {
 			}
 			Selectable={false}
 			Size={new UDim2(0, 60, 0, 60)}
-			Text={props.tool.Name}
+			Text={props.equippable.instance.Name}
 			TextColor3={Color3.fromRGB(47, 43, 30)}
 			TextSize={13}
 			TextTransparency={textTransparency}
