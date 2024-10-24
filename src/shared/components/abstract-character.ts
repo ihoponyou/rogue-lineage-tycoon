@@ -24,9 +24,13 @@ export abstract class AbstractCharacter
 	extends DisposableComponent<CharacterAttributes, Model>
 	implements OnStart
 {
+	public static readonly TAG = "Character";
+
 	protected raycastParams = new RaycastParams();
 	protected humanoid!: Humanoid;
 	protected abstract ragdoll: AbstractRagdoll;
+	protected abstract readonly inventoryFolder: Folder;
+	protected abstract readonly skillsFolder: Folder;
 
 	public onStart(): void {
 		const character = promiseR6(this.instance).expect();

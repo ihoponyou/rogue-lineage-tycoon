@@ -2,9 +2,14 @@ import { ReplicatedStorage } from "@rbxts/services";
 
 export type BodyPart = "Right Arm" | "Torso" | "Right Leg";
 
+export enum ItemId {
+	GOBLET = "Goblet",
+	BRONZE_SWORD = "Bronze Sword",
+}
+
 interface ItemConfig {
 	readonly droppable: boolean;
-	readonly maxStackSize: number;
+	readonly maxQuantity: number;
 	readonly worldModel: Model;
 	readonly hideOnHolster: boolean;
 	readonly equipLimb: BodyPart;
@@ -29,7 +34,7 @@ const SWORD_HOLSTER_C0 = new CFrame(0, 0, 0.552).mul(
 export const ITEMS: { [name: string]: ItemConfig } = {
 	Goblet: {
 		droppable: true,
-		maxStackSize: 99,
+		maxQuantity: 99,
 		worldModel: ReplicatedStorage.Assets.Tycoon.Products.Goblet,
 		hideOnHolster: true,
 		equipLimb: "Right Arm",
@@ -37,7 +42,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 	},
 	"Bronze Sword": {
 		droppable: false,
-		maxStackSize: 1,
+		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Sword"],
 		hideOnHolster: false,
 		equipLimb: "Right Arm",
@@ -47,7 +52,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 	},
 	"Bronze Spear": {
 		droppable: false,
-		maxStackSize: 1,
+		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Spear"],
 		hideOnHolster: false,
 		equipLimb: "Right Arm",
@@ -60,7 +65,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 	},
 	"Bronze Dagger": {
 		droppable: false,
-		maxStackSize: 1,
+		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Dagger"],
 		hideOnHolster: true,
 		equipLimb: "Right Arm",
@@ -71,7 +76,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 	},
 	test_tool: {
 		droppable: false,
-		maxStackSize: 1,
+		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.test_tool,
 		hideOnHolster: true,
 		equipLimb: "Right Arm",

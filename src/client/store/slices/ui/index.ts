@@ -1,7 +1,7 @@
 import Immut from "@rbxts/immut";
 import { createProducer } from "@rbxts/reflex";
 import { Equippable } from "client/components/equippable";
-import { MAX_HOTBAR_SLOTS } from "client/constants";
+import { MAX_HOTBAR_SLOTS } from "client/configs/constants";
 
 interface GuiState {
 	readonly backpackOpen: boolean;

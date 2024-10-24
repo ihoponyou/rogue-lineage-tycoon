@@ -4,8 +4,8 @@ import { Debris } from "@rbxts/services";
 import { Timer, TimerState } from "@rbxts/timer";
 import { DROPPERS } from "server/configs/tycoon";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { ModelComponent } from "shared/components/model";
 import { Toggleable } from "shared/components/toggleable";
+import { UsefulModel } from "shared/components/useful-model";
 import { Inject } from "shared/inject";
 
 type DropperInstance = Model & {
@@ -73,7 +73,7 @@ export class Dropper
 			clone.Parent = this.instance;
 
 			this.components
-				.waitForComponent<ModelComponent>(clone)
+				.waitForComponent<UsefulModel>(clone)
 				.andThen((_model) => {
 					// model.setNetworkOwner(
 					// 	this.plotAsset.getPlot().getOwner()?.instance,

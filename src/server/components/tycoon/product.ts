@@ -2,7 +2,7 @@ import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { PRODUCTS } from "server/configs/tycoon";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { ModelComponent } from "shared/components/model";
+import { UsefulModel } from "shared/components/useful-model";
 import { Currency } from "../../../../types/currency";
 
 interface ProductAttributes {
@@ -25,7 +25,7 @@ export class Product
 	extends DisposableComponent<ProductAttributes, ProductInstance>
 	implements OnStart
 {
-	public constructor(private model: ModelComponent) {
+	public constructor(private model: UsefulModel) {
 		super();
 	}
 

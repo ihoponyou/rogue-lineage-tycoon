@@ -4,7 +4,7 @@ import { Workspace } from "@rbxts/services";
 import { Events } from "server/network";
 import { store } from "server/store";
 import { AbstractItem } from "shared/components/abstract-item";
-import { ModelComponent } from "shared/components/model";
+import { UsefulModel } from "shared/components/useful-model";
 import { getItemConfig } from "shared/configs/items";
 import { Equippable } from "./equippable";
 import { TouchableModel } from "./interactable/touchable/touchable-model";
@@ -19,7 +19,7 @@ import { PlayerServer } from "./player-server";
 })
 export class Item extends AbstractItem implements OnStart {
 	public readonly config = getItemConfig(this.instance.Name);
-	private worldModel!: ModelComponent;
+	private worldModel!: UsefulModel;
 	private rootJoint!: Motor6D;
 	private propWeld!: Weld;
 	private touchable!: TouchableModel;
@@ -38,10 +38,10 @@ export class Item extends AbstractItem implements OnStart {
 
 		const worldModel = this.config.worldModel.Clone();
 		worldModel.Name = "WorldModel";
-		worldModel.AddTag(ModelComponent.TAG);
+		worldModel.AddTag(UsefulModel.TAG);
 		worldModel.Parent = this.instance;
 		this.worldModel = this.components
-			.waitForComponent<ModelComponent>(worldModel)
+			.waitForComponent<UsefulModel>(worldModel)
 			.expect();
 
 		if (worldModel.PrimaryPart === undefined) {

@@ -1,30 +1,21 @@
 import { BaseComponent, Component } from "@flamework/components";
-import { OnStart } from "@flamework/core";
-import { ItemId, ITEMS } from "shared/configs/items";
 import { Equippable, EquippableAttributes } from "shared/modules/equippable";
+import { Useable } from "shared/modules/useable";
 import { AbstractCharacter } from "./abstract-character";
 
-interface ItemAttributes extends EquippableAttributes {
-	quantity: number;
-}
+interface SkillAttributes extends EquippableAttributes {}
 
 @Component()
-export abstract class AbstractItem
-	extends BaseComponent<ItemAttributes>
-	implements OnStart, Equippable
+export abstract class AbstractSkill
+	extends BaseComponent<SkillAttributes>
+	implements Equippable, Useable
 {
-	public static readonly TAG = "Item";
-
-	public readonly config = ITEMS[this.instance.Name as ItemId];
-
-	onStart(): void {
-		if (this.config === undefined) {
-			error(`item config not found for ${this.instance.Name}`);
-		}
-	}
+	static readonly TAG = "Skill";
 
 	abstract equip(equipper: AbstractCharacter): void;
 	abstract unequip(unequipper: AbstractCharacter): void;
+
+	abstract use(user: AbstractCharacter): void;
 
 	onEquipChanged(
 		callback: (isEquipped: boolean) => void,

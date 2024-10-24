@@ -2,20 +2,21 @@ import { Controller, OnStart } from "@flamework/core";
 import React, { StrictMode } from "@rbxts/react";
 import { ReflexProvider } from "@rbxts/react-reflex";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
-import { SoundService, StarterGui } from "@rbxts/services";
-import Signal from "@rbxts/signal";
-import { LOCAL_PLAYER_GUI } from "client/constants";
-import { App } from "client/gui/components/app";
-import { signalContext, ToolSelectedCallback } from "client/gui/context";
+import {
+	ContextActionService,
+	SoundService,
+	StarterGui,
+} from "@rbxts/services";
+import { LOCAL_PLAYER_GUI } from "client/configs/constants";
 import { Events } from "client/network";
 import { store } from "client/store";
+import { selectIsBackpackOpen } from "client/store/slices/ui/selectors";
+import { App } from "client/ui/components/app";
 import { selectCurrencies } from "shared/store/slices/currencies/selectors";
 
 @Controller()
 export class GuiController implements OnStart {
 	private root = createRoot(new Instance("Folder"));
-
-	private selectedTool = new Signal<ToolSelectedCallback>();
 
 	public onStart() {
 		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Health, false);
@@ -41,15 +42,31 @@ export class GuiController implements OnStart {
 		this.root.render(
 			<StrictMode>
 				<ReflexProvider producer={store}>
-					<signalContext.Provider value={this.selectedTool}>
-						{createPortal(<App />, LOCAL_PLAYER_GUI)}
-					</signalContext.Provider>
+					{createPortal(<App />, LOCAL_PLAYER_GUI)}
 				</ReflexProvider>
 			</StrictMode>,
 		);
 	}
 
-	public onToolSelected(callback: ToolSelectedCallback): RBXScriptConnection {
-		return this.selectedTool.Connect(callback);
+	private bindToggleBackpack(): void {
+		ContextActionService.BindAction(
+			"toggle_backpack_open",
+			(_, state) => {
+				if (state !== Enum.UserInputState.Begin) {
+					return Enum.ContextActionResult.Pass;
+				}
+				const currentlyOpen = store.getState(selectIsBackpackOpen());
+				store.toggleBackpack(!currentlyOpen);
+
+				return Enum.ContextActionResult.Pass;
+			},
+			true,
+			Enum.KeyCode.Backquote,
+		);
+	}
+
+	private bindHotbarSlot(slot: number): void {
+		// get key associated with slot
+		// bind an action to that key which will equip/unequip whatever is at that slot
 	}
 }

@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { selectBackpackOpen } from "client/store/slices/gui/selectors";
+import { selectIsBackpackOpen } from "client/store/slices/ui/selectors";
 import { getDigit } from "shared/modules/get-digit";
 import {
 	selectHealth,
@@ -17,7 +17,7 @@ export function Stats() {
 	const stats = useSelector(selectStats());
 	const healthAmount = useSelector(selectHealth()) ?? -1;
 	const toxicity = useSelector(selectToxicity()) ?? 0;
-	const backpackOpen = useSelector(selectBackpackOpen());
+	const backpackOpen = useSelector(selectIsBackpackOpen());
 
 	return (
 		<frame

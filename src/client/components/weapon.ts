@@ -1,8 +1,8 @@
 import { Component, Components } from "@flamework/components";
-import { LOCAL_PLAYER } from "client/constants";
+import { LOCAL_PLAYER } from "client/configs/constants";
 import { Events } from "client/network";
 import { AbstractWeapon } from "shared/components/abstract-weapon";
-import { Item } from "./item";
+import { ItemClient } from "./item-client";
 import { PlayerClient } from "./player-client";
 
 @Component({
@@ -12,7 +12,7 @@ export class Weapon extends AbstractWeapon {
 	private player!: PlayerClient;
 
 	public constructor(
-		protected item: Item,
+		protected item: ItemClient,
 		private components: Components,
 	) {
 		super();

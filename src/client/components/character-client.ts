@@ -1,21 +1,37 @@
-import { Component } from "@flamework/components";
+import { Component, Components } from "@flamework/components";
+import { ConstructorRef } from "@flamework/components/out/utility";
 import { OnTick } from "@flamework/core";
-import { Workspace } from "@rbxts/services";
+import { Players, Workspace } from "@rbxts/services";
 import { BlockActivity } from "client/activities/block-activity";
 import { ChargeManaActivity } from "client/activities/charge-mana-activity";
 import { ClimbActivity } from "client/activities/climb-activity";
 import { DashActivity } from "client/activities/dash-activity";
 import { RunActivity } from "client/activities/run-activity";
+import { LOCAL_PLAYER } from "client/configs/constants";
 import { AnimationController } from "client/controllers/animation-controller";
 import { InputController } from "client/controllers/input-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
+import { store } from "client/store";
 import { AbstractCharacter } from "shared/components/abstract-character";
 import { Events } from "../network";
+import { Equippable } from "./equippable";
+import { ItemClient } from "./item-client";
 import { RagdollClient } from "./ragdoll-client";
+import { SkillClient } from "./skill-client";
 
-// manually created by the local player's Player component
-@Component()
-export class Character extends AbstractCharacter implements OnTick {
+@Component({
+	tag: AbstractCharacter.TAG,
+	predicate: (instance) =>
+		Players.GetPlayerFromCharacter(instance) === LOCAL_PLAYER.Character,
+})
+export class CharacterClient extends AbstractCharacter implements OnTick {
+	protected override inventoryFolder: Folder = this.instance.WaitForChild(
+		"Inventory",
+	) as Folder;
+	protected override skillsFolder: Folder = this.instance.WaitForChild(
+		"Skills",
+	) as Folder;
+
 	private run!: RunActivity;
 	private dash!: DashActivity;
 	private climb!: ClimbActivity;
@@ -23,6 +39,7 @@ export class Character extends AbstractCharacter implements OnTick {
 	private block!: BlockActivity;
 
 	public constructor(
+		private components: Components,
 		protected ragdoll: RagdollClient,
 		private animationController: AnimationController,
 		private keybindController: KeybindController,
@@ -70,6 +87,20 @@ export class Character extends AbstractCharacter implements OnTick {
 		);
 
 		this.trove.add(Events.character.killed.connect(() => this.onKilled()));
+
+		for (const instance of this.inventoryFolder.GetChildren()) {
+			this.retrieveEquippable(instance, ItemClient);
+		}
+		this.inventoryFolder.ChildAdded.Connect((child) =>
+			this.retrieveEquippable(child, ItemClient),
+		);
+
+		for (const instance of this.skillsFolder.GetChildren()) {
+			this.retrieveEquippable(instance, SkillClient);
+		}
+		this.skillsFolder.ChildAdded.Connect((child) => {
+			this.retrieveEquippable(child, SkillClient);
+		});
 	}
 
 	public override canAttack(): boolean {
@@ -87,6 +118,17 @@ export class Character extends AbstractCharacter implements OnTick {
 		if (!this.keybindController.isKeyDown("block")) return;
 		if (this.block.isActive()) return;
 		this.tryBlock();
+	}
+
+	// waitForComponent<Equippable>() does not work
+	private retrieveEquippable<T extends Equippable>(
+		instance: Instance,
+		componentSpecifier: ConstructorRef<T>,
+	) {
+		const equippable = this.components
+			.waitForComponent(instance, componentSpecifier)
+			.expect();
+		store.addEquippable(instance.Name, equippable);
 	}
 
 	private onKilled(): void {

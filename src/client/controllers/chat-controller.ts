@@ -1,6 +1,6 @@
 import { Controller, OnStart } from "@flamework/core";
 import { TextChatService } from "@rbxts/services";
-import { LOCAL_PLAYER } from "client/constants";
+import { LOCAL_PLAYER } from "client/configs/constants";
 import { Events } from "client/network";
 
 @Controller()

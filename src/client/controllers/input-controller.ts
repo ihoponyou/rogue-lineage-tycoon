@@ -8,7 +8,7 @@ import {
 	selectManaEnabled,
 } from "shared/store/slices/mana/selectors";
 import { OnLocalCharacterAdded } from "../../../types/lifecycles";
-import { Character } from "../components/character";
+import { CharacterClient } from "../components/character-client";
 import { InventoryController } from "./inventory-controller";
 import { KeybindController } from "./keybind-controller";
 
@@ -38,7 +38,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private blockTriggered = new Signal();
 
 	private lastForwardInputTick = 0;
-	private character?: Character;
+	private character?: CharacterClient;
 
 	public constructor(
 		private components: Components,
@@ -205,7 +205,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 
 	public onLocalCharacterAdded(character: Model): void {
 		this.components
-			.waitForComponent<Character>(character)
+			.waitForComponent<CharacterClient>(character)
 			.andThen((component) => (this.character = component));
 	}
 

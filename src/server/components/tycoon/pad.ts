@@ -5,7 +5,7 @@ import { TouchableModel } from "server/components/interactable/touchable/touchab
 import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { selectPlayer } from "server/store/selectors";
-import { ModelComponent } from "shared/components/model";
+import { UsefulModel } from "shared/components/useful-model";
 import { Hideable } from "shared/hideable";
 import { Inject } from "shared/inject";
 import { PlayerServer } from "../player-server";
@@ -37,7 +37,7 @@ export class Pad
 	@Inject
 	private components!: Components;
 
-	public constructor(private model: ModelComponent) {
+	public constructor(private model: UsefulModel) {
 		super();
 	}
 

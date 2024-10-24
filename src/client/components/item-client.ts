@@ -4,12 +4,12 @@ import { AbstractItem } from "shared/components/abstract-item";
 import { Equippable } from "./equippable";
 
 @Component({
-	tag: Item.TAG,
+	tag: ItemClient.TAG,
 	defaults: {
 		isEquipped: false,
 	},
 })
-export class Item extends AbstractItem {
+export class ItemClient extends AbstractItem {
 	public constructor(protected equippable: Equippable) {
 		super();
 	}

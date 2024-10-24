@@ -1,48 +1,55 @@
-import { Components } from "@flamework/components";
 import { Controller, OnStart } from "@flamework/core";
-import { Equippable } from "client/components/equippable";
-import { Item } from "client/components/item";
+import { ContextActionService } from "@rbxts/services";
 import { store } from "client/store";
-import {
-	selectActiveEquippable,
-	selectGui,
-} from "client/store/slices/gui/selectors";
+import { MAX_HOTBAR_SLOTS } from "shared/configs/constants";
+import { CharacterController } from "./character-controller";
+
+const SLOT_KEYS: Array<Enum.KeyCode> = [
+	Enum.KeyCode.One,
+	Enum.KeyCode.Two,
+	Enum.KeyCode.Three,
+	Enum.KeyCode.Four,
+	Enum.KeyCode.Five,
+	Enum.KeyCode.Six,
+	Enum.KeyCode.Seven,
+	Enum.KeyCode.Eight,
+	Enum.KeyCode.Nine,
+	Enum.KeyCode.Zero,
+	Enum.KeyCode.Minus,
+	Enum.KeyCode.Equals,
+];
 
 @Controller()
 export class InventoryController implements OnStart {
-	private selectedEquippable?: Equippable;
+	constructor(private characterController: CharacterController) {}
 
-	public constructor(private components: Components) {}
+	onStart(): void {
+		for (let i = 0; i < MAX_HOTBAR_SLOTS; i++) {
+			ContextActionService.BindAction(
+				`switch_slot_${i}`,
+				(_, inputState) => {
+					if (inputState !== Enum.UserInputState.Begin)
+						return Enum.ContextActionResult.Pass;
+					const character = this.characterController.getCharacter();
+					if (character === undefined)
+						return Enum.ContextActionResult.Pass;
 
-	public onStart(): void {
-		store.subscribe(selectActiveEquippable(), (tool) => {
-			print(tool?.instance.Name);
-			this.switchEquippable(tool);
-		});
-	}
+					const state = store.getState();
+					const equippableIdAtSlot = state.hotbar[i];
+					if (equippableIdAtSlot === "")
+						return Enum.ContextActionResult.Pass;
 
-	public equipEquippableAtSlot(slot: number) {
-		const guiState = store.getState(selectGui());
-		const toolAtSlot = guiState.hotbar.get(slot);
-		if (toolAtSlot === undefined) return;
-		this.switchEquippable(toolAtSlot);
-	}
-
-	public dropSelectedItem(): void {
-		if (this.selectedEquippable === undefined) return;
-		const item = this.components.getComponent<Item>(
-			this.selectedEquippable.instance,
-		);
-		item?.drop();
-	}
-
-	private switchEquippable(equippable?: Equippable) {
-		this.selectedEquippable?.unequip();
-		if (equippable === undefined) {
-			this.selectedEquippable = undefined;
-			return;
+					const equippable =
+						state.equippables.get(equippableIdAtSlot);
+					if (equippable?.isEquipped()) {
+						equippable.unequip(character);
+					} else {
+						equippable?.equip(character);
+					}
+				},
+				false,
+				SLOT_KEYS[i],
+			);
 		}
-		equippable.equip();
-		this.selectedEquippable = equippable;
 	}
 }

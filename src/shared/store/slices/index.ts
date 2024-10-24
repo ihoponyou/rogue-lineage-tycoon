@@ -1,6 +1,7 @@
 import { classesSlice } from "./classes";
 import { conditionsSlice } from "./conditions";
 import { currenciesSlice } from "./currencies";
+import { hotbarSlice } from "./hotbar";
 import { identitySlice } from "./identity";
 import { inventorySlice } from "./inventory";
 import { manaSlice } from "./mana";
@@ -20,4 +21,5 @@ export = {
 	inventory: inventorySlice,
 	skills: skillsSlice,
 	classes: classesSlice,
+	hotbar: hotbarSlice,
 };

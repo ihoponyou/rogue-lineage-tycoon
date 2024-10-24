@@ -1,5 +1,5 @@
 import { Component } from "@flamework/components";
-import { ModelComponent } from "shared/components/model";
+import { UsefulModel } from "shared/components/useful-model";
 import { UnlockEffect } from ".";
 import { Unlockable } from "../unlockable";
 
@@ -9,7 +9,7 @@ import { Unlockable } from "../unlockable";
 export class ShowOnUnlock extends UnlockEffect {
 	public constructor(
 		unlockable: Unlockable,
-		private model: ModelComponent,
+		private model: UsefulModel,
 	) {
 		super(unlockable);
 	}

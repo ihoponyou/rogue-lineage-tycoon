@@ -2,7 +2,7 @@ import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { store } from "server/store";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { ModelComponent } from "shared/components/model";
+import { UsefulModel } from "shared/components/useful-model";
 import { Inject } from "shared/inject";
 import { Currency } from "../../../../types/currency";
 import { Clickable } from "../interactable/clickable";
@@ -32,7 +32,7 @@ export class Plot
 	};
 	private owner?: PlayerServer;
 	private teller!: Clickable;
-	private assets = new Map<string, ModelComponent>();
+	private assets = new Map<string, UsefulModel>();
 
 	@Inject
 	private components!: Components;
@@ -45,8 +45,7 @@ export class Plot
 		this.teller.onInteracted((player) => this.onTellerInteracted(player));
 
 		this.instance.Assets.GetChildren().forEach((instance) => {
-			const model =
-				this.components.getComponent<ModelComponent>(instance);
+			const model = this.components.getComponent<UsefulModel>(instance);
 			if (model === undefined) return;
 			this.assets.set(instance.Name, model);
 			if (instance.HasTag("HideOnUnlock")) return;

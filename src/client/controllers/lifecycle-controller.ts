@@ -1,6 +1,6 @@
 import { Components } from "@flamework/components";
 import { Controller, Modding, OnStart } from "@flamework/core";
-import { LOCAL_PLAYER } from "client/constants";
+import { LOCAL_PLAYER } from "client/configs/constants";
 import { Inject } from "shared/inject";
 import {
 	OnLocalCharacterAdded,

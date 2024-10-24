@@ -1,11 +1,11 @@
 import { RunService } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
-import { Character } from "client/components/character";
+import { CharacterClient } from "client/components/character-client";
 import { AnimationController } from "client/controllers/animation-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
 import { Events } from "client/network";
 import { store } from "client/store";
-import { selectActiveEquippable } from "client/store/slices/gui/selectors";
+import { selectActiveEquippable } from "client/store/slices/ui/selectors";
 import { BLOCK_WALK_SPEED } from "shared/configs";
 import { WeaponConfig, getWeaponConfig } from "shared/configs/weapons";
 import { CharacterActivity } from "./character-activity";
@@ -15,7 +15,7 @@ export class BlockActivity extends CharacterActivity {
 	private trove = new Trove();
 
 	public constructor(
-		character: Character,
+		character: CharacterClient,
 		private animationController: AnimationController,
 		private keybindController: KeybindController,
 	) {
