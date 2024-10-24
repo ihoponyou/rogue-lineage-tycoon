@@ -1,4 +1,5 @@
 import { ReplicatedStorage } from "@rbxts/services";
+import { AbstractWeapon } from "shared/components/abstract-weapon";
 
 export type BodyPart = "Right Arm" | "Torso" | "Right Leg";
 
@@ -7,7 +8,8 @@ export enum ItemId {
 	BRONZE_SWORD = "Bronze Sword",
 }
 
-interface ItemConfig {
+export interface ItemConfig {
+	readonly tags: ReadonlyArray<string>;
 	readonly droppable: boolean;
 	readonly maxQuantity: number;
 	readonly worldModel: Model;
@@ -33,6 +35,7 @@ const SWORD_HOLSTER_C0 = new CFrame(0, 0, 0.552).mul(
 
 export const ITEMS: { [name: string]: ItemConfig } = {
 	Goblet: {
+		tags: [],
 		droppable: true,
 		maxQuantity: 99,
 		worldModel: ReplicatedStorage.Assets.Tycoon.Products.Goblet,
@@ -41,6 +44,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		holsterLimb: "Right Arm",
 	},
 	"Bronze Sword": {
+		tags: [AbstractWeapon.TAG],
 		droppable: false,
 		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Sword"],
@@ -51,6 +55,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		holsterC0: SWORD_HOLSTER_C0,
 	},
 	"Bronze Spear": {
+		tags: [AbstractWeapon.TAG],
 		droppable: false,
 		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Spear"],
@@ -64,6 +69,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		idleAnimation: ReplicatedStorage.Assets.Animations.Combat.SpearIdle,
 	},
 	"Bronze Dagger": {
+		tags: [AbstractWeapon.TAG],
 		droppable: false,
 		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Dagger"],
@@ -75,6 +81,7 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		holsterLimb: "Torso",
 	},
 	test_tool: {
+		tags: [],
 		droppable: false,
 		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.test_tool,

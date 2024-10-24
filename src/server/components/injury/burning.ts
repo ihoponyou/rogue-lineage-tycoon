@@ -3,7 +3,7 @@ import { OnStart } from "@flamework/core";
 import { Players, TweenService } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { Character } from "../character";
+import { CharacterServer } from "../character-server";
 
 const HEAT_AMOUNT = 1.5;
 const BURN_DAMAGE = 6;
@@ -16,7 +16,7 @@ const TICKS_TO_DIE = 8;
 export class Burning extends DisposableComponent<{}, Model> implements OnStart {
 	private killTicks = 0;
 
-	public constructor(private character: Character) {
+	public constructor(private character: CharacterServer) {
 		super();
 	}
 

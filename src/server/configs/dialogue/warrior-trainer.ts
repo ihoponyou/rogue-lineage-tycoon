@@ -7,7 +7,8 @@ export = {
 			{
 				label: "indeed.",
 				onClick: (dialogue, player) => {
-					player.teach("Pommel Strike");
+					error("fix me");
+					// player.teach("Pommel Strike");
 					dialogue.close(player.instance);
 				},
 			},

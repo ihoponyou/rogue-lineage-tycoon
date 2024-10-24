@@ -5,35 +5,32 @@ import { Profile } from "@rbxts/profileservice/globals";
 import { RunService } from "@rbxts/services";
 import { PlayerServer } from "server/components/player-server";
 import { store } from "server/store";
-import {
-	selectPlayerCurrencies,
-	selectPlayerData,
-} from "server/store/selectors";
+import { selectPlayer, selectPlayerCurrencies } from "server/store/selectors";
 import { Inject } from "shared/inject";
 import { onThisPlayerRemoving } from "shared/modules/on-player-removing";
 import {
-	DEFAULT_PLAYER_DATA,
-	PlayerData,
-} from "shared/store/slices/player-data";
+	DEFAULT_PLAYER_PROFILE_DATA,
+	PlayerProfileData,
+} from "shared/modules/player-data";
 import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 
 const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Testing" : "Production";
 const PROFILE_KEY_TEMPLATE = "Player%d";
 const WIPE_DATA_ON_JOIN = false;
 
-type PlayerProfile = Profile<PlayerData>;
+type PlayerProfile = Profile<PlayerProfileData>;
 
 @Service()
 export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 	private profiles = new Map<number, PlayerProfile>();
 	private profileStore = GetProfileStore(
 		PROFILE_STORE_INDEX,
-		DEFAULT_PLAYER_DATA,
+		DEFAULT_PLAYER_PROFILE_DATA,
 	);
 	private joinTicks = new Map<Player, number>();
 	private preReleaseListeners = new Map<
 		Player,
-		Array<(profile: Profile<PlayerData>) => void>
+		Array<(profile: PlayerProfile) => void>
 	>();
 
 	@Inject
@@ -61,7 +58,7 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 	 */
 	public connectToPreRelease(
 		player: Player,
-		listener: (profile: Profile<PlayerData>) => void,
+		listener: (profile: PlayerProfile) => void,
 	): () => void {
 		const listeners = this.preReleaseListeners.get(player);
 		if (listeners === undefined)
@@ -110,12 +107,9 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 
 		this.joinTicks.set(player, math.round(tick()));
 
-		const unsubscribe = store.subscribe(
-			selectPlayerData(player),
-			(data) => {
-				if (data) profile.Data = data;
-			},
-		);
+		const unsubscribe = store.subscribe(selectPlayer(player), (state) => {
+			if (state) profile.Data = state;
+		});
 
 		onThisPlayerRemoving(player, unsubscribe);
 	}

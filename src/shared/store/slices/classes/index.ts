@@ -1,9 +1,13 @@
 import { createProducer } from "@rbxts/reflex";
-import { PlayerData } from "../player-data";
+import { PlayerProfileData } from "shared/modules/player-data";
 
-export const classesSlice = createProducer([] as ReadonlyArray<string>, {
-	loadPlayerData: (_state, data: PlayerData) => {
-		return data.skills;
+export type ClassesState = ReadonlyArray<string>;
+
+export const DEFAULT_CLASSES_STATE: ClassesState = [];
+
+export const classesSlice = createProducer([] as ClassesState, {
+	loadPlayerData: (_state, data: PlayerProfileData) => {
+		return data.classes;
 	},
 
 	resetLineageValues: (_state) => {

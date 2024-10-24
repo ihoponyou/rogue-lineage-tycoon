@@ -2,8 +2,8 @@ import { useMotion } from "@rbxts/pretty-react-hooks";
 import React, { Binding, useContext, useEffect, useState } from "@rbxts/react";
 import { GuiService } from "@rbxts/services";
 import { SLOT_LABELS } from "client/configs/constants";
+import { singletonsContext } from "client/ui/context";
 import { Equippable } from "shared/modules/equippable";
-import { singletonContext } from "../context/singleton";
 
 export interface EquippableButtonProps {
 	equippable: Equippable;
@@ -44,7 +44,7 @@ function calculateMouseScreenPos(mousePosWithInset: Vector2): Vector2 {
 }
 
 export function EquippableButton(props: EquippableButtonProps) {
-	const controllers = useContext(singletonContext);
+	const controllers = useContext(singletonsContext);
 
 	const [isEquipped, setIsEquipped] = useState(props.equippable.isEquipped());
 	useEffect(() => {
@@ -54,9 +54,15 @@ export function EquippableButton(props: EquippableButtonProps) {
 
 	const theme = THEMES[isEquipped ? "equipped" : "unequipped"];
 
-	const [backgroundColor, backgroundColorMotion] = useMotion(THEMES.unequipped.backgroundColor3);
-	const [sizeOffset, sizeOffsetMotion] = useMotion(THEMES.unequipped.sizeOffset);
-	const [textTransparency, textTransparencyMotion] = useMotion(THEMES.unequipped.textTransparency);
+	const [backgroundColor, backgroundColorMotion] = useMotion(
+		THEMES.unequipped.backgroundColor3,
+	);
+	const [sizeOffset, sizeOffsetMotion] = useMotion(
+		THEMES.unequipped.sizeOffset,
+	);
+	const [textTransparency, textTransparencyMotion] = useMotion(
+		THEMES.unequipped.textTransparency,
+	);
 
 	backgroundColorMotion.tween(theme.backgroundColor3, TWEEN_OPTIONS);
 	sizeOffsetMotion.tween(theme.sizeOffset, {
@@ -73,7 +79,11 @@ export function EquippableButton(props: EquippableButtonProps) {
 			BorderSizePixel={0}
 			Font={Enum.Font.Fantasy}
 			FontFace={
-				new Font("rbxasset://fonts/families/Balthazar.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+				new Font(
+					"rbxasset://fonts/families/Balthazar.json",
+					Enum.FontWeight.Regular,
+					Enum.FontStyle.Normal,
+				)
 			}
 			LayoutOrder={props.slot ?? -1}
 			Position={props.position}
@@ -87,7 +97,11 @@ export function EquippableButton(props: EquippableButtonProps) {
 			Event={{
 				MouseButton1Down: (rbx, x, y) => {
 					if (props.onM1Down) {
-						props.onM1Down(rbx.AbsolutePosition.sub(calculateMouseScreenPos(new Vector2(x, y))));
+						props.onM1Down(
+							rbx.AbsolutePosition.sub(
+								calculateMouseScreenPos(new Vector2(x, y)),
+							),
+						);
 					} else {
 						const character = controllers.character.getCharacter();
 						if (character === undefined) {
@@ -103,7 +117,9 @@ export function EquippableButton(props: EquippableButtonProps) {
 				},
 				MouseButton1Up: (_rbx, x, y) => {
 					if (props.onM1Up) {
-						props.onM1Up(calculateMouseScreenPos(new Vector2(x, y)));
+						props.onM1Up(
+							calculateMouseScreenPos(new Vector2(x, y)),
+						);
 					}
 				},
 			}}
@@ -134,7 +150,9 @@ export function EquippableButton(props: EquippableButtonProps) {
 				}
 				Position={new UDim2(0.5, 0, 0, 0)}
 				Size={new UDim2(0, 16, 0, 12)}
-				Text={props.slot !== undefined ? SLOT_LABELS[props.slot] : "oops"}
+				Text={
+					props.slot !== undefined ? SLOT_LABELS[props.slot] : "oops"
+				}
 				TextColor3={Color3.fromRGB(47, 44, 38)}
 				TextSize={14}
 				TextYAlignment={Enum.TextYAlignment.Bottom}

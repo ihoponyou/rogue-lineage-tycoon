@@ -1,4 +1,4 @@
-import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
+import { useMotion } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 
 interface FillBarProps {
@@ -19,17 +19,10 @@ interface FillBarProps {
 // TODO: use useMotion to mimic original tween properties
 
 export function FillBar(props: FillBarProps) {
-	const [percent, setPercent] = useMotor(props.amount / props.maxAmount);
+	const [percent, percentMotion] = useMotion(props.amount / props.maxAmount);
+
 	useEffect(
-		() =>
-			setPercent(
-				new Spring(
-					props.amount / props.maxAmount,
-					props.springFrequency !== undefined
-						? { frequency: props.springFrequency }
-						: undefined,
-				),
-			),
+		() => percentMotion.tween(props.amount / props.maxAmount),
 		[props.amount],
 	);
 

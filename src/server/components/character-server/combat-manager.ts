@@ -5,7 +5,7 @@ import { HitService } from "server/services/hit-service";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { getWeaponConfig, WeaponConfig } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
-import { Character } from ".";
+import { CharacterServer } from ".";
 import { AttackData } from "../../../../types/AttackData";
 
 const COMBO_RESET_DELAY = 2;
@@ -24,7 +24,7 @@ export class CombatManager
 	private walkSpeedReset?: thread;
 
 	public constructor(
-		private character: Character,
+		private character: CharacterServer,
 		private hitService: HitService,
 	) {
 		super();
@@ -83,8 +83,9 @@ export class CombatManager
 
 		this.character.attributes.isAttacking = true;
 
-		const weaponConfig =
-			this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
+		error("fix me");
+		const weaponConfig = FISTS_CONFIG;
+		// this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
 
 		Events.character.stopRun(this.character.getPlayer());
 
@@ -184,8 +185,9 @@ export class CombatManager
 
 		this.character.attributes.isAttacking = true;
 
-		const weaponConfig =
-			this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
+		error("fix me");
+		const weaponConfig = FISTS_CONFIG;
+		// this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
 
 		Events.character.stopRun(this.character.getPlayer());
 

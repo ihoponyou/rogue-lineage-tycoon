@@ -3,7 +3,7 @@ import { Dependency, OnStart, OnTick } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
 import { store } from "server/store";
 import { OnCharacterAdded } from "../../../../types/lifecycles";
-import { Character } from "../character";
+import { CharacterServer } from "../character-server";
 
 interface Attributes {
 	temperature: number;
@@ -48,12 +48,11 @@ export class Climate
 			processedPlayers.push(player);
 
 			const characterComponent =
-				this.components.getComponent<Character>(character);
+				this.components.getComponent<CharacterServer>(character);
 			if (!characterComponent) continue;
 
-			const characterTemperature = store
-				.getState()
-				.get(tostring(player.UserId))?.resources.temperature;
+			const characterTemperature = store.getState().get(player)
+				?.resources.temperature;
 			if (characterTemperature === undefined) continue;
 			const climateTemperature = this.attributes.temperature;
 

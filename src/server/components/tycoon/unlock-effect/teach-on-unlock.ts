@@ -27,6 +27,7 @@ export class TeachOnUnlock extends UnlockEffect {
 		const playerServer = this.components
 			.waitForComponent<PlayerServer>(player)
 			.expect();
-		playerServer.teach(this.instance.Name);
+		error("fix me");
+		// playerServer.teach(this.instance.Name);
 	}
 }

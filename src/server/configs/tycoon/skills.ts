@@ -1,9 +1,3 @@
-import { Components } from "@flamework/components";
-import { Dependency } from "@flamework/core";
-import { Equippable } from "server/components/equippable";
-import { Ownable } from "server/components/ownable";
-import { PlayerServer } from "server/components/player-server";
-import { UseableServer } from "server/components/useable-server";
 import { store } from "server/store";
 
 interface SkillConfig {
@@ -47,27 +41,6 @@ export const SKILLS: { [name: string]: SkillConfig } = {
 	["Pommel Strike"]: {
 		teach: (player) => {
 			print(`${player.Name} learned Pommel Strike!`);
-
-			const tool = new Instance("Tool");
-			tool.Name = "test_tool";
-			tool.Parent = player;
-
-			tool.AddTag(Equippable.TAG);
-			tool.AddTag(Ownable.TAG);
-			tool.AddTag(UseableServer.TAG);
-
-			const components = Dependency<Components>();
-
-			const ownable = components.waitForComponent<Ownable>(tool).expect();
-			const playerServer = components
-				.waitForComponent<PlayerServer>(player)
-				.expect();
-
-			ownable.setOwner(playerServer);
-
-			print(tool, "was here");
-
-			store.addSkill(player, "Pommel Strike");
 		},
 	},
 };

@@ -5,16 +5,15 @@ import { createPortal } from "@rbxts/react-roblox";
 import { GuiService, RunService, UserInputService } from "@rbxts/services";
 import { LOCAL_PLAYER_GUI } from "client/configs/constants";
 import { Events } from "client/network";
-import { appRefContext } from "client/ui/context/app-ref";
+import { appRefContext, singletonsContext } from "client/ui/context";
+import { ItemId } from "shared/configs/items";
 import { EquippableId } from "shared/modules/equippable";
-import { ItemId } from "shared/modules/item-id";
 import { selectHotbar } from "shared/store/slices/hotbar/selectors";
-import { singletonContext } from "../context/singleton";
 import { EquippableButton, EquippableButtonProps } from "./equippable-button";
 
 export function DraggableEquippableButton(props: EquippableButtonProps) {
 	const appRef = useContext(appRefContext);
-	const controllers = useContext(singletonContext);
+	const singletons = useContext(singletonsContext);
 
 	const hotbar = useSelector(selectHotbar());
 	const inHotbar = hotbar.includes(props.equippableName as ItemId);
@@ -28,7 +27,10 @@ export function DraggableEquippableButton(props: EquippableButtonProps) {
 		const inset = GuiService.GetGuiInset()[0];
 		const mousePos = UserInputService.GetMouseLocation().sub(inset);
 		setPosition(
-			UDim2.fromOffset(mousePos.X + cursorOffset.X + inset.X + 30, mousePos.Y + cursorOffset.Y + inset.Y),
+			UDim2.fromOffset(
+				mousePos.X + cursorOffset.X + inset.X + 30,
+				mousePos.Y + cursorOffset.Y + inset.Y,
+			),
 		);
 	});
 
@@ -40,20 +42,36 @@ export function DraggableEquippableButton(props: EquippableButtonProps) {
 					onM1Up: (mousePos) => {
 						setDragging(false);
 
-						const hoveredObjects = LOCAL_PLAYER_GUI.GetGuiObjectsAtPosition(mousePos.X, mousePos.Y);
-						const index = hoveredObjects.findIndex((object) => object.Name === "EmptySlot");
+						const hoveredObjects =
+							LOCAL_PLAYER_GUI.GetGuiObjectsAtPosition(
+								mousePos.X,
+								mousePos.Y,
+							);
+						const index = hoveredObjects.findIndex(
+							(object) => object.Name === "EmptySlot",
+						);
 						const emptySlot = hoveredObjects[index];
 						let transferredFromBackpack = false;
 						if (emptySlot === undefined) {
 							transferredFromBackpack = inHotbar;
-							Events.removeFromHotbar(props.equippableName as EquippableId);
+							Events.item.removeFromHotbar(
+								props.equippableName as EquippableId,
+							);
 						} else {
-							transferredFromBackpack = !inHotbar || emptySlot.LayoutOrder !== props.slot;
-							Events.addToHotbar(props.equippableName as EquippableId, emptySlot.LayoutOrder);
+							transferredFromBackpack =
+								!inHotbar ||
+								emptySlot.LayoutOrder !== props.slot;
+							Events.item.addToHotbar(
+								props.equippableName as EquippableId,
+								emptySlot.LayoutOrder,
+							);
 						}
 
-						const character = controllers.character.getCharacter();
-						if (!transferredFromBackpack && character !== undefined) {
+						const character = singletons.character.getCharacter();
+						if (
+							!transferredFromBackpack &&
+							character !== undefined
+						) {
 							if (props.equippable.isEquipped()) {
 								props.equippable.unequip(character);
 							} else {
@@ -63,7 +81,7 @@ export function DraggableEquippableButton(props: EquippableButtonProps) {
 					},
 				}),
 				appRef.current,
-		  )
+			)
 		: EquippableButton({
 				...props,
 				position: props.position,
@@ -71,5 +89,5 @@ export function DraggableEquippableButton(props: EquippableButtonProps) {
 					setDragging(true);
 					setCursorOffset(cursorOffset);
 				},
-		  });
+			});
 }

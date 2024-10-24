@@ -1,34 +1,39 @@
 import {
-	InferState,
-	ProducerMiddleware,
 	combineProducers,
 	createBroadcaster,
+	InferState,
+	ProducerMiddleware,
 } from "@rbxts/reflex";
 import { Events } from "server/network";
+import { withMultiplayer } from "server/store/with-multiplayer";
+import { DEFAULT_PLAYER_PROFILE_DATA } from "shared/modules/player-data";
 import slices from "shared/store/slices";
-import { addMultiplayer } from "./add-multiplayer";
+import { selectPlayer } from "./selectors";
 
-export type RootState = InferState<typeof store>;
+const SECONDS_BETWEEN_HYDRATES = 60 * 5;
 
 function broadcasterMiddleware(): ProducerMiddleware {
 	const broadcaster = createBroadcaster({
-		producers: slices,
+		producers: {
+			...slices,
+		},
 		beforeDispatch: (player, action) => {
+			if (action.name === "removePlayer") return;
 			if (action.arguments[0] !== player) return;
-			(action.arguments as defined[]).remove(0);
+			(action.arguments as defined[]).shift();
 			return action;
 		},
 		dispatch: (player, actions) => {
 			Events.reflex.dispatch(player, actions);
 		},
 		hydrate: (player, _state) => {
-			// const state = store.getState().get(tostring(player.UserId));
-			// if (state === undefined)
-			// 	error(
-			// 		`hydration aborted: state does not contain ${player}'s data`,
-			// 	);
-			// Events.reflex.hydrate(player, state);
+			const playerState = store.getState(selectPlayer(player));
+			Events.reflex.hydrate(
+				player,
+				playerState ?? DEFAULT_PLAYER_PROFILE_DATA,
+			);
 		},
+		hydrateRate: SECONDS_BETWEEN_HYDRATES,
 	});
 
 	Events.reflex.start.connect((player) => {
@@ -41,5 +46,7 @@ function broadcasterMiddleware(): ProducerMiddleware {
 export const store = combineProducers({
 	...slices,
 })
-	.enhance(addMultiplayer)
+	.enhance(withMultiplayer)
 	.applyMiddleware(broadcasterMiddleware());
+
+export type RootServerState = InferState<typeof store>;

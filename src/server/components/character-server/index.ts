@@ -13,15 +13,20 @@ import {
 	selectPlayerTransform,
 } from "server/store/selectors";
 import { AbstractCharacter } from "shared/components/abstract-character";
-import { AbstractWeapon } from "shared/components/abstract-weapon";
+import { ItemId } from "shared/configs/items";
+import { SkillId } from "shared/configs/skills";
+import { WeaponType } from "shared/configs/weapons";
 import { ANIMATIONS } from "shared/constants";
 import { AnimationManager } from "shared/modules/animation-manager";
+import { Equippable } from "shared/modules/equippable";
 import {
 	deserializeVector3,
 	serializeVector3,
 } from "shared/modules/serialized-vector3";
-import { Item } from "../item";
+import { ItemServer } from "../item-server";
 import { PlayerServer } from "../player-server";
+import { SkillServer } from "../skill-server";
+import { Weapon } from "../weapon";
 import { RagdollServer } from "./ragdoll-server";
 
 const FF_DURATION = 15;
@@ -46,10 +51,22 @@ const EVENTS = Events.character;
 		heavyAttackDebounce: false,
 	},
 })
-export class Character extends AbstractCharacter implements OnTick {
-	private heldItem?: Item;
+export class CharacterServer extends AbstractCharacter implements OnTick {
+	protected inventoryFolder = this.newFolder("Inventory");
+	protected skillsFolder = this.newFolder("Skills");
+
 	private animationManager!: AnimationManager;
-	private hiltPart!: Part;
+
+	private hiltJoint = this.newHiltJoint();
+	private hiltBone = this.newHiltBone();
+	private weapons: Record<WeaponType, Weapon | undefined> = {
+		[WeaponType.Fists]: undefined,
+		[WeaponType.Dagger]: undefined,
+		[WeaponType.Spear]: undefined,
+		[WeaponType.Sword]: undefined,
+	};
+
+	private currentlyEquipped?: Equippable;
 
 	public constructor(
 		protected ragdoll: RagdollServer,
@@ -99,8 +116,6 @@ export class Character extends AbstractCharacter implements OnTick {
 					.loadCharacter();
 			},
 		);
-
-		this.hiltPart = this.instance.WaitForChild("Hilt") as Part;
 	}
 
 	public onTick(dt: number): void {
@@ -242,7 +257,7 @@ export class Character extends AbstractCharacter implements OnTick {
 		this.humanoid.TakeDamage(math.min(this.humanoid.Health, amount));
 	}
 
-	public isBehind(character: Character): boolean {
+	public isBehind(character: CharacterServer): boolean {
 		const position = this.instance.GetPivot().Position;
 		const theirCFrame = character.instance.GetPivot();
 		const toThem = theirCFrame.Position.sub(position);
@@ -250,22 +265,52 @@ export class Character extends AbstractCharacter implements OnTick {
 		return dot > 0;
 	}
 
-	public setHeldItem(item?: Item): void {
-		this.heldItem = item;
+	hasItem(itemName: string): boolean {
+		return this.getItem(itemName) !== undefined;
 	}
 
-	public getHeldItem(): Item | undefined {
-		return this.heldItem;
+	getItem(itemName: string): ItemServer | undefined {
+		const instance = this.inventoryFolder.FindFirstChild(itemName);
+		if (instance === undefined) return undefined;
+		const item = this.components.getComponent<ItemServer>(instance);
+		return item;
 	}
 
-	public getHeldWeapon(): AbstractWeapon | undefined {
-		const heldItem = this.getHeldItem();
-		if (heldItem !== undefined) {
-			return this.components.getComponents<AbstractWeapon>(
-				heldItem.instance,
-			)[0];
-		}
-		return;
+	getHiltBone(): Part {
+		return this.hiltBone;
+	}
+
+	getWeaponOfType(weaponType: WeaponType): Weapon | undefined {
+		return this.weapons[weaponType];
+	}
+
+	learnSkill(id: SkillId): void {
+		SkillServer.instantiate(id, this.skillsFolder, this);
+	}
+
+	giveItem(id: ItemId, quantity: number = 1): void {
+		ItemServer.instantiate(
+			id,
+			quantity,
+			this.inventoryFolder,
+			this,
+		).andThen((item) => {
+			// holster
+			item.unequip(this);
+
+			if (!item.instance.HasTag(Weapon.TAG)) return;
+			this.components
+				.waitForComponent<Weapon>(item.instance)
+				.andThen((weapon) => this.cacheWeapon(weapon));
+		});
+	}
+
+	getCurrentEquipped(): Equippable | undefined {
+		return this.currentlyEquipped;
+	}
+
+	setCurrentEquipped(equippable?: Equippable): void {
+		this.currentlyEquipped = equippable;
 	}
 
 	public loadAnimations(animationFolder: Folder) {
@@ -303,20 +348,41 @@ export class Character extends AbstractCharacter implements OnTick {
 		this.ragdoll.toggle(on);
 	}
 
-	public holdItem(item: Item): void {
-		this.setHeldItem(item);
-		item.weldTo(this.hiltPart, item.config.equipC0);
-		if (item.config.idleAnimation) {
-			this.playAnimation(item.config.idleAnimation.Name);
+	// what if the character drops the highest tier weapon
+	private cacheWeapon(weapon: Weapon) {
+		const weaponType = weapon.config.type;
+		const currentWeaponOfType = this.weapons[weaponType];
+		if (
+			currentWeaponOfType === undefined ||
+			currentWeaponOfType.config.equipPriority <
+				weapon.config.equipPriority
+		) {
+			this.weapons[weaponType] = weapon;
 		}
 	}
 
-	public holsterItem(item: Item): void {
-		const rig = promiseR6(this.instance).expect();
-		item.weldTo(rig[item.config.holsterLimb], item.config.holsterC0);
-		if (item.config.idleAnimation) {
-			this.stopAnimation(item.config.idleAnimation.Name);
-		}
+	private newHiltJoint(): Motor6D {
+		const joint = new Instance("Motor6D");
+		joint.Name = "HiltJoint";
+		joint.C0 = new CFrame(0, -1, 0);
+		return joint;
+	}
+
+	private newHiltBone(): Part {
+		const bone = new Instance("Part");
+		bone.Name = "Hilt";
+		bone.CanCollide = false;
+		bone.CanTouch = false;
+		bone.CanQuery = false;
+		bone.Massless = true;
+		bone.Transparency = 1;
+		return bone;
+	}
+
+	private newFolder(name: string): Folder {
+		const inventory = new Instance("Folder");
+		inventory.Name = name;
+		return inventory;
 	}
 
 	private onHealthChanged(health: number): void {

@@ -1,4 +1,4 @@
-import { Spring, useMotor } from "@rbxts/pretty-react-hooks";
+import { useMotion } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { selectTemperature } from "shared/store/slices/resources/selectors";
@@ -6,9 +6,9 @@ import { selectTemperature } from "shared/store/slices/resources/selectors";
 export function TemperatureBar() {
 	const currentTemperature = useSelector(selectTemperature()) ?? 0;
 
-	const [percent, setPercent] = useMotor(currentTemperature / 100);
+	const [percent, percentMotion] = useMotion(currentTemperature / 100);
 	useEffect(
-		() => setPercent(new Spring(currentTemperature / 100)),
+		() => percentMotion.tween(currentTemperature / 100),
 		[currentTemperature],
 	);
 

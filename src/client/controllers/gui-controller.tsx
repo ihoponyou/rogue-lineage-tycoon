@@ -1,3 +1,4 @@
+import { Components } from "@flamework/components";
 import { Controller, OnStart } from "@flamework/core";
 import React, { StrictMode } from "@rbxts/react";
 import { ReflexProvider } from "@rbxts/react-reflex";
@@ -12,11 +13,18 @@ import { Events } from "client/network";
 import { store } from "client/store";
 import { selectIsBackpackOpen } from "client/store/slices/ui/selectors";
 import { App } from "client/ui/components/app";
+import { singletonsContext } from "client/ui/context";
 import { selectCurrencies } from "shared/store/slices/currencies/selectors";
+import { CharacterController } from "./character-controller";
 
 @Controller()
 export class GuiController implements OnStart {
 	private root = createRoot(new Instance("Folder"));
+
+	constructor(
+		private components: Components,
+		private characterController: CharacterController,
+	) {}
 
 	public onStart() {
 		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Health, false);
@@ -41,11 +49,19 @@ export class GuiController implements OnStart {
 		});
 		this.root.render(
 			<StrictMode>
+				<singletonsContext.Provider
+					value={{
+						character: this.characterController,
+						components: this.components,
+					}}
+				></singletonsContext.Provider>
 				<ReflexProvider producer={store}>
 					{createPortal(<App />, LOCAL_PLAYER_GUI)}
 				</ReflexProvider>
 			</StrictMode>,
 		);
+
+		this.bindToggleBackpack();
 	}
 
 	private bindToggleBackpack(): void {
@@ -56,7 +72,7 @@ export class GuiController implements OnStart {
 					return Enum.ContextActionResult.Pass;
 				}
 				const currentlyOpen = store.getState(selectIsBackpackOpen());
-				store.toggleBackpack(!currentlyOpen);
+				store.toggleBackpackOpen(!currentlyOpen);
 
 				return Enum.ContextActionResult.Pass;
 			},

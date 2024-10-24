@@ -6,7 +6,7 @@ import { IdentityService } from "server/services/identity-service";
 import { store } from "server/store";
 import { selectPlayerResources } from "server/store/selectors";
 import { BaseInjury } from ".";
-import { Character } from "../character";
+import { CharacterServer } from "../character-server";
 
 const UPPER_TEMPERATURE_THRESHOLD = 5;
 const DEATH_MESSAGE_TEMPLATE = "{Character} froze to death innit";
@@ -19,7 +19,7 @@ export class Frostbite extends BaseInjury implements OnStart, OnTick {
 	public readonly name = "Frostbite";
 
 	public constructor(
-		character: Character,
+		character: CharacterServer,
 		private logger: Logger,
 		private identityService: IdentityService,
 	) {

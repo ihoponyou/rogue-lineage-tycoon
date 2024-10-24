@@ -4,10 +4,8 @@ import { CharacterClient } from "client/components/character-client";
 import { AnimationController } from "client/controllers/animation-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
 import { Events } from "client/network";
-import { store } from "client/store";
-import { selectActiveEquippable } from "client/store/slices/ui/selectors";
 import { BLOCK_WALK_SPEED } from "shared/configs";
-import { WeaponConfig, getWeaponConfig } from "shared/configs/weapons";
+import { WeaponConfig } from "shared/configs/weapons";
 import { CharacterActivity } from "./character-activity";
 
 export class BlockActivity extends CharacterActivity {
@@ -25,11 +23,12 @@ export class BlockActivity extends CharacterActivity {
 	public override start(): void {
 		super.start();
 
-		const equippedTool = store.getState(selectActiveEquippable());
+		const equippedTool = undefined; //store.getState(selectActiveEquippable());
 		let config: WeaponConfig | undefined;
 		if (equippedTool !== undefined) {
 			try {
-				config = getWeaponConfig(equippedTool?.Name);
+				warn("fix me");
+				// config = getWeaponConfig(equippedTool?.Name);
 			} catch (e) {
 				// oops!
 			}

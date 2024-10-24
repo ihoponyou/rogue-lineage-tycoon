@@ -5,5 +5,5 @@ export function selectGui() {
 }
 
 export function selectIsBackpackOpen() {
-	return (state: RootClientState) => state.ui.backpackOpen;
+	return (state: RootClientState) => state.ui.isBackpackOpen;
 }

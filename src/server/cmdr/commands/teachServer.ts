@@ -8,5 +8,6 @@ export = function (context: CommandContext, player: Player, skillName: string) {
 	const playerServer = components.getComponent<PlayerServer>(player);
 	if (playerServer === undefined)
 		return `Could not get PlayerServer on ${player}`;
-	playerServer.teach(skillName);
+	return "not implemented";
+	// playerServer.teach(skillName);
 };

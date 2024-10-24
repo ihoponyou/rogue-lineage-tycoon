@@ -1,5 +1,5 @@
+import { useMotion } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useState } from "@rbxts/react";
-import { useMotion } from "client/gui/hooks/use-motion";
 
 // const ROLLER_TWEEN_INFO = new TweenInfo(0.15);
 

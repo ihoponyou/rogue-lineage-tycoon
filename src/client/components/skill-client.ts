@@ -19,11 +19,11 @@ export class SkillClient extends AbstractSkill implements OnStart {
 	}
 
 	override equip(): void {
-		Events.item.equip.fire(this.instance);
+		Events.item.equip.fire(this.instance, true);
 	}
 
 	override unequip(): void {
-		Events.item.unequip.fire(this.instance);
+		Events.item.equip.fire(this.instance, false);
 	}
 
 	override use(): void {

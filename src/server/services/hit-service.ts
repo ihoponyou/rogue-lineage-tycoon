@@ -1,7 +1,7 @@
 import { Components } from "@flamework/components";
 import { Service } from "@flamework/core";
 import { Debris } from "@rbxts/services";
-import { Character } from "server/components/character";
+import { CharacterServer } from "server/components/character-server";
 import { Events } from "server/network";
 import { WeaponConfig } from "shared/configs/weapons";
 import { AttackData } from "../../../types/AttackData";
@@ -11,13 +11,14 @@ export class HitService {
 	public constructor(private components: Components) {}
 
 	public registerHit(
-		hitter: Character,
+		hitter: CharacterServer,
 		victimInstance: Model,
 		weaponConfig: WeaponConfig,
 		attackData: AttackData,
 	): void {
 		if (hitter === undefined) return;
-		const victim = this.components.getComponent<Character>(victimInstance);
+		const victim =
+			this.components.getComponent<CharacterServer>(victimInstance);
 		if (victim === undefined) return;
 		if (!this.canHit(hitter, victim)) return;
 
@@ -74,7 +75,7 @@ export class HitService {
 		}
 	}
 
-	private canHit(hitter: Character, victim: Character): boolean {
+	private canHit(hitter: CharacterServer, victim: CharacterServer): boolean {
 		const bothAlive =
 			hitter.attributes.isAlive && victim.attributes.isAlive;
 		const neitherKnocked = !(
@@ -89,8 +90,8 @@ export class HitService {
 	}
 
 	private doKnockback(
-		hitter: Character,
-		victim: Character,
+		hitter: CharacterServer,
+		victim: CharacterServer,
 		force: number,
 		duration: number,
 	): void {

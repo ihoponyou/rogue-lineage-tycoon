@@ -3,7 +3,7 @@ import { OnStart } from "@flamework/core";
 import { Workspace } from "@rbxts/services";
 import { ANIMATIONS, SFX, VFX } from "shared/constants";
 import { Inject } from "shared/inject";
-import { Character } from ".";
+import { CharacterServer } from ".";
 import { KeyInteractable } from "../interactable/key-interactable";
 import { RagdollServer } from "./ragdoll-server";
 
@@ -30,7 +30,7 @@ export class Grippable
 	private components!: Components;
 
 	public constructor(
-		private character: Character,
+		private character: CharacterServer,
 		private ragdoll: RagdollServer,
 	) {
 		super();
@@ -50,9 +50,8 @@ export class Grippable
 
 	public override interact(player: Player): void {
 		if (!player.Character) return;
-		const characterComponent = this.components.getComponent<Character>(
-			player.Character,
-		);
+		const characterComponent =
+			this.components.getComponent<CharacterServer>(player.Character);
 		if (!characterComponent) return;
 		// print(this.attributes.gettingGripped);
 		this.attributes.gettingGripped
@@ -60,7 +59,7 @@ export class Grippable
 			: this.grip(characterComponent);
 	}
 
-	public grip(gripper: Character): void {
+	public grip(gripper: CharacterServer): void {
 		const floorCheck = Workspace.Raycast(
 			this.character.getHumanoidRootPart().Position,
 			Vector3.yAxis.mul(-4),
@@ -142,7 +141,7 @@ export class Grippable
 		this.snapToGround(floorCheck, gripper, this.character);
 	}
 
-	public release(gripper: Character): void {
+	public release(gripper: CharacterServer): void {
 		this.attributes.gettingGripped = false;
 
 		this.gripTrove.clean();
@@ -156,8 +155,8 @@ export class Grippable
 
 	private snapToGround(
 		floorCheck: RaycastResult,
-		gripper: Character,
-		grippee: Character,
+		gripper: CharacterServer,
+		grippee: CharacterServer,
 	) {
 		const gripperRootPart = gripper.getHumanoidRootPart();
 		const grippeeRootPart = grippee.getHumanoidRootPart();

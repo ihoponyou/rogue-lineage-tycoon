@@ -1,4 +1,58 @@
 interface ReplicatedStorage extends Instance {
+	WorldModels: Folder & {
+		Goblet: Model & {
+			Goblet: MeshPart & {
+				Attachment: Attachment & {
+					ParticleEmitter: ParticleEmitter;
+				};
+				Mesh: SpecialMesh;
+				ParticleEmitter: ParticleEmitter;
+			};
+		};
+		["Steel Sword"]: Model & {
+			["Steel Sword"]: MeshPart & {
+				Stats: Folder & {
+					Speed: NumberValue;
+					Length: IntValue;
+					Damage: NumberValue;
+				};
+				TestTrail: Trail;
+				PropWeld: Weld;
+				Sword: Folder;
+				Prop: Folder;
+				Weld: Weld;
+				Hit1: ParticleEmitter;
+				Attachment2: Attachment;
+				Attachment1: Attachment;
+			};
+		};
+		["Bronze Sword"]: Model & {
+			["Bronze Sword"]: MeshPart & {
+				Trail: Trail;
+				Attachment2: Attachment;
+				PropWeld: Weld;
+				Weld: Weld;
+				Attachment1: Attachment;
+			};
+		};
+		["Mythril Sword"]: Model & {
+			["Mythril Sword"]: MeshPart & {
+				Stats: Folder & {
+					Speed: NumberValue;
+					Length: IntValue;
+					Damage: NumberValue;
+				};
+				TestTrail: Trail;
+				PropWeld: Weld;
+				Sword: Folder;
+				Prop: Folder;
+				Weld: Weld;
+				Hit1: ParticleEmitter;
+				Attachment2: Attachment;
+				Attachment1: Attachment;
+			};
+		};
+	};
 	Assets: Folder & {
 		Models: Folder & {
 			ParticleBack: Part & {
@@ -1597,41 +1651,26 @@ interface ReplicatedStorage extends Instance {
 			};
 			constants: ModuleScript;
 			modules: Folder & {
-				["serialized-vector3"]: ModuleScript;
+				graph: ModuleScript & {
+					node: ModuleScript;
+				};
 				["serialized-color3"]: ModuleScript;
 				["abstract-activity"]: ModuleScript;
 				["line-of-sight"]: ModuleScript;
 				["character-from-body-part"]: ModuleScript;
 				["get-digit"]: ModuleScript;
 				["on-player-removing"]: ModuleScript;
-				graph: ModuleScript & {
-					node: ModuleScript;
-				};
+				["uppercase-first-char"]: ModuleScript;
 				hitbox: ModuleScript;
 				["char-at"]: ModuleScript;
 				["state-machine"]: ModuleScript & {
 					state: ModuleScript;
 				};
+				["serialized-vector3"]: ModuleScript;
 				["animation-manager"]: ModuleScript;
-				["uppercase-first-char"]: ModuleScript;
 			};
-			hideable: ModuleScript;
 			inject: ModuleScript;
-			components: Folder & {
-				toggleable: ModuleScript;
-				["abstract-player"]: ModuleScript;
-				ragdoll: ModuleScript;
-				["disposable-component"]: ModuleScript;
-				model: ModuleScript;
-				["abstract-weapon"]: ModuleScript;
-				["abstract-character"]: ModuleScript;
-				["abstract-item"]: ModuleScript;
-			};
-			cmdr: Folder & {
-				hooks: Folder & {
-					["before-run"]: ModuleScript;
-				};
-			};
+			hideable: ModuleScript;
 			store: ModuleScript & {
 				slices: ModuleScript & {
 					inventory: ModuleScript & {
@@ -1649,12 +1688,8 @@ interface ReplicatedStorage extends Instance {
 					identity: ModuleScript & {
 						selectors: ModuleScript;
 					};
-					classes: ModuleScript & {
-						selectors: ModuleScript;
-					};
-					skills: ModuleScript & {
-						selectors: ModuleScript;
-					};
+					classes: Folder;
+					skills: Folder;
 					transform: ModuleScript & {
 						selectors: ModuleScript;
 					};
@@ -1666,21 +1701,53 @@ interface ReplicatedStorage extends Instance {
 					};
 					["player-data"]: ModuleScript;
 				};
-				middleware: Folder & {
-					logger: ModuleScript;
+				middleware: Folder;
+			};
+			components: Folder & {
+				toggleable: ModuleScript;
+				["abstract-player"]: ModuleScript;
+				ragdoll: ModuleScript;
+				["disposable-component"]: ModuleScript;
+				model: ModuleScript;
+				["abstract-weapon"]: ModuleScript;
+				["abstract-character"]: ModuleScript;
+				["abstract-item"]: ModuleScript;
+			};
+			cmdr: Folder & {
+				hooks: Folder & {
+					["before-run"]: ModuleScript;
 				};
 			};
 		};
 		client: Folder & {
 			network: ModuleScript;
+			configs: Folder;
+			controllers: Folder & {
+				["lifecycle-controller"]: ModuleScript;
+				["input-controller"]: ModuleScript;
+				["inventory-controller"]: ModuleScript;
+				["keybind-controller"]: ModuleScript;
+				["effect-controller"]: ModuleScript;
+				["chat-controller"]: ModuleScript;
+				["animation-controller"]: ModuleScript;
+				["gui-controller"]: ModuleScript;
+			};
+			effects: ModuleScript;
 			constants: ModuleScript;
 			activities: Folder & {
-				["climb-activity"]: ModuleScript;
+				["block-activity"]: ModuleScript;
 				["charge-mana-activity"]: ModuleScript;
 				["character-activity"]: ModuleScript;
-				["dash-activity"]: ModuleScript;
 				["run-activity"]: ModuleScript;
-				["block-activity"]: ModuleScript;
+				["dash-activity"]: ModuleScript;
+				["climb-activity"]: ModuleScript;
+			};
+			components: Folder & {
+				["player-client"]: ModuleScript;
+				item: ModuleScript;
+				character: ModuleScript;
+				["ragdoll-client"]: ModuleScript;
+				weapon: ModuleScript;
 			};
 			store: ModuleScript & {
 				slices: Folder & {
@@ -1692,24 +1759,6 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 			};
-			effects: ModuleScript;
-			controllers: Folder & {
-				["lifecycle-controller"]: ModuleScript;
-				["chat-controller"]: ModuleScript;
-				["effect-controller"]: ModuleScript;
-				["keybind-controller"]: ModuleScript;
-				["animation-controller"]: ModuleScript;
-				["inventory-controller"]: ModuleScript;
-				["input-controller"]: ModuleScript;
-				["gui-controller"]: ModuleScript;
-			};
-			components: Folder & {
-				["player-client"]: ModuleScript;
-				item: ModuleScript;
-				character: ModuleScript;
-				["ragdoll-client"]: ModuleScript;
-				weapon: ModuleScript;
-			};
 			gui: Folder & {
 				hooks: Folder & {
 					["use-motion"]: ModuleScript;
@@ -1717,27 +1766,27 @@ interface ReplicatedStorage extends Instance {
 				};
 				context: ModuleScript;
 				components: Folder & {
-					["dialogue-box"]: ModuleScript & {
-						["char-label"]: ModuleScript;
-						["dialogue-option"]: ModuleScript;
-					};
-					["name-plate"]: ModuleScript;
+					digit: ModuleScript;
 					app: ModuleScript;
+					stats: ModuleScript;
+					["name-plate"]: ModuleScript;
+					["silver-logo"]: ModuleScript;
+					inventory: Folder & {
+						["draggable-item-button"]: ModuleScript;
+						["item-button"]: ModuleScript;
+						hotbar: ModuleScript;
+						["empty-hotbar-slot"]: ModuleScript;
+						backpack: ModuleScript;
+					};
+					["dialogue-box"]: ModuleScript & {
+						["dialogue-option"]: ModuleScript;
+						["char-label"]: ModuleScript;
+					};
 					["fill-bar"]: ModuleScript & {
 						["mana-bar"]: ModuleScript;
 						["temperature-bar"]: ModuleScript;
 						["stomach-bar"]: ModuleScript;
 					};
-					["silver-logo"]: ModuleScript;
-					inventory: Folder & {
-						["draggable-item-button"]: ModuleScript;
-						backpack: ModuleScript;
-						hotbar: ModuleScript;
-						["item-button"]: ModuleScript;
-						["empty-hotbar-slot"]: ModuleScript;
-					};
-					stats: ModuleScript;
-					digit: ModuleScript;
 				};
 			};
 		};
@@ -1745,15 +1794,19 @@ interface ReplicatedStorage extends Instance {
 	rbxts_include: Folder & {
 		node_modules: Folder & {
 			["@rbxts"]: Folder & {
-				["reflex-class"]: Folder & {
-					out: ModuleScript & {
-						source: Folder & {
-							["class-producer"]: ModuleScript;
-							decorators: ModuleScript & {
-								action: ModuleScript;
-								subscribe: ModuleScript;
-							};
+				["ui-labs"]: Folder & {
+					src: ModuleScript & {
+						Controls: Folder & {
+							Utils: ModuleScript;
+							PrimitiveControls: ModuleScript;
+							ControlUtils: ModuleScript;
+							DatatypeControls: ModuleScript;
+							AdvancedControls: ModuleScript;
 						};
+						Libraries: Folder;
+						Enviroment: ModuleScript;
+						ControlTypings: Folder;
+						StoryCreators: ModuleScript;
 					};
 				};
 				log: Folder & {
@@ -1767,11 +1820,49 @@ interface ReplicatedStorage extends Instance {
 						Logger: ModuleScript;
 					};
 				};
-				profileservice: Folder & {
-					src: ModuleScript;
+				charm: ModuleScript & {
+					mapped: ModuleScript;
+					atom: ModuleScript;
+					effect: ModuleScript;
+					observe: ModuleScript;
+					utils: Folder & {
+						collect: ModuleScript;
+						count: ModuleScript;
+						setInterval: ModuleScript;
+					};
+					modules: Folder & {
+						React: ModuleScript;
+						Promise: ModuleScript;
+						ReactRoblox: ModuleScript;
+					};
+					types: ModuleScript;
+					sync: ModuleScript & {
+						validate: ModuleScript;
+						client: ModuleScript;
+						patch: ModuleScript;
+						server: ModuleScript;
+					};
+					subscribe: ModuleScript;
+					react: Folder & {
+						useAtom: ModuleScript;
+					};
+					computed: ModuleScript;
+					store: ModuleScript;
+					__tests__: Folder & {
+						react: Folder & {
+							helpers: Folder & {
+								renderHook: ModuleScript;
+							};
+						};
+						benchmarks: Folder & {
+							["atom.bench"]: ModuleScript;
+						};
+					};
 				};
 				["shared-components-flamework"]: Folder & {
-					LICENSE: StringValue;
+					node_modules: Folder & {
+						["@rbxts"]: Folder;
+					};
 					out: ModuleScript & {
 						utilities: ModuleScript;
 						remotes: ModuleScript;
@@ -1790,6 +1881,7 @@ interface ReplicatedStorage extends Instance {
 						};
 						types: ModuleScript;
 					};
+					LICENSE: StringValue;
 				};
 				["object-utils"]: ModuleScript;
 				ripple: ModuleScript & {
@@ -1856,8 +1948,8 @@ interface ReplicatedStorage extends Instance {
 						["use-update-effect"]: ModuleScript & {
 							["use-update-effect"]: ModuleScript;
 						};
-						["use-lifetime"]: ModuleScript & {
-							["use-lifetime"]: ModuleScript;
+						["use-previous"]: ModuleScript & {
+							["use-previous"]: ModuleScript;
 						};
 						["use-interval"]: ModuleScript & {
 							["use-interval"]: ModuleScript;
@@ -1892,8 +1984,8 @@ interface ReplicatedStorage extends Instance {
 						["use-latest-callback"]: ModuleScript & {
 							["use-latest-callback"]: ModuleScript;
 						};
-						["use-motor"]: ModuleScript & {
-							["use-motor"]: ModuleScript;
+						["use-event-listener"]: ModuleScript & {
+							["use-event-listener"]: ModuleScript;
 						};
 						["use-throttle-callback"]: ModuleScript & {
 							["use-throttle-callback"]: ModuleScript;
@@ -1904,8 +1996,8 @@ interface ReplicatedStorage extends Instance {
 						["use-async-effect"]: ModuleScript & {
 							["use-async-effect"]: ModuleScript;
 						};
-						["use-mount-effect"]: ModuleScript & {
-							["use-mount-effect"]: ModuleScript;
+						["use-viewport"]: ModuleScript & {
+							["use-viewport"]: ModuleScript;
 						};
 						["use-binding-listener"]: ModuleScript & {
 							["use-binding-listener"]: ModuleScript;
@@ -1913,14 +2005,14 @@ interface ReplicatedStorage extends Instance {
 						["use-async"]: ModuleScript & {
 							["use-async"]: ModuleScript;
 						};
-						["use-throttle-effect"]: ModuleScript & {
-							["use-throttle-effect"]: ModuleScript;
-						};
 						["use-debounce-effect"]: ModuleScript & {
 							["use-debounce-effect"]: ModuleScript;
 						};
-						["use-viewport"]: ModuleScript & {
-							["use-viewport"]: ModuleScript;
+						["use-motor"]: ModuleScript & {
+							["use-motor"]: ModuleScript;
+						};
+						["use-timer"]: ModuleScript & {
+							["use-timer"]: ModuleScript;
 						};
 						["use-defer-effect"]: ModuleScript & {
 							["use-defer-effect"]: ModuleScript;
@@ -1928,17 +2020,17 @@ interface ReplicatedStorage extends Instance {
 						["use-debounce-state"]: ModuleScript & {
 							["use-debounce-state"]: ModuleScript;
 						};
-						["use-event-listener"]: ModuleScript & {
-							["use-event-listener"]: ModuleScript;
+						["use-throttle-effect"]: ModuleScript & {
+							["use-throttle-effect"]: ModuleScript;
 						};
-						["use-previous"]: ModuleScript & {
-							["use-previous"]: ModuleScript;
+						["use-lifetime"]: ModuleScript & {
+							["use-lifetime"]: ModuleScript;
 						};
 						["use-camera"]: ModuleScript & {
 							["use-camera"]: ModuleScript;
 						};
-						["use-timer"]: ModuleScript & {
-							["use-timer"]: ModuleScript;
+						["use-mount-effect"]: ModuleScript & {
+							["use-mount-effect"]: ModuleScript;
 						};
 						["use-mouse"]: ModuleScript & {
 							["use-mouse"]: ModuleScript;
@@ -1948,18 +2040,9 @@ interface ReplicatedStorage extends Instance {
 				beacon: Folder & {
 					out: ModuleScript;
 				};
-				["set-timeout"]: Folder & {
-					out: ModuleScript & {
-						["set-countdown"]: ModuleScript;
-						["set-interval"]: ModuleScript;
-						["debounce.spec"]: ModuleScript;
-						["set-timeout"]: ModuleScript;
-						throttle: ModuleScript;
-						["set-timeout.spec"]: ModuleScript;
-						["throttle.spec"]: ModuleScript;
-						["set-interval.spec"]: ModuleScript;
-						["set-countdown.spec"]: ModuleScript;
-						debounce: ModuleScript;
+				t: Folder & {
+					lib: Folder & {
+						ts: ModuleScript;
 					};
 				};
 				["compiler-types"]: Folder & {
@@ -1974,16 +2057,8 @@ interface ReplicatedStorage extends Instance {
 						};
 					};
 				};
-				timer: Folder & {
-					out: ModuleScript & {
-						Interfaces: Folder;
-						Implementation: Folder & {
-							Timer: ModuleScript;
-						};
-						Data: Folder & {
-							Enums: ModuleScript;
-						};
-					};
+				react: ModuleScript & {
+					tags: ModuleScript;
 				};
 				["signals-tooling"]: Folder & {
 					out: ModuleScript & {
@@ -2004,8 +2079,6 @@ interface ReplicatedStorage extends Instance {
 						Promise: ModuleScript;
 						builder: ModuleScript;
 						constants: ModuleScript;
-						types: ModuleScript;
-						createRemotes: ModuleScript;
 						utils: Folder & {
 							compose: ModuleScript;
 							testRemote: ModuleScript;
@@ -2013,10 +2086,12 @@ interface ReplicatedStorage extends Instance {
 							unwrap: ModuleScript;
 							instances: ModuleScript;
 						};
+						types: ModuleScript;
 						server: ModuleScript & {
 							createRemote: ModuleScript;
 							createAsyncRemote: ModuleScript;
 						};
+						container: Configuration;
 						client: ModuleScript & {
 							createRemote: ModuleScript;
 							createAsyncRemote: ModuleScript;
@@ -2025,7 +2100,7 @@ interface ReplicatedStorage extends Instance {
 							loggerMiddleware: ModuleScript;
 							throttleMiddleware: ModuleScript;
 						};
-						container: Configuration;
+						createRemotes: ModuleScript;
 					};
 				};
 				services: ModuleScript;
@@ -2071,173 +2146,6 @@ interface ReplicatedStorage extends Instance {
 						ExpectationContext: ModuleScript;
 						Context: ModuleScript;
 						Expectation: ModuleScript;
-					};
-				};
-				sift: Folder & {
-					out: ModuleScript & {
-						Dictionary: ModuleScript & {
-							includes: ModuleScript;
-							flip: ModuleScript;
-							every: ModuleScript;
-							update: ModuleScript;
-							equalsDeep: ModuleScript;
-							flatten: ModuleScript;
-							copy: ModuleScript;
-							mergeDeep: ModuleScript;
-							values: ModuleScript;
-							keys: ModuleScript;
-							copyDeep: ModuleScript;
-							some: ModuleScript;
-							freeze: ModuleScript;
-							map: ModuleScript;
-							removeValue: ModuleScript;
-							fromEntries: ModuleScript;
-							freezeDeep: ModuleScript;
-							set: ModuleScript;
-							removeValues: ModuleScript;
-							fromArrays: ModuleScript;
-							entries: ModuleScript;
-							removeKeys: ModuleScript;
-							removeKey: ModuleScript;
-							count: ModuleScript;
-							filter: ModuleScript;
-							has: ModuleScript;
-							withKeys: ModuleScript;
-							equals: ModuleScript;
-							merge: ModuleScript;
-						};
-						Set: ModuleScript & {
-							map: ModuleScript;
-							["delete"]: ModuleScript;
-							differenceSymmetric: ModuleScript;
-							intersection: ModuleScript;
-							fromArray: ModuleScript;
-							toArray: ModuleScript;
-							isSuperset: ModuleScript;
-							merge: ModuleScript;
-							copy: ModuleScript;
-							count: ModuleScript;
-							filter: ModuleScript;
-							has: ModuleScript;
-							isSubset: ModuleScript;
-							difference: ModuleScript;
-							add: ModuleScript;
-						};
-						Types: ModuleScript;
-						Array: ModuleScript & {
-							last: ModuleScript;
-							shuffle: ModuleScript;
-							is: ModuleScript;
-							concatDeep: ModuleScript;
-							update: ModuleScript;
-							copy: ModuleScript;
-							reduceRight: ModuleScript;
-							copyDeep: ModuleScript;
-							map: ModuleScript;
-							removeValue: ModuleScript;
-							equals: ModuleScript;
-							first: ModuleScript;
-							find: ModuleScript;
-							removeIndex: ModuleScript;
-							count: ModuleScript;
-							reverse: ModuleScript;
-							zipAll: ModuleScript;
-							includes: ModuleScript;
-							removeValues: ModuleScript;
-							zip: ModuleScript;
-							unshift: ModuleScript;
-							toSet: ModuleScript;
-							equalsDeep: ModuleScript;
-							flatten: ModuleScript;
-							splice: ModuleScript;
-							sort: ModuleScript;
-							difference: ModuleScript;
-							freezeDeep: ModuleScript;
-							slice: ModuleScript;
-							findLast: ModuleScript;
-							freeze: ModuleScript;
-							findWhere: ModuleScript;
-							removeIndices: ModuleScript;
-							findWhereLast: ModuleScript;
-							shift: ModuleScript;
-							pop: ModuleScript;
-							set: ModuleScript;
-							create: ModuleScript;
-							every: ModuleScript;
-							at: ModuleScript;
-							push: ModuleScript;
-							insert: ModuleScript;
-							filter: ModuleScript;
-							differenceSymmetric: ModuleScript;
-							concat: ModuleScript;
-							reduce: ModuleScript;
-							some: ModuleScript;
-						};
-						Util: ModuleScript & {
-							equalObjects: ModuleScript;
-							isEmpty: ModuleScript;
-							func: ModuleScript;
-						};
-						None: ModuleScript;
-					};
-				};
-				charm: ModuleScript & {
-					mapped: ModuleScript;
-					atom: ModuleScript;
-					effect: ModuleScript;
-					observe: ModuleScript;
-					utils: Folder & {
-						collect: ModuleScript;
-						count: ModuleScript;
-						setInterval: ModuleScript;
-					};
-					modules: Folder & {
-						React: ModuleScript;
-						Promise: ModuleScript;
-						ReactRoblox: ModuleScript;
-					};
-					types: ModuleScript;
-					sync: ModuleScript & {
-						validate: ModuleScript;
-						client: ModuleScript;
-						patch: ModuleScript;
-						server: ModuleScript;
-					};
-					subscribe: ModuleScript;
-					react: Folder & {
-						useAtom: ModuleScript;
-					};
-					computed: ModuleScript;
-					store: ModuleScript;
-					__tests__: Folder & {
-						react: Folder & {
-							helpers: Folder & {
-								renderHook: ModuleScript;
-							};
-						};
-						benchmarks: Folder & {
-							["atom.bench"]: ModuleScript;
-						};
-					};
-				};
-				react: ModuleScript & {
-					tags: ModuleScript;
-				};
-				dumpster: Folder & {
-					Dumpster: ModuleScript;
-				};
-				["validate-tree"]: ModuleScript;
-				flipper: Folder & {
-					typings: Folder;
-					src: ModuleScript & {
-						isMotor: ModuleScript;
-						Spring: ModuleScript;
-						GroupMotor: ModuleScript;
-						Signal: ModuleScript;
-						SingleMotor: ModuleScript;
-						Instant: ModuleScript;
-						Linear: ModuleScript;
-						BaseMotor: ModuleScript;
 					};
 				};
 				["react-roblox"]: ModuleScript;
@@ -2694,8 +2602,175 @@ interface ReplicatedStorage extends Instance {
 					RoactCompat: ModuleScript;
 					ReactCache: ModuleScript;
 				};
+				["validate-tree"]: ModuleScript;
+				["reflex-class"]: Folder & {
+					node_modules: Folder & {
+						["@rbxts"]: Folder;
+					};
+					out: ModuleScript & {
+						source: Folder & {
+							["class-producer"]: ModuleScript;
+							decorators: ModuleScript & {
+								action: ModuleScript;
+								subscribe: ModuleScript;
+							};
+						};
+					};
+				};
+				timer: Folder & {
+					out: ModuleScript & {
+						Interfaces: Folder;
+						Implementation: Folder & {
+							Timer: ModuleScript;
+						};
+						Data: Folder & {
+							Enums: ModuleScript;
+						};
+					};
+				};
+				profileservice: Folder & {
+					src: ModuleScript;
+				};
 				janitor: Folder & {
 					src: ModuleScript;
+				};
+				dumpster: Folder & {
+					Dumpster: ModuleScript;
+				};
+				sift: Folder & {
+					out: ModuleScript & {
+						Dictionary: ModuleScript & {
+							includes: ModuleScript;
+							flip: ModuleScript;
+							every: ModuleScript;
+							update: ModuleScript;
+							equalsDeep: ModuleScript;
+							flatten: ModuleScript;
+							copy: ModuleScript;
+							mergeDeep: ModuleScript;
+							values: ModuleScript;
+							keys: ModuleScript;
+							copyDeep: ModuleScript;
+							some: ModuleScript;
+							freeze: ModuleScript;
+							map: ModuleScript;
+							removeValue: ModuleScript;
+							fromEntries: ModuleScript;
+							freezeDeep: ModuleScript;
+							set: ModuleScript;
+							removeValues: ModuleScript;
+							fromArrays: ModuleScript;
+							entries: ModuleScript;
+							removeKeys: ModuleScript;
+							removeKey: ModuleScript;
+							count: ModuleScript;
+							filter: ModuleScript;
+							has: ModuleScript;
+							withKeys: ModuleScript;
+							equals: ModuleScript;
+							merge: ModuleScript;
+						};
+						Set: ModuleScript & {
+							map: ModuleScript;
+							["delete"]: ModuleScript;
+							differenceSymmetric: ModuleScript;
+							intersection: ModuleScript;
+							fromArray: ModuleScript;
+							toArray: ModuleScript;
+							isSuperset: ModuleScript;
+							merge: ModuleScript;
+							copy: ModuleScript;
+							count: ModuleScript;
+							filter: ModuleScript;
+							has: ModuleScript;
+							isSubset: ModuleScript;
+							difference: ModuleScript;
+							add: ModuleScript;
+						};
+						Types: ModuleScript;
+						Array: ModuleScript & {
+							last: ModuleScript;
+							shuffle: ModuleScript;
+							is: ModuleScript;
+							concatDeep: ModuleScript;
+							update: ModuleScript;
+							copy: ModuleScript;
+							reduceRight: ModuleScript;
+							copyDeep: ModuleScript;
+							map: ModuleScript;
+							removeValue: ModuleScript;
+							equals: ModuleScript;
+							first: ModuleScript;
+							find: ModuleScript;
+							removeIndex: ModuleScript;
+							count: ModuleScript;
+							reverse: ModuleScript;
+							zipAll: ModuleScript;
+							includes: ModuleScript;
+							removeValues: ModuleScript;
+							zip: ModuleScript;
+							unshift: ModuleScript;
+							toSet: ModuleScript;
+							equalsDeep: ModuleScript;
+							flatten: ModuleScript;
+							splice: ModuleScript;
+							sort: ModuleScript;
+							difference: ModuleScript;
+							freezeDeep: ModuleScript;
+							slice: ModuleScript;
+							findLast: ModuleScript;
+							freeze: ModuleScript;
+							findWhere: ModuleScript;
+							removeIndices: ModuleScript;
+							findWhereLast: ModuleScript;
+							shift: ModuleScript;
+							pop: ModuleScript;
+							set: ModuleScript;
+							create: ModuleScript;
+							every: ModuleScript;
+							at: ModuleScript;
+							push: ModuleScript;
+							insert: ModuleScript;
+							filter: ModuleScript;
+							differenceSymmetric: ModuleScript;
+							concat: ModuleScript;
+							reduce: ModuleScript;
+							some: ModuleScript;
+						};
+						Util: ModuleScript & {
+							equalObjects: ModuleScript;
+							isEmpty: ModuleScript;
+							func: ModuleScript;
+						};
+						None: ModuleScript;
+					};
+				};
+				flipper: Folder & {
+					typings: Folder;
+					src: ModuleScript & {
+						isMotor: ModuleScript;
+						Spring: ModuleScript;
+						GroupMotor: ModuleScript;
+						Signal: ModuleScript;
+						SingleMotor: ModuleScript;
+						Instant: ModuleScript;
+						Linear: ModuleScript;
+						BaseMotor: ModuleScript;
+					};
+				};
+				["set-timeout"]: Folder & {
+					out: ModuleScript & {
+						["set-countdown"]: ModuleScript;
+						["set-interval"]: ModuleScript;
+						["debounce.spec"]: ModuleScript;
+						["set-timeout"]: ModuleScript;
+						throttle: ModuleScript;
+						["set-timeout.spec"]: ModuleScript;
+						["throttle.spec"]: ModuleScript;
+						["set-interval.spec"]: ModuleScript;
+						["set-countdown.spec"]: ModuleScript;
+						debounce: ModuleScript;
+					};
 				};
 				["message-templates"]: Folder & {
 					out: ModuleScript & {
@@ -2705,11 +2780,6 @@ interface ReplicatedStorage extends Instance {
 						MessageTemplate: ModuleScript;
 						MessageTemplateToken: ModuleScript;
 						MessageTemplateParser: ModuleScript;
-					};
-				};
-				t: Folder & {
-					lib: Folder & {
-						ts: ModuleScript;
 					};
 				};
 				trove: Folder & {

@@ -1,13 +1,13 @@
 import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Workspace } from "@rbxts/services";
-import { getAssetConfig, getSkillConfig } from "server/configs/tycoon";
+import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { selectPlayer } from "server/store/selectors";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { Inject } from "shared/inject";
 import { deserializeVector3 } from "shared/modules/serialized-vector3";
-import { Character } from "./character";
+import { CharacterServer } from "./character-server";
 
 const TYCOON_FOLDER = Workspace.Tycoons;
 
@@ -25,12 +25,12 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 			task.wait();
 		}
 
-		const knownSkills = store.getState().get(tostring(this.UserId))?.skills;
-		if (knownSkills !== undefined) {
-			for (const skillName of knownSkills) {
-				getSkillConfig(skillName).teach(this.instance);
-			}
+		if (this.instance.Character) {
+			this.onCharacterAdded(this.instance.Character);
 		}
+		this.instance.CharacterAdded.Connect((character) =>
+			this.onCharacterAdded(character),
+		);
 	}
 
 	public hasAsset(assetName: string): boolean {
@@ -53,7 +53,7 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 
 	public async loadCharacter(
 		leavingPurgatory: boolean = false,
-	): Promise<Character> {
+	): Promise<CharacterServer> {
 		return new Promise((resolve, reject) => {
 			if (this.instance.Parent === undefined) {
 				reject("player has already left");
@@ -103,7 +103,7 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 			}
 
 			this.components
-				.waitForComponent<Character>(this.instance.Character)
+				.waitForComponent<CharacterServer>(this.instance.Character)
 				.andThen(
 					(component) => {
 						component.loadHealth();
@@ -116,11 +116,11 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 		});
 	}
 
-	public getCharacter(): Character {
+	public getCharacter(): CharacterServer {
 		const model = this.instance.Character;
 		if (model === undefined)
 			error(`${this.instance.Name}.Character is undefined`);
-		const character = this.components.getComponent<Character>(model);
+		const character = this.components.getComponent<CharacterServer>(model);
 		if (character === undefined)
 			error(
 				`${this.instance.Name}'s character missing character component`,
@@ -128,19 +128,8 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 		return character;
 	}
 
-	public teach(skillName: string): void {
-		if (this.hasSkill(skillName)) return;
-		getSkillConfig(skillName).teach(this.instance);
-		store.addSkill(this.instance, skillName);
-	}
-
-	public hasSkill(skillName: string): boolean {
-		return (
-			store
-				.getState()
-				?.get(tostring(this.UserId))
-				?.skills.includes(skillName) ?? false
-		);
+	private onCharacterAdded(character: Model) {
+		character.AddTag(CharacterServer.TAG);
 	}
 
 	private isInsideTycoon(position: Vector3): boolean {

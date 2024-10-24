@@ -2,7 +2,7 @@ import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
 import { Inject } from "shared/inject";
-import { Character } from ".";
+import { CharacterServer } from ".";
 import { KeyInteractable } from "../interactable/key-interactable";
 import { RagdollServer } from "./ragdoll-server";
 
@@ -26,7 +26,7 @@ export class Carriable
 	private components!: Components;
 
 	public constructor(
-		private character: Character,
+		private character: CharacterServer,
 		private ragdoll: RagdollServer,
 	) {
 		super();
@@ -46,9 +46,8 @@ export class Carriable
 
 	public override interact(player: Player): void {
 		if (!player.Character) return;
-		const characterComponent = this.components.getComponent<Character>(
-			player.Character,
-		);
+		const characterComponent =
+			this.components.getComponent<CharacterServer>(player.Character);
 		if (!characterComponent) return;
 
 		this.attributes.isCarried
@@ -56,7 +55,7 @@ export class Carriable
 			: this.pickUp(characterComponent);
 	}
 
-	public pickUp(carrier: Character): void {
+	public pickUp(carrier: CharacterServer): void {
 		this.attributes.isCarried = true;
 
 		const ragdoll = this.components.getComponent<RagdollServer>(
@@ -97,7 +96,7 @@ export class Carriable
 			.ChangeState(Enum.HumanoidStateType.Physics);
 	}
 
-	public drop(carrier: Character): void {
+	public drop(carrier: CharacterServer): void {
 		this.attributes.isCarried = false;
 
 		this.carryTrove.clean();
