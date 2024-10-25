@@ -6,13 +6,12 @@ import { RunService } from "@rbxts/services";
 import { PlayerServer } from "server/components/player-server";
 import { store } from "server/store";
 import { selectPlayer, selectPlayerCurrencies } from "server/store/selectors";
-import { Inject } from "shared/inject";
+import { OnPlayerAdded, OnPlayerRemoving } from "shared/modules/lifecycles";
 import { onThisPlayerRemoving } from "shared/modules/on-player-removing";
 import {
 	DEFAULT_PLAYER_PROFILE_DATA,
 	PlayerProfileData,
 } from "shared/modules/player-data";
-import { OnPlayerAdded, OnPlayerRemoving } from "../../../types/lifecycles";
 
 const PROFILE_STORE_INDEX = RunService.IsStudio() ? "Testing" : "Production";
 const PROFILE_KEY_TEMPLATE = "Player%d";
@@ -33,8 +32,7 @@ export class DataService implements OnPlayerAdded, OnPlayerRemoving {
 		Array<(profile: PlayerProfile) => void>
 	>();
 
-	@Inject
-	private components!: Components;
+	constructor(private components: Components) {}
 
 	public onPlayerAdded(player: Player): void {
 		this.setupProfile(player);

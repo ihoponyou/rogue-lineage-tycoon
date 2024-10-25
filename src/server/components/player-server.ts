@@ -5,7 +5,6 @@ import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { selectPlayer } from "server/store/selectors";
 import { AbstractPlayer } from "shared/components/abstract-player";
-import { Inject } from "shared/inject";
 import { deserializeVector3 } from "shared/modules/serialized-vector3";
 import { CharacterServer } from "./character-server";
 
@@ -17,8 +16,9 @@ const TYCOON_FOLDER = Workspace.Tycoons;
 export class PlayerServer extends AbstractPlayer implements OnStart {
 	private assets = new Array<string>();
 
-	@Inject
-	private components!: Components;
+	constructor(private components: Components) {
+		super();
+	}
 
 	public onStart(): void {
 		while (!this.instance.HasTag("DataLoaded")) {

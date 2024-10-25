@@ -56,11 +56,11 @@ export abstract class AbstractCharacter
 	}
 
 	public getHumanoid(): Humanoid {
-		return this.humanoid;
+		return promiseR6(this.instance).expect().Humanoid;
 	}
 
 	public getAnimator(): Animator {
-		const animator = this.humanoid.FindFirstChild("Animator") as
+		const animator = this.getHumanoid().FindFirstChild("Animator") as
 			| Animator
 			| undefined;
 		if (!animator)
@@ -107,11 +107,11 @@ export abstract class AbstractCharacter
 	}
 
 	public resetWalkSpeed(): void {
-		this.humanoid.WalkSpeed = this.getWalkSpeed();
+		this.getHumanoid().WalkSpeed = this.getWalkSpeed();
 	}
 
 	public setWalkSpeed(speed: number): void {
-		this.humanoid.WalkSpeed = speed;
+		this.getHumanoid().WalkSpeed = speed;
 	}
 
 	public canAttack(): boolean {
@@ -147,6 +147,6 @@ export abstract class AbstractCharacter
 	}
 
 	public toggleJump(enable: boolean): void {
-		this.humanoid.JumpPower = enable ? DEFAULT_JUMP_POWER : 0;
+		this.getHumanoid().JumpPower = enable ? DEFAULT_JUMP_POWER : 0;
 	}
 }

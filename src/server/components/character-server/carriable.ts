@@ -1,7 +1,6 @@
 import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
-import { Inject } from "shared/inject";
 import { CharacterServer } from ".";
 import { KeyInteractable } from "../interactable/key-interactable";
 import { RagdollServer } from "./ragdoll-server";
@@ -22,10 +21,8 @@ export class Carriable
 {
 	private carryTrove = this.trove.extend();
 
-	@Inject
-	private components!: Components;
-
 	public constructor(
+		private components: Components,
 		private character: CharacterServer,
 		private ragdoll: RagdollServer,
 	) {

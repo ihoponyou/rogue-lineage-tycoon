@@ -6,7 +6,7 @@ import { IOwnable } from "server/modules/ownable";
 import { Events } from "server/network";
 import { AbstractItem } from "shared/components/abstract-item";
 import { UsefulModel } from "shared/components/useful-model";
-import { ItemId, ITEMS } from "shared/configs/items";
+import { ItemId } from "shared/configs/items";
 import { CharacterServer } from "./character-server";
 import { Ownable } from "./ownable";
 
@@ -40,8 +40,6 @@ export class ItemServer extends AbstractItem implements IOwnable {
 				return item;
 			});
 	}
-
-	public override readonly config = ITEMS[this.instance.Name as ItemId];
 
 	protected worldModel!: UsefulModel;
 	private bodyAttach = this.newBodyAttach();

@@ -1,18 +1,12 @@
-import { Components } from "@flamework/components";
 import { Controller, Modding, OnStart } from "@flamework/core";
 import { LOCAL_PLAYER } from "client/configs/constants";
-import { Inject } from "shared/inject";
 import {
 	OnLocalCharacterAdded,
 	OnLocalCharacterRemoving,
-	OnRemoved,
-} from "../../../types/lifecycles";
+} from "shared/modules/lifecycles";
 
 @Controller()
 export class LifecycleController implements OnStart {
-	@Inject
-	private components!: Components;
-
 	public onStart(): void {
 		const localCharacterAddedListeners = new Set<OnLocalCharacterAdded>();
 		Modding.onListenerAdded<OnLocalCharacterAdded>((obj) =>
@@ -51,10 +45,6 @@ export class LifecycleController implements OnStart {
 			for (const listener of localCharacterRemovingListeners) {
 				task.spawn(() => listener.onLocalCharacterRemoving(character));
 			}
-		});
-
-		this.components.onComponentRemoved<OnRemoved>((value) => {
-			value.onRemoved();
 		});
 	}
 }

@@ -2,7 +2,6 @@ import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { UPGRADERS } from "server/configs/tycoon";
 import { Toggleable } from "shared/components/toggleable";
-import { Inject } from "shared/inject";
 import { Product } from "./product";
 
 const DEBOUNCE_LENGTH = 1;
@@ -22,10 +21,10 @@ export class Upgrader
 	private processingBlacklist = new Map<Instance, true>();
 	private touchedConnection?: RBXScriptConnection;
 
-	@Inject
-	private components!: Components;
-
-	public constructor(private toggleable: Toggleable) {
+	public constructor(
+		private components: Components,
+		private toggleable: Toggleable,
+	) {
 		super();
 		if (this.config === undefined)
 			error(`upgrader "${this.instance.Name} does not exist"`);

@@ -2,7 +2,7 @@ import { BaseComponent, Component, Components } from "@flamework/components";
 import { Dependency, OnStart, OnTick } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
 import { store } from "server/store";
-import { OnCharacterAdded } from "../../../../types/lifecycles";
+import { OnCharacterAdded } from "shared/modules/lifecycles";
 import { CharacterServer } from "../character-server";
 
 interface Attributes {

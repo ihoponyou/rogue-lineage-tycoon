@@ -2,7 +2,7 @@ import { Components } from "@flamework/components";
 import { Controller } from "@flamework/core";
 import { CharacterClient } from "client/components/character-client";
 import { LOCAL_PLAYER } from "client/configs/constants";
-import { OnLocalCharacterAdded } from "../../../types/lifecycles";
+import { OnLocalCharacterAdded } from "shared/modules/lifecycles";
 
 @Controller()
 export class CharacterController implements OnLocalCharacterAdded {

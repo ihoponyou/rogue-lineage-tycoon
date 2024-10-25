@@ -1,11 +1,9 @@
 import { ReplicatedStorage } from "@rbxts/services";
 import { AbstractWeapon } from "shared/components/abstract-weapon";
 
-export type BodyPart = "Right Arm" | "Torso" | "Right Leg";
-
-export enum ItemId {
-	GOBLET = "Goblet",
-	BRONZE_SWORD = "Bronze Sword",
+export enum R6BodyPart {
+	RightArm = "Right Arm",
+	Torso = "Torso",
 }
 
 export interface ItemConfig {
@@ -14,9 +12,9 @@ export interface ItemConfig {
 	readonly maxQuantity: number;
 	readonly worldModel: Model;
 	readonly hideOnHolster: boolean;
-	readonly equipLimb: BodyPart;
+	readonly equipLimb: R6BodyPart;
 	readonly equipC0?: CFrame;
-	readonly holsterLimb: BodyPart;
+	readonly holsterLimb: R6BodyPart;
 	readonly holsterC0?: CFrame;
 	readonly idleAnimation?: Animation;
 }
@@ -33,15 +31,15 @@ const SWORD_HOLSTER_C0 = new CFrame(0, 0, 0.552).mul(
 	cframeFromOrientationDeg(28.695, -90, -90),
 );
 
-export const ITEMS: { [name: string]: ItemConfig } = {
+export const ITEMS = {
 	Goblet: {
 		tags: [],
 		droppable: true,
 		maxQuantity: 99,
 		worldModel: ReplicatedStorage.Assets.Tycoon.Products.Goblet,
 		hideOnHolster: true,
-		equipLimb: "Right Arm",
-		holsterLimb: "Right Arm",
+		equipLimb: R6BodyPart.RightArm,
+		holsterLimb: R6BodyPart.RightArm,
 	},
 	"Bronze Sword": {
 		tags: [AbstractWeapon.TAG],
@@ -49,9 +47,9 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Sword"],
 		hideOnHolster: false,
-		equipLimb: "Right Arm",
+		equipLimb: R6BodyPart.RightArm,
 		equipC0: new CFrame(0, 0, -1.85).mul(cframeFromOrientationDeg(-90, 90)),
-		holsterLimb: "Torso",
+		holsterLimb: R6BodyPart.Torso,
 		holsterC0: SWORD_HOLSTER_C0,
 	},
 	"Bronze Spear": {
@@ -60,9 +58,9 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Spear"],
 		hideOnHolster: false,
-		equipLimb: "Right Arm",
+		equipLimb: R6BodyPart.RightArm,
 		equipC0: new CFrame(0, 0, -2).mul(cframeFromOrientationDeg(90, -90, 0)),
-		holsterLimb: "Torso",
+		holsterLimb: R6BodyPart.Torso,
 		holsterC0: new CFrame(0, 0, 0.65).mul(
 			cframeFromOrientationDeg(25, -90, -90),
 		),
@@ -74,11 +72,11 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.Weapons["Bronze Dagger"],
 		hideOnHolster: true,
-		equipLimb: "Right Arm",
+		equipLimb: R6BodyPart.RightArm,
 		equipC0: new CFrame(0, 0.25, 0.8).mul(
 			cframeFromOrientationDeg(0, 0, -90),
 		),
-		holsterLimb: "Torso",
+		holsterLimb: R6BodyPart.Torso,
 	},
 	test_tool: {
 		tags: [],
@@ -86,13 +84,15 @@ export const ITEMS: { [name: string]: ItemConfig } = {
 		maxQuantity: 1,
 		worldModel: ReplicatedStorage.Assets.Models.test_tool,
 		hideOnHolster: true,
-		equipLimb: "Right Arm",
-		holsterLimb: "Torso",
+		equipLimb: R6BodyPart.RightArm,
+		holsterLimb: R6BodyPart.Torso,
 	},
 };
 
-export function getItemConfig(name: string): ItemConfig {
-	const config = ITEMS[name];
+export type ItemId = keyof typeof ITEMS;
+
+export function getItemConfig(name: ItemId): ItemConfig {
+	const config: ItemConfig = ITEMS[name];
 	if (config === undefined) error(`Item "${name}" does not exist`);
 	return config;
 }

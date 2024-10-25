@@ -1,6 +1,6 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { ItemId, ITEMS } from "shared/configs/items";
+import { getItemConfig, ItemConfig, ItemId } from "shared/configs/items";
 import { Equippable, EquippableAttributes } from "shared/modules/equippable";
 import { AbstractCharacter } from "./abstract-character";
 
@@ -15,7 +15,9 @@ export abstract class AbstractItem
 {
 	public static readonly TAG = "Item";
 
-	public readonly config = ITEMS[this.instance.Name as ItemId];
+	public readonly config: ItemConfig = getItemConfig(
+		this.instance.Name as ItemId,
+	);
 
 	onStart(): void {
 		if (this.config === undefined) {

@@ -6,7 +6,6 @@ import { DROPPERS } from "server/configs/tycoon";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Toggleable } from "shared/components/toggleable";
 import { UsefulModel } from "shared/components/useful-model";
-import { Inject } from "shared/inject";
 
 type DropperInstance = Model & {
 	Faucet: BasePart & {
@@ -24,10 +23,10 @@ export class Dropper
 	private readonly config = DROPPERS[this.instance.Name];
 	private timer!: Timer;
 
-	@Inject
-	private components!: Components;
-
-	public constructor(private toggleable: Toggleable) {
+	public constructor(
+		private components: Components,
+		private toggleable: Toggleable,
+	) {
 		super();
 		if (!this.config)
 			error(`dropper "${this.instance.Name}" does not exist`);

@@ -84,6 +84,9 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	public override onStart(): void {
 		super.onStart();
 
+		this.inventoryFolder.Parent = this.instance;
+		this.skillsFolder.Parent = this.instance;
+
 		this.instance.AddTag("FallDamage");
 		this.instance.AddTag("CombatManager");
 

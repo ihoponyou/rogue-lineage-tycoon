@@ -1,6 +1,5 @@
 import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { Inject } from "shared/inject";
 import { Pad } from "./pad";
 import { Unlockable } from "./unlockable";
 
@@ -14,10 +13,10 @@ export type AssetInstance = Instance & {
 export class Asset extends BaseComponent<{}, AssetInstance> implements OnStart {
 	private pad!: Pad;
 
-	@Inject
-	private components!: Components;
-
-	public constructor(private unlockable: Unlockable) {
+	public constructor(
+		private components: Components,
+		private unlockable: Unlockable,
+	) {
 		super();
 	}
 

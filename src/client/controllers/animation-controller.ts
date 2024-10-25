@@ -2,11 +2,10 @@ import { Components } from "@flamework/components";
 import { Controller } from "@flamework/core";
 import { CharacterClient } from "client/components/character-client";
 import { ANIMATIONS } from "shared/constants";
-import { Inject } from "shared/inject";
 import {
 	OnLocalCharacterAdded,
 	OnLocalCharacterRemoving,
-} from "../../../types/lifecycles";
+} from "shared/modules/lifecycles";
 
 @Controller()
 export class AnimationController
@@ -15,8 +14,7 @@ export class AnimationController
 	private character?: CharacterClient;
 	private loadedTracks = new Map<string, AnimationTrack>();
 
-	@Inject
-	private components!: Components;
+	constructor(private components: Components) {}
 
 	public onLocalCharacterAdded(character: Model): void {
 		this.character = this.components

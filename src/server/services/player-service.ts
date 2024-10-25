@@ -1,6 +1,6 @@
 import { Service } from "@flamework/core";
 import { AbstractPlayer } from "shared/components/abstract-player";
-import { OnPlayerAdded } from "../../../types/lifecycles";
+import { OnPlayerAdded } from "shared/modules/lifecycles";
 
 @Service()
 export class PlayerService implements OnPlayerAdded {

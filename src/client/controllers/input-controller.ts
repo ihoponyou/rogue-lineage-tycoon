@@ -4,11 +4,11 @@ import { UserInputService, Workspace } from "@rbxts/services";
 import Signal from "@rbxts/signal";
 import { store } from "client/store";
 import { selectIsBackpackOpen } from "client/store/slices/ui/selectors";
+import { OnLocalCharacterAdded } from "shared/modules/lifecycles";
 import {
 	selectMana,
 	selectManaEnabled,
 } from "shared/store/slices/mana/selectors";
-import { OnLocalCharacterAdded } from "../../../types/lifecycles";
 import { CharacterClient } from "../components/character-client";
 import { InventoryController } from "./inventory-controller";
 import { KeybindController } from "./keybind-controller";

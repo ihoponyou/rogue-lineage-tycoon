@@ -3,7 +3,6 @@ import { OnStart } from "@flamework/core";
 import { store } from "server/store";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { UsefulModel } from "shared/components/useful-model";
-import { Inject } from "shared/inject";
 import { Currency } from "../../../../types/currency";
 import { Clickable } from "../interactable/clickable";
 import { PlayerServer } from "../player-server";
@@ -34,8 +33,9 @@ export class Plot
 	private teller!: Clickable;
 	private assets = new Map<string, UsefulModel>();
 
-	@Inject
-	private components!: Components;
+	constructor(private components: Components) {
+		super();
+	}
 
 	public onStart(): void {
 		this.teller = this.components.getComponent<Clickable>(

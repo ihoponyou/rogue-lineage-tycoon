@@ -3,7 +3,6 @@ import { OnStart } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
 import { IdentityService } from "server/services/identity-service";
-import { OnRemoved } from "../../../../types/lifecycles";
 
 interface Attributes {
 	armorToSet: string;
@@ -17,7 +16,7 @@ interface Attributes {
 })
 export class ArmorPortal
 	extends BaseComponent<Attributes, BasePart>
-	implements OnStart, OnRemoved
+	implements OnStart
 {
 	private trove = new Trove();
 	private debounce = new Array<Player>();
@@ -32,8 +31,9 @@ export class ArmorPortal
 		);
 	}
 
-	public onRemoved(): void {
-		this.trove.destroy();
+	override destroy(): void {
+		this.trove.clean();
+		super.destroy();
 	}
 
 	public onTouched(otherPart: BasePart): void {

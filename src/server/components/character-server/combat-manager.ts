@@ -83,7 +83,7 @@ export class CombatManager
 
 		this.character.attributes.isAttacking = true;
 
-		error("fix me");
+		// error("fix me");
 		const weaponConfig = FISTS_CONFIG;
 		// this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
 
@@ -185,7 +185,6 @@ export class CombatManager
 
 		this.character.attributes.isAttacking = true;
 
-		error("fix me");
 		const weaponConfig = FISTS_CONFIG;
 		// this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
 
