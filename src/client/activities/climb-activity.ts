@@ -236,7 +236,7 @@ export class ClimbActivity extends CharacterActivity {
 	}
 
 	private tryLedgeClimb(
-		humanoidRootPart: Part,
+		humanoidRootPart: BasePart,
 		lookVector: Vector3,
 		params: RaycastParams,
 	): void {

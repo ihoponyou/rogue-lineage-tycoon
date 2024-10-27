@@ -7,6 +7,7 @@ import { selectPlayer } from "server/store/selectors";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { deserializeVector3 } from "shared/modules/serialized-vector3";
 import { CharacterServer } from "./character-server";
+import { PlayerCharacter } from "./player-character";
 
 const TYCOON_FOLDER = Workspace.Tycoons;
 
@@ -53,7 +54,7 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 
 	public async loadCharacter(
 		leavingPurgatory: boolean = false,
-	): Promise<CharacterServer> {
+	): Promise<PlayerCharacter> {
 		return new Promise((resolve, reject) => {
 			if (this.instance.Parent === undefined) {
 				reject("player has already left");
@@ -103,7 +104,7 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 			}
 
 			this.components
-				.waitForComponent<CharacterServer>(this.instance.Character)
+				.waitForComponent<PlayerCharacter>(this.instance.Character)
 				.andThen(
 					(component) => {
 						component.loadHealth();

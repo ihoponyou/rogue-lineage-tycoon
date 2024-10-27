@@ -1,5 +1,6 @@
 import { ReplicatedStorage } from "@rbxts/services";
 import { AbstractWeapon } from "shared/components/abstract-weapon";
+import { cframeFromOrientationDeg } from "shared/modules/cframe-util";
 
 export enum R6BodyPart {
 	RightArm = "Right Arm",
@@ -17,14 +18,6 @@ export interface ItemConfig {
 	readonly holsterLimb: R6BodyPart;
 	readonly holsterC0?: CFrame;
 	readonly idleAnimation?: Animation;
-}
-
-function cframeFromOrientationDeg(
-	x: number = 0,
-	y: number = 0,
-	z: number = 0,
-): CFrame {
-	return CFrame.fromOrientation(math.rad(x), math.rad(y), math.rad(z));
 }
 
 const SWORD_HOLSTER_C0 = new CFrame(0, 0, 0.552).mul(

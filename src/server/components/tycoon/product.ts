@@ -3,7 +3,7 @@ import { OnStart } from "@flamework/core";
 import { PRODUCTS } from "server/configs/tycoon";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { UsefulModel } from "shared/components/useful-model";
-import { Currency } from "../../../../types/currency";
+import { Currency } from "../../../shared/modules/currency";
 
 interface ProductAttributes {
 	isProcessed: boolean;

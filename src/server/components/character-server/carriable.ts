@@ -3,6 +3,7 @@ import { OnStart } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
 import { CharacterServer } from ".";
 import { KeyInteractable } from "../interactable/key-interactable";
+import { PlayerCharacter } from "../player-character";
 import { RagdollServer } from "./ragdoll-server";
 
 interface Attributes {
@@ -59,7 +60,7 @@ export class Carriable
 			carrier.instance,
 		);
 		if (ragdoll) {
-			this.carryTrove?.add(
+			this.carryTrove.add(
 				ragdoll.onAttributeChanged("isRagdolled", (newValue) => {
 					if (newValue) {
 						// print("carrier got ragdolled");
@@ -69,18 +70,21 @@ export class Carriable
 			);
 		}
 
-		this.instance.PrimaryPart?.SetNetworkOwner(carrier.getPlayer());
+		const playerCharacter = this.components.getComponent<PlayerCharacter>(
+			this.instance,
+		);
+		if (playerCharacter) {
+			this.instance.PrimaryPart?.SetNetworkOwner(
+				playerCharacter.getPlayer().instance,
+			);
+		}
 		this.instance.RemoveTag("Burning");
 
-		// tell carrier to play carrying animation
-		// tell this to play carried animation
-
-		const humanoidRootPart = this.character.getHumanoidRootPart();
-		const carrierAttachment = carrier.getHumanoidRootPart().CarryAttachment;
-		humanoidRootPart.CarryOrientation.Attachment1 = carrierAttachment;
-		humanoidRootPart.CarryPosition.Attachment1 = carrierAttachment;
-		this.character.getTorso().CarryCollision.Part1 = carrier.getTorso();
-		this.character.getHead().CarryCollision.Part1 = carrier.getHead();
+		const carrierAttachment = carrier.getCarryAttachment();
+		this.character.setAlignOrientationAtt1(carrierAttachment);
+		this.character.setAlignPositionAtt1(carrierAttachment);
+		this.character.setTorsoCollisionPart1(carrier.getTorso());
+		this.character.setHeadCollisionPart1(carrier.getHead());
 
 		for (const child of this.instance.GetChildren()) {
 			if (!child.IsA("BasePart")) continue;
@@ -120,10 +124,10 @@ export class Carriable
 				carrierRootPart.CFrame.LookVector.mul(35).add(up);
 		}
 
-		humanoidRootPart.CarryOrientation.Attachment1 = undefined;
-		humanoidRootPart.CarryPosition.Attachment1 = undefined;
-		this.character.getTorso().CarryCollision.Part1 = undefined;
-		this.character.getHead().CarryCollision.Part1 = undefined;
+		this.character.setAlignOrientationAtt1(undefined);
+		this.character.setAlignPositionAtt1(undefined);
+		this.character.setTorsoCollisionPart1(undefined);
+		this.character.setHeadCollisionPart1(undefined);
 
 		for (const child of this.instance.GetChildren()) {
 			if (!child.IsA("BasePart")) continue;

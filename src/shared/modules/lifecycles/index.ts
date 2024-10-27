@@ -8,11 +8,11 @@ export interface OnPlayerRemoving {
 }
 
 export interface OnCharacterAdded {
-	onCharacterAdded(character: StarterCharacter): void;
+	onCharacterAdded(character: Model): void;
 }
 
 export interface OnCharacterRemoving {
-	onCharacterRemoving(character: StarterCharacter): void;
+	onCharacterRemoving(character: Model): void;
 }
 
 // client
@@ -22,9 +22,4 @@ export interface OnLocalCharacterAdded {
 
 export interface OnLocalCharacterRemoving {
 	onLocalCharacterRemoving(character: Model): void;
-}
-
-// shared
-export interface OnRemoved {
-	onRemoved(): void;
 }

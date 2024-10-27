@@ -1,7 +1,6 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
-import { Players } from "@rbxts/services";
 import { BASE_WALK_SPEED } from "shared/configs";
 import { DisposableComponent } from "./disposable-component";
 import { AbstractRagdoll } from "./ragdoll";
@@ -24,7 +23,7 @@ export abstract class AbstractCharacter
 	extends DisposableComponent<CharacterAttributes, Model>
 	implements OnStart
 {
-	public static readonly TAG = "Character";
+	static readonly TAG = "Character";
 
 	protected raycastParams = new RaycastParams();
 	protected humanoid!: Humanoid;
@@ -32,7 +31,7 @@ export abstract class AbstractCharacter
 	protected abstract readonly inventoryFolder: Folder;
 	protected abstract readonly skillsFolder: Folder;
 
-	public onStart(): void {
+	onStart(): void {
 		const character = promiseR6(this.instance).expect();
 		this.humanoid = character.Humanoid;
 
@@ -55,66 +54,43 @@ export abstract class AbstractCharacter
 		});
 	}
 
-	public getHumanoid(): Humanoid {
+	getHumanoid(): Humanoid {
 		return promiseR6(this.instance).expect().Humanoid;
 	}
 
-	public getAnimator(): Animator {
-		const animator = this.getHumanoid().FindFirstChild("Animator") as
-			| Animator
-			| undefined;
-		if (!animator)
-			error(`Animator not found in character ${this.instance.Name}`);
-		return animator;
+	getAnimator(): Animator {
+		return promiseR6(this.instance).expect().Humanoid.Animator;
 	}
 
-	public getPlayer(): Player {
-		const player = Players.GetPlayerFromCharacter(this.instance);
-		if (!player)
-			error(`Player not found from character ${this.instance.Name}`);
-		return player;
+	getHead() {
+		return promiseR6(this.instance).expect().Head;
 	}
 
-	public getHead(): Head {
-		const head = this.instance.FindFirstChild("Head") as Head | undefined;
-		if (!head) error(`Head not found in character ${this.instance.Name}`);
-		return head;
+	getTorso() {
+		return promiseR6(this.instance).expect().Torso;
 	}
 
-	public getTorso(): Torso {
-		const torso = this.instance.FindFirstChild("Torso") as
-			| Torso
-			| undefined;
-		if (!torso) error(`Torso not found in character ${this.instance.Name}`);
-		return torso;
+	getHumanoidRootPart() {
+		return promiseR6(this.instance).expect().HumanoidRootPart;
 	}
 
-	public getHumanoidRootPart(): HumanoidRootPart {
-		const humanoidRootPart = this.instance.FindFirstChild(
-			"HumanoidRootPart",
-		) as HumanoidRootPart | undefined;
-		if (!humanoidRootPart)
-			error(`HRP not found in character ${this.instance.Name}`);
-		return humanoidRootPart;
-	}
-
-	public getRaycastParams(): RaycastParams {
+	getRaycastParams(): RaycastParams {
 		return this.raycastParams;
 	}
 
-	public getWalkSpeed(): number {
+	getWalkSpeed(): number {
 		return BASE_WALK_SPEED; // plus bonuses
 	}
 
-	public resetWalkSpeed(): void {
+	resetWalkSpeed(): void {
 		this.getHumanoid().WalkSpeed = this.getWalkSpeed();
 	}
 
-	public setWalkSpeed(speed: number): void {
+	setWalkSpeed(speed: number): void {
 		this.getHumanoid().WalkSpeed = speed;
 	}
 
-	public canAttack(): boolean {
+	canAttack(): boolean {
 		return (
 			this.attributes.isAlive &&
 			!(
@@ -126,15 +102,15 @@ export abstract class AbstractCharacter
 		);
 	}
 
-	public canLightAttack(): boolean {
+	canLightAttack(): boolean {
 		return this.canAttack() && !this.attributes.lightAttackDebounce;
 	}
 
-	public canHeavyAttack(): boolean {
+	canHeavyAttack(): boolean {
 		return this.canAttack() && !this.attributes.heavyAttackDebounce;
 	}
 
-	public canBlock(): boolean {
+	canBlock(): boolean {
 		return (
 			this.attributes.isAlive &&
 			!(
@@ -146,7 +122,7 @@ export abstract class AbstractCharacter
 		);
 	}
 
-	public toggleJump(enable: boolean): void {
+	toggleJump(enable: boolean): void {
 		this.getHumanoid().JumpPower = enable ? DEFAULT_JUMP_POWER : 0;
 	}
 }

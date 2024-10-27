@@ -48,19 +48,13 @@ export class LifecycleService implements OnStart {
 			}
 			player.CharacterAdded.Connect((character) => {
 				for (const otherListener of characterAddedListeners) {
-					task.spawn(() =>
-						otherListener.onCharacterAdded(
-							character as StarterCharacter,
-						),
-					);
+					task.spawn(() => otherListener.onCharacterAdded(character));
 				}
 			});
 			player.CharacterRemoving.Connect((character) => {
 				for (const otherListener of characterRemovingListeners) {
 					task.spawn(() =>
-						otherListener.onCharacterRemoving(
-							character as StarterCharacter,
-						),
+						otherListener.onCharacterRemoving(character),
 					);
 				}
 			});
@@ -70,12 +64,10 @@ export class LifecycleService implements OnStart {
 			for (const listener of playerAddedListeners) {
 				task.spawn(() => listener.onPlayerAdded(player));
 			}
-			if (player.Character) {
+			if (player.Character !== undefined) {
 				for (const listener of characterAddedListeners) {
 					task.spawn(() =>
-						listener.onCharacterAdded(
-							player.Character as StarterCharacter,
-						),
+						listener.onCharacterAdded(player.Character!),
 					);
 				}
 			}

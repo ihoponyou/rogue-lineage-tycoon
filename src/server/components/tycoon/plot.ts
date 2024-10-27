@@ -3,7 +3,7 @@ import { OnStart } from "@flamework/core";
 import { store } from "server/store";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { UsefulModel } from "shared/components/useful-model";
-import { Currency } from "../../../../types/currency";
+import { Currency } from "shared/modules/currency";
 import { Clickable } from "../interactable/clickable";
 import { PlayerServer } from "../player-server";
 import { Pad } from "./pad";

@@ -3,7 +3,7 @@ import { Dependency, OnStart, OnTick } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
 import { store } from "server/store";
 import { OnCharacterAdded } from "shared/modules/lifecycles";
-import { CharacterServer } from "../character-server";
+import { PlayerCharacter } from "../player-character";
 
 interface Attributes {
 	temperature: number;
@@ -29,7 +29,7 @@ export class Climate
 		this.overlapParams.FilterType = Enum.RaycastFilterType.Include;
 	}
 
-	public onCharacterAdded(character: StarterCharacter): void {
+	public onCharacterAdded(character: Model): void {
 		this.overlapParams.AddToFilter(character);
 	}
 
@@ -48,7 +48,7 @@ export class Climate
 			processedPlayers.push(player);
 
 			const characterComponent =
-				this.components.getComponent<CharacterServer>(character);
+				this.components.getComponent<PlayerCharacter>(character);
 			if (!characterComponent) continue;
 
 			const characterTemperature = store.getState().get(player)

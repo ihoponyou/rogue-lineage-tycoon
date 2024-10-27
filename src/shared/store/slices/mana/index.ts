@@ -1,6 +1,6 @@
 import { createProducer } from "@rbxts/reflex";
 import { PlayerProfileData } from "shared/modules/player-data";
-import { KeysOfType } from "../../../../../types/keys-of-type";
+import { KeysOfType } from "../../../../../types";
 
 export interface ManaData {
 	readonly amount: number;

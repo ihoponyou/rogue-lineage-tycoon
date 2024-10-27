@@ -1,17 +1,18 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
+import { AttackData } from "server/modules/attack-data";
 import { Events } from "server/network";
 import { HitService } from "server/services/hit-service";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { getWeaponConfig, WeaponConfig } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
-import { CharacterServer } from ".";
-import { AttackData } from "../../../../types/AttackData";
+import { PlayerCharacter } from "../player-character";
 
 const COMBO_RESET_DELAY = 2;
 const HEAVY_ATTACK_COOLDOWN = 3;
 const FISTS_CONFIG = getWeaponConfig("Fists");
 
+// TODO: make this not rely on playercharacter
 @Component({
 	tag: "CombatManager",
 })
@@ -24,7 +25,7 @@ export class CombatManager
 	private walkSpeedReset?: thread;
 
 	public constructor(
-		private character: CharacterServer,
+		private character: PlayerCharacter,
 		private hitService: HitService,
 	) {
 		super();
@@ -33,19 +34,19 @@ export class CombatManager
 	public onStart(): void {
 		this.trove.add(
 			Events.combat.lightAttack.connect((player) => {
-				if (player !== this.character.getPlayer()) return;
+				if (player !== this.character.getPlayer().instance) return;
 				this.handleLightAttack();
 			}),
 		);
 		this.trove.add(
 			Events.combat.block.connect((player, blockUp) => {
-				if (player !== this.character.getPlayer()) return;
+				if (player !== this.character.getPlayer().instance) return;
 				this.handleBlock(blockUp);
 			}),
 		);
 		this.trove.add(
 			Events.combat.heavyAttack.connect((player) => {
-				if (player !== this.character.getPlayer()) return;
+				if (player !== this.character.getPlayer().instance) return;
 				this.handleHeavyAttack();
 			}),
 		);
@@ -87,7 +88,7 @@ export class CombatManager
 		const weaponConfig = FISTS_CONFIG;
 		// this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
 
-		Events.character.stopRun(this.character.getPlayer());
+		Events.character.stopRun(this.character.getPlayer().instance);
 
 		this.character.attributes.combo++;
 
@@ -174,7 +175,7 @@ export class CombatManager
 
 	private handleBlock(blockUp: boolean): void {
 		if (blockUp && !this.character.canBlock()) {
-			Events.combat.unblock(this.character.getPlayer());
+			Events.combat.unblock(this.character.getPlayer().instance);
 			return;
 		}
 		this.character.attributes.isBlocking = blockUp;
@@ -188,7 +189,7 @@ export class CombatManager
 		const weaponConfig = FISTS_CONFIG;
 		// this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
 
-		Events.character.stopRun(this.character.getPlayer());
+		Events.character.stopRun(this.character.getPlayer().instance);
 
 		Events.playEffect.broadcast(
 			"HeavyCharge",

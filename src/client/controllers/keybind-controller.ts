@@ -1,7 +1,7 @@
 import { Controller } from "@flamework/core";
 import Object from "@rbxts/object-utils";
 import { ContextActionService, UserInputService } from "@rbxts/services";
-import { valueof } from "../../../types/valueof";
+import { valueof } from "../../../types";
 
 export interface Keybinds {
 	forward: Enum.KeyCode;

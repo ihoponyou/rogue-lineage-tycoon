@@ -1,6 +1,6 @@
 import { createProducer } from "@rbxts/reflex";
 import { PlayerProfileData } from "shared/modules/player-data";
-import { Currency } from "../../../../../types/currency";
+import { Currency } from "../../../modules/currency";
 
 export interface CurrencyData {
 	readonly amount: number;

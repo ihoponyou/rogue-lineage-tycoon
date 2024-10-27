@@ -2,23 +2,24 @@ import { Components } from "@flamework/components";
 import { Service } from "@flamework/core";
 import { Debris } from "@rbxts/services";
 import { CharacterServer } from "server/components/character-server";
+import { PlayerCharacter } from "server/components/player-character";
 import { Events } from "server/network";
 import { WeaponConfig } from "shared/configs/weapons";
-import { AttackData } from "../../../types/AttackData";
+import { AttackData } from "../modules/attack-data";
 
 @Service()
 export class HitService {
 	public constructor(private components: Components) {}
 
 	public registerHit(
-		hitter: CharacterServer,
+		hitter: PlayerCharacter,
 		victimInstance: Model,
 		weaponConfig: WeaponConfig,
 		attackData: AttackData,
 	): void {
 		if (hitter === undefined) return;
 		const victim =
-			this.components.getComponent<CharacterServer>(victimInstance);
+			this.components.getComponent<PlayerCharacter>(victimInstance);
 		if (victim === undefined) return;
 		if (!this.canHit(hitter, victim)) return;
 
@@ -32,9 +33,9 @@ export class HitService {
 		if (blocked) {
 			if (blockBroken) {
 				print("broke block");
-				Events.combat.unblock(victim.getPlayer());
+				Events.combat.unblock(victim.getPlayer().instance);
 			} else {
-				Events.combat.blockHit(victim.getPlayer());
+				Events.combat.blockHit(victim.getPlayer().instance);
 				Events.playEffect.broadcast(
 					`BlockHit`,
 					victimInstance,

@@ -1,30 +1,15 @@
 import { Component, Components } from "@flamework/components";
 import { OnTick } from "@flamework/core";
-import { promiseR6 } from "@rbxts/promise-character";
-import { Players } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
-import { Events } from "server/network";
-import { DataService } from "server/services/data-service";
-import { store } from "server/store";
-import {
-	selectPlayer,
-	selectPlayerConditions,
-	selectPlayerHealth,
-	selectPlayerTransform,
-} from "server/store/selectors";
 import { AbstractCharacter } from "shared/components/abstract-character";
 import { ItemId } from "shared/configs/items";
 import { SkillId } from "shared/configs/skills";
 import { WeaponType } from "shared/configs/weapons";
 import { ANIMATIONS } from "shared/constants";
 import { AnimationManager } from "shared/modules/animation-manager";
+import { cframeFromOrientationDeg } from "shared/modules/cframe-util";
 import { Equippable } from "shared/modules/equippable";
-import {
-	deserializeVector3,
-	serializeVector3,
-} from "shared/modules/serialized-vector3";
 import { ItemServer } from "../item-server";
-import { PlayerServer } from "../player-server";
 import { SkillServer } from "../skill-server";
 import { Weapon } from "../weapon";
 import { RagdollServer } from "./ragdoll-server";
@@ -32,11 +17,16 @@ import { RagdollServer } from "./ragdoll-server";
 const FF_DURATION = 15;
 const PROTECTED_DISTANCE = 5;
 const BASE_REGEN_RATE = 0.5;
-const MINIMUM_TEMPERATURE = 0;
-const MAXIMUM_TEMPERATURE = 100;
 const KNOCK_PERCENT_THRESHOLD = 0.15;
+const CARRY_ATTACHMENT_CFRAME = new CFrame(1.5, 1.5, 0).mul(
+	cframeFromOrientationDeg(-90, -180, 0),
+);
 
-const EVENTS = Events.character;
+type ParticleAttachment = Attachment & {
+	Critted: Sound;
+	Sniped: Sound;
+	Crit: ParticleEmitter;
+};
 
 @Component({
 	tag: "Character",
@@ -55,10 +45,11 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	protected inventoryFolder = this.newFolder("Inventory");
 	protected skillsFolder = this.newFolder("Skills");
 
-	private animationManager!: AnimationManager;
+	private headCollision = new Instance("NoCollisionConstraint");
+	private torsoCollision = new Instance("NoCollisionConstraint");
 
-	private hiltJoint = this.newHiltJoint();
-	private hiltBone = this.newHiltBone();
+	private currentlyEquipped?: Equippable;
+	private animationManager!: AnimationManager;
 	private weapons: Record<WeaponType, Weapon | undefined> = {
 		[WeaponType.Fists]: undefined,
 		[WeaponType.Dagger]: undefined,
@@ -66,68 +57,55 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		[WeaponType.Sword]: undefined,
 	};
 
-	private currentlyEquipped?: Equippable;
+	private hiltJoint = this.newHiltJoint();
+	private hiltBone = this.newHiltBone();
+	private alignOrientation = this.newAlignOrientation();
+	private alignPosition = this.newAlignPosition();
+	private carryAttachment = this.newCarryAttachment();
 
-	public constructor(
+	constructor(
+		protected components: Components,
 		protected ragdoll: RagdollServer,
-		private components: Components,
-		private dataService: DataService,
 	) {
 		super();
 
-		const character = promiseR6(this.instance).expect();
-		this.animationManager = new AnimationManager(
-			character.Humanoid.Animator,
-		);
+		this.animationManager = new AnimationManager(this.getAnimator());
 	}
 
-	public override onStart(): void {
+	override onStart(): void {
 		super.onStart();
 
 		this.inventoryFolder.Parent = this.instance;
 		this.skillsFolder.Parent = this.instance;
 
+		const head = this.getHead();
+		this.headCollision.Parent = head;
+		this.headCollision.Part0 = head;
+
+		const torso = this.getTorso();
+		this.torsoCollision.Parent = torso;
+		this.torsoCollision.Part0 = torso;
+
+		const humanoidRootPart = this.getHumanoidRootPart();
+		this.carryAttachment.Parent = humanoidRootPart;
+		this.alignOrientation.Parent = humanoidRootPart;
+		this.alignOrientation.Attachment0 = humanoidRootPart.RootAttachment;
+		this.alignPosition.Parent = humanoidRootPart;
+		this.alignPosition.Attachment0 = humanoidRootPart.RootAttachment;
+
+		this.instance.AddTag("Carriable");
 		this.instance.AddTag("FallDamage");
 		this.instance.AddTag("CombatManager");
 
 		this.loadAnimations(ANIMATIONS);
 
-		const player = this.getPlayer();
-		this.trove.add(
-			this.dataService.connectToPreRelease(player, (profile) => {
-				const pivot = this.instance.GetPivot();
-				const yRotation = pivot.ToEulerAnglesXYZ()[1];
-				profile.Data.transform.position = serializeVector3(
-					pivot.Position,
-				);
-				profile.Data.transform.yRotation = yRotation;
-			}),
-		);
-
 		this.trove.connect(this.humanoid.HealthChanged, (health) =>
 			this.onHealthChanged(health),
 		);
-
-		const character = promiseR6(this.instance).expect();
-		this.trove.connect(
-			character.HumanoidRootPart.AncestryChanged,
-			(_, parent) => {
-				if (parent !== undefined) return;
-				this.components
-					.waitForComponent<PlayerServer>(this.getPlayer())
-					.expect()
-					.loadCharacter();
-			},
-		);
 	}
 
-	public onTick(dt: number): void {
+	onTick(dt: number): void {
 		if (!this.attributes.isAlive) return;
-
-		const player = this.getPlayer();
-
-		store.decayStomach(player, dt);
-		store.decayToxicity(player, dt);
 
 		const humanoid = this.humanoid;
 		if (humanoid.Health >= humanoid.MaxHealth) return;
@@ -137,42 +115,13 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		humanoid.TakeDamage(dt * -regenRate);
 	}
 
-	public loadHealth(): void {
-		let savedHealth = store.getState(selectPlayerHealth(this.getPlayer()));
-		if (savedHealth === undefined) error("health not found");
-		if (savedHealth < 1) savedHealth = 100;
-		this.humanoid.Health = savedHealth;
-	}
-
-	public loadConditions(): void {
-		const conditions = store.getState(
-			selectPlayerConditions(this.getPlayer()),
-		);
-		if (conditions === undefined) error("conditions not found");
-		for (const condition of conditions) {
-			this.instance.AddTag(condition);
-		}
-	}
-
-	public loadTransform(): void {
-		const savedTransform = store.getState(
-			selectPlayerTransform(this.getPlayer()),
-		);
-		if (savedTransform === undefined) error("transform not found");
-		this.instance.PivotTo(
-			new CFrame(deserializeVector3(savedTransform.position)).mul(
-				CFrame.fromOrientation(0, savedTransform.yRotation, 0),
-			),
-		);
-	}
-
-	public knock(): void {
+	knock(): void {
 		if (this.attributes.isKnocked) return;
 		this.attributes.isKnocked = true;
 		this.ragdoll.toggle(true);
 	}
 
-	public breakJoints(): void {
+	breakJoints(): void {
 		this.instance.GetDescendants().forEach((value) => {
 			if (
 				value.IsA("BallSocketConstraint") ||
@@ -183,30 +132,20 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		});
 	}
 
-	public kill(): void {
+	kill(): void {
 		if (!this.attributes.isAlive) return;
 		this.attributes.isAlive = false;
 
 		this.humanoid.Health = 0;
 		this.breakJoints();
-
-		const player = this.getPlayer();
-
-		store.subtractLife(player);
-
-		EVENTS.killed.fire(player);
-
-		this.components
-			.waitForComponent<PlayerServer>(this.getPlayer())
-			.andThen((playerServer) => {
-				task.wait(Players.RespawnTime);
-				playerServer.loadCharacter().catch(warn);
-			});
 	}
 
-	public snipe(): void {
-		const particleAttachment = this.getHead().ParticleAttachment;
-		if (!particleAttachment) return;
+	snipe(): void {
+		// TODO: make thsi not a hack
+		const particleAttachment = this.getHead().FindFirstChild(
+			"ParticleAttachment",
+		) as ParticleAttachment;
+		if (particleAttachment === undefined) return;
 
 		particleAttachment.Critted.Play();
 		particleAttachment.Sniped.Play();
@@ -215,10 +154,9 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		this.kill();
 	}
 
-	public giveForceField(): void {
+	giveForceField(): void {
 		const ffTrove = this.trove.extend();
-		const startPos = (this.instance as StarterCharacter).HumanoidRootPart
-			.Position;
+		const startPos = this.getHumanoidRootPart().Position;
 		const startTick = tick();
 		const ff = ffTrove.add(new Instance("ForceField"));
 		ff.Parent = this.instance;
@@ -227,8 +165,7 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 			setInterval(() => {
 				const timeExpired = tick() - startTick > FF_DURATION;
 
-				const currentPos = (this.instance as StarterCharacter)
-					.HumanoidRootPart.Position;
+				const currentPos = this.getHumanoidRootPart().Position;
 				const distanceFromStart = currentPos.sub(startPos).Magnitude;
 				const leftSpawn = distanceFromStart > PROTECTED_DISTANCE;
 
@@ -237,30 +174,11 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		);
 	}
 
-	public adjustTemperature(amount: number) {
-		const player = this.getPlayer();
-		const temperature = store.getState(selectPlayer(player))?.resources
-			.temperature;
-		if (temperature === undefined) error("no data");
-
-		const newTemperature = math.clamp(
-			temperature + amount,
-			MINIMUM_TEMPERATURE,
-			MAXIMUM_TEMPERATURE,
-		);
-		store.setTemperature(player, newTemperature);
-
-		if (newTemperature === MINIMUM_TEMPERATURE)
-			this.instance.AddTag("Frostbite");
-		else if (newTemperature === MAXIMUM_TEMPERATURE)
-			this.instance.AddTag("BurnScar");
-	}
-
-	public takeDamage(amount: number): void {
+	takeDamage(amount: number): void {
 		this.humanoid.TakeDamage(math.min(this.humanoid.Health, amount));
 	}
 
-	public isBehind(character: CharacterServer): boolean {
+	isBehind(character: CharacterServer): boolean {
 		const position = this.instance.GetPivot().Position;
 		const theirCFrame = character.instance.GetPivot();
 		const toThem = theirCFrame.Position.sub(position);
@@ -316,22 +234,22 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		this.currentlyEquipped = equippable;
 	}
 
-	public loadAnimations(animationFolder: Folder) {
+	loadAnimations(animationFolder: Folder) {
 		const anims = animationFolder
 			.GetDescendants()
 			.filter((value) => value.IsA("Animation"));
 		this.animationManager.loadAnimations(anims as Animation[]);
 	}
 
-	public playAnimation(name: string, speed?: number) {
+	playAnimation(name: string, speed?: number) {
 		this.animationManager.playTrack(name, undefined, undefined, speed);
 	}
 
-	public stopAnimation(name: string, fadeTime?: number) {
+	stopAnimation(name: string, fadeTime?: number) {
 		this.animationManager.stopTrack(name, fadeTime);
 	}
 
-	public connectToAnimationMarker(
+	connectToAnimationMarker(
 		trackName: string,
 		markerName: string,
 		callback: (param?: string) => void,
@@ -343,12 +261,66 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		);
 	}
 
-	public connectToAnimationStopped(name: string, callback: () => void) {
+	connectToAnimationStopped(name: string, callback: () => void) {
 		return this.animationManager.getTrack(name)?.Stopped.Connect(callback);
 	}
 
-	public toggleRagdoll(on: boolean): void {
+	toggleRagdoll(on: boolean): void {
 		this.ragdoll.toggle(on);
+	}
+
+	setAlignOrientationAtt1(attachment?: Attachment): void {
+		this.alignOrientation.Attachment1 = attachment;
+	}
+
+	setAlignPositionAtt1(attachment?: Attachment): void {
+		this.alignPosition.Attachment1 = attachment;
+	}
+
+	getCarryAttachment(): Attachment {
+		return this.carryAttachment;
+	}
+
+	setHeadCollisionPart1(part?: BasePart): void {
+		this.headCollision.Part1 = part;
+	}
+
+	setTorsoCollisionPart1(part?: BasePart): void {
+		this.torsoCollision.Part1 = part;
+	}
+
+	protected onHealthChanged(health: number): void {
+		const percentHealth = health / this.humanoid.MaxHealth;
+		if (this.attributes.isKnocked) {
+			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
+				if (this.instance.GetAttribute("isCarried") === true) return;
+				this.attributes.isKnocked = false;
+				this.ragdoll.toggle(false);
+			}
+			return;
+		}
+
+		if (health > 0) return;
+		this.knock();
+	}
+
+	private newAlignOrientation(): AlignOrientation {
+		const constraint = new Instance("AlignOrientation");
+		constraint.RigidityEnabled = true;
+		return constraint;
+	}
+
+	private newAlignPosition(): AlignPosition {
+		const constraint = new Instance("AlignPosition");
+		constraint.ApplyAtCenterOfMass = true;
+		constraint.RigidityEnabled = true;
+		return constraint;
+	}
+
+	private newCarryAttachment(): Attachment {
+		const attachment = new Instance("Attachment");
+		attachment.CFrame = CARRY_ATTACHMENT_CFRAME;
+		return attachment;
 	}
 
 	// what if the character drops the highest tier weapon
@@ -386,21 +358,5 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		const inventory = new Instance("Folder");
 		inventory.Name = name;
 		return inventory;
-	}
-
-	private onHealthChanged(health: number): void {
-		store.setHealth(this.getPlayer(), health);
-		const percentHealth = health / this.humanoid.MaxHealth;
-		if (this.attributes.isKnocked) {
-			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
-				if (this.instance.GetAttribute("isCarried") === true) return;
-				this.attributes.isKnocked = false;
-				this.ragdoll.toggle(false);
-			}
-			return;
-		}
-
-		if (health > 0) return;
-		this.knock();
 	}
 }
