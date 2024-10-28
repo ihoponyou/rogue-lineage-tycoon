@@ -2,8 +2,8 @@ import { Component, Components } from "@flamework/components";
 import { OnTick } from "@flamework/core";
 import { setInterval } from "@rbxts/set-timeout";
 import { AbstractCharacter } from "shared/components/abstract-character";
-import { ItemId } from "shared/configs/items";
-import { SkillId } from "shared/configs/skills";
+import { isItemId, ItemId } from "shared/configs/items";
+import { isSkillId, SkillId } from "shared/configs/skills";
 import { WeaponType } from "shared/configs/weapons";
 import { ANIMATIONS } from "shared/constants";
 import { AnimationManager } from "shared/modules/animation-manager";
@@ -92,6 +92,13 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		this.alignOrientation.Attachment0 = humanoidRootPart.RootAttachment;
 		this.alignPosition.Parent = humanoidRootPart;
 		this.alignPosition.Attachment0 = humanoidRootPart.RootAttachment;
+
+		const rightArm = this.instance.WaitForChild("Right Arm") as BasePart;
+
+		this.hiltBone.Parent = this.instance;
+		this.hiltJoint.Parent = this.hiltBone;
+		this.hiltJoint.Part0 = rightArm;
+		this.hiltJoint.Part1 = this.hiltBone;
 
 		this.instance.AddTag("Carriable");
 		this.instance.AddTag("FallDamage");
@@ -206,10 +213,12 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	}
 
 	learnSkill(id: SkillId): void {
+		if (!isSkillId(id)) error(`"${id}" is not a valid SkillId`);
 		SkillServer.instantiate(id, this.skillsFolder, this);
 	}
 
 	giveItem(id: ItemId, quantity: number = 1): void {
+		if (!isItemId(id)) error(`"${id}" is not a valid ItemId`);
 		ItemServer.instantiate(
 			id,
 			quantity,

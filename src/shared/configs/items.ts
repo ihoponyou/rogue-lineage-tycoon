@@ -1,3 +1,4 @@
+import { Flamework } from "@flamework/core";
 import { ReplicatedStorage } from "@rbxts/services";
 import { AbstractWeapon } from "shared/components/abstract-weapon";
 import { cframeFromOrientationDeg } from "shared/modules/cframe-util";
@@ -83,6 +84,8 @@ export const ITEMS = {
 };
 
 export type ItemId = keyof typeof ITEMS;
+
+export const isItemId = Flamework.createGuard<ItemId>();
 
 export function getItemConfig(name: ItemId): ItemConfig {
 	const config: ItemConfig = ITEMS[name];

@@ -1,5 +1,5 @@
 export = {
-	Name: "teach",
+	Name: "give_skill",
 	Group: "Admin",
 	Args: [
 		{
@@ -7,8 +7,8 @@ export = {
 			Name: "player",
 		},
 		{
-			Type: "string",
-			Name: "skillName",
+			Type: "skillId",
+			Name: "skillId",
 		},
 	],
 };

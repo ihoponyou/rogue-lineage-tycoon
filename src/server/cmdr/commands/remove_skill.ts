@@ -7,8 +7,8 @@ export = {
 			Name: "player",
 		},
 		{
-			Type: "string",
-			Name: "skillName",
+			Type: "skillId",
+			Name: "skillId",
 		},
 	],
 };

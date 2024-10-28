@@ -6,7 +6,6 @@ import { store } from "server/store";
 import { selectPlayer } from "server/store/selectors";
 import { AbstractPlayer } from "shared/components/abstract-player";
 import { deserializeVector3 } from "shared/modules/serialized-vector3";
-import { CharacterServer } from "./character-server";
 import { PlayerCharacter } from "./player-character";
 
 const TYCOON_FOLDER = Workspace.Tycoons;
@@ -117,11 +116,11 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 		});
 	}
 
-	public getCharacter(): CharacterServer {
+	public getCharacter(): PlayerCharacter {
 		const model = this.instance.Character;
 		if (model === undefined)
 			error(`${this.instance.Name}.Character is undefined`);
-		const character = this.components.getComponent<CharacterServer>(model);
+		const character = this.components.getComponent<PlayerCharacter>(model);
 		if (character === undefined)
 			error(
 				`${this.instance.Name}'s character missing character component`,
@@ -130,7 +129,7 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 	}
 
 	private onCharacterAdded(character: Model) {
-		character.AddTag(CharacterServer.TAG);
+		character.AddTag(PlayerCharacter.TAG);
 	}
 
 	private isInsideTycoon(position: Vector3): boolean {
