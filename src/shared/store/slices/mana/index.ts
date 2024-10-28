@@ -1,6 +1,6 @@
 import { createProducer } from "@rbxts/reflex";
-import { KeysOfType } from "../../../../../types/keys-of-type";
-import { PlayerData } from "../player-data";
+import { PlayerProfileData } from "shared/modules/player-data";
+import { KeysOfType } from "../../../../../types";
 
 export interface ManaData {
 	readonly amount: number;
@@ -28,7 +28,7 @@ function toggleManaProperty(property: KeysOfType<ManaData, boolean>) {
 }
 
 export const manaSlice = createProducer(DEFAULT_MANA_DATA, {
-	loadPlayerData: (_state, data: PlayerData) => data.mana,
+	loadPlayerData: (_state, data: PlayerProfileData) => data.mana,
 
 	setManaAmount: (state, value: number) => {
 		return {

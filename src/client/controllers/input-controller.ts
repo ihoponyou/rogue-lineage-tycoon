@@ -3,12 +3,13 @@ import { Controller, OnStart, OnTick } from "@flamework/core";
 import { UserInputService, Workspace } from "@rbxts/services";
 import Signal from "@rbxts/signal";
 import { store } from "client/store";
+import { selectIsBackpackOpen } from "client/store/slices/ui/selectors";
+import { OnLocalCharacterAdded } from "shared/modules/lifecycles";
 import {
 	selectMana,
 	selectManaEnabled,
 } from "shared/store/slices/mana/selectors";
-import { OnLocalCharacterAdded } from "../../../types/lifecycles";
-import { Character } from "../components/character";
+import { CharacterClient } from "../components/character-client";
 import { InventoryController } from "./inventory-controller";
 import { KeybindController } from "./keybind-controller";
 
@@ -38,7 +39,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private blockTriggered = new Signal();
 
 	private lastForwardInputTick = 0;
-	private character?: Character;
+	private character?: CharacterClient;
 
 	public constructor(
 		private components: Components,
@@ -87,111 +88,18 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			this.keybindController.keybinds.toggleBackpack,
 			(state) => {
 				if (state !== BEGIN) return;
-				store.toggleBackpack();
+				const currentlyOpen = store.getState(selectIsBackpackOpen());
+				store.toggleBackpackOpen(!currentlyOpen);
 			},
 		);
-		this.keybindController.loadKeybind(
-			"slot1",
-			this.keybindController.keybinds.slot1,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(0);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot2",
-			this.keybindController.keybinds.slot2,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(1);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot3",
-			this.keybindController.keybinds.slot3,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(2);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot4",
-			this.keybindController.keybinds.slot4,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(3);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot5",
-			this.keybindController.keybinds.slot5,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(4);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot6",
-			this.keybindController.keybinds.slot6,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(5);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot7",
-			this.keybindController.keybinds.slot7,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(6);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot8",
-			this.keybindController.keybinds.slot8,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(7);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot9",
-			this.keybindController.keybinds.slot9,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(8);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot10",
-			this.keybindController.keybinds.slot10,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(9);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot11",
-			this.keybindController.keybinds.slot11,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(10);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot12",
-			this.keybindController.keybinds.slot12,
-			(state) => {
-				if (state !== BEGIN) return;
-				this.inventoryController.switchSlot(11);
-			},
-		);
+
 		this.keybindController.loadKeybind(
 			"drop",
 			Enum.KeyCode.Backspace,
 			(state) => {
 				if (state !== BEGIN) return;
-				this.inventoryController.dropSelectedItem();
+				error("fix me");
+				// this.inventoryController.dropSelectedItem();
 			},
 		);
 	}
@@ -205,7 +113,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 
 	public onLocalCharacterAdded(character: Model): void {
 		this.components
-			.waitForComponent<Character>(character)
+			.waitForComponent<CharacterClient>(character)
 			.andThen((component) => (this.character = component));
 	}
 

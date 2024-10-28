@@ -1,6 +1,6 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { getWeaponConfig } from "shared/configs/weapons";
-import { Useable } from "../../../types/useable";
+import { Useable } from "../modules/useable";
 import { AbstractItem } from "./abstract-item";
 
 @Component()

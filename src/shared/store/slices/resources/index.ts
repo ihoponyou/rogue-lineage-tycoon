@@ -1,5 +1,5 @@
 import { createProducer } from "@rbxts/reflex";
-import { PlayerData } from "../player-data";
+import { PlayerProfileData } from "shared/modules/player-data";
 
 const BASE_STOMACH_DECAY_RATE = 0.1;
 const BASE_TOXICITY_DECAY_RATE = 0.05;
@@ -19,7 +19,7 @@ export const DEFAULT_RESOURCES: Resources = {
 };
 
 export const resourcesSlice = createProducer(DEFAULT_RESOURCES, {
-	loadPlayerData: (_state, data: PlayerData) => data.resources,
+	loadPlayerData: (_state, data: PlayerProfileData) => data.resources,
 
 	resetLifeValues: (_state) => DEFAULT_RESOURCES,
 

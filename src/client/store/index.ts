@@ -1,36 +1,15 @@
-import {
-	InferState,
-	ProducerMiddleware,
-	combineProducers,
-	createBroadcastReceiver,
-} from "@rbxts/reflex";
-import { Events } from "client/network";
+import { InferState, combineProducers } from "@rbxts/reflex";
 import slices from "shared/store/slices";
+import { receiverMiddleware } from "./middleware/receiver";
 import { dialogueSlice } from "./slices/dialogue";
-import { guiSlice } from "./slices/gui";
+import { equippablesSlice } from "./slices/equippables";
+import { uiSlice } from "./slices/ui";
 
-export type RootState = InferState<typeof store>;
-
-function receiverMiddleware(): ProducerMiddleware {
-	const receiver = createBroadcastReceiver({
-		start: () => {
-			Events.reflex.start();
-		},
-	});
-
-	Events.reflex.dispatch.connect((actions) => {
-		receiver.dispatch(actions);
-	});
-
-	Events.reflex.hydrate.connect((state) => {
-		store.loadPlayerData(state);
-	});
-
-	return receiver.middleware;
-}
+export type RootClientState = InferState<typeof store>;
 
 export const store = combineProducers({
 	...slices,
 	dialogue: dialogueSlice,
-	gui: guiSlice,
+	ui: uiSlice,
+	equippables: equippablesSlice,
 }).applyMiddleware(receiverMiddleware());

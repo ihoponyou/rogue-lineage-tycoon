@@ -1,26 +1,26 @@
+import Immut from "@rbxts/immut";
 import { createProducer } from "@rbxts/reflex";
-import { PlayerData } from "../player-data";
+import { SkillId } from "shared/configs/skills";
+import { PlayerProfileData } from "shared/modules/player-data";
 
-export const skillsSlice = createProducer([] as ReadonlyArray<string>, {
-	loadPlayerData: (_state, data: PlayerData) => {
+export type SkillsState = ReadonlySet<SkillId>;
+
+export const DEFAULT_SKILLS_STATE: SkillsState = new Set<SkillId>();
+
+export const skillsSlice = createProducer(DEFAULT_SKILLS_STATE, {
+	loadPlayerData: (_state, data: PlayerProfileData) => {
 		return data.skills;
 	},
 
-	resetLineageValues: (_state) => {
-		return [];
+	addSkill: (state, id: SkillId) => {
+		if (state.has(id)) return state;
+		return new ReadonlySet([...state, id]);
 	},
 
-	addSkill: (state, skillName: string) => {
-		if (state.includes(skillName)) return state;
-
-		return [...state, skillName];
-	},
-
-	removeSkill: (state, skillName: string) => {
-		if (!state.includes(skillName)) return state;
-
-		return state.filter(
-			(existingCondition) => existingCondition !== skillName,
-		);
+	removeSkill: (state, id: SkillId) => {
+		if (!state.has(id)) return state;
+		return Immut.produce(state, (draft) => {
+			draft.delete(id);
+		});
 	},
 });

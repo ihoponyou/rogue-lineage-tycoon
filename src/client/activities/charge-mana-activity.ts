@@ -1,6 +1,6 @@
 import { RunService } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
-import { Character } from "client/components/character";
+import { CharacterClient } from "client/components/character-client";
 import { KeybindController } from "client/controllers/keybind-controller";
 import { Events } from "client/network";
 import { SFX } from "shared/constants";
@@ -13,7 +13,7 @@ export class ChargeManaActivity extends CharacterActivity {
 	private trove = new Trove();
 
 	public constructor(
-		character: Character,
+		character: CharacterClient,
 		private keybindController: KeybindController,
 	) {
 		super(character);

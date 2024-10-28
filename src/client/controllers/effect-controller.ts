@@ -1,5 +1,5 @@
 import { Controller, OnStart } from "@flamework/core";
-import { EFFECTS } from "client/effects";
+import { EFFECTS } from "client/configs/effects";
 import { Events } from "client/network";
 
 @Controller()

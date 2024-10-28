@@ -2,7 +2,6 @@ import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { DisposableComponent } from "shared/components/disposable-component";
 import { Toggleable } from "shared/components/toggleable";
-import { Inject } from "shared/inject";
 import { Plot } from "./plot";
 import { Product } from "./product";
 
@@ -21,10 +20,10 @@ export class Collector
 	private touchedConnection?: RBXScriptConnection;
 	private plot!: Plot;
 
-	@Inject
-	private components!: Components;
-
-	public constructor(private toggleable: Toggleable) {
+	public constructor(
+		private components: Components,
+		private toggleable: Toggleable,
+	) {
 		super();
 		const tycoon = this.instance.FindFirstAncestorOfClass("Model");
 		if (!tycoon) error("could not find parent tycoon");

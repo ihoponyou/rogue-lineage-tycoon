@@ -1,9 +1,9 @@
 import { createProducer } from "@rbxts/reflex";
+import { PlayerProfileData } from "shared/modules/player-data";
 import {
 	SerializedVector3,
 	serializeVector3,
 } from "shared/modules/serialized-vector3";
-import { PlayerData } from "../player-data";
 
 export interface TransformData {
 	position: SerializedVector3;
@@ -24,7 +24,7 @@ export const DEFAULT_TRANSFORM_DATA: TransformData = {
 };
 
 export const transformSlice = createProducer(DEFAULT_TRANSFORM_DATA, {
-	loadPlayerData: (_state, data: PlayerData) => data.transform,
+	loadPlayerData: (_state, data: PlayerProfileData) => data.transform,
 
 	resetLifeValues: (_state) => DEFAULT_TRANSFORM_DATA,
 

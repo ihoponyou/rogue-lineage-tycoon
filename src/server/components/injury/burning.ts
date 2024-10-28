@@ -3,7 +3,7 @@ import { OnStart } from "@flamework/core";
 import { Players, TweenService } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { Character } from "../character";
+import { PlayerCharacter } from "../player-character";
 
 const HEAT_AMOUNT = 1.5;
 const BURN_DAMAGE = 6;
@@ -16,19 +16,23 @@ const TICKS_TO_DIE = 8;
 export class Burning extends DisposableComponent<{}, Model> implements OnStart {
 	private killTicks = 0;
 
-	public constructor(private character: Character) {
+	constructor(private character: PlayerCharacter) {
 		super();
 	}
 
-	public onStart(): void {
+	onStart(): void {
 		const torso = this.character.getTorso();
-		torso.OrangeFire.Enabled = true;
-		torso.Burning.Play();
+		const fireParticle = torso.FindFirstChild("OrangeFire") as
+			| ParticleEmitter
+			| undefined;
+		if (fireParticle !== undefined) fireParticle.Enabled = true;
+		const burnSound = torso.FindFirstChild("Burning") as Sound | undefined;
+		burnSound?.Play();
 
 		this.trove.add(setInterval(() => this.burn(), BURN_INTERVAL));
 	}
 
-	public override destroy(): void {
+	override destroy(): void {
 		this.extinguish();
 		super.destroy();
 	}
@@ -59,9 +63,19 @@ export class Burning extends DisposableComponent<{}, Model> implements OnStart {
 	private extinguish(): void {
 		const torso = this.character.getTorso();
 		if (torso) {
-			torso.OrangeFire.Enabled = false;
-			torso.Burning.Stop();
-			torso.Extinguish.Play();
+			// TODO: create these onstart and delete on destroy
+			const fireParticle = torso.FindFirstChild("OrangeFire") as
+				| ParticleEmitter
+				| undefined;
+			if (fireParticle !== undefined) fireParticle.Enabled = false;
+			const burnSound = torso.FindFirstChild("Burning") as
+				| Sound
+				| undefined;
+			burnSound?.Stop();
+			const extinguishSound = torso.FindFirstChild("Extinguish") as
+				| Sound
+				| undefined;
+			extinguishSound?.Play();
 		}
 	}
 

@@ -1,5 +1,5 @@
 import { SharedState } from "shared/store";
 
-export function selectItems() {
-	return (state: SharedState) => state.inventory.tools;
+export function selectInventory() {
+	return (state: SharedState) => state.inventory;
 }

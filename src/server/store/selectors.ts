@@ -4,15 +4,13 @@ import { selectConditions } from "shared/store/slices/conditions/selectors";
 import { selectCurrencies } from "shared/store/slices/currencies/selectors";
 import { selectIdentity } from "shared/store/slices/identity/selectors";
 import { selectMana } from "shared/store/slices/mana/selectors";
-import { PlayerData } from "shared/store/slices/player-data";
 import { selectResources } from "shared/store/slices/resources/selectors";
-import { selectSkills } from "shared/store/slices/skills/selectors";
 import { selectStats } from "shared/store/slices/stats/selectors";
 import { selectTransform } from "shared/store/slices/transform/selectors";
-import { RootState } from ".";
+import { RootServerState } from ".";
 
 export function selectPlayer(player: Player) {
-	return (state: RootState) => state.get(tostring(player.UserId));
+	return (state: RootServerState) => state.get(player);
 }
 
 export function selectPlayerHealth(player: Player) {
@@ -64,10 +62,12 @@ export function selectPlayerIdentity(player: Player) {
 	);
 }
 
+export function selectPlayerInventory(player: Player) {
+	return createSelector(selectPlayer(player), (state) => state?.inventory);
+}
+
 export function selectPlayerSkills(player: Player) {
-	return createSelector(selectPlayer(player), (state) =>
-		state === undefined ? undefined : selectSkills()(state),
-	);
+	return createSelector(selectPlayer(player), (state) => state?.skills);
 }
 
 export function selectPlayerClasses(player: Player) {
@@ -76,39 +76,39 @@ export function selectPlayerClasses(player: Player) {
 	);
 }
 
-export function selectPlayerData(player: Player) {
-	return createSelector(
-		selectPlayerStats(player),
-		selectPlayerCurrencies(player),
-		selectPlayerResources(player),
-		selectPlayerMana(player),
-		selectPlayerConditions(player),
-		selectPlayerIdentity(player),
-		selectPlayerTransform(player),
-		selectPlayerSkills(player),
-		selectPlayerClasses(player),
-		(
-			stats,
-			currencies,
-			resources,
-			mana,
-			conditions,
-			identity,
-			transform,
-			skills,
-			classes,
-		) => {
-			return {
-				stats: stats ?? {},
-				currencies: currencies ?? {},
-				resources: resources ?? {},
-				mana: mana ?? {},
-				conditions: conditions ?? {},
-				identity: identity ?? {},
-				transform: transform ?? {},
-				skills: skills ?? {},
-				classes: classes ?? {},
-			} as PlayerData;
-		},
-	);
-}
+// export function selectPlayerData(player: Player) {
+// 	return createSelector(
+// 		selectPlayerStats(player),
+// 		selectPlayerCurrencies(player),
+// 		selectPlayerResources(player),
+// 		selectPlayerMana(player),
+// 		selectPlayerConditions(player),
+// 		selectPlayerIdentity(player),
+// 		selectPlayerTransform(player),
+// 		selectPlayerSkills(player),
+// 		selectPlayerClasses(player),
+// 		(
+// 			stats,
+// 			currencies,
+// 			resources,
+// 			mana,
+// 			conditions,
+// 			identity,
+// 			transform,
+// 			skills,
+// 			classes,
+// 		) => {
+// 			return {
+// 				stats: stats ?? {},
+// 				currencies: currencies ?? {},
+// 				resources: resources ?? {},
+// 				mana: mana ?? {},
+// 				conditions: conditions ?? {},
+// 				identity: identity ?? {},
+// 				transform: transform ?? {},
+// 				skills: skills ?? {},
+// 				classes: classes ?? {},
+// 			} as PlayerData;
+// 		},
+// 	);
+// }

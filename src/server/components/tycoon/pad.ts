@@ -5,9 +5,8 @@ import { TouchableModel } from "server/components/interactable/touchable/touchab
 import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { selectPlayer } from "server/store/selectors";
-import { ModelComponent } from "shared/components/model";
+import { UsefulModel } from "shared/components/useful-model";
 import { Hideable } from "shared/hideable";
-import { Inject } from "shared/inject";
 import { PlayerServer } from "../player-server";
 import { Plot } from "./plot";
 
@@ -34,10 +33,10 @@ export class Pad
 	private assetConfig = getAssetConfig(this.attributes.assetName);
 	private purchased = new Signal<PurchaseCallback>();
 
-	@Inject
-	private components!: Components;
-
-	public constructor(private model: ModelComponent) {
+	public constructor(
+		private components: Components,
+		private model: UsefulModel,
+	) {
 		super();
 	}
 

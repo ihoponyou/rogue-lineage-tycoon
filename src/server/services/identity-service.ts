@@ -13,8 +13,8 @@ import {
 import { store } from "server/store";
 import { selectPlayerIdentity } from "server/store/selectors";
 import { APPEARANCE } from "shared/constants";
+import { OnCharacterAdded, OnPlayerAdded } from "shared/modules/lifecycles";
 import { Sex } from "shared/store/slices/identity";
-import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
 
 const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
 const HAIR_TEXTURE = "rbxassetid://13655022252";

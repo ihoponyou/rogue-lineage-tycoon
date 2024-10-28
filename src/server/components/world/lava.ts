@@ -1,15 +1,11 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Trove } from "@rbxts/trove";
-import { OnRemoved } from "../../../../types/lifecycles";
 
 @Component({
 	tag: "Lava",
 })
-export class Lava
-	extends BaseComponent<{}, BasePart>
-	implements OnStart, OnRemoved
-{
+export class Lava extends BaseComponent<{}, BasePart> implements OnStart {
 	private trove = new Trove();
 
 	public onStart(): void {
@@ -24,5 +20,10 @@ export class Lava
 
 	public onTouched(otherPart: BasePart): void {
 		if (otherPart.Parent) otherPart.Parent.AddTag("Burning");
+	}
+
+	override destroy(): void {
+		this.trove.clean();
+		super.destroy();
 	}
 }

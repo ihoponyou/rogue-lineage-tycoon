@@ -4,9 +4,8 @@ import { Debris } from "@rbxts/services";
 import { Timer, TimerState } from "@rbxts/timer";
 import { DROPPERS } from "server/configs/tycoon";
 import { DisposableComponent } from "shared/components/disposable-component";
-import { ModelComponent } from "shared/components/model";
 import { Toggleable } from "shared/components/toggleable";
-import { Inject } from "shared/inject";
+import { UsefulModel } from "shared/components/useful-model";
 
 type DropperInstance = Model & {
 	Faucet: BasePart & {
@@ -24,10 +23,10 @@ export class Dropper
 	private readonly config = DROPPERS[this.instance.Name];
 	private timer!: Timer;
 
-	@Inject
-	private components!: Components;
-
-	public constructor(private toggleable: Toggleable) {
+	public constructor(
+		private components: Components,
+		private toggleable: Toggleable,
+	) {
 		super();
 		if (!this.config)
 			error(`dropper "${this.instance.Name}" does not exist`);
@@ -73,7 +72,7 @@ export class Dropper
 			clone.Parent = this.instance;
 
 			this.components
-				.waitForComponent<ModelComponent>(clone)
+				.waitForComponent<UsefulModel>(clone)
 				.andThen((_model) => {
 					// model.setNetworkOwner(
 					// 	this.plotAsset.getPlot().getOwner()?.instance,
