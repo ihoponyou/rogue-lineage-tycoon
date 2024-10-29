@@ -87,7 +87,6 @@ export class PlayerCharacter extends CharacterServer {
 		this.unsubscribeFromInventory = store.subscribe(
 			selectPlayerInventory(this.player.instance),
 			(state, _prevState) => {
-				print("updating");
 				this.updateInventoryFromState(state);
 			},
 		);
@@ -197,7 +196,7 @@ export class PlayerCharacter extends CharacterServer {
 
 	private updateInventoryFromState(
 		items?: ReadonlyMap<ItemId, number>,
-		autoHotbar = false,
+		autoHotbar = true,
 	) {
 		if (items === undefined) return;
 		for (const [itemId, quantity] of items) {
@@ -219,7 +218,7 @@ export class PlayerCharacter extends CharacterServer {
 	private updateSkillsFromState(
 		skills?: ReadonlySet<SkillId>,
 		prevSkills?: ReadonlySet<SkillId>,
-		autoHotbar = false,
+		autoHotbar = true,
 	) {
 		if (skills === undefined) return;
 		for (const skillId of skills) {

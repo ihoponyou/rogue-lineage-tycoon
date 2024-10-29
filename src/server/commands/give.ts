@@ -30,6 +30,7 @@ const isAdmin: CommandGuard = (ctx) => {
 })
 @Group("give")
 @Guard(isAdmin)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class GiveCommand {
 	@Command({
 		name: "item",
