@@ -28,6 +28,8 @@
     "@flamework/components": "^1.2.2",
     "@flamework/core": "^1.2.2",
     "@flamework/networking": "^1.2.2",
+    "@rbxts/centurion": "^1.0.1",
+    "@rbxts/centurion-ui": "^1.0.2",
     "@rbxts/cmdr": "^1.12.1",
     "@rbxts/immut": "^0.4.4-ts.0",
     "@rbxts/log": "^0.6.3",

@@ -86,7 +86,10 @@ export class PlayerCharacter extends CharacterServer {
 		this.updateInventoryFromState(currentInventory, false);
 		this.unsubscribeFromInventory = store.subscribe(
 			selectPlayerInventory(this.player.instance),
-			(state, _prevState) => this.updateInventoryFromState(state),
+			(state, _prevState) => {
+				print("updating");
+				this.updateInventoryFromState(state);
+			},
 		);
 
 		const currentSkills = store.getState(

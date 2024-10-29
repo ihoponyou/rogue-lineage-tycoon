@@ -1,12 +1,16 @@
 import { Flamework, Modding } from "@flamework/core";
-import { CmdrClient as Cmdr } from "@rbxts/cmdr";
+import { Centurion } from "@rbxts/centurion";
+import { CenturionUI } from "@rbxts/centurion-ui";
 import Log, { Logger } from "@rbxts/log";
-import { beforeRun } from "shared/cmdr/hooks/before-run";
 
 Log.SetLogger(Logger.configure().WriteTo(Log.RobloxOutput()).Create());
 
-Cmdr.SetActivationKeys([Enum.KeyCode.RightBracket]);
-Cmdr.Registry.RegisterHook("BeforeRun", beforeRun);
+// Cmdr.SetActivationKeys([Enum.KeyCode.RightBracket]);
+// Cmdr.Registry.RegisterHook("BeforeRun", beforeRun);
+Centurion.client()
+	.start()
+	.then(() => CenturionUI.start(Centurion.client(), {}))
+	.catch((err) => warn(`Centurion failed to start: ${err}`));
 
 Flamework.addPaths("src/shared/components");
 Flamework.addPaths("src/client/components");
