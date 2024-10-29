@@ -63,10 +63,11 @@ export class SkillServer extends AbstractSkill implements OnStart, IOwnable {
 					characterInstance,
 				);
 			if (character === undefined) error(`undefined character component`);
-			if (!this.isOwnedBy(character))
+			if (!this.isOwnedBy(character)) {
 				error(
-					`${characterInstance.Name} tried to use ${instance} but does not own`,
+					`${characterInstance.Name} tried to equip ${instance} but does not own`,
 				);
+			}
 
 			if (shouldEquip) {
 				this.equip(character);

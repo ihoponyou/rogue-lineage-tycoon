@@ -23,6 +23,7 @@ export class Ownable extends BaseComponent implements IOwnable {
 	}
 
 	isOwnedBy(character: CharacterServer): boolean {
-		return this.owner === character;
+		// === does not work for PLayerCharacter vs CharacterServer comparisons
+		return this.owner?.instance === character.instance;
 	}
 }

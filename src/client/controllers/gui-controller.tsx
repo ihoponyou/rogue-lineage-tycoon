@@ -3,15 +3,10 @@ import { Controller, OnStart } from "@flamework/core";
 import React, { StrictMode } from "@rbxts/react";
 import { ReflexProvider } from "@rbxts/react-reflex";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
-import {
-	ContextActionService,
-	SoundService,
-	StarterGui,
-} from "@rbxts/services";
+import { SoundService, StarterGui } from "@rbxts/services";
 import { LOCAL_PLAYER_GUI } from "client/configs/constants";
 import { Events } from "client/network";
 import { store } from "client/store";
-import { selectIsBackpackOpen } from "client/store/slices/ui/selectors";
 import { App } from "client/ui/components/app";
 import { singletonsContext } from "client/ui/context";
 import { selectCurrencies } from "shared/store/slices/currencies/selectors";
@@ -47,6 +42,7 @@ export class GuiController implements OnStart {
 			store.setDialogueOptions([]);
 			store.setSpeakerName("");
 		});
+
 		this.root.render(
 			<StrictMode>
 				<singletonsContext.Provider
@@ -60,29 +56,5 @@ export class GuiController implements OnStart {
 				</ReflexProvider>
 			</StrictMode>,
 		);
-
-		this.bindToggleBackpack();
-	}
-
-	private bindToggleBackpack(): void {
-		ContextActionService.BindAction(
-			"toggle_backpack_open",
-			(_, state) => {
-				if (state !== Enum.UserInputState.Begin) {
-					return Enum.ContextActionResult.Pass;
-				}
-				const currentlyOpen = store.getState(selectIsBackpackOpen());
-				store.toggleBackpackOpen(!currentlyOpen);
-
-				return Enum.ContextActionResult.Pass;
-			},
-			true,
-			Enum.KeyCode.Backquote,
-		);
-	}
-
-	private bindHotbarSlot(slot: number): void {
-		// get key associated with slot
-		// bind an action to that key which will equip/unequip whatever is at that slot
 	}
 }
