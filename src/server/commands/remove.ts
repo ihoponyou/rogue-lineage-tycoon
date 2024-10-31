@@ -7,27 +7,28 @@ import {
 	Register,
 } from "@rbxts/centurion";
 import { store } from "server/store";
+import { selectPlayerCurrencies } from "server/store/selectors";
 import isAdmin from "shared/commands/guards/is-admin";
 import { CommandArgumentType } from "shared/commands/types";
-import { isItemId } from "shared/configs/items";
+import { ItemId } from "shared/configs/items";
 import { SkillId } from "shared/configs/skills";
 import { Currency } from "shared/modules/currency";
 
 @Register({
 	groups: [
 		{
-			name: "give",
-			description: "give something",
+			name: "remove",
+			description: "take something",
 		},
 	],
 })
-@Group("give")
+@Group("remove")
 @Guard(isAdmin)
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class GiveCommand {
+class RemoveCommand {
 	@Command({
 		name: "item",
-		description: "give an item to a player",
+		description: "remove an item from a player",
 		arguments: [
 			{
 				name: "player",
@@ -41,37 +42,33 @@ class GiveCommand {
 			},
 		],
 	})
-	giveItem(context: CommandContext, player: Player, itemId: string) {
-		if (!isItemId(itemId)) {
-			context.error(`${itemId} is not a valid ItemId`);
-			return;
-		}
-		store.addItem(player, itemId);
+	removeItem(context: CommandContext, player: Player, itemId: ItemId) {
+		store.removeItem(player, itemId);
 		context.reply(`Successfully gave ${player.Name} ${itemId} x${1}`);
 	}
 
 	@Command({
 		name: "money",
-		description: "bless their cashapp",
+		description: "curse their cashapp",
 		arguments: [
 			{
 				name: "player",
-				description: "blessing receiver",
+				description: "curse bearer",
 				type: CenturionType.Player,
 			},
 			{
 				name: "currency",
-				description: "the currency of the blessing",
+				description: "the currency to be removed",
 				type: CommandArgumentType.Currency,
 			},
 			{
 				name: "quantity",
-				description: "the magnitude of the blessing",
+				description: "the amount to be removed",
 				type: CenturionType.Integer,
 			},
 		],
 	})
-	giveMoney(
+	removeMoney(
 		context: CommandContext,
 		player: Player,
 		currency: Currency,
@@ -79,30 +76,39 @@ class GiveCommand {
 	) {
 		if (quantity < 0) {
 			context.error(
-				`Cannot give a negative quantity of ${currency}; use "remove money"`,
+				`Cannot remove a negative quantity of ${currency}; use "remove money"`,
 			);
 			return;
 		}
-		store.addCurrency(player, currency, quantity);
+		const currentState = store.getState(selectPlayerCurrencies(player));
+		if (currentState === undefined) {
+			context.error(`${player.Name} could not be found in the store`);
+			return;
+		}
+		const currentAmount = currentState[currency].amount;
+		const newAmount = math.max(0, currentAmount - quantity);
+		store.setCurrencyAmount(player, currency, newAmount);
+		context.reply(`${player.Name} now has ${newAmount} ${currency}`);
 	}
 
 	@Command({
 		name: "skill",
-		description: "bless their mind",
+		description: "remove a skill from a player",
 		arguments: [
 			{
 				name: "player",
-				description: ":)",
+				description: "the player to give the skill to",
 				type: CenturionType.Player,
 			},
 			{
 				name: "skillId",
-				description: ":)",
+				description: "the skill to be removed",
 				type: CommandArgumentType.SkillId,
 			},
 		],
 	})
-	giveSkill(context: CommandContext, player: Player, skillId: SkillId) {
-		store.addSkill(player, skillId);
+	removeSkill(context: CommandContext, player: Player, skillId: SkillId) {
+		store.removeSkill(player, skillId);
+		context.reply(`Removed ${skillId} from ${player}`);
 	}
 }
