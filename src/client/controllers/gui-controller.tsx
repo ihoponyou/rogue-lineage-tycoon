@@ -3,7 +3,7 @@ import { Controller, OnStart } from "@flamework/core";
 import React, { StrictMode } from "@rbxts/react";
 import { ReflexProvider } from "@rbxts/react-reflex";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
-import { SoundService, StarterGui } from "@rbxts/services";
+import { Lighting, SoundService, StarterGui } from "@rbxts/services";
 import { LOCAL_PLAYER_GUI } from "client/configs/constants";
 import { Events } from "client/network";
 import { store } from "client/store";
@@ -41,6 +41,12 @@ export class GuiController implements OnStart {
 			store.setDialogueText("");
 			store.setDialogueOptions([]);
 			store.setSpeakerName("");
+		});
+
+		Events.kicked.connect(() => {
+			const blur = new Instance("BlurEffect");
+			blur.Size = 50;
+			blur.Parent = Lighting;
 		});
 
 		this.root.render(
