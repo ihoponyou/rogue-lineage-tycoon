@@ -1,4 +1,4 @@
-import { TransformResult, TypeBuilder } from "@rbxts/centurion";
+import { BaseRegistry, TransformResult, TypeBuilder } from "@rbxts/centurion";
 import { Currency, isCurrency } from "shared/modules/currency";
 
 const currencyType = TypeBuilder.create<Currency>("currency")
@@ -9,3 +9,7 @@ const currencyType = TypeBuilder.create<Currency>("currency")
 		return TransformResult.ok(text);
 	})
 	.build();
+
+export = (registry: BaseRegistry) => {
+	registry.registerType(currencyType);
+};
