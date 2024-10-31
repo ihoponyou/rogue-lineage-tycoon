@@ -2,24 +2,16 @@ import {
 	CenturionType,
 	Command,
 	CommandContext,
-	CommandGuard,
 	Group,
 	Guard,
 	Register,
 } from "@rbxts/centurion";
 import { store } from "server/store";
-import { GROUP_ID, MINIMUM_ADMIN_RANK } from "shared/configs/group";
+import isAdmin from "shared/commands/guards/is-admin";
+import { CommandArgumentType } from "shared/commands/types";
 import { isItemId } from "shared/configs/items";
+import { SkillId } from "shared/configs/skills";
 import { Currency } from "shared/modules/currency";
-
-const isAdmin: CommandGuard = (ctx) => {
-	if (ctx.executor.GetRankInGroup(GROUP_ID) < MINIMUM_ADMIN_RANK) {
-		ctx.error("Insufficient permission!");
-		return false;
-	}
-
-	return true;
-};
 
 @Register({
 	groups: [
@@ -45,17 +37,17 @@ class GiveCommand {
 			{
 				name: "itemId",
 				description: ":)",
-				type: CenturionType.String,
+				type: CommandArgumentType.ItemId,
 			},
 		],
 	})
-	giveItem(ctx: CommandContext, player: Player, itemId: string) {
+	giveItem(context: CommandContext, player: Player, itemId: string) {
 		if (!isItemId(itemId)) {
-			ctx.error(`${itemId} is not a valid ItemId`);
+			context.error(`${itemId} is not a valid ItemId`);
 			return;
 		}
 		store.addItem(player, itemId);
-		ctx.reply(`Successfully gave ${player.Name} ${itemId} x${1}`);
+		context.reply(`Successfully gave ${player.Name} ${itemId} x${1}`);
 	}
 
 	@Command({
@@ -70,7 +62,7 @@ class GiveCommand {
 			{
 				name: "currency",
 				description: "the currency of the blessing",
-				type: "currency",
+				type: CommandArgumentType.Currency,
 			},
 			{
 				name: "quantity",
@@ -92,5 +84,25 @@ class GiveCommand {
 			return;
 		}
 		store.addCurrency(player, currency, quantity);
+	}
+
+	@Command({
+		name: "skill",
+		description: "bless their mind",
+		arguments: [
+			{
+				name: "player",
+				description: ":)",
+				type: CenturionType.Player,
+			},
+			{
+				name: "skillId",
+				description: ":)",
+				type: CommandArgumentType.SkillId,
+			},
+		],
+	})
+	giveSkill(context: CommandContext, player: Player, skillId: SkillId) {
+		store.addSkill(player, skillId);
 	}
 }

@@ -1,8 +1,11 @@
 import { Flamework } from "@flamework/core";
+import Object from "@rbxts/object-utils";
 
-export enum SkillId {
-	GOBLET_THROW = "Goblet Throw",
-	POMMEL_STRIKE = "Pommel Strike",
-}
+export const SKILLS = {
+	"Goblet Throw": {},
+	"Pommel Strike": {},
+};
 
+export type SkillId = keyof typeof SKILLS;
+export const SKILL_IDS = Object.keys(SKILLS) as SkillId[];
 export const isSkillId = Flamework.createGuard<SkillId>();

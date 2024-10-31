@@ -1,13 +1,13 @@
 import { BaseRegistry } from "@rbxts/centurion";
-import { CURRENCIES, Currency, isCurrency } from "shared/modules/currency";
+import { isItemId, ITEM_IDS, ItemId } from "shared/configs/items";
 import { CommandArgumentType, createCenturionTypeFromFlameworkGuard } from ".";
 
 export = (registry: BaseRegistry) => {
 	registry.registerType(
-		createCenturionTypeFromFlameworkGuard<Currency>(
-			CommandArgumentType.Currency,
-			isCurrency,
-			() => CURRENCIES,
+		createCenturionTypeFromFlameworkGuard<ItemId>(
+			CommandArgumentType.ItemId,
+			isItemId,
+			() => ITEM_IDS,
 		),
 	);
 };
