@@ -1,6 +1,6 @@
-import { Component, Components } from "@flamework/components";
+import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { DisposableComponent } from "shared/components/disposable-component";
+import { Trove } from "@rbxts/trove";
 import { Toggleable } from "shared/components/toggleable";
 import { Plot } from "./plot";
 import { Product } from "./product";
@@ -13,10 +13,12 @@ type CollectorInstance = Model & {
 	tag: "Collector",
 })
 export class Collector
-	extends DisposableComponent<{}, CollectorInstance>
+	extends BaseComponent<{}, CollectorInstance>
 	implements OnStart
 {
 	private multiplier = 1;
+	private trove = new Trove();
+
 	private touchedConnection?: RBXScriptConnection;
 	private plot!: Plot;
 
@@ -25,12 +27,18 @@ export class Collector
 		private toggleable: Toggleable,
 	) {
 		super();
+	}
+
+	override destroy(): void {
+		this.trove.clean();
+		super.destroy();
+	}
+
+	onStart(): void {
 		const tycoon = this.instance.FindFirstAncestorOfClass("Model");
 		if (!tycoon) error("could not find parent tycoon");
 		this.plot = this.components.waitForComponent<Plot>(tycoon).expect();
-	}
 
-	public onStart(): void {
 		this.instance.Collider.CollisionGroup = "Collector";
 
 		this.trove.add(
@@ -47,6 +55,10 @@ export class Collector
 				}
 			}),
 		);
+	}
+
+	setMultiplier(multiplier: number): void {
+		this.multiplier = multiplier;
 	}
 
 	private onTouched(otherPart: BasePart): void {
@@ -69,10 +81,6 @@ export class Collector
 					warn("Operation encountered an error!", reason);
 				}
 			});
-	}
-
-	public setMultiplier(multiplier: number): void {
-		this.multiplier = multiplier;
 	}
 
 	private collect(product: Product): void {

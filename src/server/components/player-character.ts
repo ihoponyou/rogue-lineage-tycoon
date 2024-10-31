@@ -37,6 +37,8 @@ export class PlayerCharacter
 	extends BaseComponent<{}, Model>
 	implements OnStart, OnTick
 {
+	static readonly TAG = CharacterServer.TAG;
+
 	private player!: PlayerServer;
 	private unsubscribeFromInventory!: Callback;
 	private unsubscribeFromSkills!: Callback;

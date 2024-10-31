@@ -1,8 +1,8 @@
-import { Component } from "@flamework/components";
+import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Players, TweenService } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
-import { DisposableComponent } from "shared/components/disposable-component";
+import { Trove } from "@rbxts/trove";
 import { CharacterServer } from "../character-server";
 import { PlayerCharacter } from "../player-character";
 
@@ -14,14 +14,21 @@ const TICKS_TO_DIE = 8;
 @Component({
 	tag: "Burning",
 })
-export class Burning extends DisposableComponent<{}, Model> implements OnStart {
+export class Burning extends BaseComponent<{}, Model> implements OnStart {
 	private killTicks = 0;
+	private trove = new Trove();
 
 	constructor(
 		private playerCharacter: PlayerCharacter,
 		private character: CharacterServer,
 	) {
 		super();
+	}
+
+	override destroy(): void {
+		this.extinguish();
+		this.trove.clean();
+		super.destroy();
 	}
 
 	onStart(): void {
@@ -34,11 +41,6 @@ export class Burning extends DisposableComponent<{}, Model> implements OnStart {
 		burnSound?.Play();
 
 		this.trove.add(setInterval(() => this.burn(), BURN_INTERVAL));
-	}
-
-	override destroy(): void {
-		this.extinguish();
-		super.destroy();
 	}
 
 	private burn(): void {

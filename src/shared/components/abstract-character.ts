@@ -1,8 +1,7 @@
-import { Component } from "@flamework/components";
+import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
 import { BASE_WALK_SPEED } from "shared/configs";
-import { DisposableComponent } from "./disposable-component";
 import { AbstractRagdoll } from "./ragdoll";
 
 export interface CharacterAttributes {
@@ -20,7 +19,7 @@ const DEFAULT_JUMP_POWER = 50;
 
 @Component()
 export abstract class AbstractCharacter
-	extends DisposableComponent<CharacterAttributes, Model>
+	extends BaseComponent<CharacterAttributes, Model>
 	implements OnStart
 {
 	static readonly TAG = "Character";

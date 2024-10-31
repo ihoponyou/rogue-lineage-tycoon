@@ -36,7 +36,10 @@ class RagdollCommand {
 			const playerServer = components
 				.waitForComponent<PlayerServer>(player)
 				.expect();
-			playerServer.getCharacter().toggleRagdoll(enable);
+			playerServer
+				.getPlayerCharacter()
+				.getCharacter()
+				.toggleRagdoll(enable);
 			ctx.reply(`${enable ? "R" : "Unr"}agdolled ${player.Name}`);
 		} catch (err) {
 			ctx.error(tostring(err));

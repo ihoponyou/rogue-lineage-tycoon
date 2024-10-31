@@ -2,6 +2,7 @@ import { Component, Components } from "@flamework/components";
 import { ConstructorRef } from "@flamework/components/out/utility";
 import { OnTick } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
+import { Trove } from "@rbxts/trove";
 import { BlockActivity } from "client/activities/block-activity";
 import { ChargeManaActivity } from "client/activities/charge-mana-activity";
 import { ClimbActivity } from "client/activities/climb-activity";
@@ -32,13 +33,15 @@ export class CharacterClient extends AbstractCharacter implements OnTick {
 		"Skills",
 	) as Folder;
 
+	private trove = new Trove();
+
 	private run!: RunActivity;
 	private dash!: DashActivity;
 	private climb!: ClimbActivity;
 	private chargeMana!: ChargeManaActivity;
 	private block!: BlockActivity;
 
-	public constructor(
+	constructor(
 		private components: Components,
 		protected ragdoll: RagdollClient,
 		private animationController: AnimationController,
@@ -67,7 +70,12 @@ export class CharacterClient extends AbstractCharacter implements OnTick {
 		);
 	}
 
-	public override onStart(): void {
+	override destroy(): void {
+		this.trove.clean();
+		super.destroy();
+	}
+
+	override onStart(): void {
 		super.onStart();
 
 		this.inputController.onRunTriggered(() => this.tryRun());
@@ -103,18 +111,18 @@ export class CharacterClient extends AbstractCharacter implements OnTick {
 		});
 	}
 
-	public override canAttack(): boolean {
+	override canAttack(): boolean {
 		return (
 			super.canAttack() &&
 			!(this.climb.isActive() || this.block.isActive())
 		);
 	}
 
-	public override canBlock(): boolean {
+	override canBlock(): boolean {
 		return super.canBlock() && !this.dash.isActive();
 	}
 
-	public onTick(_dt: number): void {
+	onTick(_dt: number): void {
 		if (!this.keybindController.isKeyDown("block")) return;
 		if (this.block.isActive()) return;
 		this.tryBlock();

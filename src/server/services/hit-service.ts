@@ -12,14 +12,14 @@ export class HitService {
 	public constructor(private components: Components) {}
 
 	public registerHit(
-		hitter: PlayerCharacter,
+		hitter: CharacterServer,
 		victimInstance: Model,
 		weaponConfig: WeaponConfig,
 		attackData: AttackData,
 	): void {
 		if (hitter === undefined) return;
 		const victim =
-			this.components.getComponent<PlayerCharacter>(victimInstance);
+			this.components.getComponent<CharacterServer>(victimInstance);
 		if (victim === undefined) return;
 		if (!this.canHit(hitter, victim)) return;
 
@@ -30,12 +30,22 @@ export class HitService {
 			!hitter.isBehind(victim);
 		const blockBroken = blocked && attackData.breaksBlock;
 
+		let victimPlayer: Player | undefined;
+		const victimPlayerCharacter =
+			this.components.getComponent<PlayerCharacter>(victim.instance);
+		if (victimPlayerCharacter) {
+			victimPlayer = victimPlayerCharacter?.getPlayer().instance;
+		}
 		if (blocked) {
 			if (blockBroken) {
-				print("broke block");
-				Events.combat.unblock(victim.getPlayer().instance);
+				// print("broke block");
+				if (victimPlayer !== undefined) {
+					Events.combat.unblock(victimPlayer);
+				}
 			} else {
-				Events.combat.blockHit(victim.getPlayer().instance);
+				if (victimPlayer !== undefined) {
+					Events.combat.blockHit(victimPlayer);
+				}
 				Events.playEffect.broadcast(
 					`BlockHit`,
 					victimInstance,

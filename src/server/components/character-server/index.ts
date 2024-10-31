@@ -2,6 +2,7 @@ import { Component, Components } from "@flamework/components";
 import { OnTick } from "@flamework/core";
 import { setInterval } from "@rbxts/set-timeout";
 import Signal from "@rbxts/signal";
+import { Trove } from "@rbxts/trove";
 import { AbstractCharacter } from "shared/components/abstract-character";
 import { isItemId, ItemId } from "shared/configs/items";
 import { isSkillId, SkillId } from "shared/configs/skills";
@@ -49,6 +50,7 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	private headCollision = new Instance("NoCollisionConstraint");
 	private torsoCollision = new Instance("NoCollisionConstraint");
 	private killed = new Signal();
+	private trove = new Trove();
 
 	private currentlyEquipped?: Equippable;
 	private animationManager!: AnimationManager;
@@ -70,6 +72,10 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		protected ragdoll: RagdollServer,
 	) {
 		super();
+	}
+
+	override destroy(): void {
+		this.trove.clean();
 	}
 
 	override onStart(): void {

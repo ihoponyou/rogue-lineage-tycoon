@@ -8,22 +8,18 @@ import { Trove } from "@rbxts/trove";
 export class Lava extends BaseComponent<{}, BasePart> implements OnStart {
 	private trove = new Trove();
 
-	public onStart(): void {
+	onStart(): void {
 		this.trove.connect(this.instance.Touched, (otherPart) =>
 			this.onTouched(otherPart),
 		);
 	}
 
-	public onRemoved(): void {
-		this.trove.destroy();
-	}
-
-	public onTouched(otherPart: BasePart): void {
-		if (otherPart.Parent) otherPart.Parent.AddTag("Burning");
-	}
-
 	override destroy(): void {
 		this.trove.clean();
 		super.destroy();
+	}
+
+	private onTouched(otherPart: BasePart): void {
+		if (otherPart.Parent) otherPart.Parent.AddTag("Burning");
 	}
 }

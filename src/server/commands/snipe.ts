@@ -31,7 +31,8 @@ class SnipeCommand {
 			const playerServer = components
 				.waitForComponent<PlayerServer>(player)
 				.expect();
-			playerServer.getCharacter().snipe();
+			// erm
+			playerServer.getPlayerCharacter().getCharacter().snipe();
 			context.reply(`Sniped ${player.Name}`);
 		} catch (err) {
 			context.error(tostring(err));

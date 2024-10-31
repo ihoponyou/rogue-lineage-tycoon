@@ -1,10 +1,9 @@
-import { Component, Components } from "@flamework/components";
+import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { ReplicatedStorage } from "@rbxts/services";
 import Signal from "@rbxts/signal";
 import { DIALOGUE } from "server/configs/dialogue";
 import { Events } from "server/network";
-import { DisposableComponent } from "shared/components/disposable-component";
 import { Clickable } from "./interactable/clickable";
 import { PlayerServer } from "./player-server";
 
@@ -15,7 +14,7 @@ type SpokeCallback = (topic: string) => void;
 @Component({
 	tag: "Dialogue",
 })
-export class Dialogue extends DisposableComponent implements OnStart {
+export class Dialogue extends BaseComponent implements OnStart {
 	private static openDialogues = new Map<Player, Array<ImageLabel>>();
 
 	private config = DIALOGUE[this.instance.Name];

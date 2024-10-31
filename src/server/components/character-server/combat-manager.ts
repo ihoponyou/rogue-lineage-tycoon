@@ -1,52 +1,60 @@
-import { Component } from "@flamework/components";
+import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
+import { Trove } from "@rbxts/trove";
 import { AttackData } from "server/modules/attack-data";
 import { Events } from "server/network";
 import { HitService } from "server/services/hit-service";
-import { DisposableComponent } from "shared/components/disposable-component";
 import { getWeaponConfig, WeaponConfig } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
+import { CharacterServer } from ".";
 import { PlayerCharacter } from "../player-character";
 
 const COMBO_RESET_DELAY = 2;
 const HEAVY_ATTACK_COOLDOWN = 3;
 const FISTS_CONFIG = getWeaponConfig("Fists");
 
-// TODO: make this not rely on playercharacter
 @Component({
 	tag: "CombatManager",
 })
-export class CombatManager
-	extends DisposableComponent<{}, Model>
-	implements OnStart
-{
+export class CombatManager extends BaseComponent<{}, Model> implements OnStart {
 	private attackSpeed = 1;
 	private comboReset?: thread;
 	private walkSpeedReset?: thread;
 
-	public constructor(
-		private character: PlayerCharacter,
+	private trove = new Trove();
+
+	constructor(
+		private character: CharacterServer,
+		private playerCharacter: PlayerCharacter,
 		private hitService: HitService,
 	) {
 		super();
 	}
 
-	public onStart(): void {
+	override destroy(): void {
+		this.trove.clean();
+		super.destroy();
+	}
+
+	onStart(): void {
 		this.trove.add(
 			Events.combat.lightAttack.connect((player) => {
-				if (player !== this.character.getPlayer().instance) return;
+				if (player !== this.playerCharacter.getPlayer().instance)
+					return;
 				this.handleLightAttack();
 			}),
 		);
 		this.trove.add(
 			Events.combat.block.connect((player, blockUp) => {
-				if (player !== this.character.getPlayer().instance) return;
+				if (player !== this.playerCharacter.getPlayer().instance)
+					return;
 				this.handleBlock(blockUp);
 			}),
 		);
 		this.trove.add(
 			Events.combat.heavyAttack.connect((player) => {
-				if (player !== this.character.getPlayer().instance) return;
+				if (player !== this.playerCharacter.getPlayer().instance)
+					return;
 				this.handleHeavyAttack();
 			}),
 		);
@@ -64,7 +72,7 @@ export class CombatManager
 		const hits = spawnHitbox(
 			hitboxCFrame,
 			size,
-			[this.character.instance],
+			[this.playerCharacter.instance],
 			true,
 		);
 		if (hits.size() > 0) {
@@ -88,7 +96,7 @@ export class CombatManager
 		const weaponConfig = FISTS_CONFIG;
 		// this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
 
-		Events.character.stopRun(this.character.getPlayer().instance);
+		Events.character.stopRun(this.playerCharacter.getPlayer().instance);
 
 		this.character.attributes.combo++;
 
@@ -103,7 +111,7 @@ export class CombatManager
 			() => {
 				Events.playEffect.broadcast(
 					"Swing",
-					this.character.instance,
+					this.playerCharacter.instance,
 					weaponConfig.type,
 				);
 			},
@@ -175,7 +183,7 @@ export class CombatManager
 
 	private handleBlock(blockUp: boolean): void {
 		if (blockUp && !this.character.canBlock()) {
-			Events.combat.unblock(this.character.getPlayer().instance);
+			Events.combat.unblock(this.playerCharacter.getPlayer().instance);
 			return;
 		}
 		this.character.attributes.isBlocking = blockUp;
@@ -189,11 +197,11 @@ export class CombatManager
 		const weaponConfig = FISTS_CONFIG;
 		// this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
 
-		Events.character.stopRun(this.character.getPlayer().instance);
+		Events.character.stopRun(this.playerCharacter.getPlayer().instance);
 
 		Events.playEffect.broadcast(
 			"HeavyCharge",
-			this.character.instance,
+			this.playerCharacter.instance,
 			weaponConfig.type,
 		);
 
@@ -205,11 +213,11 @@ export class CombatManager
 			() => {
 				Events.playEffect.broadcast(
 					"StopHeavyCharge",
-					this.character.instance,
+					this.playerCharacter.instance,
 				);
 				Events.playEffect.broadcast(
 					"HeavySwing",
-					this.character.instance,
+					this.playerCharacter.instance,
 					weaponConfig.type,
 				);
 			},

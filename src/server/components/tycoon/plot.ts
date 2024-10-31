@@ -1,7 +1,6 @@
-import { Component, Components } from "@flamework/components";
+import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { store } from "server/store";
-import { DisposableComponent } from "shared/components/disposable-component";
 import { UsefulModel } from "shared/components/useful-model";
 import { Currency } from "shared/modules/currency";
 import { Clickable } from "../interactable/clickable";
@@ -17,10 +16,7 @@ type PlotInstance = Model & {
 @Component({
 	tag: "Plot",
 })
-export class Plot
-	extends DisposableComponent<{}, PlotInstance>
-	implements OnStart
-{
+export class Plot extends BaseComponent<{}, PlotInstance> implements OnStart {
 	private static plotOwners = new Map<Player, Plot>();
 
 	private bank: { [currency in Currency]: number } = {

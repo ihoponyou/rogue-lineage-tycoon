@@ -1,7 +1,7 @@
-import { Component } from "@flamework/components";
+import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
+import { Trove } from "@rbxts/trove";
 import { PRODUCTS } from "server/configs/tycoon";
-import { DisposableComponent } from "shared/components/disposable-component";
 import { UsefulModel } from "shared/components/useful-model";
 import { Currency } from "../../../shared/modules/currency";
 
@@ -22,11 +22,18 @@ export type ProductInstance = Model;
 	},
 })
 export class Product
-	extends DisposableComponent<ProductAttributes, ProductInstance>
+	extends BaseComponent<ProductAttributes, ProductInstance>
 	implements OnStart
 {
-	public constructor(private model: UsefulModel) {
+	private trove = new Trove();
+
+	constructor(private model: UsefulModel) {
 		super();
+	}
+
+	override destroy(): void {
+		this.trove.clean();
+		super.destroy();
 	}
 
 	public onStart(): void {

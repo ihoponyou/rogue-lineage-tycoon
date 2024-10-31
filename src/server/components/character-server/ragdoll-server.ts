@@ -45,9 +45,6 @@ function getSocketTypeFromMotorName(name: string): SocketType {
 	},
 })
 export class RagdollServer extends AbstractRagdoll implements OnStart {
-	private trove = new Trove();
-	private joints = new Map<string, RagdollJoint>();
-
 	private static newJoint(
 		motor: Motor6D,
 		socketType: SocketType,
@@ -107,7 +104,15 @@ export class RagdollServer extends AbstractRagdoll implements OnStart {
 		return socket;
 	}
 
-	public onStart(): void {
+	private trove = new Trove();
+	private joints = new Map<string, RagdollJoint>();
+
+	override destroy(): void {
+		this.trove.clean();
+		super.destroy();
+	}
+
+	onStart(): void {
 		this.configureHumanoid();
 
 		for (const motor of this.instance.GetDescendants()) {
@@ -144,7 +149,7 @@ export class RagdollServer extends AbstractRagdoll implements OnStart {
 		this.toggle(this.attributes.isRagdolled);
 	}
 
-	public toggle(on: boolean): void {
+	toggle(on: boolean): void {
 		this.attributes.isRagdolled = on;
 
 		this.humanoid.AutoRotate = !on;

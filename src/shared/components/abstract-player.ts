@@ -1,8 +1,7 @@
-import { Component } from "@flamework/components";
-import { DisposableComponent } from "./disposable-component";
+import { BaseComponent, Component } from "@flamework/components";
 
 @Component()
-export abstract class AbstractPlayer extends DisposableComponent<{}, Player> {
+export abstract class AbstractPlayer extends BaseComponent<{}, Player> {
 	static readonly TAG = "Player";
 
 	public readonly Name = this.instance.Name;

@@ -116,7 +116,7 @@ export class PlayerServer extends AbstractPlayer implements OnStart {
 		});
 	}
 
-	public getCharacter(): PlayerCharacter {
+	public getPlayerCharacter(): PlayerCharacter {
 		const model = this.instance.Character;
 		if (model === undefined)
 			error(`${this.instance.Name}.Character is undefined`);

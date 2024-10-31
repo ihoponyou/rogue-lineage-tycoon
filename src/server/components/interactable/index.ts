@@ -1,6 +1,6 @@
-import { Component } from "@flamework/components";
+import { BaseComponent, Component } from "@flamework/components";
 import Signal from "@rbxts/signal";
-import { DisposableComponent } from "shared/components/disposable-component";
+import { Trove } from "@rbxts/trove";
 import { Toggleable } from "shared/toggleable";
 
 type InteractedCallback = (player: Player) => void;
@@ -10,33 +10,40 @@ export abstract class Interactable<
 		A extends {} = {},
 		I extends Instance = Instance,
 	>
-	extends DisposableComponent<A, I>
+	extends BaseComponent<A, I>
 	implements Toggleable
 {
+	protected trove = new Trove();
+
 	private _isEnabled = false;
 	private interacted = new Signal<InteractedCallback>();
 
-	public interact(player: Player): void {
+	override destroy(): void {
+		this.trove.clean();
+		super.destroy();
+	}
+
+	interact(player: Player): void {
 		this.interacted.Fire(player);
 	}
 
-	public onInteracted(callback: InteractedCallback): void {
+	onInteracted(callback: InteractedCallback): void {
 		this.trove.connect(this.interacted, (player) => callback(player));
 	}
 
-	public isEnabled(): boolean {
+	isEnabled(): boolean {
 		return this._isEnabled;
 	}
 
-	public enable(): void {
+	enable(): void {
 		this._isEnabled = true;
 	}
 
-	public disable(): void {
+	disable(): void {
 		this._isEnabled = false;
 	}
 
-	public isPlayerAllowed(_player: Player): boolean {
+	isPlayerAllowed(_player: Player): boolean {
 		return true;
 	}
 }
