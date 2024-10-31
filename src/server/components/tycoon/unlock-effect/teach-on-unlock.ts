@@ -1,6 +1,7 @@
 import { Component, Components } from "@flamework/components";
-import { PlayerServer } from "server/components/player-server";
 import { SKILLS } from "server/configs/tycoon";
+import { store } from "server/store";
+import { SkillId } from "shared/configs/skills";
 import { UnlockEffect } from ".";
 import { Unlockable } from "../unlockable";
 
@@ -24,10 +25,6 @@ export class TeachOnUnlock extends UnlockEffect {
 	}
 
 	public override onUnlocked(player: Player): void {
-		const playerServer = this.components
-			.waitForComponent<PlayerServer>(player)
-			.expect();
-		error("fix me");
-		// playerServer.teach(this.instance.Name);
+		store.addSkill(player, this.instance.Name as SkillId);
 	}
 }

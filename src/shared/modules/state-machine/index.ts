@@ -26,7 +26,6 @@ export class StateMachine {
 	public addState(state: State): void {
 		const name = state.name.lower();
 		if (this.states.has(name)) {
-			// TODO: get class name?
 			error(`duplicate state: "${state.name}"`);
 		}
 		this.states.set(state.name.lower(), state);

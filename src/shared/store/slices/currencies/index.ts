@@ -27,9 +27,8 @@ export const currenciesSlice = createProducer(DEFAULT_CURRENCY_STATE, {
 	},
 
 	resetLineageValues: (state) => {
-		// TODO: implement this
 		return {
-			...state,
+			...DEFAULT_CURRENCY_STATE,
 			Insight: state.Insight,
 		};
 	},

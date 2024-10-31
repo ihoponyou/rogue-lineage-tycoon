@@ -1,3 +1,4 @@
+import { store } from "server/store";
 import { DialogueConfig } from ".";
 
 export = {
@@ -7,8 +8,7 @@ export = {
 			{
 				label: "indeed.",
 				onClick: (dialogue, player) => {
-					error("fix me");
-					// player.teach("Pommel Strike");
+					store.addSkill(player.instance, "Pommel Strike");
 					dialogue.close(player.instance);
 				},
 			},

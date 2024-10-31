@@ -16,7 +16,7 @@ interface FillBarProps {
 	zIndex?: number;
 }
 
-// TODO: use useMotion to mimic original tween properties
+// TODO: find original tween properties for mana bar, health bar, stomach, tox
 
 export function FillBar(props: FillBarProps) {
 	const [percent, percentMotion] = useMotion(props.amount / props.maxAmount);

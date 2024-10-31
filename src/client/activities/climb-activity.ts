@@ -232,7 +232,7 @@ export class ClimbActivity extends CharacterActivity {
 		if (combined.Magnitude > 1) combined = combined.Unit;
 		this.climbForce.VectorVelocity = combined.mul(
 			this.calculateClimbSpeed(100, 0, 0),
-		); // TODO: fix this
+		); // TODO: calculate climb speed based on mana, training, and passive boosts
 	}
 
 	private tryLedgeClimb(
@@ -315,7 +315,6 @@ export class ClimbActivity extends CharacterActivity {
 		this.goalPart.CFrame = goal;
 
 		if (!this.character) return;
-		// TODO: make this frame independent
 		const humanoidRootPart = this.character.getHumanoidRootPart();
 		humanoidRootPart.CFrame = humanoidRootPart.CFrame.Lerp(
 			goal,
