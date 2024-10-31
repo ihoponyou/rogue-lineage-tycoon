@@ -6,6 +6,7 @@ import { IdentityService } from "server/services/identity-service";
 import { store } from "server/store";
 import { selectPlayerResources } from "server/store/selectors";
 import { BaseInjury } from ".";
+import { CharacterServer } from "../character-server";
 import { PlayerCharacter } from "../player-character";
 
 const UPPER_TEMPERATURE_THRESHOLD = 5;
@@ -19,17 +20,18 @@ export class Frostbite extends BaseInjury implements OnStart, OnTick {
 	public readonly name = "Frostbite";
 
 	public constructor(
-		character: PlayerCharacter,
+		playerCharacter: PlayerCharacter,
+		character: CharacterServer,
 		private logger: Logger,
 		private identityService: IdentityService,
 	) {
-		super(character);
+		super(playerCharacter, character);
 	}
 
 	public onStart(): void {
 		this.inflict();
 
-		const player = this.character.getPlayer().instance;
+		const player = this.playerCharacter.getPlayer().instance;
 		const data = store.getState(selectPlayerResources(player));
 		if (!data) error("no data");
 		if (data.temperature === 0) {
@@ -53,7 +55,7 @@ export class Frostbite extends BaseInjury implements OnStart, OnTick {
 	public onTick(dt: number): void {
 		if (!this.character.attributes.isAlive) return;
 		const characterTemperature = store.getState(
-			selectPlayerResources(this.character.getPlayer().instance),
+			selectPlayerResources(this.playerCharacter.getPlayer().instance),
 		)?.temperature;
 		if (characterTemperature === undefined) return;
 		if (characterTemperature > UPPER_TEMPERATURE_THRESHOLD) return;

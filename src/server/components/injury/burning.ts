@@ -3,6 +3,7 @@ import { OnStart } from "@flamework/core";
 import { Players, TweenService } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { DisposableComponent } from "shared/components/disposable-component";
+import { CharacterServer } from "../character-server";
 import { PlayerCharacter } from "../player-character";
 
 const HEAT_AMOUNT = 1.5;
@@ -16,7 +17,10 @@ const TICKS_TO_DIE = 8;
 export class Burning extends DisposableComponent<{}, Model> implements OnStart {
 	private killTicks = 0;
 
-	constructor(private character: PlayerCharacter) {
+	constructor(
+		private playerCharacter: PlayerCharacter,
+		private character: CharacterServer,
+	) {
 		super();
 	}
 
@@ -56,7 +60,7 @@ export class Burning extends DisposableComponent<{}, Model> implements OnStart {
 			const humanoid = this.character.getHumanoid();
 			humanoid.TakeDamage(math.min(BURN_DAMAGE, humanoid.Health));
 
-			this.character.adjustTemperature(HEAT_AMOUNT);
+			this.playerCharacter.adjustTemperature(HEAT_AMOUNT);
 		}
 	}
 

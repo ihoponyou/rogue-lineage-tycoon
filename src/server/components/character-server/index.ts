@@ -1,6 +1,7 @@
 import { Component, Components } from "@flamework/components";
 import { OnTick } from "@flamework/core";
 import { setInterval } from "@rbxts/set-timeout";
+import Signal from "@rbxts/signal";
 import { AbstractCharacter } from "shared/components/abstract-character";
 import { isItemId, ItemId } from "shared/configs/items";
 import { isSkillId, SkillId } from "shared/configs/skills";
@@ -47,6 +48,7 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 
 	private headCollision = new Instance("NoCollisionConstraint");
 	private torsoCollision = new Instance("NoCollisionConstraint");
+	private killed = new Signal();
 
 	private currentlyEquipped?: Equippable;
 	private animationManager!: AnimationManager;
@@ -68,12 +70,12 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		protected ragdoll: RagdollServer,
 	) {
 		super();
-
-		this.animationManager = new AnimationManager(this.getAnimator());
 	}
 
 	override onStart(): void {
 		super.onStart();
+
+		this.animationManager = new AnimationManager(this.getAnimator());
 
 		this.inventoryFolder.Parent = this.instance;
 		this.skillsFolder.Parent = this.instance;
@@ -106,9 +108,7 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 
 		this.loadAnimations(ANIMATIONS);
 
-		this.trove.connect(this.humanoid.HealthChanged, (health) =>
-			this.onHealthChanged(health),
-		);
+		this.onHealthChanged((newHealth) => this._onHealthChanged(newHealth));
 	}
 
 	onTick(dt: number): void {
@@ -145,6 +145,12 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 
 		this.humanoid.Health = 0;
 		this.breakJoints();
+
+		this.killed.Fire();
+	}
+
+	onKilled(callback: () => void): RBXScriptConnection {
+		return this.killed.Connect(callback);
 	}
 
 	snipe(): void {
@@ -298,7 +304,13 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		this.torsoCollision.Part1 = part;
 	}
 
-	protected onHealthChanged(health: number): void {
+	onHealthChanged(
+		callback: (newHealth: number) => void,
+	): RBXScriptConnection {
+		return this.trove.connect(this.humanoid.HealthChanged, callback);
+	}
+
+	private _onHealthChanged(health: number): void {
 		const percentHealth = health / this.humanoid.MaxHealth;
 		if (this.attributes.isKnocked) {
 			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {

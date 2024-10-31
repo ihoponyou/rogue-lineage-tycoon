@@ -1,6 +1,8 @@
-import { Component, Components } from "@flamework/components";
+import { BaseComponent, Component, Components } from "@flamework/components";
+import { OnStart, OnTick } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
+import { Trove } from "@rbxts/trove";
 import {
 	MAXIMUM_TEMPERATURE,
 	MINIMUM_TEMPERATURE,
@@ -23,7 +25,6 @@ import {
 	serializeVector3,
 } from "shared/modules/serialized-vector3";
 import { CharacterServer } from "./character-server";
-import { RagdollServer } from "./character-server/ragdoll-server";
 import { PlayerServer } from "./player-server";
 
 @Component({
@@ -32,22 +33,25 @@ import { PlayerServer } from "./player-server";
 		return Players.GetPlayerFromCharacter(instance) !== undefined;
 	},
 })
-export class PlayerCharacter extends CharacterServer {
+export class PlayerCharacter
+	extends BaseComponent<{}, Model>
+	implements OnStart, OnTick
+{
 	private player!: PlayerServer;
 	private unsubscribeFromInventory!: Callback;
 	private unsubscribeFromSkills!: Callback;
 
+	private trove = new Trove();
+
 	constructor(
-		components: Components,
-		ragdoll: RagdollServer,
+		private components: Components,
+		private character: CharacterServer,
 		private dataService: DataService,
 	) {
-		super(components, ragdoll);
+		super();
 	}
 
-	override onStart(): void {
-		super.onStart();
-
+	onStart(): void {
 		this.player = this.components
 			.waitForComponent<PlayerServer>(
 				Players.GetPlayerFromCharacter(this.instance)!,
@@ -107,11 +111,14 @@ export class PlayerCharacter extends CharacterServer {
 		Events.item.removeFromHotbar.connect((player, id) => {
 			store.removeFromHotbar(player, id);
 		});
+
+		this.character.onKilled(() => this.onKilled());
+		this.character.onHealthChanged((newHealth) =>
+			this._onHealthChanged(newHealth),
+		);
 	}
 
-	override onTick(dt: number): void {
-		super.onTick(dt);
-
+	onTick(dt: number): void {
 		store.decayStomach(this.player.instance, dt);
 		store.decayToxicity(this.player.instance, dt);
 	}
@@ -123,9 +130,7 @@ export class PlayerCharacter extends CharacterServer {
 		super.destroy();
 	}
 
-	override kill(): void {
-		super.kill();
-
+	private onKilled(): void {
 		store.subtractLife(this.player.instance);
 
 		Events.character.killed.fire(this.player.instance);
@@ -139,13 +144,17 @@ export class PlayerCharacter extends CharacterServer {
 		return this.player;
 	}
 
+	getCharacter(): CharacterServer {
+		return this.character;
+	}
+
 	loadHealth(): void {
 		let savedHealth = store.getState(
 			selectPlayerHealth(this.player.instance),
 		);
 		if (savedHealth === undefined) error("health not found");
 		if (savedHealth < 1) savedHealth = 100;
-		this.humanoid.Health = savedHealth;
+		this.character.getHumanoid().Health = savedHealth;
 	}
 
 	loadConditions(): void {
@@ -189,8 +198,7 @@ export class PlayerCharacter extends CharacterServer {
 			this.instance.AddTag("BurnScar");
 	}
 
-	protected override onHealthChanged(health: number): void {
-		super.onHealthChanged(health);
+	private _onHealthChanged(health: number): void {
 		store.setHealth(this.getPlayer().instance, health);
 	}
 
@@ -200,7 +208,7 @@ export class PlayerCharacter extends CharacterServer {
 	) {
 		if (items === undefined) return;
 		for (const [itemId, quantity] of items) {
-			const existingItem = this.getItem(itemId);
+			const existingItem = this.character.getItem(itemId);
 			if (existingItem) {
 				if (existingItem.attributes.quantity !== quantity) {
 					existingItem.attributes.quantity = quantity;
@@ -208,7 +216,7 @@ export class PlayerCharacter extends CharacterServer {
 				continue;
 			}
 
-			this.giveItem(itemId, quantity);
+			this.character.giveItem(itemId, quantity);
 			if (autoHotbar) {
 				store.addToHotbar(this.player.instance, itemId);
 			}
@@ -223,7 +231,7 @@ export class PlayerCharacter extends CharacterServer {
 		if (skills === undefined) return;
 		for (const skillId of skills) {
 			if (prevSkills && prevSkills.has(skillId)) continue;
-			this.learnSkill(skillId);
+			this.character.learnSkill(skillId);
 			if (autoHotbar) {
 				store.addToHotbar(this.player.instance, skillId);
 			}
