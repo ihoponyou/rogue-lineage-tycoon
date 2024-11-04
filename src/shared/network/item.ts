@@ -7,3 +7,7 @@ export interface ItemServerEvents {
 	addToHotbar(equippableId: EquippableId, hotbarSlot: number): void;
 	removeFromHotbar(equippableId: EquippableId): void;
 }
+
+export interface ItemServerFunctions {
+	canEquip(equippable: Instance): boolean;
+}

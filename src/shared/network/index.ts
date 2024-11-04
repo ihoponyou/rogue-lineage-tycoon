@@ -3,7 +3,7 @@ import { CharacterClientEvents } from "./character";
 import { CombatClientEvents, CombatServerEvents } from "./combat";
 import { CurrencyClientEvents, CurrencyServerFunctions } from "./currency";
 import { DialogueClientEvents } from "./dialogue";
-import { ItemServerEvents } from "./item";
+import { ItemServerEvents, ItemServerFunctions } from "./item";
 import { ManaClientEvents, ManaServerEvents } from "./mana";
 import { ReflexClientEvents, ReflexServerEvents } from "./reflex";
 
@@ -29,6 +29,7 @@ interface ClientEvents {
 
 interface ServerFunctions {
 	currency: CurrencyServerFunctions;
+	item: ItemServerFunctions;
 }
 
 interface ClientFunctions {}

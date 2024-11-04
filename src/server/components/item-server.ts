@@ -67,6 +67,7 @@ export class ItemServer extends AbstractItem implements IOwnable {
 		this.worldModel = this.components
 			.waitForComponent<UsefulModel>(clone)
 			.expect();
+		this.worldModel.setCanCollide(false);
 
 		this.bodyAttach.Parent = this.worldModel.instance;
 		this.bodyAttach.Part1 = this.worldModel.instance.PrimaryPart;
@@ -129,9 +130,21 @@ export class ItemServer extends AbstractItem implements IOwnable {
 	rigTo(character: CharacterServer, equipped: boolean) {
 		if (equipped) {
 			this.weldTo(character.getHiltBone(), this.config.equipC0);
+			if (this.config.idleAnimation !== undefined) {
+				character.playAnimation(this.config.idleAnimation.Name);
+			}
+			if (this.config.hideOnHolster) {
+				this.worldModel.show();
+			}
 		} else {
 			const rig = promiseR6(character.instance).expect();
 			this.weldTo(rig[this.config.holsterLimb], this.config.holsterC0);
+			if (this.config.idleAnimation !== undefined) {
+				character.stopAnimation(this.config.idleAnimation.Name);
+			}
+			if (this.config.hideOnHolster) {
+				this.worldModel.hide();
+			}
 		}
 	}
 
