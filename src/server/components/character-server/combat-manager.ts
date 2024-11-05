@@ -1,4 +1,4 @@
-import { BaseComponent, Component } from "@flamework/components";
+import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Trove } from "@rbxts/trove";
 import { AttackData } from "server/modules/attack-data";
@@ -8,6 +8,7 @@ import { getWeaponConfig, WeaponConfig } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
 import { CharacterServer } from ".";
 import { PlayerCharacter } from "../player-character";
+import { Weapon } from "../weapon";
 
 const COMBO_RESET_DELAY = 2;
 const HEAVY_ATTACK_COOLDOWN = 3;
@@ -24,6 +25,7 @@ export class CombatManager extends BaseComponent<{}, Model> implements OnStart {
 	private trove = new Trove();
 
 	constructor(
+		private components: Components,
 		private character: CharacterServer,
 		private playerCharacter: PlayerCharacter,
 		private hitService: HitService,
@@ -87,14 +89,30 @@ export class CombatManager extends BaseComponent<{}, Model> implements OnStart {
 		}
 	}
 
+	private getEquippedWeaponConfig(): WeaponConfig {
+		let weaponConfig = FISTS_CONFIG;
+		// warning: the following code is cooked
+		const equippedThing = this.character.getCurrentEquipped();
+		if (equippedThing !== undefined) {
+			const equippedWeapon = equippedThing as Weapon | undefined;
+			if (equippedWeapon !== undefined) {
+				const weapon = this.components.getComponent<Weapon>(
+					equippedWeapon.instance,
+				);
+				if (weapon !== undefined) {
+					weaponConfig = weapon?.config;
+				}
+			}
+		}
+		return weaponConfig;
+	}
+
 	private handleLightAttack(): void {
 		if (!this.character.canLightAttack()) return;
 
-		this.character.attributes.isAttacking = true;
+		const weaponConfig = this.getEquippedWeaponConfig();
 
-		// error("fix me");
-		const weaponConfig = FISTS_CONFIG;
-		// this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
+		this.character.attributes.isAttacking = true;
 
 		Events.character.stopRun(this.playerCharacter.getPlayer().instance);
 
@@ -194,8 +212,7 @@ export class CombatManager extends BaseComponent<{}, Model> implements OnStart {
 
 		this.character.attributes.isAttacking = true;
 
-		const weaponConfig = FISTS_CONFIG;
-		// this.character.getHeldWeapon()?.config ?? FISTS_CONFIG;
+		const weaponConfig = this.getEquippedWeaponConfig();
 
 		Events.character.stopRun(this.playerCharacter.getPlayer().instance);
 
