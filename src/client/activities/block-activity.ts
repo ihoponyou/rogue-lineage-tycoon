@@ -3,13 +3,14 @@ import { Trove } from "@rbxts/trove";
 import { CharacterClient } from "client/components/character-client";
 import { AnimationController } from "client/controllers/animation-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
-import { Events } from "client/network";
+import { Events, Functions } from "client/network";
 import { BLOCK_WALK_SPEED } from "shared/configs";
-import { WeaponConfig } from "shared/configs/weapons";
+import { getWeaponConfig, WEAPONS } from "shared/configs/weapons";
 import { CharacterActivity } from "./character-activity";
 
 export class BlockActivity extends CharacterActivity {
 	private blockAnimationName = "";
+	private getEquippedWeaponPromise?: Promise<void>;
 	private trove = new Trove();
 
 	public constructor(
@@ -23,19 +24,23 @@ export class BlockActivity extends CharacterActivity {
 	public override start(): void {
 		super.start();
 
-		const equippedTool = undefined; //store.getState(selectActiveEquippable());
-		let config: WeaponConfig | undefined;
-		if (equippedTool !== undefined) {
-			try {
-				warn("fix me");
-				// config = getWeaponConfig(equippedTool?.Name);
-			} catch (e) {
-				// oops!
-			}
-		}
-		this.blockAnimationName =
-			config?.blockAnimation?.Name ?? "DefaultBlock";
-		this.animationController.play(this.blockAnimationName);
+		this.getEquippedWeaponPromise =
+			Functions.item.getCurrentlyEquippedWeaponInstance
+				.invoke()
+				.then((instance) => {
+					let config = WEAPONS["Fists"];
+					if (instance !== undefined) {
+						try {
+							config = getWeaponConfig(instance?.Name);
+						} catch (e) {
+							// oops!
+						}
+					}
+					this.blockAnimationName =
+						config?.blockAnimation?.Name ?? "DefaultBlock";
+					this.animationController.play(this.blockAnimationName);
+				})
+				.catch(warn);
 		this.character.setWalkSpeed(BLOCK_WALK_SPEED);
 
 		Events.combat.block(true);
@@ -57,6 +62,7 @@ export class BlockActivity extends CharacterActivity {
 	public override stop(): void {
 		super.stop();
 
+		this.getEquippedWeaponPromise?.cancel();
 		Events.combat.block(false);
 		this.animationController.stop(this.blockAnimationName);
 		this.character.resetWalkSpeed();

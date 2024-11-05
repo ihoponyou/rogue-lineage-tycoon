@@ -10,4 +10,5 @@ export interface ItemServerEvents {
 
 export interface ItemServerFunctions {
 	canEquip(equippable: Instance): boolean;
+	getCurrentlyEquippedWeaponInstance(): Instance | undefined;
 }
