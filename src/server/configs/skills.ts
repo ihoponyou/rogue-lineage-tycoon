@@ -114,7 +114,8 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 		requiredClasses: [ClassId.WARRIOR],
 		requiredWeaponType: WeaponType.Sword,
 		activate: (user) => {
-			print("struck a pommel");
+			// print("struck a pommel");
+			user.playAnimation("PommelStrike");
 		},
 	},
 };

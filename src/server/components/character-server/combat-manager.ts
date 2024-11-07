@@ -62,6 +62,54 @@ export class CombatManager extends BaseComponent<{}, Model> implements OnStart {
 		);
 	}
 
+	attack(
+		animationName: string,
+		noJumpDuration: number = 0,
+		onSwing: Callback,
+		onContact: Callback,
+		onStopped: Callback,
+	): void {
+		this.character.attributes.isAttacking = true;
+
+		Events.character.stopRun(this.playerCharacter.getPlayer().instance);
+
+		if (noJumpDuration > 0) {
+			this.character.toggleJump(false);
+		}
+
+		const swingConn = this.character.connectToAnimationMarker(
+			animationName,
+			"swing",
+			onSwing,
+		);
+		const contactConn = this.character.connectToAnimationMarker(
+			animationName,
+			"contact",
+			onContact,
+		);
+		const stoppedConn = this.character.connectToAnimationStopped(
+			animationName,
+			() => {
+				swingConn?.Disconnect();
+				contactConn?.Disconnect();
+				stoppedConn?.Disconnect();
+
+				this.character.attributes.isAttacking = false;
+
+				if (noJumpDuration > 0) {
+					this.trove.add(
+						task.delay(noJumpDuration / this.attackSpeed, () =>
+							this.character.toggleJump(true),
+						),
+					);
+				}
+
+				onStopped();
+			},
+		);
+		this.character.playAnimation(animationName, this.attackSpeed);
+	}
+
 	private spawnHitbox(
 		weaponConfig: WeaponConfig,
 		attackData: AttackData,
@@ -107,98 +155,6 @@ export class CombatManager extends BaseComponent<{}, Model> implements OnStart {
 		return weaponConfig;
 	}
 
-	private handleLightAttack(): void {
-		if (!this.character.canLightAttack()) return;
-
-		const weaponConfig = this.getEquippedWeaponConfig();
-
-		this.character.attributes.isAttacking = true;
-
-		Events.character.stopRun(this.playerCharacter.getPlayer().instance);
-
-		this.character.attributes.combo++;
-
-		if (this.character.attributes.combo > weaponConfig.maxLightAttacks)
-			this.character.attributes.combo = weaponConfig.maxLightAttacks;
-
-		const animationName = `${weaponConfig.type}${this.character.attributes.combo}`;
-
-		const swingConn = this.character.connectToAnimationMarker(
-			animationName,
-			"swing",
-			() => {
-				Events.playEffect.broadcast(
-					"Swing",
-					this.playerCharacter.instance,
-					weaponConfig.type,
-				);
-			},
-		);
-		const contactConn = this.character.connectToAnimationMarker(
-			animationName,
-			"contact",
-			() => {
-				const isLastHit =
-					this.character.attributes.combo >=
-					weaponConfig.maxLightAttacks;
-				this.spawnHitbox(weaponConfig, {
-					ragdollDuration: isLastHit ? 1 : 0,
-					knockbackForce: isLastHit ? 35 : 15,
-					knockbackDuration: isLastHit ? 0.5 : 1 / 6,
-					breaksBlock: false,
-				});
-
-				if (
-					this.character.attributes.combo >=
-					weaponConfig.maxLightAttacks
-				) {
-					this.character.attributes.combo = 0;
-					this.character.attributes.isStunned = true;
-					task.delay(weaponConfig.endlag / this.attackSpeed, () => {
-						this.character.attributes.isStunned = false;
-					});
-				}
-			},
-		);
-		const stoppedConn = this.character.connectToAnimationStopped(
-			animationName,
-			() => {
-				swingConn?.Disconnect();
-				contactConn?.Disconnect();
-				stoppedConn?.Disconnect();
-
-				this.character.attributes.isAttacking = false;
-
-				if (this.comboReset !== undefined) {
-					task.cancel(this.comboReset);
-					this.trove.remove(this.comboReset);
-				}
-				this.comboReset = this.trove.add(
-					task.delay(COMBO_RESET_DELAY, () => {
-						this.character.attributes.combo = 0;
-						this.comboReset = undefined;
-					}),
-				);
-			},
-		);
-		this.character.playAnimation(animationName, this.attackSpeed);
-
-		this.character.attributes.lightAttackDebounce = true;
-		this.trove.add(
-			task.delay(
-				weaponConfig.lightAttackCooldown / this.attackSpeed,
-				() => (this.character.attributes.lightAttackDebounce = false),
-			),
-		);
-
-		this.character.toggleJump(false);
-		this.trove.add(
-			task.delay(weaponConfig.noJumpDuration / this.attackSpeed, () =>
-				this.character.toggleJump(true),
-			),
-		);
-	}
-
 	private handleBlock(blockUp: boolean): void {
 		if (blockUp && !this.character.canBlock()) {
 			Events.combat.unblock(this.playerCharacter.getPlayer().instance);
@@ -207,14 +163,78 @@ export class CombatManager extends BaseComponent<{}, Model> implements OnStart {
 		this.character.attributes.isBlocking = blockUp;
 	}
 
-	private handleHeavyAttack() {
-		if (!this.character.canHeavyAttack()) return;
-
-		this.character.attributes.isAttacking = true;
+	private handleLightAttack(): void {
+		if (!this.character.canLightAttack()) return;
 
 		const weaponConfig = this.getEquippedWeaponConfig();
 
-		Events.character.stopRun(this.playerCharacter.getPlayer().instance);
+		this.character.attributes.combo++;
+
+		if (this.character.attributes.combo > weaponConfig.maxLightAttacks)
+			this.character.attributes.combo = weaponConfig.maxLightAttacks;
+
+		const animationName = `${weaponConfig.type}${this.character.attributes.combo}`;
+		const onSwing = () => {
+			Events.playEffect.broadcast(
+				"Swing",
+				this.playerCharacter.instance,
+				weaponConfig.type,
+			);
+		};
+		const onContact = () => {
+			const isLastHit =
+				this.character.attributes.combo >= weaponConfig.maxLightAttacks;
+			this.spawnHitbox(weaponConfig, {
+				ragdollDuration: isLastHit ? 1 : 0,
+				knockbackForce: isLastHit ? 35 : 15,
+				knockbackDuration: isLastHit ? 0.5 : 1 / 6,
+				breaksBlock: false,
+			});
+
+			if (
+				this.character.attributes.combo >= weaponConfig.maxLightAttacks
+			) {
+				this.character.attributes.combo = 0;
+				this.character.attributes.isStunned = true;
+				task.delay(weaponConfig.endlag / this.attackSpeed, () => {
+					this.character.attributes.isStunned = false;
+				});
+			}
+		};
+		const onStopped = () => {
+			if (this.comboReset !== undefined) {
+				task.cancel(this.comboReset);
+				this.trove.remove(this.comboReset);
+			}
+			this.comboReset = this.trove.add(
+				task.delay(COMBO_RESET_DELAY, () => {
+					this.character.attributes.combo = 0;
+					this.comboReset = undefined;
+				}),
+			);
+		};
+
+		this.attack(
+			animationName,
+			weaponConfig.noJumpDuration,
+			onSwing,
+			onContact,
+			onStopped,
+		);
+
+		this.character.attributes.lightAttackDebounce = true;
+		this.trove.add(
+			task.delay(
+				weaponConfig.lightAttackCooldown / this.attackSpeed,
+				() => (this.character.attributes.lightAttackDebounce = false),
+			),
+		);
+	}
+
+	private handleHeavyAttack() {
+		if (!this.character.canHeavyAttack()) return;
+
+		const weaponConfig = this.getEquippedWeaponConfig();
 
 		Events.playEffect.broadcast(
 			"HeavyCharge",
@@ -223,54 +243,43 @@ export class CombatManager extends BaseComponent<{}, Model> implements OnStart {
 		);
 
 		const animationName = `${weaponConfig.type}Heavy`;
+		const onSwing = () => {
+			Events.playEffect.broadcast(
+				"StopHeavyCharge",
+				this.playerCharacter.instance,
+			);
+			Events.playEffect.broadcast(
+				"HeavySwing",
+				this.playerCharacter.instance,
+				weaponConfig.type,
+			);
+		};
+		const onContact = () => {
+			this.spawnHitbox(weaponConfig, {
+				ragdollDuration: 1,
+				knockbackForce: 35,
+				knockbackDuration: 0.5,
+				breaksBlock: true,
+			});
 
-		const swingConn = this.character.connectToAnimationMarker(
+			// TODO: no endlag if hit something
+		};
+		const onStopped = () => {
+			this.character.attributes.isStunned = true;
+			// use double m1 endlag
+			task.delay((weaponConfig.endlag * 2) / this.attackSpeed, () => {
+				this.character.attributes.isStunned = false;
+				this.character.toggleJump(true);
+				this.character.resetWalkSpeed();
+			});
+		};
+		this.attack(
 			animationName,
-			"swing",
-			() => {
-				Events.playEffect.broadcast(
-					"StopHeavyCharge",
-					this.playerCharacter.instance,
-				);
-				Events.playEffect.broadcast(
-					"HeavySwing",
-					this.playerCharacter.instance,
-					weaponConfig.type,
-				);
-			},
+			weaponConfig.endlag * 2,
+			onSwing,
+			onContact,
+			onStopped,
 		);
-		const contactConn = this.character.connectToAnimationMarker(
-			animationName,
-			"contact",
-			() => {
-				this.spawnHitbox(weaponConfig, {
-					ragdollDuration: 1,
-					knockbackForce: 35,
-					knockbackDuration: 0.5,
-					breaksBlock: true,
-				});
-
-				// TODO: no endlag if hit something
-			},
-		);
-		const stoppedConn = this.character.connectToAnimationStopped(
-			animationName,
-			() => {
-				swingConn?.Disconnect();
-				contactConn?.Disconnect();
-				stoppedConn?.Disconnect();
-
-				this.character.attributes.isAttacking = false;
-
-				this.character.attributes.isStunned = true;
-				task.delay((weaponConfig.endlag * 2) / this.attackSpeed, () => {
-					this.character.attributes.isStunned = false;
-					this.character.toggleJump(true);
-					this.character.resetWalkSpeed();
-				});
-			},
-		);
-		this.character.playAnimation(animationName, this.attackSpeed);
 
 		this.character.attributes.heavyAttackDebounce = true;
 		this.trove.add(
@@ -280,7 +289,6 @@ export class CombatManager extends BaseComponent<{}, Model> implements OnStart {
 			),
 		);
 
-		this.character.toggleJump(false);
 		this.character.setWalkSpeed(this.character.getWalkSpeed() * 0.2);
 	}
 }
