@@ -1,7 +1,7 @@
 import { Component, Components } from "@flamework/components";
 import { ConstructorRef } from "@flamework/components/out/utility";
 import { OnTick } from "@flamework/core";
-import { Players, Workspace } from "@rbxts/services";
+import { Workspace } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
 import { BlockActivity } from "client/activities/block-activity";
 import { ChargeManaActivity } from "client/activities/charge-mana-activity";
@@ -22,8 +22,9 @@ import { SkillClient } from "./skill-client";
 
 @Component({
 	tag: AbstractCharacter.TAG,
-	predicate: (instance) =>
-		Players.GetPlayerFromCharacter(instance) === LOCAL_PLAYER.Character,
+	predicate: (instance) => {
+		return instance === LOCAL_PLAYER.Character;
+	},
 })
 export class CharacterClient extends AbstractCharacter implements OnTick {
 	protected override inventoryFolder: Folder = this.instance.WaitForChild(
@@ -77,6 +78,7 @@ export class CharacterClient extends AbstractCharacter implements OnTick {
 
 	override onStart(): void {
 		super.onStart();
+		print(this.instance);
 
 		this.inputController.onRunTriggered(() => this.tryRun());
 		this.inputController.onDashTriggered(() => this.tryDash());
