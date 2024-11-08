@@ -1,9 +1,9 @@
 import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
-import { CharacterServer } from ".";
-import { KeyInteractable } from "../interactable/key-interactable";
-import { PlayerCharacter } from "../player-character";
+import { CharacterServer } from "./character-server";
+import { KeyInteractable } from "./interactable/key-interactable";
+import { PlayerCharacter } from "./player-character";
 import { RagdollServer } from "./ragdoll-server";
 
 interface Attributes {

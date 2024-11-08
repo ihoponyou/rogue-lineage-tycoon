@@ -11,10 +11,10 @@ import { ANIMATIONS } from "shared/constants";
 import { AnimationManager } from "shared/modules/animation-manager";
 import { cframeFromOrientationDeg } from "shared/modules/cframe-util";
 import { Equippable } from "shared/modules/equippable";
-import { ItemServer } from "../item-server";
-import { SkillServer } from "../skill-server";
-import { Weapon } from "../weapon";
+import { ItemServer } from "./item-server";
 import { RagdollServer } from "./ragdoll-server";
+import { SkillServer } from "./skill-server";
+import { Weapon } from "./weapon";
 
 const FF_DURATION = 15;
 const PROTECTED_DISTANCE = 5;

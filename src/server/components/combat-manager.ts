@@ -6,9 +6,9 @@ import { Events } from "server/network";
 import { HitService } from "server/services/hit-service";
 import { getWeaponConfig, WeaponConfig } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
-import { CharacterServer } from ".";
-import { PlayerCharacter } from "../player-character";
-import { Weapon } from "../weapon";
+import { CharacterServer } from "./character-server";
+import { PlayerCharacter } from "./player-character";
+import { Weapon } from "./weapon";
 
 const COMBO_RESET_DELAY = 2;
 const HEAVY_ATTACK_COOLDOWN = 3;

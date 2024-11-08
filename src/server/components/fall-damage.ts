@@ -1,6 +1,6 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { OnTick } from "@flamework/core";
-import { CharacterServer } from ".";
+import { CharacterServer } from "./character-server";
 import { RagdollServer } from "./ragdoll-server";
 
 @Component({
