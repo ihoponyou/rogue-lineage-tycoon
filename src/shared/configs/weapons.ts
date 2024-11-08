@@ -1,3 +1,4 @@
+import Object from "@rbxts/object-utils";
 import { ReplicatedStorage } from "@rbxts/services";
 
 export enum WeaponType {
@@ -19,7 +20,7 @@ export interface WeaponConfig {
 	readonly equipPriority: number;
 }
 
-export const WEAPONS: { [name: string]: WeaponConfig } = {
+export const WEAPONS = {
 	Fists: {
 		type: WeaponType.Fists,
 		damage: 6,
@@ -64,7 +65,9 @@ export const WEAPONS: { [name: string]: WeaponConfig } = {
 	},
 };
 
-export function getWeaponConfig(name: string): WeaponConfig {
+export type WeaponName = keyof typeof WEAPONS;
+export const WEAPON_NAMES = Object.keys(WEAPONS) as WeaponName[];
+export function getWeaponConfig(name: WeaponName): WeaponConfig {
 	const config = WEAPONS[name];
 	if (config === undefined) {
 		error(`Weapon ${name} does not exist`);

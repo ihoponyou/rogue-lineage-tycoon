@@ -11,14 +11,11 @@ export class CharacterController implements OnLocalCharacterAdded {
 	constructor(private components: Components) {}
 
 	onLocalCharacterAdded(model: Model): void {
-		const character = model;
-		if (character !== undefined) {
-			this.components
-				.waitForComponent<CharacterClient>(character)
-				.andThen((characterClient) => {
-					this.character = characterClient;
-				});
-		}
+		this.components
+			.waitForComponent<CharacterClient>(model)
+			.andThen((characterClient) => {
+				this.character = characterClient;
+			});
 		LOCAL_PLAYER.CharacterAdded.Connect((newCharacter) => {
 			this.components
 				.waitForComponent<CharacterClient>(newCharacter)

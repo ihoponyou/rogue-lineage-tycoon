@@ -1,6 +1,6 @@
 import { BaseComponent, Component } from "@flamework/components";
 import { AbstractCharacter } from "shared/components/abstract-character";
-import { WEAPONS } from "shared/configs/weapons";
+import { getWeaponConfig, WeaponName } from "shared/configs/weapons";
 import { Equippable } from "shared/modules/equippable";
 import { Useable } from "shared/modules/useable";
 import { CharacterServer } from "./character-server";
@@ -12,7 +12,7 @@ import { ItemServer } from "./item-server";
 export class Weapon extends BaseComponent implements Equippable, Useable {
 	static readonly TAG = "Weapon";
 
-	public readonly config = WEAPONS[this.instance.Name];
+	public readonly config = getWeaponConfig(this.instance.Name as WeaponName);
 
 	constructor(private item: ItemServer) {
 		super();

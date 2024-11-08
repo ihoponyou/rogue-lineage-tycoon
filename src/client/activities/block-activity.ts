@@ -5,7 +5,7 @@ import { AnimationController } from "client/controllers/animation-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
 import { Events, Functions } from "client/network";
 import { BLOCK_WALK_SPEED } from "shared/configs";
-import { getWeaponConfig, WEAPONS } from "shared/configs/weapons";
+import { getWeaponConfig, WeaponName } from "shared/configs/weapons";
 import { CharacterActivity } from "./character-activity";
 
 export class BlockActivity extends CharacterActivity {
@@ -28,10 +28,12 @@ export class BlockActivity extends CharacterActivity {
 			Functions.item.getCurrentlyEquippedWeaponInstance
 				.invoke()
 				.then((instance) => {
-					let config = WEAPONS["Fists"];
+					let config = getWeaponConfig("Fists");
 					if (instance !== undefined) {
 						try {
-							config = getWeaponConfig(instance?.Name);
+							config = getWeaponConfig(
+								instance?.Name as WeaponName,
+							);
 						} catch (e) {
 							// oops!
 						}

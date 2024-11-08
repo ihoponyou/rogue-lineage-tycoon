@@ -67,6 +67,10 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	private alignPosition = this.newAlignPosition();
 	private carryAttachment = this.newCarryAttachment();
 
+	// TODO: yeah
+	private attackSpeed = 1;
+	private noJumpThread?: thread;
+
 	constructor(
 		protected components: Components,
 		protected ragdoll: RagdollServer,
@@ -110,7 +114,6 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 
 		this.instance.AddTag("Carriable");
 		this.instance.AddTag("FallDamage");
-		this.instance.AddTag("CombatManager");
 
 		this.loadAnimations(ANIMATIONS);
 
@@ -314,6 +317,71 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		callback: (newHealth: number) => void,
 	): RBXScriptConnection {
 		return this.trove.connect(this.humanoid.HealthChanged, callback);
+	}
+
+	attack(
+		animationName: string,
+		onSwing: Callback,
+		onContact: Callback,
+		onStopped: Callback,
+		noJumpDuration: number = 0,
+		endlagDuration: number = 0,
+	): void {
+		this.attributes.isAttacking = true;
+
+		// Events.character.stopRun(this.playerCharacter.getPlayer().instance);
+
+		if (noJumpDuration > 0) {
+			this.toggleJump(false);
+		}
+
+		const swingConn = this.connectToAnimationMarker(
+			animationName,
+			"swing",
+			onSwing,
+		);
+		const contactConn = this.connectToAnimationMarker(
+			animationName,
+			"contact",
+			onContact,
+		);
+		const stoppedConn = this.connectToAnimationStopped(
+			animationName,
+			() => {
+				swingConn?.Disconnect();
+				contactConn?.Disconnect();
+				stoppedConn?.Disconnect();
+
+				this.attributes.isAttacking = false;
+
+				if (noJumpDuration > 0) {
+					if (this.noJumpThread !== undefined) {
+						task.cancel(this.noJumpThread);
+					}
+					this.noJumpThread = this.trove.add(
+						task.delay(noJumpDuration / this.attackSpeed, () =>
+							this.toggleJump(true),
+						),
+					);
+				}
+
+				if (endlagDuration > 0) {
+					this.attributes.isStunned = true;
+					// use double m1 endlag
+					task.delay(endlagDuration / this.attackSpeed, () => {
+						this.attributes.isStunned = false;
+						this.resetWalkSpeed();
+					});
+				}
+
+				onStopped();
+			},
+		);
+		this.playAnimation(animationName, this.attackSpeed);
+	}
+
+	getAttackSpeed(): number {
+		return this.attackSpeed;
 	}
 
 	private _onHealthChanged(health: number): void {

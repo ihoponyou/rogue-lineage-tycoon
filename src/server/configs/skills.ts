@@ -1,7 +1,9 @@
+import { Modding } from "@flamework/core";
 import { CharacterServer } from "server/components/character-server";
+import { HitService } from "server/services/hit-service";
 import { ClassId } from "shared/configs/classes";
 import { SkillId } from "shared/configs/skills";
-import { WeaponType } from "shared/configs/weapons";
+import { getWeaponConfig, WeaponType } from "shared/configs/weapons";
 
 export interface SkillConfig {
 	readonly cooldown: number;
@@ -88,6 +90,7 @@ interface AbilityParams {
 	}>;
 }
 
+const hitser = Modding.resolveSingleton(HitService);
 export const SKILLS: Record<SkillId, SkillConfig> = {
 	"Goblet Throw": {
 		cooldown: 2,
@@ -116,6 +119,26 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 		activate: (user) => {
 			// print("struck a pommel");
 			user.playAnimation("PommelStrike");
+			user.attack(
+				"PommelStrike",
+				() => print("swing"),
+				() => {
+					hitser.registerHit(
+						user,
+						user.instance,
+						getWeaponConfig("Bronze Sword"),
+						{
+							ragdollDuration: 0,
+							knockbackDuration: 0,
+							knockbackForce: 0,
+							breaksBlock: false,
+						},
+					);
+				},
+				() => print("stop"),
+				undefined,
+				1,
+			);
 		},
 	},
 };

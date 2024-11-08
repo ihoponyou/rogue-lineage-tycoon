@@ -11,7 +11,7 @@ import { AttackData } from "../modules/attack-data";
 export class HitService {
 	public constructor(private components: Components) {}
 
-	public registerHit(
+	registerHit(
 		hitter: CharacterServer,
 		victimInstance: Model,
 		weaponConfig: WeaponConfig,
