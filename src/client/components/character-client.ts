@@ -78,7 +78,6 @@ export class CharacterClient extends AbstractCharacter implements OnTick {
 
 	override onStart(): void {
 		super.onStart();
-		print(this.instance);
 
 		this.inputController.onRunTriggered(() => this.tryRun());
 		this.inputController.onDashTriggered(() => this.tryDash());

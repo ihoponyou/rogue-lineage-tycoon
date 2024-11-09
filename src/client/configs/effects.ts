@@ -52,23 +52,22 @@ export const EFFECTS: { [name: string]: Callback } = {
 	HeavySwing: (character: Model, weaponType: WeaponType) => {
 		const torso = character.FindFirstChild("Torso");
 		if (torso === undefined) return;
-		let clone: Sound;
+		let sound: Sound;
 		switch (weaponType) {
 			case WeaponType.Fists:
-				clone = SFX[`FistsChargeFinish`].Clone();
+				sound = SFX[`FistsChargeFinish`];
 				break;
 			case WeaponType.Spear:
-				clone = SFX[`HeavySpearSwing`].Clone();
+				sound = SFX[`HeavySpearSwing`];
 				break;
 			case WeaponType.Dagger:
-				clone =
-					SFX[
-						math.random(2) === 1 ? `DaggerSwing` : `DaggerSwing2`
-					].Clone();
+				sound =
+					SFX[math.random(2) === 1 ? `DaggerSwing` : `DaggerSwing2`];
 				break;
 			default:
 				return;
 		}
+		const clone = sound.Clone();
 		clone.PlayOnRemove = true;
 		clone.Parent = torso;
 		clone.Destroy();
