@@ -15,6 +15,7 @@ import { CharacterController } from "./character-controller";
 @Controller()
 export class GuiController implements OnStart {
 	private root = createRoot(new Instance("Folder"));
+	private blurEffect = new Instance("BlurEffect");
 
 	constructor(
 		private components: Components,
@@ -22,6 +23,10 @@ export class GuiController implements OnStart {
 	) {}
 
 	public onStart() {
+		this.blurEffect.Parent = Lighting;
+		this.blurEffect.Enabled = false;
+		this.blurEffect.Size = 50;
+
 		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Health, false);
 		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, false);
 		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false);
@@ -43,10 +48,8 @@ export class GuiController implements OnStart {
 			store.setSpeakerName("");
 		});
 
-		Events.kicked.connect(() => {
-			const blur = new Instance("BlurEffect");
-			blur.Size = 50;
-			blur.Parent = Lighting;
+		Events.toggleBlur.connect((on) => {
+			this.blurEffect.Enabled = on;
 		});
 
 		this.root.render(

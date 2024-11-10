@@ -6,16 +6,16 @@ import { PlayerCharacter } from "../player-character";
 
 @Component()
 export abstract class BaseInjury extends BaseComponent<{}, Model> {
-	protected abstract readonly name: Condition;
+	abstract readonly name: Condition;
 
-	public constructor(
+	constructor(
 		protected playerCharacter: PlayerCharacter,
 		protected character: CharacterServer,
 	) {
 		super();
 	}
 
-	public inflict(): void {
+	inflict(): void {
 		store.addCondition(
 			this.playerCharacter.getPlayer().instance,
 			this.name,
@@ -24,7 +24,7 @@ export abstract class BaseInjury extends BaseComponent<{}, Model> {
 		this.playInjuryEffects();
 	}
 
-	public heal(): void {
+	heal(): void {
 		store.removeCondition(
 			this.playerCharacter.getPlayer().instance,
 			this.name,
@@ -33,7 +33,7 @@ export abstract class BaseInjury extends BaseComponent<{}, Model> {
 		this.instance.RemoveTag(this.name);
 	}
 
-	public playInjuryEffects(): void {
+	playInjuryEffects(): void {
 		const torso = this.character.getTorso();
 		// TODO: create these at runtime
 		const injureParticle = torso.FindFirstChild("Injure") as

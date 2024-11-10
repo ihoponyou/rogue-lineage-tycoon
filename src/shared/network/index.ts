@@ -16,7 +16,7 @@ interface ServerEvents {
 }
 
 interface ClientEvents {
-	kicked(): void;
+	toggleBlur(on: boolean): void;
 	greeted(player: Player): void;
 	playEffect(name: string, ...args: unknown[]): void;
 	mana: ManaClientEvents;

@@ -68,7 +68,6 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 			const cframeOffset = humanoidRootPartCFrame.LookVector.mul(
 				hitboxSize.Z,
 			);
-			user.playAnimation("PommelStrike");
 			user.attack(
 				"PommelStrike",
 				() => {},
@@ -79,6 +78,7 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 						[user.instance],
 						true,
 					).forEach((hitModel) => {
+						hitModel.AddTag("Concussion");
 						hitService.registerHit(
 							user,
 							hitModel,
@@ -95,6 +95,52 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 				() => {},
 				undefined,
 				1,
+			);
+		},
+	},
+	"Triple Strike": {
+		cooldown: 12,
+		weaponXpRequired: {
+			[WeaponType.Dagger]: 0,
+			[WeaponType.Fists]: 0,
+			[WeaponType.Spear]: 10,
+			[WeaponType.Sword]: 0,
+		},
+		requiredClasses: [ClassId.PIT_FIGHTER],
+		requiredWeaponType: WeaponType.Spear,
+		activate: (user) => {
+			if (!user.canAttack()) return;
+			const hitboxSize = new Vector3(6, 5, 7);
+			const humanoidRootPartCFrame = user.getHumanoidRootPart().CFrame;
+			const cframeOffset = humanoidRootPartCFrame.LookVector.mul(
+				hitboxSize.Z,
+			);
+			user.attack(
+				"TripleStrike",
+				() => {},
+				() => {
+					spawnHitbox(
+						humanoidRootPartCFrame.add(cframeOffset),
+						hitboxSize,
+						[user.instance],
+						true,
+					).forEach((hitModel) => {
+						hitService.registerHit(
+							user,
+							hitModel,
+							getWeaponConfig("Bronze Spear"),
+							{
+								ragdollDuration: 0,
+								knockbackDuration: 0,
+								knockbackForce: 0,
+								breaksBlock: false,
+							},
+						);
+					});
+				},
+				() => {},
+				0,
+				2,
 			);
 		},
 	},

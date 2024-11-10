@@ -9,7 +9,7 @@ export class GroupService implements OnPlayerAdded {
 	public onPlayerAdded(player: Player): void {
 		if (RunService.IsStudio()) return;
 		if (player.GetRankInGroup(GROUP_ID) >= MINIMUM_JOIN_RANK) return;
-		Events.kicked(player);
+		Events.toggleBlur(player, true);
 		player.Kick("not in group");
 	}
 }

@@ -4,6 +4,7 @@ import Object from "@rbxts/object-utils";
 export const SKILLS = {
 	"Goblet Throw": {},
 	"Pommel Strike": {},
+	"Triple Strike": {},
 };
 
 export type SkillId = keyof typeof SKILLS;
