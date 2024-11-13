@@ -5,6 +5,7 @@ export const SKILLS = {
 	"Goblet Throw": {},
 	"Pommel Strike": {},
 	"Triple Strike": {},
+	Agility: {},
 };
 
 export type SkillId = keyof typeof SKILLS;

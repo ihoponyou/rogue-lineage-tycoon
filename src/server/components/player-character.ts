@@ -374,6 +374,7 @@ export class PlayerCharacter
 			onContact,
 			onStopped,
 			weaponConfig.noJumpDuration,
+			0,
 		);
 
 		this.character.attributes.lightAttackDebounce = true;

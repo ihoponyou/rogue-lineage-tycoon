@@ -11,7 +11,7 @@ export interface SkillConfig {
 	readonly cooldown: number;
 	readonly weaponXpRequired: Record<WeaponType, number>;
 	readonly requiredClasses: ReadonlyArray<ClassId>;
-	readonly requiredWeaponType: WeaponType | undefined;
+	readonly requiredWeaponType: WeaponType | undefined; //optional type is less readbale
 	readonly activate: (user: CharacterServer) => void;
 }
 
@@ -48,6 +48,7 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 				},
 				() => {},
 				0.5,
+				0,
 			);
 		},
 	},
@@ -59,10 +60,10 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 			[WeaponType.Spear]: 0,
 			[WeaponType.Sword]: 10,
 		},
-		requiredClasses: [ClassId.WARRIOR],
+		requiredClasses: ["Warrior"],
 		requiredWeaponType: WeaponType.Sword,
 		activate: (user) => {
-			if (!user.canAttack()) return;
+			// if (!user.canAttack()) return;
 			const hitboxSize = new Vector3(6, 5, 6);
 			const humanoidRootPartCFrame = user.getHumanoidRootPart().CFrame;
 			const cframeOffset = humanoidRootPartCFrame.LookVector.mul(
@@ -84,7 +85,7 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 							hitModel,
 							getWeaponConfig("Bronze Sword"),
 							{
-								ragdollDuration: 5,
+								ragdollDuration: 2,
 								knockbackDuration: 1,
 								knockbackForce: 20,
 								breaksBlock: false,
@@ -93,7 +94,7 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 					});
 				},
 				() => {},
-				undefined,
+				0,
 				1,
 			);
 		},
@@ -106,10 +107,10 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 			[WeaponType.Spear]: 10,
 			[WeaponType.Sword]: 0,
 		},
-		requiredClasses: [ClassId.PIT_FIGHTER],
+		requiredClasses: ["Pit Fighter"],
 		requiredWeaponType: WeaponType.Spear,
 		activate: (user) => {
-			if (!user.canAttack()) return;
+			// if (!user.canAttack()) return;
 			const hitboxSize = new Vector3(6, 5, 7);
 			const humanoidRootPartCFrame = user.getHumanoidRootPart().CFrame;
 			const cframeOffset = humanoidRootPartCFrame.LookVector.mul(
@@ -142,6 +143,22 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 				0,
 				2,
 			);
+		},
+	},
+	Agility: {
+		cooldown: 15,
+		weaponXpRequired: {
+			[WeaponType.Dagger]: 0,
+			[WeaponType.Fists]: 0,
+			[WeaponType.Spear]: 0,
+			[WeaponType.Sword]: 0,
+		},
+		requiredClasses: ["Thief"],
+		requiredWeaponType: WeaponType.Spear,
+		activate: (user) => {
+			// emit the particle
+			// play the sound effect
+			// increase player speed by some multiplier
 		},
 	},
 };

@@ -324,8 +324,8 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		onSwing: Callback,
 		onContact: Callback,
 		onStopped: Callback,
-		noJumpDuration: number = 0,
-		endlagDuration: number = 0,
+		noJumpDuration: number,
+		endlagDuration: number,
 	): void {
 		this.attributes.isAttacking = true;
 
