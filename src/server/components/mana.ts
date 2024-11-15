@@ -3,9 +3,7 @@ import { OnStart, OnTick } from "@flamework/core";
 import { Events } from "server/network";
 import { store } from "server/store";
 import { selectPlayerIdentity } from "server/store/selectors";
-
-const BASE_MANA_CHARGE_RATE = 100 / 3.5;
-const BASE_MANA_DECAY_RATE = 100 / 2.5;
+import { BASE_MANA_CHARGE_RATE, BASE_MANA_DECAY_RATE } from "shared/configs";
 
 // what do the mana events even do?
 

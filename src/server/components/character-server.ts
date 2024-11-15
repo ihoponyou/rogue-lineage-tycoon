@@ -368,9 +368,11 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 				if (endlagDuration > 0) {
 					this.attributes.isStunned = true;
 					// use double m1 endlag
-					task.delay(endlagDuration / this.attackSpeed, () => {
+					this.adjustWalkSpeedTemporary(
+						0,
+						endlagDuration / this.attackSpeed,
+					).andThen(() => {
 						this.attributes.isStunned = false;
-						this.resetWalkSpeed();
 					});
 				}
 
