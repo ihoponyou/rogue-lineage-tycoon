@@ -146,7 +146,7 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 		},
 	},
 	Agility: {
-		cooldown: 15,
+		cooldown: 30,
 		weaponXpRequired: {
 			[WeaponType.Dagger]: 0,
 			[WeaponType.Fists]: 0,
@@ -154,11 +154,19 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 			[WeaponType.Sword]: 0,
 		},
 		requiredClasses: ["Thief"],
-		requiredWeaponType: WeaponType.Spear,
+		requiredWeaponType: WeaponType.Dagger,
 		activate: (user) => {
 			// emit the particle
 			// play the sound effect
 			// increase player speed by some multiplier
+			const duration = 10;
+			user.getWalkSpeed().addTemporaryModifier(
+				duration,
+				"agility",
+				1.25,
+				false,
+				false,
+			);
 		},
 	},
 };

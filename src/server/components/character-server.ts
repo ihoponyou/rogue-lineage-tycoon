@@ -35,12 +35,12 @@ type ParticleAttachment = Attachment & {
 	defaults: {
 		isKnocked: false,
 		isAlive: true,
-		isStunned: false,
 		isBlocking: false,
 		isAttacking: false,
 		combo: 0,
 		lightAttackDebounce: false,
 		heavyAttackDebounce: false,
+		stunTimer: 0,
 	},
 })
 export class CharacterServer extends AbstractCharacter implements OnTick {
@@ -121,6 +121,7 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	}
 
 	onTick(dt: number): void {
+		this.attributes.stunTimer -= dt;
 		if (!this.attributes.isAlive) return;
 
 		const humanoid = this.humanoid;
@@ -366,14 +367,16 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 				}
 
 				if (endlagDuration > 0) {
-					this.attributes.isStunned = true;
-					// use double m1 endlag
-					this.adjustWalkSpeedTemporary(
-						0,
+					this.attributes.stunTimer =
+						endlagDuration / this.attackSpeed;
+
+					// call this if attack gets cancelled
+					const removeModifier = this.walkSpeed.addTemporaryModifier(
 						endlagDuration / this.attackSpeed,
-					).andThen(() => {
-						this.attributes.isStunned = false;
-					});
+						"endlag",
+						0,
+						false,
+					);
 				}
 
 				onStopped();

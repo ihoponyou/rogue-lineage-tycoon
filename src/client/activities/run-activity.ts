@@ -52,7 +52,7 @@ export class RunActivity extends CharacterActivity {
 	private manaRun(): void {
 		this.trove.add(Events.mana.emptied.connect(() => this.onManaEmptied()));
 
-		this.character.setWalkSpeed(this.character.getWalkSpeed() * 2);
+		this.character.setWalkSpeed(this.character.getWalkSpeed().get * 2);
 		this.animationController.play("ManaRun");
 		this.manaTrail.Enabled = true;
 	}

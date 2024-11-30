@@ -4,6 +4,8 @@ import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
 import {
+	LAST_LIGHT_ATTACK_DATA,
+	LIGHT_ATTACK_DATA,
 	MAXIMUM_TEMPERATURE,
 	MINIMUM_TEMPERATURE,
 } from "server/configs/constants";
@@ -338,21 +340,15 @@ export class PlayerCharacter
 		const onContact = () => {
 			const isLastHit =
 				this.character.attributes.combo >= weaponConfig.maxLightAttacks;
-			this.spawnHitbox(weaponConfig, {
-				ragdollDuration: isLastHit ? 1 : 0,
-				knockbackForce: isLastHit ? 35 : 15,
-				knockbackDuration: isLastHit ? 0.5 : 1 / 6,
-				breaksBlock: false,
-			});
+			this.spawnHitbox(
+				weaponConfig,
+				isLastHit ? LAST_LIGHT_ATTACK_DATA : LIGHT_ATTACK_DATA,
+			);
 
-			if (
-				this.character.attributes.combo >= weaponConfig.maxLightAttacks
-			) {
+			if (isLastHit) {
 				this.character.attributes.combo = 0;
-				this.character.attributes.isStunned = true;
-				task.delay(weaponConfig.endlag / attackSpeed, () => {
-					this.character.attributes.isStunned = false;
-				});
+				this.character.attributes.stunTimer =
+					weaponConfig.endlag / attackSpeed;
 			}
 		};
 		const onStopped = () => {
@@ -419,7 +415,9 @@ export class PlayerCharacter
 
 			// TODO: no endlag if hit something
 		};
-		const onStopped = () => {};
+		const onStopped = () => {
+			this.character.resetWalkSpeed();
+		};
 
 		this.character.attack(
 			animationName,
@@ -438,7 +436,7 @@ export class PlayerCharacter
 			),
 		);
 
-		this.character.setWalkSpeed(this.character.getWalkSpeed() * 0.2);
+		this.character.getWalkSpeed().addModifier("heavy_attack", 0.2, false);
 	}
 
 	private block(blockUp: boolean): void {

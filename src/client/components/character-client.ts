@@ -151,7 +151,7 @@ export class CharacterClient extends AbstractCharacter implements OnTick {
 			this.attributes.isAttacking ||
 			this.attributes.isBlocking ||
 			this.attributes.isKnocked ||
-			this.attributes.isStunned
+			this.attributes.stunTimer > 0
 		)
 			return;
 		this.chargeMana.stop();
@@ -168,7 +168,7 @@ export class CharacterClient extends AbstractCharacter implements OnTick {
 		if (
 			this.attributes.isBlocking ||
 			this.attributes.isKnocked ||
-			this.attributes.isStunned
+			this.attributes.stunTimer > 0
 		)
 			return;
 		this.run.stop();
@@ -199,7 +199,7 @@ export class CharacterClient extends AbstractCharacter implements OnTick {
 		if (
 			this.attributes.isBlocking ||
 			this.attributes.isKnocked ||
-			this.attributes.isStunned ||
+			this.attributes.stunTimer > 0 ||
 			this.attributes.isAttacking
 		)
 			return;

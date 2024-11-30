@@ -6,17 +6,18 @@ import {
 	BASE_JUMP_POWER,
 	BASE_WALK_SPEED,
 } from "shared/configs";
+import { Stat } from "shared/modules/stat";
 import { AbstractRagdoll } from "./ragdoll";
 
 export interface CharacterAttributes {
 	isKnocked: boolean;
 	isAlive: boolean;
-	isStunned: boolean;
 	isBlocking: boolean;
 	isAttacking: boolean;
 	combo: number;
 	lightAttackDebounce: boolean;
 	heavyAttackDebounce: boolean;
+	stunTimer: number;
 }
 
 @Component()
@@ -32,9 +33,9 @@ export abstract class AbstractCharacter
 	protected abstract readonly inventoryFolder: Folder;
 	protected abstract readonly skillsFolder: Folder;
 
-	protected manaChargeRate = 0;
-	protected walkSpeed = BASE_WALK_SPEED;
-	protected climbSpeed = BASE_CLIMB_SPEED;
+	protected manaChargeRate = new Stat(-1);
+	protected walkSpeed = new Stat(BASE_WALK_SPEED);
+	protected climbSpeed = new Stat(BASE_CLIMB_SPEED);
 
 	onStart(): void {
 		this.raycastParams.CollisionGroup = "Characters";
@@ -47,14 +48,8 @@ export abstract class AbstractCharacter
 		character.Humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
 		this.humanoid = character.Humanoid;
 
-		this.onAttributeChanged("isStunned", (stunned, _wasStunned) => {
-			if (stunned) {
-				this.setWalkSpeed(0);
-				this.toggleJump(false);
-			} else {
-				this.resetWalkSpeed();
-				this.toggleJump(true);
-			}
+		this.walkSpeed.onModifiersChanged(() => {
+			this.setWalkSpeed(this.walkSpeed.getCalculatedValue());
 		});
 	}
 
@@ -82,40 +77,15 @@ export abstract class AbstractCharacter
 		return this.raycastParams;
 	}
 
-	getWalkSpeed(): number {
+	getWalkSpeed(): Stat {
 		return this.walkSpeed;
 	}
 
 	resetWalkSpeed(): void {
-		this.getHumanoid().WalkSpeed = this.getWalkSpeed();
-	}
-
-	adjustWalkSpeedTemporary(
-		multiplier: number,
-		duration: number,
-	): Promise<void> {
-		return new Promise((resolve, reject, onCancel) => {
-			if (duration <= 0) {
-				return reject("duration must be greater than 0");
-			}
-			const humanoid = this.getHumanoid();
-			const bonus = humanoid.WalkSpeed * multiplier;
-			humanoid.WalkSpeed += bonus;
-			const resetPromise = Promise.delay(duration).andThen(
-				(_timeElapsed) => {
-					print(`resetting walkspeed after ${_timeElapsed}s`);
-					humanoid.WalkSpeed -= bonus;
-					resolve();
-				},
-			);
-			onCancel(() => {
-				resetPromise.cancel();
-			});
-		});
+		this.getHumanoid().WalkSpeed = this.walkSpeed.getCalculatedValue();
 	}
 
 	setWalkSpeed(speed: number): void {
-		this.walkSpeed = speed;
 		this.getHumanoid().WalkSpeed = speed;
 	}
 
@@ -123,7 +93,7 @@ export abstract class AbstractCharacter
 		return (
 			this.attributes.isAlive &&
 			!(
-				this.attributes.isStunned ||
+				this.attributes.stunTimer > 0 ||
 				this.attributes.isBlocking ||
 				this.attributes.isAttacking ||
 				this.ragdoll.attributes.isRagdolled
@@ -143,7 +113,7 @@ export abstract class AbstractCharacter
 		return (
 			this.attributes.isAlive &&
 			!(
-				this.attributes.isStunned ||
+				this.attributes.stunTimer > 0 ||
 				this.attributes.isBlocking ||
 				this.attributes.isAttacking ||
 				this.ragdoll.attributes.isRagdolled

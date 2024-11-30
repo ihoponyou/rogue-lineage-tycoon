@@ -1,16 +1,15 @@
+import Signal from "@rbxts/signal";
+
 export class Stat {
 	private calculatedValue: number;
 	private shouldRecalculate = false;
 
 	private multipliers = new Map<string, number>();
 	private addends = new Map<string, number>();
+	private modifiersChanged = new Signal();
 
-	constructor(private readonly baseValue: number) {
+	constructor(public readonly baseValue: number) {
 		this.calculatedValue = this.baseValue;
-	}
-
-	getBaseValue(): number {
-		return this.baseValue;
 	}
 
 	getCalculatedValue(): number {
@@ -21,43 +20,51 @@ export class Stat {
 		return this.calculatedValue;
 	}
 
-	addMultiplier(
+	onModifiersChanged(callback: Callback): RBXScriptConnection {
+		return this.modifiersChanged.Connect(callback);
+	}
+
+	addModifier(
 		source: string,
 		value: number,
-		overwrite: boolean = false,
-	): void {
-		this.addBonus(this.multipliers, source, value, overwrite);
-	}
-
-	removeMultiplier(source: string): void {
-		this.removeBonus(this.multipliers, source);
-	}
-
-	addAddend(source: string, value: number, overwrite: boolean = false): void {
-		this.addBonus(this.addends, source, value, overwrite);
-	}
-
-	removeAddend(source: string): void {
-		this.removeBonus(this.addends, source);
-	}
-
-	private addBonus(
-		bonusMap: Map<string, number>,
-		source: string,
-		value: number,
-		overwrite: boolean = false,
+		flat: boolean,
+		overwrite: boolean = true,
 	) {
+		const modifierMap = flat ? this.addends : this.multipliers;
 		let newValue = value;
 		if (!overwrite) {
-			newValue += bonusMap.get(source) ?? 0;
+			newValue += modifierMap.get(source) ?? 0;
 		}
-		bonusMap.set(source, newValue);
+		modifierMap.set(source, newValue);
 		this.shouldRecalculate = true;
+		this.modifiersChanged.Fire();
 	}
 
-	private removeBonus(bonusMap: Map<string, number>, source: string) {
-		bonusMap.delete(source);
+	/**
+	 * @returns a callback that instantly removes the added modifier
+	 */
+	addTemporaryModifier(
+		duration: number,
+		source: string,
+		value: number,
+		flat: boolean,
+		overwrite: boolean = true,
+	) {
+		this.addModifier(source, value, flat, overwrite);
+		const cleanupTask = task.delay(duration, () => {
+			this.removeModifier(source, flat);
+		});
+		return () => {
+			task.cancel(cleanupTask);
+			this.removeModifier(source, flat);
+		};
+	}
+
+	removeModifier(source: string, flat: boolean) {
+		const modifierMap = flat ? this.addends : this.multipliers;
+		modifierMap.delete(source);
 		this.shouldRecalculate = true;
+		this.modifiersChanged.Fire();
 	}
 
 	private recalculateValue(): number {

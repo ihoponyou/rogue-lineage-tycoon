@@ -4,7 +4,6 @@ import { CharacterClient } from "client/components/character-client";
 import { AnimationController } from "client/controllers/animation-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
 import { Events, Functions } from "client/network";
-import { BLOCK_WALK_SPEED } from "shared/configs";
 import { getWeaponConfig, WeaponName } from "shared/configs/weapons";
 import { CharacterActivity } from "./character-activity";
 
@@ -43,11 +42,10 @@ export class BlockActivity extends CharacterActivity {
 					this.animationController.play(this.blockAnimationName);
 				})
 				.catch(warn);
-		this.character.setWalkSpeed(BLOCK_WALK_SPEED);
-
-		Events.combat.block(true);
 
 		this.trove.add(Events.combat.unblock.connect(() => this.stop()));
+
+		Events.combat.block(true);
 
 		this.trove.add(
 			Events.combat.blockHit.connect(() => {
