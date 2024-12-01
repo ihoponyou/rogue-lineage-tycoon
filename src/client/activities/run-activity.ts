@@ -36,31 +36,27 @@ export class RunActivity extends CharacterActivity {
 	public override stop(): void {
 		super.stop();
 
-		this.character.resetWalkSpeed();
-		this.animationController.stop("Run");
-		this.animationController.stop("ManaRun");
+		Events.character.stopRun();
 		this.manaTrail.Enabled = false;
 
 		this.trove.clean();
 	}
 
 	private run(): void {
-		this.character.setWalkSpeed(this.character.getWalkSpeed() * 1.5);
 		this.animationController.play("Run");
 	}
 
 	private manaRun(): void {
-		this.trove.add(Events.mana.emptied.connect(() => this.onManaEmptied()));
+		this.trove.add(
+			Events.mana.emptied.connect(() => {
+				this.animationController.stop("ManaRun");
+				if (this.manaTrail) this.manaTrail.Enabled = false;
+				this.run();
+			}),
+		);
 
-		this.character.setWalkSpeed(this.character.getWalkSpeed().get * 2);
 		this.animationController.play("ManaRun");
 		this.manaTrail.Enabled = true;
-	}
-
-	private onManaEmptied(): void {
-		this.animationController.stop("ManaRun");
-		if (this.manaTrail) this.manaTrail.Enabled = false;
-		this.run();
 	}
 
 	private newManaTrail(): Trail {

@@ -19,9 +19,14 @@ import {
 	selectPlayerConditions,
 	selectPlayerHealth,
 	selectPlayerInventory,
+	selectPlayerMana,
 	selectPlayerSkills,
 	selectPlayerTransform,
 } from "server/store/selectors";
+import {
+	MANA_RUN_WALK_SPEED_MODIFIER,
+	RUN_WALK_SPEED_MODIFIER,
+} from "shared/configs";
 import { ItemId } from "shared/configs/items";
 import { SkillId } from "shared/configs/skills";
 import { getWeaponConfig, WeaponConfig } from "shared/configs/weapons";
@@ -445,5 +450,34 @@ export class PlayerCharacter
 			return;
 		}
 		this.character.attributes.isBlocking = blockUp;
+	}
+
+	private startRun(): void {
+		const manaData = store.getState(selectPlayerMana(this.player.instance));
+		const canManaRun = (manaData?.amount ?? 0) > 0 && manaData?.runEnabled;
+		if (canManaRun) {
+			store.subscribe(selectPlayerMana(this.player.instance), (data) => {
+				if (!data || data.amount > 0) {
+					return;
+				}
+				this.character.stopAnimation("ManaRun");
+				this.character
+					.getWalkSpeed()
+					.addModifier("run", RUN_WALK_SPEED_MODIFIER, true);
+				this.character.playAnimation("Run");
+			});
+		}
+		const initialModifier = canManaRun
+			? MANA_RUN_WALK_SPEED_MODIFIER
+			: RUN_WALK_SPEED_MODIFIER;
+		this.character
+			.getWalkSpeed()
+			.addModifier("run", initialModifier, false);
+		const initialAnimationName = canManaRun ? "ManaRun" : "Run";
+		this.character.playAnimation(initialAnimationName);
+	}
+
+	private stopRun(): void {
+		this.character.getWalkSpeed().removeModifier("run", false);
 	}
 }
