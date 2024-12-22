@@ -18,11 +18,23 @@ interface FillBarProps {
 
 // TODO: find original tween properties for mana bar, health bar, stomach, tox
 
+// MANA BAR
+// const MANA_TWEEN_INFO = new TweenInfo(
+// 	0.1,
+// 	Enum.EasingStyle.Sine,
+// 	Enum.EasingDirection.Out,
+// );
+
 export function FillBar(props: FillBarProps) {
 	const [percent, percentMotion] = useMotion(props.amount / props.maxAmount);
 
 	useEffect(
-		() => percentMotion.tween(props.amount / props.maxAmount),
+		() =>
+			percentMotion.tween(props.amount / props.maxAmount, {
+				time: 0.1,
+				style: Enum.EasingStyle.Sine,
+				direction: Enum.EasingDirection.Out,
+			}),
 		[props.amount],
 	);
 

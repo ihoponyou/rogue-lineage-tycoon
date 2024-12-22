@@ -24,17 +24,22 @@ export class ChargeManaActivity extends CharacterActivity {
 	public override start(): void {
 		super.start();
 
-		this.character.getHumanoid().WalkSpeed =
-			this.character.getWalkSpeed() * 0.85;
-		Events.mana.charge(true);
-		this.chargeSound.Play();
-
 		this.trove.add(Events.mana.filled.connect(() => this.stop()));
+		this.trove.add(
+			// in case server cancels charging
+			Events.mana.charge.connect((charging) => {
+				if (charging) return;
+				this.stop();
+			}),
+		);
 		this.trove.connect(RunService.RenderStepped, () => this.update());
+
+		Events.mana.charge(true);
+		print("start charge");
+		this.chargeSound.Play();
 	}
 
 	public override stop(): void {
-		this.character.resetWalkSpeed();
 		Events.mana.charge(false);
 
 		this.trove.clean();

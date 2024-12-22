@@ -80,7 +80,7 @@ class SetCommand {
 		],
 	})
 	setManaEnabled(ctx: CommandContext, player: Player, enable: boolean) {
-		store.toggleManaEnabled(player, enable);
+		player.AddTag("Mana");
 		ctx.reply(`${player.Name} no${enable ? "w" : " longer"} has mana`);
 	}
 }

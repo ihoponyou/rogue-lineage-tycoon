@@ -161,6 +161,18 @@ export class PlayerCharacter
 				this.block(blockUp);
 			}),
 		);
+		this.trove.add(
+			Events.character.startRun.connect((player) => {
+				if (player !== this.getPlayer().instance) return;
+				this.startRun();
+			}),
+		);
+		this.trove.add(
+			Events.character.stopRun.connect((player) => {
+				if (player !== this.getPlayer().instance) return;
+				this.stopRun();
+			}),
+		);
 	}
 
 	onTick(dt: number): void {
@@ -453,6 +465,7 @@ export class PlayerCharacter
 	}
 
 	private startRun(): void {
+		print("go");
 		const manaData = store.getState(selectPlayerMana(this.player.instance));
 		const canManaRun = (manaData?.amount ?? 0) > 0 && manaData?.runEnabled;
 		if (canManaRun) {
@@ -479,5 +492,7 @@ export class PlayerCharacter
 
 	private stopRun(): void {
 		this.character.getWalkSpeed().removeModifier("run", false);
+		this.character.stopAnimation("Run");
+		this.character.stopAnimation("ManaRun");
 	}
 }

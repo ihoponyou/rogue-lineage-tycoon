@@ -43,19 +43,17 @@ export class RunActivity extends CharacterActivity {
 	}
 
 	private run(): void {
-		this.animationController.play("Run");
+		Events.character.startRun();
 	}
 
 	private manaRun(): void {
 		this.trove.add(
 			Events.mana.emptied.connect(() => {
-				this.animationController.stop("ManaRun");
 				if (this.manaTrail) this.manaTrail.Enabled = false;
 				this.run();
 			}),
 		);
 
-		this.animationController.play("ManaRun");
 		this.manaTrail.Enabled = true;
 	}
 

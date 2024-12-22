@@ -330,8 +330,6 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	): void {
 		this.attributes.isAttacking = true;
 
-		// Events.character.stopRun(this.playerCharacter.getPlayer().instance);
-
 		if (noJumpDuration > 0) {
 			this.toggleJump(false);
 		}
