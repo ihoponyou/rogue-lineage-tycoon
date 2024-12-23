@@ -1,5 +1,10 @@
 import Signal from "@rbxts/signal";
 
+export enum StatModifierType {
+	Multiplier,
+	Addend,
+}
+
 export class Stat {
 	private calculatedValue: number;
 	private shouldRecalculate = false;
@@ -27,10 +32,14 @@ export class Stat {
 	addModifier(
 		source: string,
 		value: number,
-		flat: boolean,
+		modifierType: StatModifierType,
 		overwrite: boolean = true,
 	) {
-		const modifierMap = flat ? this.addends : this.multipliers;
+		// this is troll but the enum makes things readable i promise
+		const modifierMap =
+			modifierType === StatModifierType.Addend
+				? this.addends
+				: this.multipliers;
 		let newValue = value;
 		if (!overwrite) {
 			newValue += modifierMap.get(source) ?? 0;
@@ -47,21 +56,22 @@ export class Stat {
 		duration: number,
 		source: string,
 		value: number,
-		flat: boolean,
+		modifierType: StatModifierType,
 		overwrite: boolean = true,
 	) {
-		this.addModifier(source, value, flat, overwrite);
+		this.addModifier(source, value, modifierType, overwrite);
 		const cleanupTask = task.delay(duration, () => {
-			this.removeModifier(source, flat);
+			this.removeModifier(source, modifierType);
 		});
 		return () => {
 			task.cancel(cleanupTask);
-			this.removeModifier(source, flat);
+			this.removeModifier(source, modifierType);
 		};
 	}
 
-	removeModifier(source: string, flat: boolean) {
-		const modifierMap = flat ? this.addends : this.multipliers;
+	removeModifier(source: string, flat: StatModifierType) {
+		const modifierMap =
+			flat === StatModifierType.Addend ? this.addends : this.multipliers;
 		modifierMap.delete(source);
 		this.shouldRecalculate = true;
 		this.modifiersChanged.Fire();

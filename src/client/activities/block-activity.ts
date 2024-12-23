@@ -65,7 +65,6 @@ export class BlockActivity extends CharacterActivity {
 		this.getEquippedWeaponPromise?.cancel();
 		Events.combat.block(false);
 		this.animationController.stop(this.blockAnimationName);
-		this.character.resetWalkSpeed();
 
 		this.trove.clean();
 	}

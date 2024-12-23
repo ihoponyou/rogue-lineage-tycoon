@@ -35,7 +35,6 @@ export class ChargeManaActivity extends CharacterActivity {
 		this.trove.connect(RunService.RenderStepped, () => this.update());
 
 		Events.mana.charge(true);
-		print("start charge");
 		this.chargeSound.Play();
 	}
 

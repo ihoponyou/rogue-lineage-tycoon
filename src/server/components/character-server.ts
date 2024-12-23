@@ -4,6 +4,7 @@ import { setInterval } from "@rbxts/set-timeout";
 import Signal from "@rbxts/signal";
 import { Trove } from "@rbxts/trove";
 import { AbstractCharacter } from "shared/components/abstract-character";
+import { BASE_CLIMB_SPEED, BASE_WALK_SPEED } from "shared/configs";
 import { isItemId, ItemId } from "shared/configs/items";
 import { isSkillId, SkillId } from "shared/configs/skills";
 import { WeaponType } from "shared/configs/weapons";
@@ -11,6 +12,7 @@ import { ANIMATIONS } from "shared/constants";
 import { AnimationManager } from "shared/modules/animation-manager";
 import { cframeFromOrientationDeg } from "shared/modules/cframe-util";
 import { Equippable } from "shared/modules/equippable";
+import { Stat, StatModifierType } from "shared/modules/stat";
 import { ItemServer } from "./item-server";
 import { RagdollServer } from "./ragdoll-server";
 import { SkillServer } from "./skill-server";
@@ -51,6 +53,8 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	private torsoCollision = new Instance("NoCollisionConstraint");
 	private killed = new Signal();
 	private trove = new Trove();
+	public readonly walkSpeed = new Stat(BASE_WALK_SPEED);
+	public readonly climbSpeed = new Stat(BASE_CLIMB_SPEED);
 
 	private currentlyEquipped?: Equippable;
 	private animationManager!: AnimationManager;
@@ -118,6 +122,9 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		this.loadAnimations(ANIMATIONS);
 
 		this.onHealthChanged((newHealth) => this._onHealthChanged(newHealth));
+		this.walkSpeed.onModifiersChanged(() => {
+			this.getHumanoid().WalkSpeed = this.walkSpeed.getCalculatedValue();
+		});
 	}
 
 	onTick(dt: number): void {
@@ -320,6 +327,21 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		return this.trove.connect(this.humanoid.HealthChanged, callback);
 	}
 
+	stun(duration: number): () => void {
+		if (duration <= 0) {
+			error(`stun duration must be positive`);
+		}
+		const removeModifier = this.walkSpeed.addTemporaryModifier(
+			duration,
+			"endlag",
+			0,
+			StatModifierType.Multiplier,
+		);
+		return () => {
+			removeModifier();
+		};
+	}
+
 	attack(
 		animationName: string,
 		onSwing: Callback,
@@ -373,7 +395,7 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 						endlagDuration / this.attackSpeed,
 						"endlag",
 						0,
-						false,
+						StatModifierType.Multiplier,
 					);
 				}
 

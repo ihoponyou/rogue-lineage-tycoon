@@ -6,6 +6,7 @@ import { ClassId } from "shared/configs/classes";
 import { SkillId } from "shared/configs/skills";
 import { getWeaponConfig, WeaponType } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
+import { StatModifierType } from "shared/modules/stat";
 
 export interface SkillConfig {
 	readonly cooldown: number;
@@ -160,11 +161,11 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 			// play the sound effect
 			// increase player speed by some multiplier
 			const duration = 10;
-			user.getWalkSpeed().addTemporaryModifier(
+			user.walkSpeed.addTemporaryModifier(
 				duration,
 				"agility",
 				1.25,
-				false,
+				StatModifierType.Multiplier,
 				false,
 			);
 		},

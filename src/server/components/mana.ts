@@ -4,10 +4,11 @@ import { Events } from "server/network";
 import { store } from "server/store";
 import { selectPlayerIdentity } from "server/store/selectors";
 import { BASE_MANA_CHARGE_RATE, BASE_MANA_DECAY_RATE } from "shared/configs";
+import { StatModifierType } from "shared/modules/stat";
 import { PlayerServer } from "./player-server";
 
 const MODIFIER_LABEL = "charging_mana";
-const WALK_SPEED_MODIFIER = 0.85;
+const WALK_SPEED_MODIFIER = 0.8;
 // what do the mana events even do?
 
 @Component({
@@ -27,6 +28,23 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 		Events.mana.charge.connect((player, bool) => {
 			if (player !== this.instance) return;
 			this.charging = bool;
+			const character = this.playerServer
+				.getPlayerCharacter()
+				.getCharacter();
+
+			if (this.charging) {
+				character.walkSpeed.addModifier(
+					MODIFIER_LABEL,
+					WALK_SPEED_MODIFIER,
+					StatModifierType.Multiplier,
+					true,
+				);
+			} else {
+				character.walkSpeed.removeModifier(
+					MODIFIER_LABEL,
+					StatModifierType.Multiplier,
+				);
+			}
 		});
 
 		const race = store.getState(
@@ -45,12 +63,9 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 
 	public onTick(dt: number): void {
 		const prevAmount = this.amount;
-		const character = this.playerServer.getPlayerCharacter().getCharacter();
 		if (this.charging) {
 			this.amount += this.chargeRate * dt;
-			character
-				.getWalkSpeed()
-				.addModifier(MODIFIER_LABEL, 0.85, false, true);
+
 			if (this.amount >= 100) {
 				this.amount = 100;
 				this.charging = false;
@@ -59,7 +74,7 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 			}
 		} else if (this.amount > 0) {
 			this.amount -= this.decayRate * dt;
-			character.getWalkSpeed().removeModifier(MODIFIER_LABEL, false);
+
 			if (this.amount <= 0) {
 				this.amount = 0;
 				Events.mana.emptied.fire(this.instance);

@@ -24,8 +24,9 @@ import {
 	selectPlayerTransform,
 } from "server/store/selectors";
 import {
-	MANA_RUN_WALK_SPEED_MODIFIER,
-	RUN_WALK_SPEED_MODIFIER,
+	BLOCK_WALK_SPEED_MULTIPLIER,
+	MANA_RUN_WALK_SPEED_MULTIPLIER,
+	RUN_WALK_SPEED_MULTIPLIER,
 } from "shared/configs";
 import { ItemId } from "shared/configs/items";
 import { SkillId } from "shared/configs/skills";
@@ -35,12 +36,14 @@ import {
 	deserializeVector3,
 	serializeVector3,
 } from "shared/modules/serialized-vector3";
+import { StatModifierType } from "shared/modules/stat";
 import { CharacterServer } from "./character-server";
 import { PlayerServer } from "./player-server";
 import { Weapon } from "./weapon";
 
 const COMBO_RESET_DELAY = 2;
 const HEAVY_ATTACK_COOLDOWN = 3;
+const HEAVY_ATTACK_WALKSPEED_MULTIPLIER = 0.2;
 const FISTS_CONFIG = getWeaponConfig("Fists");
 
 @Component({
@@ -433,7 +436,8 @@ export class PlayerCharacter
 			// TODO: no endlag if hit something
 		};
 		const onStopped = () => {
-			this.character.resetWalkSpeed();
+			this.character.getHumanoid().WalkSpeed =
+				this.character.walkSpeed.getCalculatedValue();
 		};
 
 		this.character.attack(
@@ -453,7 +457,11 @@ export class PlayerCharacter
 			),
 		);
 
-		this.character.getWalkSpeed().addModifier("heavy_attack", 0.2, false);
+		this.character.walkSpeed.addModifier(
+			"heavy_attack",
+			HEAVY_ATTACK_WALKSPEED_MULTIPLIER,
+			StatModifierType.Multiplier,
+		);
 	}
 
 	private block(blockUp: boolean): void {
@@ -461,37 +469,59 @@ export class PlayerCharacter
 			Events.combat.unblock(this.getPlayer().instance);
 			return;
 		}
+		if (blockUp) {
+			this.character.walkSpeed.addModifier(
+				"blocking",
+				BLOCK_WALK_SPEED_MULTIPLIER,
+				StatModifierType.Multiplier,
+			);
+		} else {
+			this.character.walkSpeed.removeModifier(
+				"blocking",
+				StatModifierType.Multiplier,
+			);
+		}
 		this.character.attributes.isBlocking = blockUp;
 	}
 
 	private startRun(): void {
-		print("go");
 		const manaData = store.getState(selectPlayerMana(this.player.instance));
 		const canManaRun = (manaData?.amount ?? 0) > 0 && manaData?.runEnabled;
 		if (canManaRun) {
-			store.subscribe(selectPlayerMana(this.player.instance), (data) => {
-				if (!data || data.amount > 0) {
-					return;
-				}
-				this.character.stopAnimation("ManaRun");
-				this.character
-					.getWalkSpeed()
-					.addModifier("run", RUN_WALK_SPEED_MODIFIER, true);
-				this.character.playAnimation("Run");
-			});
+			const unsubscribe = store.subscribe(
+				selectPlayerMana(this.player.instance),
+				(data) => {
+					if (!data || data.amount > 0) {
+						return;
+					}
+					unsubscribe();
+					this.character.stopAnimation("ManaRun");
+					this.character.walkSpeed.addModifier(
+						"run",
+						RUN_WALK_SPEED_MULTIPLIER,
+						StatModifierType.Multiplier,
+					);
+					this.character.playAnimation("Run");
+				},
+			);
 		}
 		const initialModifier = canManaRun
-			? MANA_RUN_WALK_SPEED_MODIFIER
-			: RUN_WALK_SPEED_MODIFIER;
-		this.character
-			.getWalkSpeed()
-			.addModifier("run", initialModifier, false);
+			? MANA_RUN_WALK_SPEED_MULTIPLIER
+			: RUN_WALK_SPEED_MULTIPLIER;
+		this.character.walkSpeed.addModifier(
+			"run",
+			initialModifier,
+			StatModifierType.Multiplier,
+		);
 		const initialAnimationName = canManaRun ? "ManaRun" : "Run";
 		this.character.playAnimation(initialAnimationName);
 	}
 
 	private stopRun(): void {
-		this.character.getWalkSpeed().removeModifier("run", false);
+		this.character.walkSpeed.removeModifier(
+			"run",
+			StatModifierType.Multiplier,
+		);
 		this.character.stopAnimation("Run");
 		this.character.stopAnimation("ManaRun");
 	}
