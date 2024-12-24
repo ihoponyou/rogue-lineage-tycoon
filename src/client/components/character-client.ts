@@ -18,7 +18,7 @@ import { Equippable } from "shared/modules/equippable";
 import { Events } from "../network";
 import { ItemClient } from "./item-client";
 import { RagdollClient } from "./ragdoll-client";
-import { SkillClient } from "./skill-client";
+import { AbstractSkillClient } from "./skill-client";
 
 @Component({
 	tag: AbstractCharacter.TAG,
@@ -105,10 +105,10 @@ export class CharacterClient extends AbstractCharacter implements OnTick {
 		);
 
 		for (const instance of this.skillsFolder.GetChildren()) {
-			this.retrieveEquippable(instance, SkillClient);
+			this.retrieveEquippable(instance, AbstractSkillClient);
 		}
 		this.skillsFolder.ChildAdded.Connect((child) => {
-			this.retrieveEquippable(child, SkillClient);
+			this.retrieveEquippable(child, AbstractSkillClient);
 		});
 	}
 

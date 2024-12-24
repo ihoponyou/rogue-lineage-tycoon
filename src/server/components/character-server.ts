@@ -6,7 +6,7 @@ import { Trove } from "@rbxts/trove";
 import { AbstractCharacter } from "shared/components/abstract-character";
 import { BASE_CLIMB_SPEED, BASE_WALK_SPEED } from "shared/configs";
 import { isItemId, ItemId } from "shared/configs/items";
-import { isSkillId, SkillId } from "shared/configs/skills";
+import { ActiveSkillId, isActiveSkillId } from "shared/configs/skills";
 import { WeaponType } from "shared/configs/weapons";
 import { ANIMATIONS } from "shared/constants";
 import { AnimationManager } from "shared/modules/animation-manager";
@@ -15,7 +15,7 @@ import { Equippable } from "shared/modules/equippable";
 import { Stat, StatModifierType } from "shared/modules/stat";
 import { ItemServer } from "./item-server";
 import { RagdollServer } from "./ragdoll-server";
-import { SkillServer } from "./skill-server";
+import { ActiveSkillServer } from "./skill-server";
 import { Weapon } from "./weapon";
 
 const FF_DURATION = 15;
@@ -235,9 +235,9 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		return this.weapons[weaponType];
 	}
 
-	learnSkill(id: SkillId): void {
-		if (!isSkillId(id)) error(`"${id}" is not a valid SkillId`);
-		SkillServer.instantiate(id, this.skillsFolder, this);
+	learnSkill(id: ActiveSkillId): void {
+		if (!isActiveSkillId(id)) error(`"${id}" is not a valid ActiveSkillId`);
+		ActiveSkillServer.instantiate(id, this.skillsFolder, this);
 	}
 
 	giveItem(id: ItemId, quantity: number = 1): void {

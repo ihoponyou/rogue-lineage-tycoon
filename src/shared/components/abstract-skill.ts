@@ -6,7 +6,7 @@ import { AbstractCharacter } from "./abstract-character";
 interface SkillAttributes extends EquippableAttributes {}
 
 @Component()
-export abstract class AbstractSkill
+export abstract class AbstractActiveSkill
 	extends BaseComponent<SkillAttributes>
 	implements Equippable, Useable
 {

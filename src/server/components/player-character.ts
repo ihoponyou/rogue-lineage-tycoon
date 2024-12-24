@@ -29,7 +29,7 @@ import {
 	RUN_WALK_SPEED_MULTIPLIER,
 } from "shared/configs";
 import { ItemId } from "shared/configs/items";
-import { SkillId } from "shared/configs/skills";
+import { isActiveSkillId, SkillId } from "shared/configs/skills";
 import { getWeaponConfig, WeaponConfig } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
 import {
@@ -284,13 +284,15 @@ export class PlayerCharacter
 	private updateSkillsFromState(
 		skills?: ReadonlySet<SkillId>,
 		prevSkills?: ReadonlySet<SkillId>,
-		autoHotbar = true,
+		addToHotbar = true,
 	) {
 		if (skills === undefined) return;
 		for (const skillId of skills) {
 			if (prevSkills && prevSkills.has(skillId)) continue;
+			// passive skills are handled as edge cases wherever they apply
+			if (!isActiveSkillId(skillId)) continue;
 			this.character.learnSkill(skillId);
-			if (autoHotbar) {
+			if (addToHotbar) {
 				store.addToHotbar(this.player.instance, skillId);
 			}
 		}

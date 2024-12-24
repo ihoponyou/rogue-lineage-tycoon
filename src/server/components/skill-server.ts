@@ -1,26 +1,29 @@
 import { Component, Components } from "@flamework/components";
 import { Modding, OnStart } from "@flamework/core";
-import { SKILLS } from "server/configs/skills";
+import { ACTIVE_SKILLS } from "server/configs/skills";
 import { IOwnable } from "server/modules/ownable";
 import { Events } from "server/network";
-import { AbstractSkill } from "shared/components/abstract-skill";
-import { SkillId } from "shared/configs/skills";
+import { AbstractActiveSkill } from "shared/components/abstract-skill";
+import { ActiveSkillId, SkillId } from "shared/configs/skills";
 import { CharacterServer } from "./character-server";
 import { Ownable } from "./ownable";
 import { Weapon } from "./weapon";
 
 @Component({
-	tag: AbstractSkill.TAG,
+	tag: AbstractActiveSkill.TAG,
 	defaults: {
 		isEquipped: false,
 	},
 })
-export class SkillServer extends AbstractSkill implements OnStart, IOwnable {
+export class ActiveSkillServer
+	extends AbstractActiveSkill
+	implements OnStart, IOwnable
+{
 	static async instantiate(
 		name: SkillId,
 		parent?: Instance,
 		owner?: CharacterServer,
-	): Promise<SkillServer> {
+	): Promise<ActiveSkillServer> {
 		const skillInstance = new Instance("Tool");
 		skillInstance.Parent = script;
 
@@ -29,7 +32,7 @@ export class SkillServer extends AbstractSkill implements OnStart, IOwnable {
 		skillInstance.Name = name;
 
 		return Modding.resolveSingleton(Components)
-			.waitForComponent<SkillServer>(skillInstance)
+			.waitForComponent<ActiveSkillServer>(skillInstance)
 			.andThen((newSkill) => {
 				skillInstance.Parent = parent ?? script;
 				newSkill.setOwner(owner);
@@ -37,7 +40,7 @@ export class SkillServer extends AbstractSkill implements OnStart, IOwnable {
 			});
 	}
 
-	public readonly config = SKILLS[this.instance.Name as SkillId];
+	public readonly config = ACTIVE_SKILLS[this.instance.Name as ActiveSkillId];
 
 	private equippedWeapon?: Weapon;
 

@@ -3,31 +3,37 @@ import { ReplicatedStorage, Workspace } from "@rbxts/services";
 import { CharacterServer } from "server/components/character-server";
 import { HitService } from "server/services/hit-service";
 import { ClassId } from "shared/configs/classes";
-import { SkillId } from "shared/configs/skills";
+import { ActiveSkillId, PassiveSkillId } from "shared/configs/skills";
 import { getWeaponConfig, WeaponType } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
 import { StatModifierType } from "shared/modules/stat";
 
-export interface SkillConfig {
-	readonly cooldown: number;
+const hitService = Modding.resolveSingleton(HitService);
+
+interface SkillConfig {
 	readonly weaponXpRequired: Record<WeaponType, number>;
 	readonly requiredClasses: ReadonlyArray<ClassId>;
 	readonly requiredWeaponType: WeaponType | undefined; //optional type is less readbale
+}
+
+export interface ActiveSkillConfig extends SkillConfig {
+	readonly cooldown: number;
 	readonly activate: (user: CharacterServer) => void;
 }
 
-const hitService = Modding.resolveSingleton(HitService);
-export const SKILLS: Record<SkillId, SkillConfig> = {
+const NO_WEAPON_XP_REQUIRED = {
+	[WeaponType.Dagger]: 0,
+	[WeaponType.Fists]: 0,
+	[WeaponType.Spear]: 0,
+	[WeaponType.Sword]: 0,
+};
+
+export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 	"Goblet Throw": {
-		cooldown: 2,
-		weaponXpRequired: {
-			[WeaponType.Dagger]: 0,
-			[WeaponType.Fists]: 0,
-			[WeaponType.Spear]: 0,
-			[WeaponType.Sword]: 0,
-		},
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
 		requiredClasses: [],
 		requiredWeaponType: undefined,
+		cooldown: 2,
 		activate: (user) => {
 			if (!user.canAttack()) return;
 			user.attack(
@@ -54,7 +60,6 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 		},
 	},
 	"Pommel Strike": {
-		cooldown: 12,
 		weaponXpRequired: {
 			[WeaponType.Dagger]: 0,
 			[WeaponType.Fists]: 0,
@@ -63,6 +68,7 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 		},
 		requiredClasses: ["Warrior"],
 		requiredWeaponType: WeaponType.Sword,
+		cooldown: 12,
 		activate: (user) => {
 			// if (!user.canAttack()) return;
 			const hitboxSize = new Vector3(6, 5, 6);
@@ -101,7 +107,6 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 		},
 	},
 	"Triple Strike": {
-		cooldown: 12,
 		weaponXpRequired: {
 			[WeaponType.Dagger]: 0,
 			[WeaponType.Fists]: 0,
@@ -110,6 +115,7 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 		},
 		requiredClasses: ["Pit Fighter"],
 		requiredWeaponType: WeaponType.Spear,
+		cooldown: 12,
 		activate: (user) => {
 			// if (!user.canAttack()) return;
 			const hitboxSize = new Vector3(6, 5, 7);
@@ -147,7 +153,6 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 		},
 	},
 	Agility: {
-		cooldown: 30,
 		weaponXpRequired: {
 			[WeaponType.Dagger]: 0,
 			[WeaponType.Fists]: 0,
@@ -156,18 +161,79 @@ export const SKILLS: Record<SkillId, SkillConfig> = {
 		},
 		requiredClasses: ["Thief"],
 		requiredWeaponType: WeaponType.Dagger,
+		cooldown: 30,
 		activate: (user) => {
 			// emit the particle
 			// play the sound effect
 			// increase player speed by some multiplier
-			const duration = 10;
 			user.walkSpeed.addTemporaryModifier(
-				duration,
+				10,
 				"agility",
 				1.25,
 				StatModifierType.Multiplier,
 				false,
 			);
 		},
+	},
+	"Dagger Throw": {
+		weaponXpRequired: {
+			[WeaponType.Dagger]: 0,
+			[WeaponType.Fists]: 0,
+			[WeaponType.Spear]: 0,
+			[WeaponType.Sword]: 0,
+		},
+		requiredClasses: [],
+		requiredWeaponType: undefined,
+		cooldown: 2,
+		activate: (user) => {
+			if (!user.canAttack()) return;
+			user.attack(
+				"PommelStrike",
+				() => {},
+				() => {},
+				() => {},
+				0.5,
+				0,
+			);
+		},
+	},
+	Pickpocket: {
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
+		requiredClasses: [],
+		requiredWeaponType: undefined,
+		cooldown: 0,
+		activate: (user) => {},
+	},
+	"Lock Manipulation": {
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
+		requiredClasses: [],
+		requiredWeaponType: undefined,
+		cooldown: 0,
+		activate: (user) => {},
+	},
+	Stealth: {
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
+		requiredClasses: [],
+		requiredWeaponType: undefined,
+		cooldown: 0,
+		activate: (user) => {},
+	},
+};
+
+export const PASSIVE_SKILLS: Record<PassiveSkillId, SkillConfig> = {
+	"Mercenary Carry": {
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
+		requiredClasses: [],
+		requiredWeaponType: undefined,
+	},
+	"Plate Training": {
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
+		requiredClasses: [],
+		requiredWeaponType: undefined,
+	},
+	"Spear Dash": {
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
+		requiredClasses: [],
+		requiredWeaponType: undefined,
 	},
 };

@@ -2,12 +2,15 @@ import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { ContextActionService } from "@rbxts/services";
 import { Events } from "client/network";
-import { AbstractSkill } from "shared/components/abstract-skill";
+import { AbstractActiveSkill } from "shared/components/abstract-skill";
 
 @Component({
-	tag: AbstractSkill.TAG,
+	tag: AbstractActiveSkill.TAG,
 })
-export class SkillClient extends AbstractSkill implements OnStart {
+export class AbstractSkillClient
+	extends AbstractActiveSkill
+	implements OnStart
+{
 	onStart(): void {
 		this.onEquipChanged((isEquipped) => {
 			if (isEquipped) {

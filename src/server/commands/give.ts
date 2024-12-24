@@ -47,7 +47,7 @@ class GiveCommand {
 			return;
 		}
 		store.addItem(player, itemId);
-		context.reply(`Successfully gave ${player.Name} ${itemId} x${1}`);
+		context.reply(`Gave ${player.Name} ${itemId} x1`);
 	}
 
 	@Command({
@@ -84,6 +84,7 @@ class GiveCommand {
 			return;
 		}
 		store.addCurrency(player, currency, quantity);
+		context.reply(`Gave ${player.Name} ${quantity} ${currency}`);
 	}
 
 	@Command({
@@ -92,17 +93,18 @@ class GiveCommand {
 		arguments: [
 			{
 				name: "player",
-				description: ":)",
+				description: "the player to be taught",
 				type: CenturionType.Player,
 			},
 			{
 				name: "skillId",
-				description: ":)",
+				description: "the skill to be learned",
 				type: CommandArgumentType.SkillId,
 			},
 		],
 	})
 	giveSkill(context: CommandContext, player: Player, skillId: SkillId) {
 		store.addSkill(player, skillId);
+		context.reply(`Gave ${player.Name} ${skillId}`);
 	}
 }
