@@ -31,8 +31,8 @@ export class Stat {
 
 	addModifier(
 		source: string,
-		value: number,
 		modifierType: StatModifierType,
+		value: number,
 		overwrite: boolean = true,
 	) {
 		// this is troll but the enum makes things readable i promise
@@ -53,10 +53,10 @@ export class Stat {
 	 * @returns a callback that instantly removes the added modifier
 	 */
 	addTemporaryModifier(
-		duration: number,
 		source: string,
-		value: number,
 		modifierType: StatModifierType,
+		value: number,
+		duration: number,
 		overwrite: boolean = true,
 	) {
 		this.addModifier(source, value, modifierType, overwrite);
@@ -69,9 +69,11 @@ export class Stat {
 		};
 	}
 
-	removeModifier(source: string, flat: StatModifierType) {
+	removeModifier(source: string, modifierType: StatModifierType) {
 		const modifierMap =
-			flat === StatModifierType.Addend ? this.addends : this.multipliers;
+			modifierType === StatModifierType.Addend
+				? this.addends
+				: this.multipliers;
 		modifierMap.delete(source);
 		this.shouldRecalculate = true;
 		this.modifiersChanged.Fire();

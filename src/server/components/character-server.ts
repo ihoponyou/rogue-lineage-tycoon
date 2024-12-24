@@ -332,10 +332,10 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 			error(`stun duration must be positive`);
 		}
 		const removeModifier = this.walkSpeed.addTemporaryModifier(
-			duration,
 			"endlag",
-			0,
 			StatModifierType.Multiplier,
+			0,
+			duration,
 		);
 		return () => {
 			removeModifier();
@@ -392,8 +392,8 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 
 					// call this if attack gets cancelled
 					const removeModifier = this.walkSpeed.addTemporaryModifier(
-						endlagDuration / this.attackSpeed,
 						"endlag",
+						endlagDuration / this.attackSpeed,
 						0,
 						StatModifierType.Multiplier,
 					);

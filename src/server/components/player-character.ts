@@ -438,8 +438,10 @@ export class PlayerCharacter
 			// TODO: no endlag if hit something
 		};
 		const onStopped = () => {
-			this.character.getHumanoid().WalkSpeed =
-				this.character.walkSpeed.getCalculatedValue();
+			this.character.walkSpeed.removeModifier(
+				"heavy_attack",
+				StatModifierType.Multiplier,
+			);
 		};
 
 		this.character.attack(
@@ -461,8 +463,8 @@ export class PlayerCharacter
 
 		this.character.walkSpeed.addModifier(
 			"heavy_attack",
-			HEAVY_ATTACK_WALKSPEED_MULTIPLIER,
 			StatModifierType.Multiplier,
+			HEAVY_ATTACK_WALKSPEED_MULTIPLIER,
 		);
 	}
 
@@ -474,8 +476,8 @@ export class PlayerCharacter
 		if (blockUp) {
 			this.character.walkSpeed.addModifier(
 				"blocking",
-				BLOCK_WALK_SPEED_MULTIPLIER,
 				StatModifierType.Multiplier,
+				BLOCK_WALK_SPEED_MULTIPLIER,
 			);
 		} else {
 			this.character.walkSpeed.removeModifier(
@@ -500,8 +502,8 @@ export class PlayerCharacter
 					this.character.stopAnimation("ManaRun");
 					this.character.walkSpeed.addModifier(
 						"run",
-						RUN_WALK_SPEED_MULTIPLIER,
 						StatModifierType.Multiplier,
+						RUN_WALK_SPEED_MULTIPLIER,
 					);
 					this.character.playAnimation("Run");
 				},
@@ -512,8 +514,8 @@ export class PlayerCharacter
 			: RUN_WALK_SPEED_MULTIPLIER;
 		this.character.walkSpeed.addModifier(
 			"run",
-			initialModifier,
 			StatModifierType.Multiplier,
+			initialModifier,
 		);
 		const initialAnimationName = canManaRun ? "ManaRun" : "Run";
 		this.character.playAnimation(initialAnimationName);

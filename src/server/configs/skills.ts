@@ -167,10 +167,10 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 			// play the sound effect
 			// increase player speed by some multiplier
 			user.walkSpeed.addTemporaryModifier(
-				10,
 				"agility",
-				1.25,
 				StatModifierType.Multiplier,
+				1.25,
+				10,
 				false,
 			);
 		},

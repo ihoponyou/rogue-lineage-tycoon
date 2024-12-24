@@ -35,8 +35,8 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 			if (this.charging) {
 				character.walkSpeed.addModifier(
 					MODIFIER_LABEL,
-					WALK_SPEED_MODIFIER,
 					StatModifierType.Multiplier,
+					WALK_SPEED_MODIFIER,
 					true,
 				);
 			} else {

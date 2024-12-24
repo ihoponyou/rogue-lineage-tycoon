@@ -7,6 +7,8 @@ import { Events } from "server/network";
 import { WeaponConfig } from "shared/configs/weapons";
 import { AttackData } from "../modules/attack-data";
 
+const BLOCK_BREAK_STUN_DURATION = 1.5;
+
 @Service()
 export class HitService {
 	public constructor(private components: Components) {}
@@ -24,21 +26,18 @@ export class HitService {
 		if (!this.canHit(hitter, victim)) return;
 
 		const blockable360 = false;
-		const blocked =
-			victim.attributes.isBlocking &&
-			!blockable360 &&
-			!hitter.isBehind(victim);
+		const blocked = blockable360
+			? victim.attributes.isBlocking
+			: victim.attributes.isBlocking && !hitter.isBehind(victim);
 		const blockBroken = blocked && attackData.breaksBlock;
 
-		let victimPlayer: Player | undefined;
 		const victimPlayerCharacter =
 			this.components.getComponent<PlayerCharacter>(victim.instance);
-		if (victimPlayerCharacter) {
-			victimPlayer = victimPlayerCharacter?.getPlayer().instance;
-		}
+		const victimPlayer = victimPlayerCharacter?.getPlayer().instance;
 		if (blocked) {
 			if (blockBroken) {
 				// print("broke block");
+				victim.stun(BLOCK_BREAK_STUN_DURATION);
 				if (victimPlayer !== undefined) {
 					Events.combat.unblock(victimPlayer);
 				}
@@ -63,27 +62,27 @@ export class HitService {
 
 		Events.playEffect.broadcast(`Hit`, victimInstance, weaponConfig.type);
 		victim.takeDamage(weaponConfig.damage);
-		if (blockBroken) {
-			Events.playEffect.broadcast(`BlockBreak`, victimInstance);
-		}
-
+		victim.stun(weaponConfig.damage / 15);
 		victim.playAnimation(`Stunned${math.random(1, 3)}`);
 
-		if (attackData.ragdollDuration > 0 && !blockBroken) {
+		if (blockBroken) {
+			Events.playEffect.broadcast(`BlockBreak`, victimInstance);
+			return;
+		}
+
+		if (attackData.ragdollDuration > 0) {
 			victim.toggleRagdoll(true);
 			task.delay(attackData.ragdollDuration, () => {
 				victim.toggleRagdoll(false);
 			});
 		}
 
-		if (!blockBroken) {
-			this.doKnockback(
-				hitter,
-				victim,
-				attackData.knockbackForce,
-				attackData.knockbackDuration,
-			);
-		}
+		this.doKnockback(
+			hitter,
+			victim,
+			attackData.knockbackForce,
+			attackData.knockbackDuration,
+		);
 	}
 
 	private canHit(hitter: CharacterServer, victim: CharacterServer): boolean {
