@@ -1,6 +1,6 @@
 import { Components } from "@flamework/components";
 import { Controller } from "@flamework/core";
-import { CharacterClient } from "client/components/character-client";
+import { LocalCharacter } from "client/components/local-character";
 import { ANIMATIONS } from "shared/constants";
 import {
 	OnLocalCharacterAdded,
@@ -11,14 +11,14 @@ import {
 export class AnimationController
 	implements OnLocalCharacterAdded, OnLocalCharacterRemoving
 {
-	private character?: CharacterClient;
+	private character?: LocalCharacter;
 	private loadedTracks = new Map<string, AnimationTrack>();
 
 	constructor(private components: Components) {}
 
 	public onLocalCharacterAdded(character: Model): void {
 		this.character = this.components
-			.waitForComponent<CharacterClient>(character)
+			.waitForComponent<LocalCharacter>(character)
 			.expect();
 		for (const animation of ANIMATIONS.GetDescendants()) {
 			if (!animation.IsA("Animation")) continue;

@@ -6,7 +6,7 @@ import {
 	Workspace,
 } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
-import { CharacterClient } from "client/components/character-client";
+import { LocalCharacter } from "client/components/local-character";
 import { AnimationController } from "client/controllers/animation-controller";
 import {
 	Direction,
@@ -36,7 +36,7 @@ export class ClimbActivity extends CharacterActivity {
 	private climbConstraint = this.newClimbConstraint();
 
 	public constructor(
-		character: CharacterClient,
+		character: LocalCharacter,
 		private animationController: AnimationController,
 		private inputController: InputController,
 		private keybindController: KeybindController,

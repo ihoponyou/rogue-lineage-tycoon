@@ -45,7 +45,7 @@ const COMBO_RESET_DELAY = 2;
 const HEAVY_ATTACK_COOLDOWN = 3;
 const HEAVY_ATTACK_WALKSPEED_MULTIPLIER = 0.2;
 const FISTS_CONFIG = getWeaponConfig("Fists");
-const CARRY_CHECK_RADIUS = 10;
+const CARRY_CHECK_RADIUS = 7.5;
 
 @Component({
 	tag: CharacterServer.TAG,
@@ -183,7 +183,6 @@ export class PlayerCharacter
 			Events.combat.carryInput.connect((player) => {
 				if (player !== this.player.instance) return;
 
-				print(this.carriedCharacter);
 				if (this.carriedCharacter !== undefined) {
 					this.releaseCarriedCharacter();
 					return;
@@ -198,8 +197,8 @@ export class PlayerCharacter
 					CARRY_CHECK_RADIUS,
 					overlapParams,
 				);
-				print(detectedParts);
 				for (const part of detectedParts) {
+					if (part.Name !== "Torso") continue;
 					if (part.Parent === undefined) continue;
 					if (part.Parent.ClassName !== "Model") continue;
 					const characterServer =
@@ -294,6 +293,7 @@ export class PlayerCharacter
 	}
 
 	carry(otherCharacter: CharacterServer): void {
+		if (!this.character.canCarry()) return;
 		if (!otherCharacter.canBeCarried()) error(`how did this happen`);
 		otherCharacter.attributes.isCarried = true;
 
@@ -335,7 +335,6 @@ export class PlayerCharacter
 
 	releaseCarriedCharacter(): void {
 		if (this.carriedCharacter === undefined) return;
-		this.carriedCharacter.attributes.isCarried = false;
 
 		const player = this.components
 			.getComponent<PlayerCharacter>(this.carriedCharacter.instance)
@@ -349,15 +348,15 @@ export class PlayerCharacter
 			2,
 			carrierRootPart.CFrame.LookVector.mul(2),
 		);
-		if (wallCheck) {
-			this.carriedCharacter.instance.PivotTo(
-				new CFrame(wallCheck.Position.add(wallCheck.Normal)),
-			);
-		} else {
+		if (wallCheck === undefined) {
 			const up = Vector3.yAxis.mul(50);
 			this.carriedCharacter.getHead().AssemblyLinearVelocity = up;
 			carriedRootPart.AssemblyLinearVelocity =
 				carrierRootPart.CFrame.LookVector.mul(35).add(up);
+		} else {
+			this.carriedCharacter.instance.PivotTo(
+				new CFrame(wallCheck.Position.add(wallCheck.Normal)),
+			);
 		}
 
 		this.carriedCharacter.setAlignOrientationAtt1(undefined);
@@ -376,6 +375,7 @@ export class PlayerCharacter
 			.ChangeState(Enum.HumanoidStateType.GettingUp);
 
 		this.carryTrove.clean();
+		this.carriedCharacter.attributes.isCarried = false;
 		this.carriedCharacter = undefined;
 	}
 

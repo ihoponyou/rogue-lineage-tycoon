@@ -129,7 +129,11 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	}
 
 	onTick(dt: number): void {
-		this.attributes.stunTimer -= dt;
+		if (this.attributes.stunTimer > 0) {
+			this.attributes.stunTimer -= dt;
+		} else if (this.attributes.stunTimer < 0) {
+			this.attributes.stunTimer = 0;
+		}
 		if (!this.attributes.isAlive) return;
 
 		const humanoid = this.humanoid;
@@ -415,11 +419,22 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		);
 	}
 
+	canCarry(): boolean {
+		return !(
+			!this.attributes.isAlive ||
+			this.attributes.isBlocking ||
+			this.attributes.isCarried ||
+			this.attributes.isKnocked
+		);
+	}
+
 	private _onHealthChanged(health: number): void {
 		const percentHealth = health / this.humanoid.MaxHealth;
 		if (this.attributes.isKnocked) {
-			if (percentHealth > KNOCK_PERCENT_THRESHOLD) {
-				if (this.instance.GetAttribute("isCarried") === true) return;
+			if (
+				!this.attributes.isCarried &&
+				percentHealth > KNOCK_PERCENT_THRESHOLD
+			) {
 				this.attributes.isKnocked = false;
 				this.ragdoll.toggle(false);
 			}

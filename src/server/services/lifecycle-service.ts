@@ -1,5 +1,5 @@
 import { Modding, OnStart, Service } from "@flamework/core";
-import { Players } from "@rbxts/services";
+import { Players, Workspace } from "@rbxts/services";
 import {
 	OnCharacterAdded,
 	OnCharacterRemoving,
@@ -47,6 +47,9 @@ export class LifecycleService implements OnStart {
 				task.spawn(() => listener.onPlayerAdded(player));
 			}
 			player.CharacterAdded.Connect((character) => {
+				if (!character.IsDescendantOf(Workspace)) {
+					character.AncestryChanged.Wait();
+				}
 				for (const otherListener of characterAddedListeners) {
 					task.spawn(() => otherListener.onCharacterAdded(character));
 				}

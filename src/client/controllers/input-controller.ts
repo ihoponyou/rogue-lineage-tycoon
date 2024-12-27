@@ -155,7 +155,6 @@ export class InputController implements OnStart, OnTick {
 			this.keybindController.keybinds.carry,
 			(state) => {
 				if (state !== BEGIN) return;
-				print("want carry");
 				Events.combat.carryInput();
 			},
 		);

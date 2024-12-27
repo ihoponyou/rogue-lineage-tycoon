@@ -149,15 +149,15 @@ export class RagdollServer extends AbstractRagdoll implements OnStart {
 		this.toggle(this.attributes.isRagdolled);
 	}
 
-	toggle(on: boolean): void {
-		this.attributes.isRagdolled = on;
+	toggle(ragdolled: boolean): void {
+		this.attributes.isRagdolled = ragdolled;
 
-		this.humanoid.AutoRotate = !on;
-		this.changeHumanoidState(on);
+		this.humanoid.AutoRotate = !ragdolled;
+		this.changeHumanoidState(ragdolled);
 
 		for (const [_, joint] of this.joints) {
-			joint.motor.Enabled = !on;
-			if (joint.motor.Part1) joint.motor.Part1.CanCollide = on;
+			joint.motor.Enabled = !ragdolled;
+			if (joint.motor.Part1) joint.motor.Part1.CanCollide = ragdolled;
 		}
 	}
 }

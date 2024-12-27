@@ -1,6 +1,6 @@
 import { UserInputService } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
-import { CharacterClient } from "client/components/character-client";
+import { LocalCharacter } from "client/components/local-character";
 import { AnimationController } from "client/controllers/animation-controller";
 import { Events } from "client/network";
 import { store } from "client/store";
@@ -13,7 +13,7 @@ export class RunActivity extends CharacterActivity {
 	private manaTrail = this.newManaTrail();
 
 	public constructor(
-		character: CharacterClient,
+		character: LocalCharacter,
 		private animationController: AnimationController,
 	) {
 		super(character);

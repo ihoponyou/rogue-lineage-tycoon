@@ -1,6 +1,6 @@
 import { RunService } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
-import { CharacterClient } from "client/components/character-client";
+import { LocalCharacter } from "client/components/local-character";
 import { AnimationController } from "client/controllers/animation-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
 import { Events, Functions } from "client/network";
@@ -13,7 +13,7 @@ export class BlockActivity extends CharacterActivity {
 	private trove = new Trove();
 
 	public constructor(
-		character: CharacterClient,
+		character: LocalCharacter,
 		private animationController: AnimationController,
 		private keybindController: KeybindController,
 	) {
