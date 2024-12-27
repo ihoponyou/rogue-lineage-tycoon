@@ -1,7 +1,7 @@
 import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart, OnTick } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
-import { Players } from "@rbxts/services";
+import { Players, Workspace } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
 import {
 	LAST_LIGHT_ATTACK_DATA,
@@ -45,6 +45,7 @@ const COMBO_RESET_DELAY = 2;
 const HEAVY_ATTACK_COOLDOWN = 3;
 const HEAVY_ATTACK_WALKSPEED_MULTIPLIER = 0.2;
 const FISTS_CONFIG = getWeaponConfig("Fists");
+const CARRY_CHECK_RADIUS = 10;
 
 @Component({
 	tag: CharacterServer.TAG,
@@ -59,8 +60,10 @@ export class PlayerCharacter
 	static readonly TAG = CharacterServer.TAG;
 
 	private player!: PlayerServer;
+	private carriedCharacter: CharacterServer | undefined;
 
 	private trove = new Trove();
+	private carryTrove = this.trove.extend();
 
 	private comboResetThread?: thread;
 
@@ -176,6 +179,40 @@ export class PlayerCharacter
 				this.stopRun();
 			}),
 		);
+		this.trove.add(
+			Events.combat.carryInput.connect((player) => {
+				if (player !== this.player.instance) return;
+
+				print(this.carriedCharacter);
+				if (this.carriedCharacter !== undefined) {
+					this.releaseCarriedCharacter();
+					return;
+				}
+
+				const overlapParams = new OverlapParams();
+				overlapParams.FilterType = Enum.RaycastFilterType.Exclude;
+				overlapParams.AddToFilter(this.instance);
+
+				const detectedParts = Workspace.GetPartBoundsInRadius(
+					this.character.getHumanoidRootPart().Position,
+					CARRY_CHECK_RADIUS,
+					overlapParams,
+				);
+				print(detectedParts);
+				for (const part of detectedParts) {
+					if (part.Parent === undefined) continue;
+					if (part.Parent.ClassName !== "Model") continue;
+					const characterServer =
+						this.components.getComponent<CharacterServer>(
+							part.Parent,
+						);
+					if (characterServer === undefined) continue;
+					if (!characterServer.canBeCarried()) continue;
+					this.carry(characterServer);
+					return;
+				}
+			}),
+		);
 	}
 
 	onTick(dt: number): void {
@@ -254,6 +291,92 @@ export class PlayerCharacter
 			this.instance.AddTag("Frostbite");
 		else if (newTemperature === MAXIMUM_TEMPERATURE)
 			this.instance.AddTag("BurnScar");
+	}
+
+	carry(otherCharacter: CharacterServer): void {
+		if (!otherCharacter.canBeCarried()) error(`how did this happen`);
+		otherCharacter.attributes.isCarried = true;
+
+		this.carryTrove.add(
+			this.character.ragdoll.onAttributeChanged(
+				"isRagdolled",
+				(newValue) => {
+					if (!newValue) {
+						return;
+					}
+					this.releaseCarriedCharacter();
+				},
+			),
+		);
+
+		otherCharacter.instance.PrimaryPart?.SetNetworkOwner(
+			this.player.instance,
+		);
+		otherCharacter.instance.RemoveTag("Burning");
+
+		const carrierAttachment = this.character.getCarryAttachment();
+		otherCharacter.setAlignOrientationAtt1(carrierAttachment);
+		otherCharacter.setAlignPositionAtt1(carrierAttachment);
+		otherCharacter.setTorsoCollisionPart1(this.character.getTorso());
+		otherCharacter.setHeadCollisionPart1(this.character.getHead());
+
+		for (const child of otherCharacter.instance.GetChildren()) {
+			if (!child.IsA("BasePart")) continue;
+			child.CollisionGroup = "Carried";
+			child.Massless = true;
+		}
+
+		otherCharacter
+			.getHumanoid()
+			.ChangeState(Enum.HumanoidStateType.Physics);
+
+		this.carriedCharacter = otherCharacter;
+	}
+
+	releaseCarriedCharacter(): void {
+		if (this.carriedCharacter === undefined) return;
+		this.carriedCharacter.attributes.isCarried = false;
+
+		const player = this.components
+			.getComponent<PlayerCharacter>(this.carriedCharacter.instance)
+			?.getPlayer().instance;
+		this.carriedCharacter.instance.PrimaryPart?.SetNetworkOwner(player);
+
+		const carrierRootPart = this.character.getHumanoidRootPart();
+		const carriedRootPart = this.carriedCharacter.getHumanoidRootPart();
+		const wallCheck = Workspace.Spherecast(
+			this.character.getHead().Position,
+			2,
+			carrierRootPart.CFrame.LookVector.mul(2),
+		);
+		if (wallCheck) {
+			this.carriedCharacter.instance.PivotTo(
+				new CFrame(wallCheck.Position.add(wallCheck.Normal)),
+			);
+		} else {
+			const up = Vector3.yAxis.mul(50);
+			this.carriedCharacter.getHead().AssemblyLinearVelocity = up;
+			carriedRootPart.AssemblyLinearVelocity =
+				carrierRootPart.CFrame.LookVector.mul(35).add(up);
+		}
+
+		this.carriedCharacter.setAlignOrientationAtt1(undefined);
+		this.carriedCharacter.setAlignPositionAtt1(undefined);
+		this.carriedCharacter.setTorsoCollisionPart1(undefined);
+		this.carriedCharacter.setHeadCollisionPart1(undefined);
+
+		for (const child of this.carriedCharacter.instance.GetChildren()) {
+			if (!child.IsA("BasePart")) continue;
+			child.CollisionGroup = "Characters";
+			child.Massless = false;
+		}
+
+		this.carriedCharacter
+			.getHumanoid()
+			.ChangeState(Enum.HumanoidStateType.GettingUp);
+
+		this.carryTrove.clean();
+		this.carriedCharacter = undefined;
 	}
 
 	private _onHealthChanged(health: number): void {
@@ -349,7 +472,7 @@ export class PlayerCharacter
 		if (this.character.attributes.combo > weaponConfig.maxLightAttacks)
 			this.character.attributes.combo = weaponConfig.maxLightAttacks;
 
-		const attackSpeed = this.character.getAttackSpeed();
+		const attackSpeed = this.character.attackSpeed.getCalculatedValue();
 
 		const animationName = `${weaponConfig.type}${this.character.attributes.combo}`;
 		const onSwing = () => {
@@ -416,7 +539,7 @@ export class PlayerCharacter
 			weaponConfig.type,
 		);
 
-		const attackSpeed = this.character.getAttackSpeed();
+		const attackSpeed = this.character.attackSpeed.getCalculatedValue();
 
 		const animationName = `${weaponConfig.type}Heavy`;
 		const onSwing = () => {
@@ -489,7 +612,16 @@ export class PlayerCharacter
 	}
 
 	private startRun(): void {
-		const manaData = store.getState(selectPlayerMana(this.player.instance));
+		const playerState = store.getState(selectPlayer(this.player.instance));
+
+		const hasMercCarry =
+			playerState?.skills?.has("Mercenary Carry") ?? false;
+		// if carrying a character then cancel;
+		if (!hasMercCarry && this.carriedCharacter !== undefined) {
+			return;
+		}
+
+		const manaData = playerState?.mana;
 		const canManaRun = (manaData?.amount ?? 0) > 0 && manaData?.runEnabled;
 		if (canManaRun) {
 			const unsubscribe = store.subscribe(
@@ -529,4 +661,6 @@ export class PlayerCharacter
 		this.character.stopAnimation("Run");
 		this.character.stopAnimation("ManaRun");
 	}
+
+	private dash(): void {}
 }

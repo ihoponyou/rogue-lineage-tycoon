@@ -39,6 +39,7 @@ type ParticleAttachment = Attachment & {
 		isAlive: true,
 		isBlocking: false,
 		isAttacking: false,
+		isCarried: false,
 		combo: 0,
 		lightAttackDebounce: false,
 		heavyAttackDebounce: false,
@@ -46,15 +47,23 @@ type ParticleAttachment = Attachment & {
 	},
 })
 export class CharacterServer extends AbstractCharacter implements OnTick {
+	readonly walkSpeed = new Stat(BASE_WALK_SPEED);
+	readonly climbSpeed = new Stat(BASE_CLIMB_SPEED);
+	readonly attackSpeed = new Stat(1);
+
 	protected inventoryFolder = this.newFolder("Inventory");
 	protected skillsFolder = this.newFolder("Skills");
+
+	private hiltJoint = this.newHiltJoint();
+	private hiltBone = this.newHiltBone();
+	private alignOrientation = this.newAlignOrientation();
+	private alignPosition = this.newAlignPosition();
+	private carryAttachment = this.newCarryAttachment();
 
 	private headCollision = new Instance("NoCollisionConstraint");
 	private torsoCollision = new Instance("NoCollisionConstraint");
 	private killed = new Signal();
 	private trove = new Trove();
-	public readonly walkSpeed = new Stat(BASE_WALK_SPEED);
-	public readonly climbSpeed = new Stat(BASE_CLIMB_SPEED);
 
 	private currentlyEquipped?: Equippable;
 	private animationManager!: AnimationManager;
@@ -64,26 +73,18 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		[WeaponType.Spear]: undefined,
 		[WeaponType.Sword]: undefined,
 	};
-
-	private hiltJoint = this.newHiltJoint();
-	private hiltBone = this.newHiltBone();
-	private alignOrientation = this.newAlignOrientation();
-	private alignPosition = this.newAlignPosition();
-	private carryAttachment = this.newCarryAttachment();
-
-	// TODO: yeah
-	private attackSpeed = 1;
 	private noJumpThread?: thread;
 
 	constructor(
 		protected components: Components,
-		protected ragdoll: RagdollServer,
+		readonly ragdoll: RagdollServer,
 	) {
 		super();
 	}
 
 	override destroy(): void {
 		this.trove.clean();
+		super.destroy();
 	}
 
 	override onStart(): void {
@@ -332,7 +333,7 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 			error(`stun duration must be positive`);
 		}
 		const removeModifier = this.walkSpeed.addTemporaryModifier(
-			"endlag",
+			"stun",
 			StatModifierType.Multiplier,
 			0,
 			duration,
@@ -366,6 +367,8 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 			"contact",
 			onContact,
 		);
+
+		const attackSpeed = this.attackSpeed.getCalculatedValue();
 		const stoppedConn = this.connectToAnimationStopped(
 			animationName,
 			() => {
@@ -380,20 +383,19 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 						task.cancel(this.noJumpThread);
 					}
 					this.noJumpThread = this.trove.add(
-						task.delay(noJumpDuration / this.attackSpeed, () =>
+						task.delay(noJumpDuration / attackSpeed, () =>
 							this.toggleJump(true),
 						),
 					);
 				}
 
 				if (endlagDuration > 0) {
-					this.attributes.stunTimer =
-						endlagDuration / this.attackSpeed;
+					this.attributes.stunTimer = endlagDuration / attackSpeed;
 
 					// call this if attack gets cancelled
 					const removeModifier = this.walkSpeed.addTemporaryModifier(
 						"endlag",
-						endlagDuration / this.attackSpeed,
+						endlagDuration / attackSpeed,
 						0,
 						StatModifierType.Multiplier,
 					);
@@ -402,11 +404,15 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 				onStopped();
 			},
 		);
-		this.playAnimation(animationName, this.attackSpeed);
+		this.playAnimation(animationName, attackSpeed);
 	}
 
-	getAttackSpeed(): number {
-		return this.attackSpeed;
+	canBeCarried(): boolean {
+		return !(
+			!this.attributes.isAlive ||
+			!this.attributes.isKnocked ||
+			this.attributes.isCarried
+		);
 	}
 
 	private _onHealthChanged(health: number): void {

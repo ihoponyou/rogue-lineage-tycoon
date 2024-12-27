@@ -6,6 +6,7 @@ import {
 	Workspace,
 } from "@rbxts/services";
 import Signal from "@rbxts/signal";
+import { Events } from "client/network";
 import { store } from "client/store";
 import { selectIsBackpackOpen } from "client/store/slices/ui/selectors";
 import { MAX_HOTBAR_SLOTS } from "shared/configs/constants";
@@ -148,6 +149,16 @@ export class InputController implements OnStart, OnTick {
 				SLOT_KEYS[i],
 			);
 		}
+
+		this.keybindController.loadKeybind(
+			"carry",
+			this.keybindController.keybinds.carry,
+			(state) => {
+				if (state !== BEGIN) return;
+				print("want carry");
+				Events.combat.carryInput();
+			},
+		);
 	}
 
 	public onTick(): void {

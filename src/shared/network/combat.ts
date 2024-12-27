@@ -3,6 +3,7 @@ export interface CombatServerEvents {
 	heavyAttack(): void;
 	damage(characters: Model[]): void;
 	block(blockUp: boolean): void;
+	carryInput(): void;
 }
 
 export interface CombatClientEvents {

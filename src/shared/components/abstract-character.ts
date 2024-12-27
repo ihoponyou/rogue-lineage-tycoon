@@ -10,6 +10,7 @@ export interface CharacterAttributes {
 	isAlive: boolean;
 	isBlocking: boolean;
 	isAttacking: boolean;
+	isCarried: boolean;
 	combo: number;
 	lightAttackDebounce: boolean;
 	heavyAttackDebounce: boolean;
