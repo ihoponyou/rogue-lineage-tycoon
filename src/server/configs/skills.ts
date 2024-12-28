@@ -13,12 +13,12 @@ const hitService = Modding.resolveSingleton(HitService);
 interface SkillConfig {
 	readonly weaponXpRequired: Record<WeaponType, number>;
 	readonly requiredClasses: ReadonlyArray<ClassId>;
-	readonly requiredWeaponType: WeaponType | undefined; //optional type is less readbale
 }
 
 export interface ActiveSkillConfig extends SkillConfig {
 	readonly cooldown: number;
 	readonly activate: (user: CharacterServer) => void;
+	readonly requiredWeaponType: WeaponType | undefined; //optional type is less readbale
 }
 
 const NO_WEAPON_XP_REQUIRED = {
@@ -224,16 +224,13 @@ export const PASSIVE_SKILLS: Record<PassiveSkillId, SkillConfig> = {
 	"Mercenary Carry": {
 		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
 		requiredClasses: [],
-		requiredWeaponType: undefined,
 	},
 	"Plate Training": {
 		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
 		requiredClasses: [],
-		requiredWeaponType: undefined,
 	},
 	"Spear Dash": {
 		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
 		requiredClasses: [],
-		requiredWeaponType: undefined,
 	},
 };

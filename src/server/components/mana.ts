@@ -2,7 +2,6 @@ import { BaseComponent, Component } from "@flamework/components";
 import { OnStart, OnTick } from "@flamework/core";
 import { Events } from "server/network";
 import { store } from "server/store";
-import { selectPlayerIdentity } from "server/store/selectors";
 import { BASE_MANA_CHARGE_RATE, BASE_MANA_DECAY_RATE } from "shared/configs";
 import { StatModifierType } from "shared/modules/stat";
 import { PlayerServer } from "./player-server";
@@ -24,7 +23,7 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 		super();
 	}
 
-	public onStart(): void {
+	onStart(): void {
 		Events.mana.charge.connect((player, bool) => {
 			if (player !== this.instance) return;
 			this.charging = bool;
@@ -47,13 +46,16 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 			}
 		});
 
-		const race = store.getState(
-			selectPlayerIdentity(this.instance),
-		)?.raceName;
+		const playerCharacter = this.playerServer.getPlayerCharacter();
+		playerCharacter
+			.getCharacter()
+			.onAttributeChanged("isDashing", (isDashing) => {
+				if (playerCharacter.isDefaultDashing() && this.charging) {
+					this.charging = false;
+				}
+			});
 
-		let boost = 0;
-		if (race === "Azael") boost = 10;
-		else if (race === "Rigan") boost = 15;
+		const boost = 0;
 
 		this.chargeRate = BASE_MANA_CHARGE_RATE + boost;
 
@@ -61,7 +63,7 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 		store.toggleManaEnabled(this.instance, true);
 	}
 
-	public onTick(dt: number): void {
+	onTick(dt: number): void {
 		const prevAmount = this.amount;
 		if (this.charging) {
 			this.amount += this.chargeRate * dt;
@@ -85,7 +87,7 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 		store.setManaAmount(this.instance, this.amount);
 	}
 
-	public override destroy(): void {
+	override destroy(): void {
 		super.destroy();
 		Events.mana.disabled(this.instance);
 		store.toggleManaEnabled(this.instance, false);

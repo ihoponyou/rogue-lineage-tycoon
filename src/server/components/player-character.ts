@@ -212,6 +212,12 @@ export class PlayerCharacter
 				}
 			}),
 		);
+		this.trove.add(
+			Events.character.dash.connect((player) => {
+				if (player !== this.player.instance) return;
+				this.dash();
+			}),
+		);
 	}
 
 	onTick(dt: number): void {
@@ -379,6 +385,14 @@ export class PlayerCharacter
 		this.carriedCharacter = undefined;
 	}
 
+	isDefaultDashing(): boolean {
+		const hasSpearDash =
+			store
+				.getState(selectPlayerSkills(this.player.instance))
+				?.has("Spear Dash") ?? false;
+		return this.character.attributes.isDashing && !hasSpearDash;
+	}
+
 	private _onHealthChanged(health: number): void {
 		store.setHealth(this.getPlayer().instance, health);
 	}
@@ -462,7 +476,7 @@ export class PlayerCharacter
 	}
 
 	private lightAttack(): void {
-		if (!this.character.canLightAttack()) return;
+		if (!this.character.canLightAttack() || this.isDefaultDashing()) return;
 
 		Events.character.stopRun(this.getPlayer().instance);
 		const weaponConfig = this.getEquippedWeaponConfig();
@@ -528,7 +542,7 @@ export class PlayerCharacter
 	}
 
 	private heavyAttack() {
-		if (!this.character.canHeavyAttack()) return;
+		if (!this.character.canHeavyAttack() || this.isDefaultDashing()) return;
 
 		Events.character.stopRun(this.getPlayer().instance);
 		const weaponConfig = this.getEquippedWeaponConfig();
@@ -662,5 +676,13 @@ export class PlayerCharacter
 		this.character.stopAnimation("ManaRun");
 	}
 
-	private dash(): void {}
+	private dash(): void {
+		// replicate sound
+		this.character.attributes.isDashing = true;
+		this.trove.add(
+			task.delay(0.5, () => {
+				this.character.attributes.isDashing = false;
+			}),
+		);
+	}
 }

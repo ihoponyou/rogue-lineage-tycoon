@@ -40,6 +40,7 @@ type ParticleAttachment = Attachment & {
 		isBlocking: false,
 		isAttacking: false,
 		isCarried: false,
+		isDashing: false,
 		combo: 0,
 		lightAttackDebounce: false,
 		heavyAttackDebounce: false,

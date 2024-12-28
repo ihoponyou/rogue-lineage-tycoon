@@ -7,4 +7,5 @@ export interface CharacterClientEvents {
 export interface CharacterServerEvents {
 	startRun(): void;
 	stopRun(): void;
+	dash(): void;
 }

@@ -11,6 +11,7 @@ export interface CharacterAttributes {
 	isBlocking: boolean;
 	isAttacking: boolean;
 	isCarried: boolean;
+	isDashing: boolean;
 	combo: number;
 	lightAttackDebounce: boolean;
 	heavyAttackDebounce: boolean;
@@ -99,6 +100,7 @@ export abstract class AbstractCharacter
 				this.isStunned() ||
 				this.attributes.isBlocking ||
 				this.attributes.isAttacking ||
+				this.attributes.isDashing ||
 				this.ragdoll.attributes.isRagdolled
 			)
 		);
