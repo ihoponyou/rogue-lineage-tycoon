@@ -9,6 +9,7 @@ import {
 	MAXIMUM_TEMPERATURE,
 	MINIMUM_TEMPERATURE,
 } from "server/configs/constants";
+import { PASSIVE_SKILLS } from "server/configs/skills";
 import { AttackData } from "server/modules/attack-data";
 import { Events } from "server/network";
 import { DataService } from "server/services/data-service";
@@ -427,7 +428,11 @@ export class PlayerCharacter
 		for (const skillId of skills) {
 			if (prevSkills && prevSkills.has(skillId)) continue;
 			// passive skills are handled as edge cases wherever they apply
-			if (!isActiveSkillId(skillId)) continue;
+			if (!isActiveSkillId(skillId)) {
+				const onLearn = PASSIVE_SKILLS[skillId].onLearn;
+				if (onLearn !== undefined) onLearn(this);
+				continue;
+			}
 			this.character.learnSkill(skillId);
 			if (addToHotbar) {
 				store.addToHotbar(this.player.instance, skillId);
@@ -630,21 +635,19 @@ export class PlayerCharacter
 
 		const hasMercCarry =
 			playerState?.skills?.has("Mercenary Carry") ?? false;
-		// if carrying a character then cancel;
-		if (!hasMercCarry && this.carriedCharacter !== undefined) {
+		if (this.carriedCharacter !== undefined && !hasMercCarry) {
 			return;
 		}
 
-		const manaData = playerState?.mana;
-		const canManaRun = (manaData?.amount ?? 0) > 0 && manaData?.runEnabled;
+		const hasManaRun = playerState?.skills.has("Mana Run");
+		const canManaRun = (playerState?.mana.amount ?? 0) > 0 && hasManaRun;
 		if (canManaRun) {
 			const unsubscribe = store.subscribe(
 				selectPlayerMana(this.player.instance),
 				(data) => {
-					if (!data || data.amount > 0) {
+					if (data === undefined || data.amount > 0) {
 						return;
 					}
-					unsubscribe();
 					this.character.stopAnimation("ManaRun");
 					this.character.walkSpeed.addModifier(
 						"run",
@@ -652,6 +655,7 @@ export class PlayerCharacter
 						RUN_WALK_SPEED_MULTIPLIER,
 					);
 					this.character.playAnimation("Run");
+					unsubscribe();
 				},
 			);
 		}

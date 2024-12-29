@@ -4,18 +4,18 @@ import { KeysOfType } from "../../../../../types";
 
 export interface ManaData {
 	readonly amount: number;
-	readonly enabled: boolean;
-	readonly runEnabled: boolean;
-	readonly dashEnabled: boolean;
-	readonly climbEnabled: boolean;
+	// readonly enabled: boolean;
+	// readonly runEnabled: boolean;
+	// readonly dashEnabled: boolean;
+	// readonly climbEnabled: boolean;
 }
 
 export const DEFAULT_MANA_DATA: ManaData = {
 	amount: 0,
-	enabled: false,
-	runEnabled: false,
-	dashEnabled: false,
-	climbEnabled: false,
+	// enabled: false,
+	// runEnabled: false,
+	// dashEnabled: false,
+	// climbEnabled: false,
 };
 
 function toggleManaProperty(property: KeysOfType<ManaData, boolean>) {
@@ -37,8 +37,8 @@ export const manaSlice = createProducer(DEFAULT_MANA_DATA, {
 		};
 	},
 
-	toggleManaEnabled: toggleManaProperty("enabled"),
-	toggleManaRunEnabled: toggleManaProperty("runEnabled"),
-	toggleManaDashEnabled: toggleManaProperty("dashEnabled"),
-	toggleManaClimbEnabled: toggleManaProperty("climbEnabled"),
+	// toggleManaEnabled: toggleManaProperty("enabled"),
+	// toggleManaRunEnabled: toggleManaProperty("runEnabled"),
+	// toggleManaDashEnabled: toggleManaProperty("dashEnabled"),
+	// toggleManaClimbEnabled: toggleManaProperty("climbEnabled"),
 });

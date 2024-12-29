@@ -1,9 +1,10 @@
 import { Modding } from "@flamework/core";
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
 import { CharacterServer } from "server/components/character-server";
+import { PlayerCharacter } from "server/components/player-character";
 import { HitService } from "server/services/hit-service";
 import { ClassId } from "shared/configs/classes";
-import { ActiveSkillId, PassiveSkillId } from "shared/configs/skills";
+import { ActiveSkillId, PassiveSkillId, SkillId } from "shared/configs/skills";
 import { getWeaponConfig, WeaponType } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
 import { StatModifierType } from "shared/modules/stat";
@@ -19,6 +20,10 @@ export interface ActiveSkillConfig extends SkillConfig {
 	readonly cooldown: number;
 	readonly activate: (user: CharacterServer) => void;
 	readonly requiredWeaponType: WeaponType | undefined; //optional type is less readbale
+}
+
+interface PassiveSkillConfig extends SkillConfig {
+	readonly onLearn?: (character: PlayerCharacter) => void;
 }
 
 const NO_WEAPON_XP_REQUIRED = {
@@ -220,7 +225,7 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 	},
 };
 
-export const PASSIVE_SKILLS: Record<PassiveSkillId, SkillConfig> = {
+export const PASSIVE_SKILLS: Record<PassiveSkillId, PassiveSkillConfig> = {
 	"Mercenary Carry": {
 		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
 		requiredClasses: [],
@@ -233,4 +238,28 @@ export const PASSIVE_SKILLS: Record<PassiveSkillId, SkillConfig> = {
 		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
 		requiredClasses: [],
 	},
+	Mana: {
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
+		requiredClasses: [],
+		onLearn: (character) => {
+			character.getPlayer().instance.AddTag("Mana");
+		},
+	},
+	"Mana Climb": {
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
+		requiredClasses: [],
+	},
+	"Mana Dash": {
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
+		requiredClasses: [],
+	},
+	"Mana Run": {
+		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
+		requiredClasses: [],
+	},
+};
+
+export const SKILLS: Record<SkillId, SkillConfig> = {
+	...PASSIVE_SKILLS,
+	...ACTIVE_SKILLS,
 };

@@ -10,10 +10,7 @@ import { Events } from "client/network";
 import { store } from "client/store";
 import { selectIsBackpackOpen } from "client/store/slices/ui/selectors";
 import { MAX_HOTBAR_SLOTS } from "shared/configs/constants";
-import {
-	selectMana,
-	selectManaEnabled,
-} from "shared/store/slices/mana/selectors";
+import { selectSkills } from "shared/store/slices/skills/selectors";
 import { CharacterController } from "./character-controller";
 import { KeybindController } from "./keybind-controller";
 
@@ -248,8 +245,11 @@ export class InputController implements OnStart, OnTick {
 		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		const character = this.characterController.getCharacter();
 		if (character === undefined) return Enum.ContextActionResult.Pass;
-		const manaData = store.getState(selectMana());
-		if ((manaData?.amount ?? 0) <= 0 || !manaData?.climbEnabled)
+		const playerState = store.getState();
+		if (
+			(playerState?.mana.amount ?? 0) <= 0 ||
+			!playerState.skills.has("Mana Climb")
+		)
 			return Enum.ContextActionResult.Pass;
 
 		const humanoidRootPart = character.getHumanoidRootPart();
@@ -276,7 +276,7 @@ export class InputController implements OnStart, OnTick {
 	}
 
 	private handleManaInput(state: Enum.UserInputState) {
-		const manaEnabled = store.getState(selectManaEnabled());
+		const manaEnabled = store.getState(selectSkills()).has("Mana");
 		if (!manaEnabled) return Enum.ContextActionResult.Pass;
 		if (state === BEGIN || state === END) {
 			this.chargeManaTriggered.Fire(state === BEGIN);

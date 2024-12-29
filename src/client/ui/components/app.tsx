@@ -7,7 +7,7 @@ import { ItemId } from "shared/configs/items";
 import { EquippableId } from "shared/modules/equippable";
 import { selectHotbar } from "shared/store/slices/hotbar/selectors";
 import { selectInventory } from "shared/store/slices/inventory/selectors";
-import { selectManaEnabled } from "shared/store/slices/mana/selectors";
+import { selectSkills } from "shared/store/slices/skills/selectors";
 import { appRefContext } from "../context";
 import { DialogueBox } from "./dialogue-box";
 import { ManaBar } from "./fill-bar/mana-bar";
@@ -19,7 +19,7 @@ import { SilverLogo } from "./silver-logo";
 import { Stats } from "./stats";
 
 export function App() {
-	const manaEnabled = useSelector(selectManaEnabled());
+	const manaEnabled = useSelector(selectSkills()).has("Mana");
 	const ref = useRef<ScreenGui>();
 	const isBackpackOpen = useSelector(selectIsBackpackOpen());
 	const hotbar = useSelector(selectHotbar());

@@ -1,5 +1,5 @@
 import { Component, Components } from "@flamework/components";
-import { SKILLS } from "server/configs/tycoon";
+import { SKILLS } from "server/configs/skills";
 import { store } from "server/store";
 import { SkillId } from "shared/configs/skills";
 import { UnlockEffect } from ".";
@@ -9,7 +9,7 @@ import { Unlockable } from "../unlockable";
 	tag: "TeachOnUnlock",
 })
 export class TeachOnUnlock extends UnlockEffect {
-	private skillConfig = SKILLS[this.instance.Name];
+	private skillConfig = SKILLS[this.instance.Name as SkillId];
 
 	public constructor(
 		unlockable: Unlockable,

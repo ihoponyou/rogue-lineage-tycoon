@@ -11,6 +11,6 @@ export function selectManaAmount() {
 	});
 }
 
-export function selectManaEnabled() {
-	return (state: SharedState) => state.mana.enabled;
-}
+// export function selectManaEnabled() {
+// 	return (state: SharedState) => state.mana.enabled;
+// }

@@ -6,6 +6,7 @@ import { Events } from "client/network";
 import { store } from "client/store";
 import { VFX } from "shared/constants";
 import { selectMana } from "shared/store/slices/mana/selectors";
+import { selectSkills } from "shared/store/slices/skills/selectors";
 import { CharacterActivity } from "./character-activity";
 
 export class RunActivity extends CharacterActivity {
@@ -22,9 +23,20 @@ export class RunActivity extends CharacterActivity {
 	public override start(): void {
 		super.start();
 
+		Events.character.startRun();
+
+		const hasManaRun = store.getState(selectSkills()).has("Mana Run");
 		const manaData = store.getState(selectMana());
-		const canManaRun = (manaData?.amount ?? 0) > 0 && manaData?.runEnabled;
-		canManaRun ? this.manaRun() : this.run();
+		const canManaRun = (manaData?.amount ?? 0) > 0 && hasManaRun;
+		if (canManaRun) {
+			this.trove.add(
+				Events.mana.emptied.connect(() => {
+					if (this.manaTrail) this.manaTrail.Enabled = false;
+				}),
+			);
+
+			this.manaTrail.Enabled = true;
+		}
 
 		this.trove.connect(UserInputService.InputEnded, (input, gpe) => {
 			if (gpe) return;
@@ -40,21 +52,6 @@ export class RunActivity extends CharacterActivity {
 		this.manaTrail.Enabled = false;
 
 		this.trove.clean();
-	}
-
-	private run(): void {
-		Events.character.startRun();
-	}
-
-	private manaRun(): void {
-		this.trove.add(
-			Events.mana.emptied.connect(() => {
-				if (this.manaTrail) this.manaTrail.Enabled = false;
-				this.run();
-			}),
-		);
-
-		this.manaTrail.Enabled = true;
 	}
 
 	private newManaTrail(): Trail {

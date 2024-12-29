@@ -60,7 +60,7 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 		this.chargeRate = BASE_MANA_CHARGE_RATE + boost;
 
 		Events.mana.obtained(this.instance);
-		store.toggleManaEnabled(this.instance, true);
+		store.addSkill(this.instance, "Mana");
 	}
 
 	onTick(dt: number): void {
@@ -90,6 +90,6 @@ export class Mana extends BaseComponent<{}, Player> implements OnStart, OnTick {
 	override destroy(): void {
 		super.destroy();
 		Events.mana.disabled(this.instance);
-		store.toggleManaEnabled(this.instance, false);
+		store.removeSkill(this.instance, "Mana");
 	}
 }

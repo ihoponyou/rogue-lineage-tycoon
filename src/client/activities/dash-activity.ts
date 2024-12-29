@@ -13,7 +13,6 @@ import { SFX, VFX } from "shared/constants";
 import { deserializeColor3 } from "shared/modules/serialized-color3";
 import { uppercaseFirstChar } from "shared/modules/uppercase-first-char";
 import { selectManaColor } from "shared/store/slices/identity/selectors";
-import { selectMana } from "shared/store/slices/mana/selectors";
 import { selectSkills } from "shared/store/slices/skills/selectors";
 import { CharacterActivity } from "./character-activity";
 
@@ -76,9 +75,10 @@ export class DashActivity extends CharacterActivity {
 		this.dashAngle = DIRECTION_TO_ANGLE[direction];
 		const humanoidRootPart = this.character.getHumanoidRootPart();
 
-		const manaData = store.getState(selectMana());
+		const playerState = store.getState();
 		const canManaDash =
-			(manaData?.amount ?? 0) > 0 && manaData?.dashEnabled;
+			(playerState?.mana.amount ?? 0) > 0 &&
+			playerState?.skills.has("Mana Dash");
 
 		this.dashVelocity.Parent = humanoidRootPart;
 		this.dashVelocity.Velocity = humanoidRootPart.CFrame.mul(
