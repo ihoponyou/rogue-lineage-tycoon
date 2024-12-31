@@ -1,9 +1,12 @@
 import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Workspace } from "@rbxts/services";
+import { store } from "server/store";
+import { selectPlayerCurrencies } from "server/store/selectors";
 import { ANIMATIONS, SFX, VFX } from "shared/constants";
 import { CharacterServer } from "./character-server";
 import { KeyInteractable } from "./interactable/key-interactable";
+import { PlayerCharacter } from "./player-character";
 import { RagdollServer } from "./ragdoll-server";
 
 interface Attributes {
@@ -116,17 +119,42 @@ export class Grippable
 			(keyframeName) => {
 				if (keyframeName !== "FinalHit") return;
 
-				grippingAnimationTrack.Play();
 				hitSound.Play();
 				hitParticle.Emit(1);
+				grippingAnimationTrack.Play();
 
-				ticks++;
-				if (ticks < 5) return;
+				if (++ticks < 5) return;
 
 				this.character.kill();
 
 				hitSound.Ended.Wait();
 				this.release(gripper);
+
+				// steal silver
+				const grippeePlayer = this.components
+					.getComponent<PlayerCharacter>(this.instance)
+					?.getPlayer();
+				print(grippeePlayer?.instance.GetFullName());
+				if (grippeePlayer === undefined) return;
+				const gripperPlayer = this.components
+					.getComponent<PlayerCharacter>(gripper.instance)
+					?.getPlayer();
+				if (gripperPlayer === undefined) return;
+				const grippeeSilver =
+					store.getState(
+						selectPlayerCurrencies(grippeePlayer.instance),
+					)?.Silver.amount ?? 0;
+				const silverToLose = math.ceil(grippeeSilver / 2);
+				store.addCurrency(
+					gripperPlayer.instance,
+					"Silver",
+					silverToLose,
+				);
+				store.addCurrency(
+					grippeePlayer.instance,
+					"Silver",
+					-silverToLose,
+				);
 			},
 		);
 

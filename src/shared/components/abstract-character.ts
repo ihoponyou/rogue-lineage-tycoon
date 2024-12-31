@@ -46,7 +46,13 @@ export abstract class AbstractCharacter
 	}
 
 	getHumanoid(): Humanoid {
-		return promiseR6(this.instance).expect().Humanoid;
+		const rig = promiseR6(this.instance)
+			.catch((reason) => debug.traceback(reason))
+			.expect();
+		if (typeIs(rig, "string")) {
+			error(`wtf`);
+		}
+		return rig.Humanoid;
 	}
 
 	getAnimator(): Animator {
@@ -62,7 +68,13 @@ export abstract class AbstractCharacter
 	}
 
 	getHumanoidRootPart() {
-		return promiseR6(this.instance).expect().HumanoidRootPart;
+		const rig = promiseR6(this.instance)
+			.catch((reason) => debug.traceback(reason))
+			.expect();
+		if (typeIs(rig, "string")) {
+			error(`wtf`);
+		}
+		return rig.HumanoidRootPart;
 	}
 
 	getRaycastParams(): RaycastParams {
