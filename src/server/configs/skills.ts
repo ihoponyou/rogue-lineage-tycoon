@@ -2,12 +2,15 @@ import { Modding } from "@flamework/core";
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
 import { CharacterServer } from "server/components/character-server";
 import { PlayerCharacter } from "server/components/player-character";
+import { Events } from "server/network";
 import { HitService } from "server/services/hit-service";
+import { AbstractCharacter } from "shared/components/abstract-character";
 import { ClassId } from "shared/configs/classes";
 import { ActiveSkillId, PassiveSkillId, SkillId } from "shared/configs/skills";
 import { getWeaponConfig, WeaponType } from "shared/configs/weapons";
 import { spawnHitbox } from "shared/modules/hitbox";
 import { StatModifierType } from "shared/modules/stat";
+import { LAST_LIGHT_ATTACK_DATA, LIGHT_ATTACK_DATA } from "./constants";
 
 const hitService = Modding.resolveSingleton(HitService);
 
@@ -32,6 +35,16 @@ const NO_WEAPON_XP_REQUIRED = {
 	[WeaponType.Spear]: 0,
 	[WeaponType.Sword]: 0,
 };
+
+function getCFrameOffsetFromHRP(
+	character: AbstractCharacter,
+	offset: number,
+): CFrame {
+	const humanoidRootPartCFrame = character.getHumanoidRootPart().CFrame;
+	return humanoidRootPartCFrame.add(
+		humanoidRootPartCFrame.LookVector.mul(offset),
+	);
+}
 
 export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 	"Goblet Throw": {
@@ -64,6 +77,18 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 			);
 		},
 	},
+	"Action Surge": {
+		weaponXpRequired: {
+			[WeaponType.Dagger]: 0,
+			[WeaponType.Fists]: 0,
+			[WeaponType.Spear]: 0,
+			[WeaponType.Sword]: 20,
+		},
+		requiredClasses: ["Warrior"],
+		requiredWeaponType: WeaponType.Sword,
+		cooldown: 12,
+		activate: (user) => {},
+	},
 	"Pommel Strike": {
 		weaponXpRequired: {
 			[WeaponType.Dagger]: 0,
@@ -76,6 +101,7 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		cooldown: 12,
 		activate: (user) => {
 			// if (!user.canAttack()) return;
+			Events.playEffect.broadcast("StrikeCharge", user.instance);
 			const hitboxSize = new Vector3(6, 5, 6);
 			const humanoidRootPartCFrame = user.getHumanoidRootPart().CFrame;
 			const cframeOffset = humanoidRootPartCFrame.LookVector.mul(
@@ -91,7 +117,6 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 						[user.instance],
 						true,
 					).forEach((hitModel) => {
-						hitModel.AddTag("Concussion");
 						hitService.registerHit(
 							user,
 							hitModel,
@@ -103,6 +128,7 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 								breaksBlock: false,
 							},
 						);
+						hitModel.AddTag("Concussion");
 					});
 				},
 				() => {},
@@ -123,17 +149,17 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		cooldown: 12,
 		activate: (user) => {
 			// if (!user.canAttack()) return;
+			Events.playEffect.broadcast("StrikeCharge", user.instance);
+			Events.playEffect.broadcast("SpearEmit", user.instance);
 			const hitboxSize = new Vector3(6, 5, 7);
-			const humanoidRootPartCFrame = user.getHumanoidRootPart().CFrame;
-			const cframeOffset = humanoidRootPartCFrame.LookVector.mul(
-				hitboxSize.Z,
-			);
+			let swings = 0;
 			user.attack(
 				"TripleStrike",
 				() => {},
 				() => {
+					const isLastSwing = ++swings >= 3;
 					spawnHitbox(
-						humanoidRootPartCFrame.add(cframeOffset),
+						getCFrameOffsetFromHRP(user, hitboxSize.Z),
 						hitboxSize,
 						[user.instance],
 						true,
@@ -142,13 +168,49 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 							user,
 							hitModel,
 							getWeaponConfig("Bronze Spear"),
-							{
-								ragdollDuration: 0,
-								knockbackDuration: 0,
-								knockbackForce: 0,
-								breaksBlock: false,
-							},
+							isLastSwing
+								? LAST_LIGHT_ATTACK_DATA
+								: LIGHT_ATTACK_DATA,
 						);
+					});
+				},
+				() => {},
+				0,
+				2,
+			);
+		},
+	},
+	"Serpent Strike": {
+		weaponXpRequired: {
+			[WeaponType.Dagger]: 0,
+			[WeaponType.Fists]: 0,
+			[WeaponType.Spear]: 0,
+			[WeaponType.Sword]: 0,
+		},
+		requiredClasses: ["Pit Fighter"],
+		requiredWeaponType: WeaponType.Spear,
+		cooldown: 30,
+		activate: (user) => {
+			Events.playEffect.broadcast("StrikeCharge", user.instance);
+			Events.playEffect.broadcast("SpearEmit", user.instance);
+			const hitboxSize = new Vector3(6, 5, 7);
+			user.attack(
+				"SpearStrike",
+				() => {},
+				() => {
+					spawnHitbox(
+						getCFrameOffsetFromHRP(user, hitboxSize.Z),
+						hitboxSize,
+						[user.instance],
+						true,
+					).forEach((hitModel) => {
+						hitService.registerHit(
+							user,
+							hitModel,
+							getWeaponConfig("Bronze Spear"),
+							LAST_LIGHT_ATTACK_DATA,
+						);
+						hitModel.AddTag("Poison");
 					});
 				},
 				() => {},
@@ -170,14 +232,21 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		activate: (user) => {
 			// emit the particle
 			// play the sound effect
-			// increase player speed by some multiplier
-			user.walkSpeed.addTemporaryModifier(
+			const removeWalkSpeedModifier = user.walkSpeed.addTemporaryModifier(
 				"agility",
 				StatModifierType.Multiplier,
 				1.25,
 				10,
 				false,
 			);
+			const removeAttackSpeedModifier =
+				user.attackSpeed.addTemporaryModifier(
+					"agility",
+					StatModifierType.Multiplier,
+					1.25,
+					10,
+					false,
+				);
 		},
 	},
 	"Dagger Throw": {

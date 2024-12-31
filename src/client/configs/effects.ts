@@ -1,9 +1,49 @@
 import { WeaponType } from "shared/configs/weapons";
-import { SFX } from "shared/constants";
+import { SFX, VFX } from "shared/constants";
 
 function getHitType(weaponType: WeaponType) {
 	const hitType = weaponType === WeaponType.Fists ? "Blunt" : "Sharp";
 	return hitType;
+}
+
+function playSound(character: Model, soundName: string): void {
+	const torso = character.FindFirstChild("Torso");
+	if (torso === undefined) return;
+	let sound = torso.FindFirstChild(soundName) as Sound | undefined;
+	if (sound === undefined) {
+		sound = SFX.FindFirstChild(soundName) as Sound | undefined;
+		if (sound === undefined) {
+			error(`${soundName} does not exist`);
+		}
+	}
+	const clone = sound.Clone();
+	clone.PlayOnRemove = true;
+	clone.Parent = torso;
+	clone.Destroy();
+}
+
+function emitParticle(
+	character: Model,
+	particleName: string,
+	amount: number,
+): void {
+	const torso = character.FindFirstChild("Torso");
+	if (torso === undefined) return;
+	let particle = torso.FindFirstChild(particleName) as
+		| ParticleEmitter
+		| undefined;
+	if (particle === undefined) {
+		particle = VFX.FindFirstChild(particleName) as
+			| ParticleEmitter
+			| undefined;
+		if (particle === undefined || !particle.IsA("ParticleEmitter")) {
+			error(`${particleName} does not exist`);
+		}
+	}
+	const clone = particle.Clone();
+	clone.Enabled = false;
+	clone.Parent = torso;
+	clone.Emit(amount);
 }
 
 export const EFFECTS: { [name: string]: Callback } = {
@@ -95,11 +135,12 @@ export const EFFECTS: { [name: string]: Callback } = {
 		if (emitter?.IsA("ParticleEmitter")) emitter.Enabled = false;
 	},
 	BlockBreak: (character: Model) => {
-		const torso = character.FindFirstChild("Torso");
-		if (torso === undefined) return;
-		const clone = SFX.BlockBreak.Clone();
-		clone.PlayOnRemove = true;
-		clone.Parent = torso;
-		clone.Destroy();
+		playSound(character, "BlockBreak");
+	},
+	StrikeCharge: (character: Model) => {
+		playSound(character, "StrikeCharge");
+	},
+	SpearEmit: (character: Model) => {
+		emitParticle(character, "SpearEmit", 8);
 	},
 };

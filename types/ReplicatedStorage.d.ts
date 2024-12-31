@@ -1441,19 +1441,8 @@ interface ReplicatedStorage extends Instance {
 			};
 		};
 		Animations: Folder & {
-			Movement: Folder & {
-				ClimbRight: Animation;
-				ClimbIdle: Animation;
-				DashForward: Animation;
-				DashBackward: Animation;
-				ClimbDown: Animation;
-				ClimbUp: Animation;
-				DashLeft: Animation;
-				Run: Animation;
-				DashRight: Animation;
-				LedgeClimbUp: Animation;
-				ManaRun: Animation;
-				ClimbLeft: Animation;
+			Skills: Folder & {
+				PommelStrike: Animation;
 			};
 			Combat: Folder & {
 				Fists2: Animation;
@@ -1480,6 +1469,8 @@ interface ReplicatedStorage extends Instance {
 				Dagger2: Animation;
 				BlockHit3: Animation;
 				SpearBlock: Animation;
+				TripleStrike: Animation;
+				SpearStrike: Animation;
 				Fists4: Animation;
 				Stunned1: Animation;
 				Stunned2: Animation;
@@ -1496,6 +1487,23 @@ interface ReplicatedStorage extends Instance {
 				BlockHit2: Animation;
 				PickUp: Animation;
 			};
+			Movement: Folder & {
+				SpearDashRight: Animation;
+				ClimbRight: Animation;
+				ClimbIdle: Animation;
+				SpearDashBackward: Animation;
+				DashForward: Animation;
+				DashBackward: Animation;
+				ClimbDown: Animation;
+				SpearDashLeft: Animation;
+				ClimbUp: Animation;
+				DashLeft: Animation;
+				Run: Animation;
+				DashRight: Animation;
+				LedgeClimbUp: Animation;
+				ManaRun: Animation;
+				ClimbLeft: Animation;
+			};
 		};
 		Effects: Folder & {
 			Sounds: Folder & {
@@ -1507,6 +1515,7 @@ interface ReplicatedStorage extends Instance {
 				PerfectCast: Sound;
 				DaggerHit2: Sound;
 				FinishedCharging: Sound;
+				GrappleNoise: Sound;
 				CounterSpell: Sound;
 				FreeFalling: Sound;
 				SpearHit: Sound;
@@ -1557,7 +1566,7 @@ interface ReplicatedStorage extends Instance {
 				CounterSpellOff: Sound;
 				DaggerSwing2: Sound;
 				Dash: Sound;
-				GrappleNoise: Sound;
+				StrikeCharge: Sound;
 				Snap: Sound;
 				SwordCharge: Sound;
 			};
@@ -1617,12 +1626,52 @@ interface ReplicatedStorage extends Instance {
 		shared: Folder & {
 			toggleable: ModuleScript;
 			commands: Folder & {
-				hooks: Folder & {
-					["before-run"]: ModuleScript;
-				};
-				types: Folder & {
+				types: ModuleScript & {
 					currency: ModuleScript;
+					["skill-id"]: ModuleScript;
+					["item-id"]: ModuleScript;
 				};
+				guards: Folder & {
+					["is-admin"]: ModuleScript;
+				};
+			};
+			hideable: ModuleScript;
+			configs: ModuleScript & {
+				classes: ModuleScript;
+				character: ModuleScript;
+				weapons: ModuleScript;
+				skills: ModuleScript;
+				group: ModuleScript;
+				conditions: ModuleScript;
+				items: ModuleScript;
+				constants: ModuleScript;
+			};
+			constants: ModuleScript;
+			modules: Folder & {
+				["animation-manager"]: ModuleScript;
+				["serialized-color3"]: ModuleScript;
+				["character-from-body-part"]: ModuleScript;
+				lifecycles: ModuleScript;
+				currency: ModuleScript;
+				stat: ModuleScript;
+				["player-data"]: ModuleScript;
+				graph: ModuleScript & {
+					node: ModuleScript;
+				};
+				equippable: ModuleScript;
+				["abstract-activity"]: ModuleScript;
+				["line-of-sight"]: ModuleScript;
+				["get-digit"]: ModuleScript;
+				["on-player-removing"]: ModuleScript;
+				useable: ModuleScript;
+				["uppercase-first-char"]: ModuleScript;
+				hitbox: ModuleScript;
+				["char-at"]: ModuleScript;
+				["state-machine"]: ModuleScript & {
+					state: ModuleScript;
+				};
+				["serialized-vector3"]: ModuleScript;
+				["cframe-util"]: ModuleScript;
 			};
 			network: ModuleScript & {
 				currency: ModuleScript;
@@ -1633,62 +1682,27 @@ interface ReplicatedStorage extends Instance {
 				item: ModuleScript;
 				reflex: ModuleScript;
 			};
-			configs: ModuleScript & {
-				items: ModuleScript;
-				character: ModuleScript;
-				classes: ModuleScript;
-				weapons: ModuleScript;
-				group: ModuleScript;
-				conditions: ModuleScript;
-				skills: ModuleScript;
-				constants: ModuleScript;
-			};
-			constants: ModuleScript;
-			modules: Folder & {
-				["serialized-vector3"]: ModuleScript;
-				["serialized-color3"]: ModuleScript;
-				["uppercase-first-char"]: ModuleScript;
-				lifecycles: ModuleScript;
-				currency: ModuleScript;
-				["player-data"]: ModuleScript;
-				graph: ModuleScript & {
-					node: ModuleScript;
-				};
-				equippable: ModuleScript;
-				["abstract-activity"]: ModuleScript;
-				["line-of-sight"]: ModuleScript;
-				["get-digit"]: ModuleScript;
-				["on-player-removing"]: ModuleScript;
-				["cframe-util"]: ModuleScript;
-				useable: ModuleScript;
-				hitbox: ModuleScript;
-				["char-at"]: ModuleScript;
-				["state-machine"]: ModuleScript & {
-					state: ModuleScript;
-				};
-				["character-from-body-part"]: ModuleScript;
-				["animation-manager"]: ModuleScript;
-			};
-			hideable: ModuleScript;
 			components: Folder & {
 				toggleable: ModuleScript;
 				["abstract-weapon"]: ModuleScript;
 				["useful-model"]: ModuleScript;
-				["disposable-component"]: ModuleScript;
 				["abstract-skill"]: ModuleScript;
-				["abstract-item"]: ModuleScript;
-				["abstract-equippable"]: ModuleScript;
-				["abstract-useable"]: ModuleScript;
 				["abstract-player"]: ModuleScript;
-				["abstract-character"]: ModuleScript;
+				["abstract-equippable"]: ModuleScript;
+				["abstract-item"]: ModuleScript;
 				ragdoll: ModuleScript;
+				["abstract-character"]: ModuleScript;
+				["abstract-useable"]: ModuleScript;
 			};
 			store: ModuleScript & {
+				middleware: Folder & {
+					logger: ModuleScript;
+				};
 				slices: ModuleScript & {
 					inventory: ModuleScript & {
 						selectors: ModuleScript;
 					};
-					transform: ModuleScript & {
+					stats: ModuleScript & {
 						selectors: ModuleScript;
 					};
 					currencies: ModuleScript & {
@@ -1703,7 +1717,7 @@ interface ReplicatedStorage extends Instance {
 					classes: ModuleScript & {
 						selectors: ModuleScript;
 					};
-					hotbar: ModuleScript & {
+					transform: ModuleScript & {
 						selectors: ModuleScript;
 					};
 					skills: ModuleScript & {
@@ -1712,15 +1726,12 @@ interface ReplicatedStorage extends Instance {
 					conditions: ModuleScript & {
 						selectors: ModuleScript;
 					};
-					stats: ModuleScript & {
-						selectors: ModuleScript;
-					};
 					resources: ModuleScript & {
 						selectors: ModuleScript;
 					};
-				};
-				middleware: Folder & {
-					logger: ModuleScript;
+					hotbar: ModuleScript & {
+						selectors: ModuleScript;
+					};
 				};
 			};
 		};
@@ -1739,23 +1750,29 @@ interface ReplicatedStorage extends Instance {
 				["character-client"]: ModuleScript;
 				["ragdoll-client"]: ModuleScript;
 				["item-client"]: ModuleScript;
+				["local-character"]: ModuleScript;
 			};
 			ui: Folder & {
 				hooks: Folder & {
 					["reflex-hooks"]: ModuleScript;
 				};
+				context: ModuleScript & {
+					singletons: ModuleScript;
+					["app-ref"]: ModuleScript;
+				};
 				components: Folder & {
+					digit: ModuleScript;
+					app: ModuleScript;
+					stats: ModuleScript;
+					["name-plate"]: ModuleScript;
+					["silver-logo"]: ModuleScript;
 					inventory: Folder & {
 						["draggable-equippable-button"]: ModuleScript;
 						["equippable-button"]: ModuleScript;
-						hotbar: ModuleScript;
 						["empty-slot"]: ModuleScript;
+						hotbar: ModuleScript;
 						backpack: ModuleScript;
 					};
-					app: ModuleScript;
-					["name-plate"]: ModuleScript;
-					digit: ModuleScript;
-					["silver-logo"]: ModuleScript;
 					["dialogue-box"]: ModuleScript & {
 						["dialogue-option"]: ModuleScript;
 						["char-label"]: ModuleScript;
@@ -1765,11 +1782,6 @@ interface ReplicatedStorage extends Instance {
 						["temperature-bar"]: ModuleScript;
 						["stomach-bar"]: ModuleScript;
 					};
-					stats: ModuleScript;
-				};
-				context: ModuleScript & {
-					singletons: ModuleScript;
-					["app-ref"]: ModuleScript;
 				};
 			};
 			configs: Folder & {
@@ -1777,30 +1789,30 @@ interface ReplicatedStorage extends Instance {
 				constants: ModuleScript;
 			};
 			store: ModuleScript & {
+				middleware: Folder & {
+					receiver: ModuleScript;
+				};
 				slices: Folder & {
-					ui: ModuleScript & {
+					dialogue: ModuleScript & {
 						selectors: ModuleScript;
 					};
 					equippables: ModuleScript & {
 						selectors: ModuleScript;
 					};
-					dialogue: ModuleScript & {
+					ui: ModuleScript & {
 						selectors: ModuleScript;
 					};
-				};
-				middleware: Folder & {
-					receiver: ModuleScript;
 				};
 			};
 			controllers: Folder & {
 				["lifecycle-controller"]: ModuleScript;
-				["character-controller"]: ModuleScript;
+				["gui-controller"]: ModuleScript;
 				["input-controller"]: ModuleScript;
 				["keybind-controller"]: ModuleScript;
 				["effect-controller"]: ModuleScript;
 				["chat-controller"]: ModuleScript;
 				["animation-controller"]: ModuleScript;
-				["gui-controller"]: ModuleScript;
+				["character-controller"]: ModuleScript;
 			};
 		};
 	};
@@ -1808,6 +1820,9 @@ interface ReplicatedStorage extends Instance {
 		node_modules: Folder & {
 			["@rbxts"]: Folder & {
 				["reflex-class"]: Folder & {
+					node_modules: Folder & {
+						["@rbxts"]: Folder;
+					};
 					out: ModuleScript & {
 						source: Folder & {
 							["class-producer"]: ModuleScript;
@@ -1869,6 +1884,9 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 				["shared-components-flamework"]: Folder & {
+					node_modules: Folder & {
+						["@rbxts"]: Folder;
+					};
 					out: ModuleScript & {
 						utilities: ModuleScript;
 						remotes: ModuleScript;

@@ -3,7 +3,9 @@ import Object from "@rbxts/object-utils";
 
 const activeSkills = {
 	"Goblet Throw": 0,
+	"Action Surge": 0,
 	"Pommel Strike": 0,
+	"Serpent Strike": 0,
 	"Triple Strike": 0,
 	Agility: 0,
 	"Dagger Throw": 0,
