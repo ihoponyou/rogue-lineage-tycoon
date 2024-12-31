@@ -25,6 +25,11 @@ export class Stat {
 		return this.calculatedValue;
 	}
 
+	printModifiers(): void {
+		print("Multipliers:", this.multipliers);
+		print("Addends:", this.addends);
+	}
+
 	onModifiersChanged(callback: Callback): RBXScriptConnection {
 		return this.modifiersChanged.Connect(callback);
 	}
@@ -45,6 +50,9 @@ export class Stat {
 			newValue += modifierMap.get(source) ?? 0;
 		}
 		modifierMap.set(source, newValue);
+		// print(
+		// 	`${source} => ${newValue} (${value}+${modifierMap.get(source)} ?? 0)`,
+		// );
 		this.shouldRecalculate = true;
 		this.modifiersChanged.Fire();
 	}
@@ -59,7 +67,7 @@ export class Stat {
 		duration: number,
 		overwrite: boolean = true,
 	) {
-		this.addModifier(source, value, modifierType, overwrite);
+		this.addModifier(source, modifierType, value, overwrite);
 		const cleanupTask = task.delay(duration, () => {
 			this.removeModifier(source, modifierType);
 		});
