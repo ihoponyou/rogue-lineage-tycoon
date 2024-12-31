@@ -22,28 +22,47 @@ function playSound(character: Model, soundName: string): void {
 	clone.Destroy();
 }
 
+function getParticleEmitter(
+	character: Model,
+	particleName: string,
+): ParticleEmitter {
+	const torso = character.FindFirstChild("Torso");
+	if (torso === undefined) error(`${character.GetFullName()} has no torso`);
+	let particle = torso.FindFirstChild(particleName) as
+		| ParticleEmitter
+		| undefined;
+	if (particle === undefined) {
+		const template = VFX.FindFirstChild(particleName) as
+			| ParticleEmitter
+			| undefined;
+		if (template !== undefined) {
+			particle = template.Clone();
+			particle.Parent = torso;
+		}
+	}
+	if (particle === undefined || !particle.IsA("ParticleEmitter")) {
+		error(`${particleName} is not a particle emitter`);
+	}
+	return particle;
+}
+
 function emitParticle(
 	character: Model,
 	particleName: string,
 	amount: number,
 ): void {
-	const torso = character.FindFirstChild("Torso");
-	if (torso === undefined) return;
-	let particle = torso.FindFirstChild(particleName) as
-		| ParticleEmitter
-		| undefined;
-	if (particle === undefined) {
-		particle = VFX.FindFirstChild(particleName) as
-			| ParticleEmitter
-			| undefined;
-		if (particle === undefined || !particle.IsA("ParticleEmitter")) {
-			error(`${particleName} does not exist`);
-		}
-	}
-	const clone = particle.Clone();
+	const clone = getParticleEmitter(character, particleName);
 	clone.Enabled = false;
-	clone.Parent = torso;
 	clone.Emit(amount);
+}
+
+function toggleParticle(
+	character: Model,
+	particleName: string,
+	enabled: boolean,
+): void {
+	const particle = getParticleEmitter(character, particleName);
+	particle.Enabled = enabled;
 }
 
 export const EFFECTS: { [name: string]: Callback } = {
@@ -142,5 +161,12 @@ export const EFFECTS: { [name: string]: Callback } = {
 	},
 	SpearEmit: (character: Model) => {
 		emitParticle(character, "SpearEmit", 8);
+	},
+	Poison: (character: Model) => {
+		playSound(character, "Poisoned");
+		toggleParticle(character, "Poison", true);
+	},
+	StopPoison: (character: Model) => {
+		toggleParticle(character, "Poison", false);
 	},
 };

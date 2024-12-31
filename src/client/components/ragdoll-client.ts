@@ -16,7 +16,6 @@ export class RagdollClient extends AbstractRagdoll implements OnStart {
 		this.configureHumanoid();
 
 		this.onAttributeChanged("isRagdolled", (newValue) => {
-			print("changed");
 			this.changeHumanoidState(newValue);
 			if (!newValue) return;
 			this.stopAnimations();
