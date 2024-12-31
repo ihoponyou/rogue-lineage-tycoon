@@ -73,6 +73,7 @@ export class HitService {
 		if (attackData.ragdollDuration > 0) {
 			victim.toggleRagdoll(true);
 			task.delay(attackData.ragdollDuration, () => {
+				if (victim.attributes.isKnocked) return;
 				victim.toggleRagdoll(false);
 			});
 		}
