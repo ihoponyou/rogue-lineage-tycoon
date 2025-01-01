@@ -261,6 +261,9 @@ export class InputController implements OnStart, OnTick {
 
 		const inAir =
 			character.getHumanoid().FloorMaterial === Enum.Material.Air;
+
+		// TODO: double jump
+
 		if (!forwardCast || !inAir) {
 			return Enum.ContextActionResult.Pass;
 		}

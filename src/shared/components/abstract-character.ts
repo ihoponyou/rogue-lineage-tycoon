@@ -37,6 +37,7 @@ export abstract class AbstractCharacter
 		this.raycastParams.CollisionGroup = "Characters";
 		this.raycastParams.FilterType = Enum.RaycastFilterType.Exclude;
 		this.raycastParams.IgnoreWater = true;
+		this.raycastParams.RespectCanCollide = true;
 
 		this.raycastParams.AddToFilter(this.instance);
 

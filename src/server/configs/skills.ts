@@ -87,7 +87,17 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		requiredClasses: ["Warrior"],
 		requiredWeaponType: WeaponType.Sword,
 		cooldown: 12,
-		activate: (user) => {},
+		activate: (user) => {
+			Events.playEffect.broadcast("StartActionSurge", user.instance);
+			user.attackSpeed.addTemporaryModifier(
+				"action_surge",
+				StatModifierType.Addend,
+				5,
+				1.5,
+			);
+			task.wait(1.5);
+			Events.playEffect.broadcast("StopActionSurge", user.instance);
+		},
 	},
 	"Pommel Strike": {
 		weaponXpRequired: {

@@ -169,4 +169,11 @@ export const EFFECTS: { [name: string]: Callback } = {
 	StopPoison: (character: Model) => {
 		toggleParticle(character, "Poison", false);
 	},
+	StartActionSurge: (character: Model) => {
+		playSound(character, "Surge");
+		toggleParticle(character, "ActionSurge", true);
+	},
+	StopActionSurge: (character: Model) => {
+		toggleParticle(character, "ActionSurge", false);
+	},
 };
