@@ -25,8 +25,13 @@ export class KeyInteractable<
 	private onPromptTriggered(player: Player): void {
 		if (this.promptDebounce) return;
 		this.promptDebounce = true;
-		this.interact(player);
-		task.defer(() => (this.promptDebounce = false));
+		try {
+			this.interact(player);
+		} catch (e) {
+			warn(`attempted interaction failed:`, e);
+		} finally {
+			task.defer(() => (this.promptDebounce = false));
+		}
 	}
 
 	public toggle(bool: boolean): void {

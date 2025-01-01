@@ -45,7 +45,7 @@ export abstract class AbstractCharacter
 		this.humanoid = character.Humanoid;
 	}
 
-	getHumanoid(): Humanoid {
+	getHumanoid() {
 		const rig = promiseR6(this.instance)
 			.catch((reason) => debug.traceback(reason))
 			.expect();
@@ -56,11 +56,13 @@ export abstract class AbstractCharacter
 	}
 
 	getAnimator(): Animator {
-		return promiseR6(this.instance).expect().Humanoid.Animator;
+		return this.getHumanoid().Animator;
 	}
 
-	getHead() {
-		return promiseR6(this.instance).expect().Head;
+	getHead(): Part {
+		const head = this.instance.FindFirstChild("Head");
+		if (head === undefined) error(`nil head`);
+		return head as Part;
 	}
 
 	getTorso() {

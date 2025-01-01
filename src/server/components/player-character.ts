@@ -237,7 +237,9 @@ export class PlayerCharacter
 		Events.character.killed.fire(this.player.instance);
 
 		task.delay(Players.RespawnTime, () => {
-			this.player.loadCharacter().catch(warn);
+			this.player
+				.loadCharacter()
+				.catch((reason) => warn(`failed to load character:`, reason));
 		});
 	}
 

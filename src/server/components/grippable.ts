@@ -1,9 +1,9 @@
 import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
-import { Workspace } from "@rbxts/services";
 import { store } from "server/store";
 import { selectPlayerCurrencies } from "server/store/selectors";
 import { ANIMATIONS, SFX, VFX } from "shared/constants";
+import { raycastWithVisualizer } from "shared/modules/raycasting";
 import { CharacterServer } from "./character-server";
 import { KeyInteractable } from "./interactable/key-interactable";
 import { PlayerCharacter } from "./player-character";
@@ -60,9 +60,13 @@ export class Grippable
 	}
 
 	public grip(gripper: CharacterServer): void {
-		const floorCheck = Workspace.Raycast(
-			this.character.getHumanoidRootPart().Position,
+		const grippeePosition = this.character.getHumanoidRootPart().Position;
+		const params = new RaycastParams();
+		params.AddToFilter(this.instance);
+		const floorCheck = raycastWithVisualizer(
+			grippeePosition,
 			Vector3.yAxis.mul(-4),
+			params,
 		);
 
 		if (!floorCheck) error(`${this.instance.Name} is mid-air`);
@@ -85,9 +89,9 @@ export class Grippable
 		this.instance.RemoveTag("Burning");
 
 		const gripperHumanoid = gripper.getHumanoid();
-		const humanoid = this.character.getHumanoid();
+		const grippeeHumanoid = this.character.getHumanoid();
 
-		humanoid.AutoRotate = false;
+		grippeeHumanoid.AutoRotate = false;
 		gripperHumanoid.AutoRotate = false;
 
 		const torso = this.character.getTorso();
@@ -113,28 +117,22 @@ export class Grippable
 		const grippingAnimationTrack = gripper
 			.getAnimator()
 			.LoadAnimation(GRIPPING_ANIMATION);
-		this.gripTrove.add(() => grippingAnimationTrack.Stop());
 		this.gripTrove.connect(
 			grippingAnimationTrack.KeyframeReached,
 			(keyframeName) => {
 				if (keyframeName !== "FinalHit") return;
-
 				hitSound.Play();
 				hitParticle.Emit(1);
 				grippingAnimationTrack.Play();
 
 				if (++ticks < 5) return;
-
-				this.character.kill();
-
-				hitSound.Ended.Wait();
 				this.release(gripper);
+				this.character.kill();
 
 				// steal silver
 				const grippeePlayer = this.components
 					.getComponent<PlayerCharacter>(this.instance)
 					?.getPlayer();
-				print(grippeePlayer?.instance.GetFullName());
 				if (grippeePlayer === undefined) return;
 				const gripperPlayer = this.components
 					.getComponent<PlayerCharacter>(gripper.instance)
@@ -157,9 +155,9 @@ export class Grippable
 				);
 			},
 		);
+		this.gripTrove.add(() => grippingAnimationTrack.Stop());
 
 		grippingAnimationTrack.Play();
-
 		// gripee may need to have motor6ds reenabled because of ragdoll
 		grippedAnimationTrack.Play(0, 1, 0);
 
@@ -171,9 +169,11 @@ export class Grippable
 
 		this.gripTrove.clean();
 
+		const gripperRootPart = gripper.getHumanoidRootPart();
+		const grippeeRootPart = this.character.getHumanoidRootPart();
 		gripper.getHumanoid().AutoRotate = true;
-		gripper.getHumanoidRootPart().Anchored = false;
-		this.character.getHumanoidRootPart().Anchored = false;
+		grippeeRootPart.Anchored = false;
+		gripperRootPart.Anchored = false;
 
 		// redisable motor6ds if ragdolled
 	}
@@ -185,27 +185,24 @@ export class Grippable
 	) {
 		const gripperRootPart = gripper.getHumanoidRootPart();
 		const grippeeRootPart = grippee.getHumanoidRootPart();
-		const zRotation = grippeeRootPart.Orientation.Z;
+		const goalPos = floorCheck.Position.add(Vector3.yAxis.mul(3));
 
-		const goalPos = floorCheck.Position.add(Vector3.yAxis.mul(0.5));
-
+		// the animation needs the grippee to face opposite of the gripper
+		// with the grippee slightly in front of the gripper
 		grippeeRootPart.Anchored = true;
 		grippee.instance.PivotTo(
-			CFrame.lookAt(goalPos, goalPos.add(Vector3.yAxis)),
+			CFrame.lookAt(
+				goalPos,
+				goalPos.sub(gripperRootPart.CFrame.LookVector),
+			),
 		);
-		const grippeePivot = grippee.instance.GetPivot();
-		grippee.instance.PivotTo(
-			grippeePivot.mul(CFrame.Angles(0, 0, zRotation)),
-		);
-
-		const gripperPosOffset = Vector3.yAxis
-			.mul(2.5)
-			.add(grippeeRootPart.CFrame.UpVector.mul(3));
-		const gripperRotOffset = CFrame.Angles(math.rad(90), 0, math.rad(180));
 
 		gripperRootPart.Anchored = true;
 		gripper.instance.PivotTo(
-			grippeePivot.mul(gripperRotOffset).add(gripperPosOffset),
+			CFrame.lookAt(
+				goalPos.add(gripperRootPart.CFrame.LookVector.mul(-2.5)),
+				goalPos,
+			),
 		);
 	}
 }

@@ -12,7 +12,7 @@ export function spawnHitbox(
 	filter?.forEach((instance) => overlapParams.AddToFilter(instance));
 
 	const parts = Workspace.GetPartBoundsInBox(cframe, size, overlapParams);
-	if (visualize) spawnVisualizer(cframe, size);
+	if (visualize) spawnHitboxVisualizer(cframe, size);
 	const hits: Model[] = [];
 	parts.forEach((basePart) => {
 		const parent = basePart.Parent as Model | undefined;
@@ -26,7 +26,7 @@ export function spawnHitbox(
 	return hits;
 }
 
-export function spawnVisualizer(
+export function spawnHitboxVisualizer(
 	cframe: CFrame,
 	size: Vector3,
 	duration = 0.5,

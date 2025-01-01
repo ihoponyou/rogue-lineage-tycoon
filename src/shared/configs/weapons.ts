@@ -23,7 +23,7 @@ export interface WeaponConfig {
 export const WEAPONS = {
 	Fists: {
 		type: WeaponType.Fists,
-		damage: 6,
+		damage: 60,
 		lightAttackCooldown: 0.475,
 		noJumpDuration: 0.7,
 		endlag: 0.5,

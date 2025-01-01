@@ -127,6 +127,8 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 		this.walkSpeed.onModifiersChanged(() => {
 			this.getHumanoid().WalkSpeed = this.walkSpeed.getCalculatedValue();
 		});
+
+		this.takeDamage(90);
 	}
 
 	onTick(dt: number): void {
