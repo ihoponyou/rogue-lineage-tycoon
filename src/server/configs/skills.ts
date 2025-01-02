@@ -1,9 +1,12 @@
+import { Components } from "@flamework/components";
 import { Modding } from "@flamework/core";
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
 import { CharacterServer } from "server/components/character-server";
 import { PlayerCharacter } from "server/components/player-character";
 import { Events } from "server/network";
 import { HitService } from "server/services/hit-service";
+import { store } from "server/store";
+import { selectPlayerCurrencies } from "server/store/selectors";
 import { AbstractCharacter } from "shared/components/abstract-character";
 import { ClassId } from "shared/configs/classes";
 import { ActiveSkillId, PassiveSkillId, SkillId } from "shared/configs/skills";
@@ -13,6 +16,7 @@ import { StatModifierType } from "shared/modules/stat";
 import { LAST_LIGHT_ATTACK_DATA, LIGHT_ATTACK_DATA } from "./constants";
 
 const hitService = Modding.resolveSingleton(HitService);
+const components = Modding.resolveSingleton(Components);
 
 interface SkillConfig {
 	readonly weaponXpRequired: Record<WeaponType, number>;
@@ -286,7 +290,46 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		requiredClasses: [],
 		requiredWeaponType: undefined,
 		cooldown: 0,
-		activate: (user) => {},
+		activate: (user) => {
+			user.playAnimation("Pickpocket");
+
+			const victims = spawnHitbox(
+				user.getHumanoidRootPart().CFrame,
+				user.getHumanoidRootPart().Size.mul(3),
+				user.getRaycastParams().FilterDescendantsInstances,
+			);
+			let totalAmountStolen = 0;
+			for (const victim of victims) {
+				const victimPlayer = components
+					.getComponent<PlayerCharacter>(victim)
+					?.getPlayer().instance;
+				if (victimPlayer === undefined) {
+					continue;
+				}
+
+				const victimSilverAmount = store.getState(
+					selectPlayerCurrencies(victimPlayer),
+				)?.Silver.amount;
+				if (victimSilverAmount === undefined) {
+					error(`${victimPlayer.Name} is super broke`);
+				}
+				const PERCENT_TO_STEAL = 0.05;
+				const amountToSteal = math.ceil(
+					victimSilverAmount * PERCENT_TO_STEAL,
+				);
+				store.addCurrency(victimPlayer, "Silver", -amountToSteal);
+
+				totalAmountStolen += amountToSteal;
+			}
+
+			const userPlayer = components
+				.getComponent<PlayerCharacter>(user.instance)
+				?.getPlayer().instance;
+			if (userPlayer === undefined) {
+				return;
+			}
+			store.addCurrency(userPlayer, "Silver", totalAmountStolen);
+		},
 	},
 	"Lock Manipulation": {
 		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
