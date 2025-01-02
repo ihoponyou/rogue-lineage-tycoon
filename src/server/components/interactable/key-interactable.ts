@@ -3,7 +3,9 @@ import { InputBasedInteractable } from "./input-based-interactable";
 
 // TODO: allow a KeyInteractable to handle multiple keys each with their own unique callbacks (replace grippable/carriable extension)
 
-@Component()
+@Component({
+	tag: "KeyInteractable",
+})
 export class KeyInteractable<
 	A extends {} = {},
 	I extends Instance = Instance,
@@ -11,7 +13,7 @@ export class KeyInteractable<
 	private promptDebounce = false;
 	protected inputInstance = new Instance("ProximityPrompt");
 
-	public override onStart(): void {
+	override onStart(): void {
 		super.onStart();
 
 		this.inputInstance.ClickablePrompt = false;
@@ -20,6 +22,14 @@ export class KeyInteractable<
 		this.trove.connect(this.inputInstance.Triggered, (player) =>
 			this.onPromptTriggered(player),
 		);
+	}
+
+	toggle(bool: boolean): void {
+		this.inputInstance.Enabled = bool;
+	}
+
+	setKey(key: Enum.KeyCode): void {
+		this.inputInstance.KeyboardKeyCode = key;
 	}
 
 	private onPromptTriggered(player: Player): void {
@@ -32,13 +42,5 @@ export class KeyInteractable<
 		} finally {
 			task.defer(() => (this.promptDebounce = false));
 		}
-	}
-
-	public toggle(bool: boolean): void {
-		this.inputInstance.Enabled = bool;
-	}
-
-	public setKey(key: Enum.KeyCode): void {
-		this.inputInstance.KeyboardKeyCode = key;
 	}
 }
