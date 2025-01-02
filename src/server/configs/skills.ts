@@ -2,6 +2,7 @@ import { Components } from "@flamework/components";
 import { Modding } from "@flamework/core";
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
 import { CharacterServer } from "server/components/character-server";
+import { DoorServer } from "server/components/door-server";
 import { PlayerCharacter } from "server/components/player-character";
 import { Events } from "server/network";
 import { HitService } from "server/services/hit-service";
@@ -11,6 +12,7 @@ import { AbstractCharacter } from "shared/components/abstract-character";
 import { ClassId } from "shared/configs/classes";
 import { ActiveSkillId, PassiveSkillId, SkillId } from "shared/configs/skills";
 import { getWeaponConfig, WeaponType } from "shared/configs/weapons";
+import { INTERACT_RADIUS } from "shared/constants";
 import { spawnHitbox } from "shared/modules/hitbox";
 import { StatModifierType } from "shared/modules/stat";
 import { LAST_LIGHT_ATTACK_DATA, LIGHT_ATTACK_DATA } from "./constants";
@@ -336,7 +338,59 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		requiredClasses: [],
 		requiredWeaponType: undefined,
 		cooldown: 0,
-		activate: (user) => {},
+		activate: (user) => {
+			const params = new OverlapParams();
+			params.AddToFilter(user.instance);
+
+			const humanoidRootPart = user.getHumanoidRootPart();
+			const partsWithinInteractRadius = Workspace.GetPartBoundsInRadius(
+				humanoidRootPart.Position,
+				INTERACT_RADIUS,
+				params,
+			);
+			let door: DoorServer | undefined;
+			let minDistanceToCharacter = math.huge;
+			for (const part of partsWithinInteractRadius) {
+				const doorServer = components.getComponent<DoorServer>(part);
+				if (doorServer === undefined || doorServer.attributes.isOpen) {
+					continue;
+				}
+				// we want to find closest door to character
+				const distanceToCharacter = doorServer.instance.Position.sub(
+					humanoidRootPart.Position,
+				).Magnitude;
+				if (distanceToCharacter < minDistanceToCharacter) {
+					minDistanceToCharacter = distanceToCharacter;
+					door = doorServer;
+				}
+			}
+			if (door === undefined) {
+				return;
+			}
+
+			const humanoid = user.getHumanoid();
+
+			humanoid.AutoRotate = false;
+			user.playAnimation("LockManipulation");
+			user.walkSpeed.addModifier(
+				"lockpicking",
+				StatModifierType.Multiplier,
+				0,
+			);
+
+			Events.playEffect.broadcast("Lockpicking", user.instance);
+
+			task.wait(3);
+
+			humanoid.AutoRotate = true;
+			user.stopAnimation("LockManipulation");
+			user.walkSpeed.removeModifier(
+				"lockpicking",
+				StatModifierType.Multiplier,
+			);
+
+			door.toggleUnlocked();
+		},
 	},
 	Stealth: {
 		weaponXpRequired: NO_WEAPON_XP_REQUIRED,

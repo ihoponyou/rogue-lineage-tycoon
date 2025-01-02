@@ -6,8 +6,8 @@ function getHitType(weaponType: WeaponType) {
 	return hitType;
 }
 
-function playSound(character: Model, soundName: string): void {
-	const torso = character.FindFirstChild("Torso");
+function playSound(model: Model, soundName: string): void {
+	const torso = model.FindFirstChild("Torso");
 	if (torso === undefined) return;
 	let sound = torso.FindFirstChild(soundName) as Sound | undefined;
 	if (sound === undefined) {
@@ -175,5 +175,8 @@ export const EFFECTS: { [name: string]: Callback } = {
 	},
 	StopActionSurge: (character: Model) => {
 		toggleParticle(character, "ActionSurge", false);
+	},
+	Lockpicking: (character: Model) => {
+		playSound(character, "Lockpicking");
 	},
 };

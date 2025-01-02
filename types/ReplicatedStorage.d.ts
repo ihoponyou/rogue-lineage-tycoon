@@ -1442,7 +1442,9 @@ interface ReplicatedStorage extends Instance {
 		};
 		Animations: Folder & {
 			Skills: Folder & {
+				Pickpocket: Animation;
 				PommelStrike: Animation;
+				LockManipulation: Animation;
 			};
 			Combat: Folder & {
 				Fists2: Animation;
@@ -1507,72 +1509,74 @@ interface ReplicatedStorage extends Instance {
 		};
 		Effects: Folder & {
 			Sounds: Folder & {
-				HeavySpearSwing: Sound;
-				WoodDoorOpen: Sound;
-				WoodDoorClose: Sound;
-				FistsHit: Sound;
-				Greatspearhit: Sound;
-				SoulRipped: Sound;
-				Surge: Sound;
-				Died: Sound;
-				PerfectCast: Sound;
 				DaggerHit2: Sound;
-				Poisoned: Sound;
 				FinishedCharging: Sound;
-				GrappleNoise: Sound;
 				CounterSpell: Sound;
 				FreeFalling: Sound;
-				SpearHit: Sound;
 				SilverDischarge: Sound;
-				SwordSwing: Sound;
-				SwordHit: Sound;
 				FistsCharge: Sound;
 				DaggerCharge: Sound;
-				Diffusion: Sound;
-				Lannis: Sound;
-				Roar: Sound;
-				Heavy: Sound;
+				Poisoned: Sound;
 				Blink: Sound;
 				WingFlap: Sound;
 				Injured: Sound;
 				DaggerSwing: Sound;
 				Stealth: Sound;
+				Climbing: Sound;
+				Erase: Sound;
+				DaggerSwing2: Sound;
+				Surge: Sound;
+				FistsChargeFinish: Sound;
+				Growth: Sound;
+				Swimming: Sound;
+				CounterSpellOff: Sound;
+				Lockpicking: Sound;
+				Landing: Sound;
+				StrikeCharge: Sound;
+				Snap: Sound;
+				HeavySpearSwing: Sound;
+				WoodDoorOpen: Sound;
+				FistsHit: Sound;
+				Greatspearhit: Sound;
+				SoulRipped: Sound;
+				Died: Sound;
+				PerfectCast: Sound;
+				Jumping: Sound;
+				Shadowrush: Sound;
+				Ordersound: Sound;
+				WoodDoorClose: Sound;
+				SwordSwing: Sound;
+				ShadowrushCharge: Sound;
+				BaneCharge: Sound;
+				Diffusion: Sound;
+				Lannis: Sound;
+				SwordCharge: Sound;
 				Charging: Sound;
 				BlockBreak: Sound;
 				Pondus: Sound & {
 					FlangeSoundEffect: FlangeSoundEffect;
 				};
-				Erase: Sound;
-				SpearSwing: Sound;
+				DaggerHit: Sound;
 				ManaDash: Sound;
+				EtherealStrike: Sound;
+				EpicDemon: Sound;
+				Running: Sound;
+				Splash: Sound;
+				BaneDischarge: Sound;
+				DoorKnock: Sound;
+				GrappleNoise: Sound;
+				SpearHit: Sound;
+				SwordHit: Sound;
+				OwlSlash: Sound;
+				Heavy: Sound;
+				LightningHit: Sound;
+				GettingUp: Sound;
+				Roar: Sound;
+				SpearSwing: Sound;
+				Dash: Sound;
 				FistsSwing: Sound;
 				FlyingAssaulter: Sound;
 				Extinguish: Sound;
-				DaggerHit: Sound;
-				EpicDemon: Sound;
-				Running: Sound;
-				EtherealStrike: Sound;
-				Splash: Sound;
-				BaneDischarge: Sound;
-				ShadowrushCharge: Sound;
-				Shadowrush: Sound;
-				FistsChargeFinish: Sound;
-				OwlSlash: Sound;
-				Ordersound: Sound;
-				BaneCharge: Sound;
-				Landing: Sound;
-				Jumping: Sound;
-				Climbing: Sound;
-				Growth: Sound;
-				Swimming: Sound;
-				LightningHit: Sound;
-				GettingUp: Sound;
-				CounterSpellOff: Sound;
-				DaggerSwing2: Sound;
-				Dash: Sound;
-				StrikeCharge: Sound;
-				Snap: Sound;
-				SwordCharge: Sound;
 			};
 			Visuals: Folder & {
 				ShriekerSmoke: ParticleEmitter;
@@ -1829,9 +1833,6 @@ interface ReplicatedStorage extends Instance {
 		node_modules: Folder & {
 			["@rbxts"]: Folder & {
 				["reflex-class"]: Folder & {
-					node_modules: Folder & {
-						["@rbxts"]: Folder;
-					};
 					out: ModuleScript & {
 						source: Folder & {
 							["class-producer"]: ModuleScript;
@@ -1893,9 +1894,6 @@ interface ReplicatedStorage extends Instance {
 					};
 				};
 				["shared-components-flamework"]: Folder & {
-					node_modules: Folder & {
-						["@rbxts"]: Folder;
-					};
 					out: ModuleScript & {
 						utilities: ModuleScript;
 						remotes: ModuleScript;

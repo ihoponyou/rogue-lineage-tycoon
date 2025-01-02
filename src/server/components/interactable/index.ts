@@ -17,6 +17,7 @@ export abstract class Interactable<
 
 	private _isEnabled = false;
 	private interacted = new Signal<InteractedCallback>();
+	private interactFailed = new Signal();
 
 	override destroy(): void {
 		this.trove.clean();
@@ -24,12 +25,19 @@ export abstract class Interactable<
 	}
 
 	interact(player: Player): void {
-		if (!this._isEnabled) return;
+		if (!this._isEnabled) {
+			this.interactFailed.Fire();
+			return;
+		}
 		this.interacted.Fire(player);
 	}
 
 	onInteracted(callback: InteractedCallback): void {
 		this.trove.connect(this.interacted, (player) => callback(player));
+	}
+
+	onInteractFailed(callback: Callback): void {
+		this.trove.connect(this.interactFailed, callback);
 	}
 
 	isEnabled(): boolean {

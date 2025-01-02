@@ -1,6 +1,7 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { AbstractDoor } from "shared/components/abstract-door";
+import { SFX } from "shared/constants";
 import { ProximityInteractable } from "./interactable/proximity-interactable";
 
 @Component({
@@ -13,12 +14,15 @@ import { ProximityInteractable } from "./interactable/proximity-interactable";
 })
 export class DoorServer extends AbstractDoor implements OnStart {
 	private closeDoorThread?: thread;
+	private knockSound = this.trove.clone(SFX.DoorKnock);
 
 	constructor(private interactable: ProximityInteractable) {
 		super();
 	}
 
 	onStart(): void {
+		this.knockSound.Parent = this.instance;
+
 		this.interactable.toggle(this.attributes.isUnlocked);
 		this.trove.add(
 			this.onAttributeChanged("isUnlocked", (newValue) => {
@@ -43,6 +47,10 @@ export class DoorServer extends AbstractDoor implements OnStart {
 					this.closeDoorThread = undefined;
 				}),
 			);
+		});
+
+		this.interactable.onInteractFailed(() => {
+			this.knockSound.Play();
 		});
 	}
 
