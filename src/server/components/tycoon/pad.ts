@@ -50,7 +50,7 @@ export class Pad
 
 		this.setupBillboard();
 
-		this.enable();
+		this.toggle(true);
 	}
 
 	public onPurchased(callback: PurchaseCallback): void {
@@ -97,7 +97,7 @@ export class Pad
 		print(`unlocked ${this.attributes.assetName}`);
 		playerServer.addAsset(this.attributes.assetName);
 		this.hide();
-		this.disable();
+		this.toggle(false);
 
 		this.purchased.Fire(playerServer);
 	}

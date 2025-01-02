@@ -24,7 +24,8 @@ export class KeyInteractable<
 		);
 	}
 
-	toggle(bool: boolean): void {
+	override toggle(bool: boolean): void {
+		super.toggle(bool);
 		this.inputInstance.Enabled = bool;
 	}
 

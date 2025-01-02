@@ -52,7 +52,7 @@ export class Plot extends BaseComponent<{}, PlotInstance> implements OnStart {
 			const pad = this.components.getComponent<Pad>(instance);
 			if (pad === undefined) return;
 			pad.hide();
-			pad.disable();
+			pad.toggle(false);
 			pad.onPurchased(() => this.refreshPads());
 		});
 	}
@@ -90,7 +90,7 @@ export class Plot extends BaseComponent<{}, PlotInstance> implements OnStart {
 			if (!this.owner.hasAssetPrerequisites(pad.attributes.assetName))
 				continue;
 			pad.show();
-			pad.enable();
+			pad.toggle(true);
 		}
 	}
 

@@ -33,7 +33,7 @@ export class Dialogue extends BaseComponent implements OnStart {
 		if (this.config["Open"] === undefined)
 			error('missing "Open" dialogue cfg');
 
-		this.clickable.enable();
+		this.clickable.toggle(true);
 		this.clickable.onInteracted((player) => {
 			this.open(player);
 		});

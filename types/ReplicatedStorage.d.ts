@@ -1508,12 +1508,16 @@ interface ReplicatedStorage extends Instance {
 		Effects: Folder & {
 			Sounds: Folder & {
 				HeavySpearSwing: Sound;
+				WoodDoorOpen: Sound;
+				WoodDoorClose: Sound;
 				FistsHit: Sound;
 				Greatspearhit: Sound;
 				SoulRipped: Sound;
+				Surge: Sound;
 				Died: Sound;
 				PerfectCast: Sound;
 				DaggerHit2: Sound;
+				Poisoned: Sound;
 				FinishedCharging: Sound;
 				GrappleNoise: Sound;
 				CounterSpell: Sound;
@@ -1601,6 +1605,7 @@ interface ReplicatedStorage extends Instance {
 				DBloodTrue: ParticleEmitter;
 				MonasticFire: ParticleEmitter;
 				Cameo: ParticleEmitter;
+				LannisParticle: ParticleEmitter;
 				ManaStopParticle: ParticleEmitter;
 				LElectric: ParticleEmitter;
 				Sparks: ParticleEmitter;
@@ -1618,7 +1623,7 @@ interface ReplicatedStorage extends Instance {
 				Broken: ParticleEmitter;
 				Poison: ParticleEmitter;
 				Injure: ParticleEmitter;
-				LannisParticle: ParticleEmitter;
+				ActionSurge: ParticleEmitter;
 			};
 		};
 	};
@@ -1662,6 +1667,7 @@ interface ReplicatedStorage extends Instance {
 				["abstract-activity"]: ModuleScript;
 				["line-of-sight"]: ModuleScript;
 				["get-digit"]: ModuleScript;
+				raycasting: ModuleScript;
 				["on-player-removing"]: ModuleScript;
 				useable: ModuleScript;
 				["uppercase-first-char"]: ModuleScript;
@@ -1688,11 +1694,12 @@ interface ReplicatedStorage extends Instance {
 				["useful-model"]: ModuleScript;
 				["abstract-skill"]: ModuleScript;
 				["abstract-player"]: ModuleScript;
+				["abstract-useable"]: ModuleScript;
 				["abstract-equippable"]: ModuleScript;
 				["abstract-item"]: ModuleScript;
 				ragdoll: ModuleScript;
 				["abstract-character"]: ModuleScript;
-				["abstract-useable"]: ModuleScript;
+				["abstract-door"]: ModuleScript;
 			};
 			store: ModuleScript & {
 				middleware: Folder & {
@@ -1751,6 +1758,8 @@ interface ReplicatedStorage extends Instance {
 				["ragdoll-client"]: ModuleScript;
 				["item-client"]: ModuleScript;
 				["local-character"]: ModuleScript;
+				["proximity-interactable"]: ModuleScript;
+				["door-client"]: ModuleScript;
 			};
 			ui: Folder & {
 				hooks: Folder & {

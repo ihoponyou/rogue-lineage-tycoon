@@ -1,7 +1,7 @@
 import { Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { AbstractDoor } from "shared/components/abstract-door";
-import { KeyInteractable } from "./interactable/key-interactable";
+import { ProximityInteractable } from "./interactable/proximity-interactable";
 
 @Component({
 	tag: AbstractDoor.TAG,
@@ -12,28 +12,36 @@ import { KeyInteractable } from "./interactable/key-interactable";
 	},
 })
 export class DoorServer extends AbstractDoor implements OnStart {
-	constructor(private keyInteractable: KeyInteractable) {
+	private closeDoorThread?: thread;
+
+	constructor(private interactable: ProximityInteractable) {
 		super();
 	}
 
 	onStart(): void {
-		this.keyInteractable.toggle(this.attributes.isUnlocked);
+		this.interactable.toggle(this.attributes.isUnlocked);
 		this.trove.add(
 			this.onAttributeChanged("isUnlocked", (newValue) => {
-				this.keyInteractable.toggle(newValue);
+				this.interactable.toggle(newValue);
 			}),
 		);
 
-		this.keyInteractable.onInteracted((_player) => {
+		this.interactable.onInteracted((_player) => {
 			this.attributes.isOpen = !this.attributes.isOpen;
 
 			const goalHingeCFrame = this.attributes.isOpen
 				? this.openedHingeCFrame
 				: this.closedHingeCFrame;
 
-			task.delay(
-				AbstractDoor.TWEEN_DURATION + 0.1,
-				() => (this.instance.Hinge.CFrame = goalHingeCFrame),
+			if (this.closeDoorThread !== undefined) {
+				task.cancel(this.closeDoorThread);
+				this.trove.remove(this.closeDoorThread);
+			}
+			this.closeDoorThread = this.trove.add(
+				task.delay(AbstractDoor.TWEEN_DURATION + 0.1, () => {
+					this.instance.Hinge.CFrame = goalHingeCFrame;
+					this.closeDoorThread = undefined;
+				}),
 			);
 		});
 	}

@@ -6,10 +6,12 @@ import {
 	Workspace,
 } from "@rbxts/services";
 import Signal from "@rbxts/signal";
+import { ProximityInteractableClient } from "client/components/proximity-interactable";
 import { Events } from "client/network";
 import { store } from "client/store";
 import { selectIsBackpackOpen } from "client/store/slices/ui/selectors";
 import { MAX_HOTBAR_SLOTS } from "shared/configs/constants";
+import { INTERACT_RADIUS } from "shared/constants";
 import { selectSkills } from "shared/store/slices/skills/selectors";
 import { CharacterController } from "./character-controller";
 import { KeybindController } from "./keybind-controller";
@@ -153,6 +155,33 @@ export class InputController implements OnStart, OnTick {
 			(state) => {
 				if (state !== BEGIN) return;
 				Events.combat.carryInput();
+			},
+		);
+		this.keybindController.loadKeybind(
+			"interact",
+			this.keybindController.keybinds.interact,
+			(state) => {
+				if (state !== BEGIN) return;
+				const character = this.characterController.getCharacter();
+				if (character === undefined) return;
+				const params = new OverlapParams();
+				params.AddToFilter(character.instance);
+				const partsWithinInteractRadius =
+					Workspace.GetPartBoundsInRadius(
+						character.getHumanoidRootPart().Position,
+						INTERACT_RADIUS,
+						params,
+					);
+				for (const part of partsWithinInteractRadius) {
+					const interactable =
+						this.components.getComponent<ProximityInteractableClient>(
+							part,
+						);
+					if (interactable === undefined) {
+						continue;
+					}
+					interactable.interact();
+				}
 			},
 		);
 	}

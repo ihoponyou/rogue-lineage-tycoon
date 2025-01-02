@@ -24,6 +24,7 @@ export abstract class Interactable<
 	}
 
 	interact(player: Player): void {
+		if (!this._isEnabled) return;
 		this.interacted.Fire(player);
 	}
 
@@ -35,12 +36,8 @@ export abstract class Interactable<
 		return this._isEnabled;
 	}
 
-	enable(): void {
-		this._isEnabled = true;
-	}
-
-	disable(): void {
-		this._isEnabled = false;
+	toggle(bool: boolean): void {
+		this._isEnabled = bool;
 	}
 
 	isPlayerAllowed(_player: Player): boolean {
