@@ -7,7 +7,7 @@ interface DoorAttributes {
 	isUnlocked: boolean;
 }
 
-type DoorInstance = Instance & {
+type DoorInstance = BasePart & {
 	Hinge: BasePart;
 };
 

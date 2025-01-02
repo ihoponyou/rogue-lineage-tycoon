@@ -45,4 +45,8 @@ export class DoorServer extends AbstractDoor implements OnStart {
 			);
 		});
 	}
+
+	toggleUnlocked(bool?: boolean): void {
+		this.attributes.isUnlocked = bool ?? !this.attributes.isUnlocked;
+	}
 }
