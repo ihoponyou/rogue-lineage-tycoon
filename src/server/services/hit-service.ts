@@ -62,7 +62,7 @@ export class HitService {
 
 		Events.playEffect.broadcast(`Hit`, victimInstance, weaponConfig.type);
 		victim.takeDamage(weaponConfig.damage);
-		victim.stun(weaponConfig.damage / 15);
+		victim.stun(math.abs(weaponConfig.damage / 15));
 		victim.playAnimation(`Stunned${math.random(1, 3)}`);
 
 		if (blockBroken) {
