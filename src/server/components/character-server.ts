@@ -4,6 +4,7 @@ import { setInterval } from "@rbxts/set-timeout";
 import Signal from "@rbxts/signal";
 import { Trove } from "@rbxts/trove";
 import { AbstractCharacter } from "shared/components/abstract-character";
+import { UsefulModel } from "shared/components/useful-model";
 import { BASE_CLIMB_SPEED, BASE_WALK_SPEED } from "shared/configs";
 import { isItemId, ItemId } from "shared/configs/items";
 import { ActiveSkillId, isActiveSkillId } from "shared/configs/skills";
@@ -77,10 +78,11 @@ export class CharacterServer extends AbstractCharacter implements OnTick {
 	private noJumpThread?: thread;
 
 	constructor(
+		usefulModel: UsefulModel,
 		protected components: Components,
 		readonly ragdoll: RagdollServer,
 	) {
-		super();
+		super(usefulModel);
 	}
 
 	override destroy(): void {

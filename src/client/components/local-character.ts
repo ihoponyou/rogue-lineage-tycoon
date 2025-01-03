@@ -14,6 +14,7 @@ import { InputController } from "client/controllers/input-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
 import { store } from "client/store";
 import { AbstractCharacter } from "shared/components/abstract-character";
+import { UsefulModel } from "shared/components/useful-model";
 import { Equippable } from "shared/modules/equippable";
 import { Events } from "../network";
 import { ItemClient } from "./item-client";
@@ -43,13 +44,15 @@ export class LocalCharacter extends AbstractCharacter implements OnTick {
 	private block!: BlockActivity;
 
 	constructor(
+		usefulModel: UsefulModel,
 		private components: Components,
 		protected ragdoll: RagdollClient,
 		private animationController: AnimationController,
 		private keybindController: KeybindController,
 		private inputController: InputController,
 	) {
-		super();
+		super(usefulModel);
+
 		this.run = new RunActivity(this, animationController);
 		this.dash = new DashActivity(
 			this,

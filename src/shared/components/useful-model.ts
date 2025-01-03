@@ -20,6 +20,8 @@ export class UsefulModel
 	private canCollides = new Map<BasePart, boolean>();
 	private transparencies = new Map<TransparentInstance, number>();
 
+	private _isHidden = false;
+
 	public onStart(): void {
 		for (const instance of this.instance.GetDescendants()) {
 			if (instance.IsA("BasePart")) {
@@ -39,26 +41,39 @@ export class UsefulModel
 		}
 	}
 
-	public show(): void {
-		for (const part of this.parts) {
-			part.Transparency = this.transparencies.get(part)!;
-			part.CanCollide = this.canCollides.get(part)!;
-		}
-		for (const decal of this.decals) {
-			decal.Transparency = this.transparencies.get(decal)!;
-		}
-		this.toggleables.forEach((instance) => (instance.Enabled = true));
+	isHidden(): boolean {
+		return this._isHidden;
 	}
 
-	public hide(): void {
+	toggleHidden(bool?: boolean): void {
+		if (this._isHidden === bool) {
+			return;
+		}
+		this._isHidden = bool ?? !this._isHidden;
 		for (const part of this.parts) {
-			part.Transparency = 1;
-			part.CanCollide = false;
+			part.Transparency = this._isHidden
+				? 1
+				: this.transparencies.get(part)!;
+			part.CanCollide = this._isHidden
+				? false
+				: this.canCollides.get(part)!;
 		}
 		for (const decal of this.decals) {
-			decal.Transparency = 1;
+			decal.Transparency = this._isHidden
+				? 1
+				: this.transparencies.get(decal)!;
 		}
-		this.toggleables.forEach((instance) => (instance.Enabled = false));
+		this.toggleables.forEach(
+			(instance) => (instance.Enabled = !this._isHidden),
+		);
+	}
+
+	show(): void {
+		this.toggleHidden(false);
+	}
+
+	hide(): void {
+		this.toggleHidden(true);
 	}
 
 	public setCollisionGroup(group: string): void {
@@ -81,5 +96,9 @@ export class UsefulModel
 		for (const part of this.parts) {
 			part.CanCollide = bool;
 		}
+	}
+
+	forEachPart(callback: (part: BasePart) => void): void {
+		this.parts.forEach(callback);
 	}
 }

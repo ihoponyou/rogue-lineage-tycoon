@@ -15,6 +15,6 @@ export class ShowOnUnlock extends UnlockEffect {
 	}
 
 	public override onUnlocked(): void {
-		this.model.show();
+		this.model.toggleHidden(false);
 	}
 }

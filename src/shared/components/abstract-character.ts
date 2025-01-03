@@ -4,6 +4,7 @@ import { promiseR6 } from "@rbxts/promise-character";
 import { BASE_JUMP_POWER } from "shared/configs";
 import { Stat } from "shared/modules/stat";
 import { AbstractRagdoll } from "./ragdoll";
+import { UsefulModel } from "./useful-model";
 
 export interface CharacterAttributes {
 	isKnocked: boolean;
@@ -32,6 +33,10 @@ export abstract class AbstractCharacter
 	protected abstract readonly skillsFolder: Folder;
 
 	protected manaChargeRate = new Stat(-1);
+
+	constructor(readonly usefulModel: UsefulModel) {
+		super();
+	}
 
 	onStart(): void {
 		this.raycastParams.CollisionGroup = "Characters";

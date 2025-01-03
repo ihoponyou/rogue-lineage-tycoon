@@ -1,3 +1,4 @@
+import { TweenService } from "@rbxts/services";
 import { WeaponType } from "shared/configs/weapons";
 import { SFX, VFX } from "shared/constants";
 
@@ -178,5 +179,34 @@ export const EFFECTS: { [name: string]: Callback } = {
 	},
 	Lockpicking: (character: Model) => {
 		playSound(character, "Lockpicking");
+	},
+	StartStealth: (character: Model) => {
+		playSound(character, "Stealth");
+		for (const basePart of character.GetDescendants()) {
+			if (
+				!basePart.IsA("BasePart") ||
+				basePart.Name === "HumanoidRootPart" ||
+				basePart.Transparency > 0
+			) {
+				continue;
+			}
+			TweenService.Create(basePart, new TweenInfo(0.5), {
+				Transparency: 0.5,
+			}).Play();
+			basePart.SetAttribute("stealthed", true);
+		}
+	},
+	StopStealth: (character: Model) => {
+		emitParticle(character, "ShadowEmitter", 20);
+		for (const basePart of character.GetDescendants()) {
+			if (
+				!basePart.IsA("BasePart") ||
+				basePart.GetAttribute("stealthed") !== true
+			) {
+				continue;
+			}
+			basePart.Transparency = 0;
+			basePart.SetAttribute("stealthed", false);
+		}
 	},
 };

@@ -397,7 +397,11 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		requiredClasses: [],
 		requiredWeaponType: undefined,
 		cooldown: 0,
-		activate: (user) => {},
+		activate: (user) => {
+			Events.playEffect.broadcast("StartStealth", user.instance);
+			task.wait(10);
+			Events.playEffect.broadcast("StopStealth", user.instance);
+		},
 	},
 };
 

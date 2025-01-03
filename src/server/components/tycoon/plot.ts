@@ -51,7 +51,7 @@ export class Plot extends BaseComponent<{}, PlotInstance> implements OnStart {
 		this.instance.Pads.GetChildren().forEach((instance) => {
 			const pad = this.components.getComponent<Pad>(instance);
 			if (pad === undefined) return;
-			pad.hide();
+			pad.toggleHidden(true);
 			pad.toggle(false);
 			pad.onPurchased(() => this.refreshPads());
 		});
@@ -89,7 +89,7 @@ export class Plot extends BaseComponent<{}, PlotInstance> implements OnStart {
 			if (this.owner.hasAsset(pad.attributes.assetName)) continue;
 			if (!this.owner.hasAssetPrerequisites(pad.attributes.assetName))
 				continue;
-			pad.show();
+			pad.toggleHidden(false);
 			pad.toggle(true);
 		}
 	}

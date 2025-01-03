@@ -57,12 +57,12 @@ export class Pad
 		this.trove.connect(this.purchased, (player) => callback(player));
 	}
 
-	public hide(): void {
-		this.model.hide();
+	isHidden(): boolean {
+		return this.model.isHidden();
 	}
 
-	public show(): void {
-		this.model.show();
+	toggleHidden(bool?: boolean): void {
+		this.model.toggleHidden(bool);
 	}
 
 	public override isPlayerAllowed(player: Player): boolean {
@@ -96,7 +96,7 @@ export class Pad
 
 		print(`unlocked ${this.attributes.assetName}`);
 		playerServer.addAsset(this.attributes.assetName);
-		this.hide();
+		this.toggleHidden(true);
 		this.toggle(false);
 
 		this.purchased.Fire(playerServer);
