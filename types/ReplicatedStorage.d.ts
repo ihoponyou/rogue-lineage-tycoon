@@ -1,22 +1,5 @@
 interface ReplicatedStorage extends Instance {
 	WorldModels: Folder & {
-		["Bronze Dagger"]: Model & {
-			["Bronze Dagger"]: MeshPart & {
-				PropWeld: Weld;
-				Trail: Trail;
-				Attachment2: Attachment;
-				Attachment1: Attachment;
-			};
-		};
-		["Bronze Spear"]: Model & {
-			["Bronze Spear"]: MeshPart & {
-				Trail: Trail;
-				Attachment2: Attachment;
-				PropWeld: Weld;
-				Weld: Weld;
-				Attachment1: Attachment;
-			};
-		};
 		["Bronze Sword"]: Model & {
 			["Bronze Sword"]: MeshPart & {
 				Trail: Trail;
@@ -33,6 +16,28 @@ interface ReplicatedStorage extends Instance {
 				};
 				Mesh: SpecialMesh;
 				ParticleEmitter: ParticleEmitter;
+			};
+		};
+		["Bronze Spear"]: Model & {
+			["Bronze Spear"]: MeshPart & {
+				Trail: Trail;
+				Attachment2: Attachment;
+				PropWeld: Weld;
+				Weld: Weld;
+				Attachment1: Attachment;
+			};
+		};
+		ThrownDagger: MeshPart & {
+			TestTrail: Trail;
+			Attachment2: Attachment;
+			Attachment1: Attachment;
+		};
+		["Bronze Dagger"]: Model & {
+			["Bronze Dagger"]: MeshPart & {
+				PropWeld: Weld;
+				Trail: Trail;
+				Attachment2: Attachment;
+				Attachment1: Attachment;
 			};
 		};
 	};

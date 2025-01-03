@@ -1,6 +1,12 @@
 import { Components } from "@flamework/components";
 import { Modding } from "@flamework/core";
-import { ReplicatedStorage, Workspace } from "@rbxts/services";
+import {
+	Debris,
+	ReplicatedStorage,
+	RunService,
+	Workspace,
+} from "@rbxts/services";
+import { Trove } from "@rbxts/trove";
 import { CharacterServer } from "server/components/character-server";
 import { DoorServer } from "server/components/door-server";
 import { PlayerCharacter } from "server/components/player-character";
@@ -276,11 +282,77 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		requiredWeaponType: undefined,
 		cooldown: 2,
 		activate: (user) => {
-			if (!user.canAttack()) return;
+			// if (!user.canAttack()) return;
 			user.attack(
 				"PommelStrike",
 				() => {},
-				() => {},
+				() => {
+					const dagger =
+						ReplicatedStorage.WorldModels.ThrownDagger.Clone();
+					dagger.Parent = Workspace;
+					dagger.Anchored = true;
+					dagger.CanCollide = false;
+					dagger.CastShadow = false;
+
+					const trove = new Trove();
+					trove.attachToInstance(dagger);
+					Debris.AddItem(dagger, 20);
+
+					const humanoidRootPart = user.getHumanoidRootPart();
+					const direction = humanoidRootPart.CFrame.LookVector;
+					const speed = 100;
+					const velocity = direction.mul(speed);
+
+					const castParams = new RaycastParams();
+					castParams.AddToFilter(user.instance);
+
+					dagger.CFrame = humanoidRootPart.CFrame;
+					trove.connect(RunService.Heartbeat, (deltaTime) => {
+						// const att = new Instance("Attachment");
+						// att.WorldCFrame = dagger.CFrame;
+						// att.Parent = Workspace.Terrain;
+						// att.Visible = true;
+						// trove.add(att);
+
+						const castResult = Workspace.Raycast(
+							dagger.Position,
+							velocity.mul(deltaTime),
+							castParams,
+						);
+
+						dagger.Position = dagger.Position.add(
+							velocity.mul(deltaTime),
+						);
+
+						if (castResult === undefined) {
+							return;
+						}
+						// print(
+						// 	`collided with ${castResult.Instance.GetFullName()}`,
+						// );
+						dagger.Destroy();
+						const parent = castResult.Instance.Parent;
+						if (parent === undefined || !parent.IsA("Model")) {
+							return;
+						}
+						const characterServer =
+							components.getComponent<CharacterServer>(parent);
+						if (characterServer === undefined) {
+							return;
+						}
+						hitService.registerHit(
+							user,
+							parent,
+							getWeaponConfig("Bronze Dagger"),
+							{
+								breaksBlock: true,
+								ragdollDuration: 0,
+								knockbackForce: 0,
+								knockbackDuration: 0,
+							},
+						);
+					});
+				},
 				() => {},
 				0.5,
 				0,

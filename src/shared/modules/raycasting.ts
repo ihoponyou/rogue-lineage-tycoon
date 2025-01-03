@@ -4,7 +4,7 @@ export function raycastWithVisualizer(
 	origin: Vector3,
 	direction: Vector3,
 	params?: RaycastParams,
-	duration?: number,
+	visualizerDuration?: number,
 ): RaycastResult | undefined {
 	const visualizer = new Instance("Part");
 	const destination = origin.add(direction);
@@ -13,6 +13,8 @@ export function raycastWithVisualizer(
 	visualizer.Anchored = true;
 	visualizer.Transparency = 0.8;
 	visualizer.Material = Enum.Material.Neon;
+	visualizer.CanCollide = false;
+	visualizer.CanQuery = false;
 
 	const raycastResult = Workspace.Raycast(origin, direction, params);
 	visualizer.Color =
@@ -22,8 +24,8 @@ export function raycastWithVisualizer(
 
 	visualizer.Parent = Workspace;
 	visualizer.Name = `RAY: ${origin} => ${direction}`;
-	if (duration !== undefined) {
-		Debris.AddItem(visualizer, duration);
+	if (visualizerDuration !== undefined) {
+		Debris.AddItem(visualizer, visualizerDuration);
 	}
 
 	return raycastResult;
