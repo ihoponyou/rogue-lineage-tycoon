@@ -66,6 +66,7 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		cooldown: 2,
 		activate: (user) => {
 			if (!user.canAttack()) return;
+
 			user.attack(
 				"PommelStrike",
 				() => {},
@@ -124,6 +125,7 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		activate: (user) => {
 			// if (!user.canAttack()) return;
 			Events.playEffect.broadcast("StrikeCharge", user.instance);
+			Events.playEffect.broadcast("SworderEmit", user.instance);
 			const hitboxSize = new Vector3(6, 5, 6);
 			const humanoidRootPartCFrame = user.getHumanoidRootPart().CFrame;
 			const cframeOffset = humanoidRootPartCFrame.LookVector.mul(
@@ -252,8 +254,8 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 		requiredWeaponType: WeaponType.Dagger,
 		cooldown: 30,
 		activate: (user) => {
-			// emit the particle
-			// play the sound effect
+			Events.playEffect.broadcast("SworderEmit", user.instance);
+			Events.playEffect.broadcast("Agility", user.instance);
 			const removeWalkSpeedModifier = user.walkSpeed.addTemporaryModifier(
 				"agility",
 				StatModifierType.Multiplier,
@@ -305,6 +307,7 @@ export const ACTIVE_SKILLS: Record<ActiveSkillId, ActiveSkillConfig> = {
 
 					const castParams = new RaycastParams();
 					castParams.AddToFilter(user.instance);
+					castParams.RespectCanCollide = true;
 
 					dagger.CFrame = humanoidRootPart.CFrame;
 					trove.connect(RunService.Heartbeat, (deltaTime) => {
@@ -486,7 +489,7 @@ export const PASSIVE_SKILLS: Record<PassiveSkillId, PassiveSkillConfig> = {
 		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
 		requiredClasses: [],
 	},
-	"Spear Dash": {
+	"Dash Mastery": {
 		weaponXpRequired: NO_WEAPON_XP_REQUIRED,
 		requiredClasses: [],
 	},

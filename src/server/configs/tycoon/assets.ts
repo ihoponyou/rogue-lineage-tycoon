@@ -1,7 +1,7 @@
-import { Currency } from "../../../shared/modules/currency";
+import { Currency } from "shared/modules/currency";
 
 export interface AssetConfig {
-	readonly displayName: string;
+	readonly displayName?: string;
 	readonly cost: number;
 	readonly currency: Currency;
 	readonly prerequisites: Array<string>;
@@ -103,5 +103,74 @@ export const ASSETS: { [name: string]: AssetConfig } = {
 		cost: 1000,
 		currency: "Silver",
 		prerequisites: ["ManaDash"],
+	},
+	PlateTraining: {
+		displayName: "Plate Training",
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	MercenaryCarry: {
+		displayName: "Mercenary Carry",
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	PommelStrike: {
+		displayName: "Pommel Strike",
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	ActionSurge: {
+		displayName: "Pommel Strike",
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	DashMastery: {
+		displayName: "Dash Mastery",
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	SerpentStrike: {
+		displayName: "Serpent Strike",
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	TripleStrike: {
+		displayName: "Triple Strike",
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	Agility: {
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	Stealth: {
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	Pickpocket: {
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	LockManipulation: {
+		displayName: "Lock Manipulation",
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
+	},
+	DaggerThrow: {
+		displayName: "Dagger Throw",
+		cost: 350,
+		currency: "Silver",
+		prerequisites: ["WeaponRack"],
 	},
 };

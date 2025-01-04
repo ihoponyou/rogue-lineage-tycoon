@@ -392,7 +392,7 @@ export class PlayerCharacter
 		const hasSpearDash =
 			store
 				.getState(selectPlayerSkills(this.player.instance))
-				?.has("Spear Dash") ?? false;
+				?.has("Dash Mastery") ?? false;
 		return this.character.attributes.isDashing && !hasSpearDash;
 	}
 

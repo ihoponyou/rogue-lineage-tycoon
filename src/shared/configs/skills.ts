@@ -21,7 +21,7 @@ export const isActiveSkillId = Flamework.createGuard<ActiveSkillId>();
 const passiveSkills = {
 	"Mercenary Carry": 0,
 	"Plate Training": 0,
-	"Spear Dash": 0,
+	"Dash Mastery": 0,
 	Mana: 0,
 	"Mana Climb": 0,
 	"Mana Run": 0,

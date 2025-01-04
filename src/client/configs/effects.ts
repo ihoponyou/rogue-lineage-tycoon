@@ -209,4 +209,11 @@ export const EFFECTS: { [name: string]: Callback } = {
 			basePart.SetAttribute("stealthed", false);
 		}
 	},
+	Agility: (character: Model) => {
+		playSound(character, "Agility");
+	},
+	// what is a sworder
+	SworderEmit: (character: Model) => {
+		emitParticle(character, "SworderEmit", 33);
+	},
 };

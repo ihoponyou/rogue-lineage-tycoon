@@ -77,7 +77,7 @@ export class Plot extends BaseComponent<{}, PlotInstance> implements OnStart {
 
 		this.refreshPads();
 
-		print(`${this.instance} claimed by ${this.owner.instance.Name}`);
+		// print(`${this.instance} claimed by ${this.owner.instance.Name}`);
 	}
 
 	public refreshPads(): void {

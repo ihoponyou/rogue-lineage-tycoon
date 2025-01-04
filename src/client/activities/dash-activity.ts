@@ -90,7 +90,7 @@ export class DashActivity extends CharacterActivity {
 			this.manaParticles.Enabled = true;
 		}
 
-		const hasSpearDash = store.getState(selectSkills()).has("Spear Dash");
+		const hasSpearDash = store.getState(selectSkills()).has("Dash Mastery");
 		this.animationController.play(
 			`${hasSpearDash && direction !== "forward" ? "Spear" : ""}Dash${uppercaseFirstChar(direction)}`,
 		);

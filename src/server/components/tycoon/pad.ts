@@ -78,7 +78,7 @@ export class Pad
 		const playerServer = this.components.getComponent<PlayerServer>(player);
 		if (!playerServer) return;
 		if (!playerServer.hasAssetPrerequisites(this.attributes.assetName)) {
-			print(playerServer.Name, "missing prerequisites");
+			// print(playerServer.Name, "missing prerequisites");
 			return;
 		}
 
@@ -87,7 +87,7 @@ export class Pad
 		];
 		if (currencyData === undefined) return;
 		if (currencyData.amount < this.assetConfig.cost) {
-			print(playerServer.Name, "error = broke");
+			// print(playerServer.Name, "error = broke");
 			return;
 		}
 		store.addCurrency(
@@ -96,7 +96,7 @@ export class Pad
 			-this.assetConfig.cost,
 		);
 
-		print(`unlocked ${this.attributes.assetName}`);
+		// print(`unlocked ${this.attributes.assetName}`);
 		playerServer.addAsset(this.attributes.assetName);
 		this.toggleHidden(true);
 		this.toggle(false);
@@ -107,7 +107,8 @@ export class Pad
 	private setupBillboard(): void {
 		const labelsFrame = ReplicatedStorage.Assets.UI.PadLabels.Clone();
 
-		labelsFrame.AssetLabel.Text = this.assetConfig.displayName;
+		labelsFrame.AssetLabel.Text =
+			this.assetConfig.displayName ?? this.attributes.assetName;
 		const cost = this.assetConfig.cost;
 		labelsFrame.CostLabel.Text = cost <= 0 ? "FREE" : `$${cost}`;
 

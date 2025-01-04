@@ -1,8 +1,10 @@
 import { Dialogue } from "server/components/dialogue";
 import { PlayerServer } from "server/components/player-server";
+import warriorTrainer from "./alfric";
+import cu from "./cu";
 import dorgen from "./dorgen";
+import fabiana from "./fabiana";
 import ferryman from "./ferryman";
-import warriorTrainer from "./warrior-trainer";
 
 export interface TopicConfig {
 	speech: string;
@@ -24,4 +26,6 @@ export const DIALOGUE: {
 	Ferryman: ferryman,
 	Dorgen: dorgen,
 	Alfric: warriorTrainer,
+	Cu: cu,
+	Fabiana: fabiana,
 };
