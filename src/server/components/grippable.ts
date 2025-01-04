@@ -2,6 +2,7 @@ import { Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { store } from "server/store";
 import { selectPlayerCurrencies } from "server/store/selectors";
+import { Toggleable } from "shared/components/toggleable";
 import { ANIMATIONS, SFX, VFX } from "shared/constants";
 import { raycastWithVisualizer } from "shared/modules/raycasting";
 import { CharacterServer } from "./character-server";
@@ -29,11 +30,12 @@ export class Grippable
 	private gripTrove = this.trove.extend();
 
 	public constructor(
+		toggleable: Toggleable,
 		private components: Components,
 		private character: CharacterServer,
 		private ragdoll: RagdollServer,
 	) {
-		super();
+		super(toggleable);
 	}
 
 	public override onStart(): void {

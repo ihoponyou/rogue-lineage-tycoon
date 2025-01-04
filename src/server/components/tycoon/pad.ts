@@ -5,6 +5,7 @@ import { TouchableModel } from "server/components/interactable/touchable/touchab
 import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { selectPlayer } from "server/store/selectors";
+import { Toggleable } from "shared/components/toggleable";
 import { UsefulModel } from "shared/components/useful-model";
 import { Hideable } from "shared/hideable";
 import { PlayerServer } from "../player-server";
@@ -34,10 +35,11 @@ export class Pad
 	private purchased = new Signal<PurchaseCallback>();
 
 	public constructor(
+		toggleable: Toggleable,
 		private components: Components,
 		private model: UsefulModel,
 	) {
-		super();
+		super(toggleable);
 	}
 
 	public override onStart(): void {
