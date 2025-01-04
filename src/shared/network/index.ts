@@ -1,9 +1,9 @@
 import { Networking } from "@flamework/networking";
-import { CharacterClientEvents } from "./character";
+import { CharacterClientEvents, CharacterServerEvents } from "./character";
 import { CombatClientEvents, CombatServerEvents } from "./combat";
 import { CurrencyClientEvents, CurrencyServerFunctions } from "./currency";
 import { DialogueClientEvents } from "./dialogue";
-import { ItemServerEvents } from "./item";
+import { ItemServerEvents, ItemServerFunctions } from "./item";
 import { ManaClientEvents, ManaServerEvents } from "./mana";
 import { ReflexClientEvents, ReflexServerEvents } from "./reflex";
 
@@ -13,10 +13,11 @@ interface ServerEvents {
 	combat: CombatServerEvents;
 	reflex: ReflexServerEvents;
 	item: ItemServerEvents;
+	character: CharacterServerEvents;
 }
 
 interface ClientEvents {
-	kicked(): void;
+	toggleBlur(on: boolean): void;
 	greeted(player: Player): void;
 	playEffect(name: string, ...args: unknown[]): void;
 	mana: ManaClientEvents;
@@ -29,6 +30,7 @@ interface ClientEvents {
 
 interface ServerFunctions {
 	currency: CurrencyServerFunctions;
+	item: ItemServerFunctions;
 }
 
 interface ClientFunctions {}

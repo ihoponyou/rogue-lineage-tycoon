@@ -1,21 +1,21 @@
 import { createProducer } from "@rbxts/reflex";
-import { KeysOfType } from "../../../../../types/keys-of-type";
-import { PlayerData } from "../player-data";
+import { PlayerProfileData } from "shared/modules/player-data";
+import { KeysOfType } from "../../../../../types";
 
 export interface ManaData {
 	readonly amount: number;
-	readonly enabled: boolean;
-	readonly runEnabled: boolean;
-	readonly dashEnabled: boolean;
-	readonly climbEnabled: boolean;
+	// readonly enabled: boolean;
+	// readonly runEnabled: boolean;
+	// readonly dashEnabled: boolean;
+	// readonly climbEnabled: boolean;
 }
 
 export const DEFAULT_MANA_DATA: ManaData = {
 	amount: 0,
-	enabled: false,
-	runEnabled: false,
-	dashEnabled: false,
-	climbEnabled: false,
+	// enabled: false,
+	// runEnabled: false,
+	// dashEnabled: false,
+	// climbEnabled: false,
 };
 
 function toggleManaProperty(property: KeysOfType<ManaData, boolean>) {
@@ -28,7 +28,7 @@ function toggleManaProperty(property: KeysOfType<ManaData, boolean>) {
 }
 
 export const manaSlice = createProducer(DEFAULT_MANA_DATA, {
-	loadPlayerData: (_state, data: PlayerData) => data.mana,
+	loadPlayerData: (_state, data: PlayerProfileData) => data.mana,
 
 	setManaAmount: (state, value: number) => {
 		return {
@@ -37,8 +37,8 @@ export const manaSlice = createProducer(DEFAULT_MANA_DATA, {
 		};
 	},
 
-	toggleManaEnabled: toggleManaProperty("enabled"),
-	toggleManaRunEnabled: toggleManaProperty("runEnabled"),
-	toggleManaDashEnabled: toggleManaProperty("dashEnabled"),
-	toggleManaClimbEnabled: toggleManaProperty("climbEnabled"),
+	// toggleManaEnabled: toggleManaProperty("enabled"),
+	// toggleManaRunEnabled: toggleManaProperty("runEnabled"),
+	// toggleManaDashEnabled: toggleManaProperty("dashEnabled"),
+	// toggleManaClimbEnabled: toggleManaProperty("climbEnabled"),
 });

@@ -1,3 +1,4 @@
+import Object from "@rbxts/object-utils";
 import { ReplicatedStorage } from "@rbxts/services";
 
 export enum WeaponType {
@@ -16,9 +17,10 @@ export interface WeaponConfig {
 	readonly maxLightAttacks: number;
 	readonly hitboxSize: Vector3;
 	readonly blockAnimation?: Animation;
+	readonly equipPriority: number;
 }
 
-export const WEAPONS: { [name: string]: WeaponConfig } = {
+export const WEAPONS = {
 	Fists: {
 		type: WeaponType.Fists,
 		damage: 6,
@@ -27,6 +29,7 @@ export const WEAPONS: { [name: string]: WeaponConfig } = {
 		endlag: 0.5,
 		maxLightAttacks: 5,
 		hitboxSize: new Vector3(6, 7, 6),
+		equipPriority: -1,
 	},
 	"Bronze Sword": {
 		type: WeaponType.Sword,
@@ -37,6 +40,7 @@ export const WEAPONS: { [name: string]: WeaponConfig } = {
 		maxLightAttacks: 5,
 		hitboxSize: new Vector3(7, 7, 6),
 		blockAnimation: ReplicatedStorage.Assets.Animations.Combat.SwordBlock,
+		equipPriority: 0,
 	},
 	"Bronze Spear": {
 		type: WeaponType.Spear,
@@ -47,6 +51,7 @@ export const WEAPONS: { [name: string]: WeaponConfig } = {
 		maxLightAttacks: 4,
 		hitboxSize: new Vector3(6, 7, 8),
 		blockAnimation: ReplicatedStorage.Assets.Animations.Combat.SpearBlock,
+		equipPriority: 0,
 	},
 	"Bronze Dagger": {
 		type: WeaponType.Dagger,
@@ -56,10 +61,13 @@ export const WEAPONS: { [name: string]: WeaponConfig } = {
 		endlag: 0.75,
 		maxLightAttacks: 5,
 		hitboxSize: new Vector3(6, 7, 7),
+		equipPriority: 0,
 	},
 };
 
-export function getWeaponConfig(name: string): WeaponConfig {
+export type WeaponName = keyof typeof WEAPONS;
+export const WEAPON_NAMES = Object.keys(WEAPONS) as WeaponName[];
+export function getWeaponConfig(name: WeaponName): WeaponConfig {
 	const config = WEAPONS[name];
 	if (config === undefined) {
 		error(`Weapon ${name} does not exist`);

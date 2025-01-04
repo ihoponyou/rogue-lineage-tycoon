@@ -3,7 +3,9 @@ import { InputBasedInteractable } from "./input-based-interactable";
 
 // TODO: allow a KeyInteractable to handle multiple keys each with their own unique callbacks (replace grippable/carriable extension)
 
-@Component()
+@Component({
+	tag: "KeyInteractable",
+})
 export class KeyInteractable<
 	A extends {} = {},
 	I extends Instance = Instance,
@@ -11,7 +13,7 @@ export class KeyInteractable<
 	private promptDebounce = false;
 	protected inputInstance = new Instance("ProximityPrompt");
 
-	public override onStart(): void {
+	override onStart(): void {
 		super.onStart();
 
 		this.inputInstance.ClickablePrompt = false;
@@ -22,18 +24,24 @@ export class KeyInteractable<
 		);
 	}
 
-	private onPromptTriggered(player: Player): void {
-		if (this.promptDebounce) return;
-		this.promptDebounce = true;
-		this.interact(player);
-		task.defer(() => (this.promptDebounce = false));
-	}
-
-	public toggle(bool: boolean): void {
+	override toggle(bool: boolean): void {
+		super.toggle(bool);
 		this.inputInstance.Enabled = bool;
 	}
 
-	public setKey(key: Enum.KeyCode): void {
+	setKey(key: Enum.KeyCode): void {
 		this.inputInstance.KeyboardKeyCode = key;
+	}
+
+	private onPromptTriggered(player: Player): void {
+		if (this.promptDebounce) return;
+		this.promptDebounce = true;
+		try {
+			this.interact(player);
+		} catch (e) {
+			warn(`attempted interaction failed:`, e);
+		} finally {
+			task.defer(() => (this.promptDebounce = false));
+		}
 	}
 }

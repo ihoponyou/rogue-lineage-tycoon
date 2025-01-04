@@ -1,4 +1,4 @@
-import { Currency } from "../../../../types/currency";
+import { Currency } from "../../../shared/modules/currency";
 
 export interface AssetConfig {
 	readonly displayName: string;

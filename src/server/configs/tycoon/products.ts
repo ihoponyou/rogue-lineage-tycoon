@@ -1,4 +1,4 @@
-import { Currency } from "../../../../types/currency";
+import { Currency } from "../../../shared/modules/currency";
 
 interface ProductConfig {
 	readonly currency: Currency;

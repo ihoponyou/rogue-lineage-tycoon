@@ -12,5 +12,9 @@ export function receiverMiddleware(): ProducerMiddleware {
 		receiver.dispatch(actions);
 	});
 
+	Events.reflex.hydrate.connect((state) => {
+		receiver.hydrate(state);
+	});
+
 	return receiver.middleware;
 }

@@ -1,18 +1,19 @@
 import { RunService, Workspace } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
-import { Character } from "client/components/character";
+import { LocalCharacter } from "client/components/local-character";
 import { AnimationController } from "client/controllers/animation-controller";
 import {
 	Direction,
 	InputController,
 } from "client/controllers/input-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
+import { Events } from "client/network";
 import { store } from "client/store";
 import { SFX, VFX } from "shared/constants";
 import { deserializeColor3 } from "shared/modules/serialized-color3";
 import { uppercaseFirstChar } from "shared/modules/uppercase-first-char";
 import { selectManaColor } from "shared/store/slices/identity/selectors";
-import { selectMana } from "shared/store/slices/mana/selectors";
+import { selectSkills } from "shared/store/slices/skills/selectors";
 import { CharacterActivity } from "./character-activity";
 
 const DIRECTION_TO_ANGLE: { [direction: string]: number } = {
@@ -35,8 +36,8 @@ export class DashActivity extends CharacterActivity {
 	private manaParticles = VFX.ManaStopParticle.Clone();
 	private manaDashSound = SFX.ManaDash.Clone();
 
-	public constructor(
-		character: Character,
+	constructor(
+		character: LocalCharacter,
 		private animationController: AnimationController,
 		private keybindController: KeybindController,
 		private inputController: InputController,
@@ -55,9 +56,11 @@ export class DashActivity extends CharacterActivity {
 		);
 	}
 
-	public override start(): void {
+	override start(): void {
 		if (this.onCooldown || this.isActive()) return;
 		super.start();
+
+		Events.character.dash.fire();
 
 		this.tickStarted = tick();
 
@@ -72,9 +75,10 @@ export class DashActivity extends CharacterActivity {
 		this.dashAngle = DIRECTION_TO_ANGLE[direction];
 		const humanoidRootPart = this.character.getHumanoidRootPart();
 
-		const manaData = store.getState(selectMana());
+		const playerState = store.getState();
 		const canManaDash =
-			(manaData?.amount ?? 0) > 0 && manaData?.dashEnabled;
+			(playerState?.mana.amount ?? 0) > 0 &&
+			playerState?.skills.has("Mana Dash");
 
 		this.dashVelocity.Parent = humanoidRootPart;
 		this.dashVelocity.Velocity = humanoidRootPart.CFrame.mul(
@@ -86,7 +90,10 @@ export class DashActivity extends CharacterActivity {
 			this.manaParticles.Enabled = true;
 		}
 
-		this.animationController.play(`Dash${uppercaseFirstChar(direction)}`);
+		const hasSpearDash = store.getState(selectSkills()).has("Spear Dash");
+		this.animationController.play(
+			`${hasSpearDash && direction !== "forward" ? "Spear" : ""}Dash${uppercaseFirstChar(direction)}`,
+		);
 
 		this.trove.connect(RunService.Stepped, () => {
 			if (tick() - this.tickStarted >= DASH_DURATION) {
@@ -111,7 +118,7 @@ export class DashActivity extends CharacterActivity {
 		});
 	}
 
-	public override stop(): void {
+	override stop(): void {
 		super.stop();
 
 		this.dashVelocity.Parent = this.character.instance;

@@ -1,9 +1,7 @@
-import { Components } from "@flamework/components";
-import { Dependency, OnStart, Service } from "@flamework/core";
+import { OnStart, Service } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
-import { Character } from "server/components/character";
 import { ARMORS, getRandomStarterArmor } from "server/configs/armors";
 import { getRandomFirstName } from "server/configs/names";
 import {
@@ -15,9 +13,8 @@ import {
 import { store } from "server/store";
 import { selectPlayerIdentity } from "server/store/selectors";
 import { APPEARANCE } from "shared/constants";
-import { deserializeColor3 } from "shared/modules/serialized-color3";
+import { OnCharacterAdded, OnPlayerAdded } from "shared/modules/lifecycles";
 import { Sex } from "shared/store/slices/identity";
-import { OnCharacterAdded, OnPlayerAdded } from "../../../types/lifecycles";
 
 const ERROR_404_MESSAGE_TEMPLATE = "Could not find {Attribute} of/in {Object}";
 const HAIR_TEXTURE = "rbxassetid://13655022252";
@@ -46,9 +43,9 @@ export class IdentityService
 	}
 
 	public onPlayerAdded(player: Player) {
-		this.playerDescriptions[player.UserId] =
-			this.getPlayerAvatarDescription(player.UserId);
-		this.cleanPlayerDescription(this.playerDescriptions[player.UserId]);
+		this.playerDescriptions[player.UserId] = this.cleanPlayerDescription(
+			this.getPlayerAvatarDescription(player.UserId),
+		);
 	}
 
 	public async onCharacterAdded(model: Model) {
@@ -56,12 +53,13 @@ export class IdentityService
 		const player = Players.GetPlayerFromCharacter(character);
 		if (!player) error(`Player not found for ${character.Name}`);
 
-		this.playerDescriptions[player.UserId] =
-			this.getPlayerAvatarDescription(player.UserId);
-		this.cleanPlayerDescription(this.playerDescriptions[player.UserId]);
+		const description = this.cleanPlayerDescription(
+			this.getPlayerAvatarDescription(player.UserId),
+		);
+		this.playerDescriptions[player.UserId] = description;
 
 		const data = store.getState(selectPlayerIdentity(player));
-		if (!data) error("missing data");
+		if (!data) error("undefined identity data");
 
 		let raceName = data.raceName;
 		if (raceName === "") {
@@ -76,7 +74,7 @@ export class IdentityService
 				personality = this.getRandomPersonality(raceName);
 				store.setPersonality(player, personality);
 			}
-			this.setFace(character, raceName, personality);
+			this.applyFace(character, raceName, personality);
 		} else {
 			this.cleanCharacterFace(character);
 		}
@@ -86,20 +84,21 @@ export class IdentityService
 			phenotypeName = getRandomPhenotype(raceName);
 			store.setPhenotype(player, phenotypeName);
 		}
-		this.setPhenotype(character, raceName, phenotypeName);
+		this.applyPhenotype(character, raceName, phenotypeName);
 
 		let sex = data.sex;
 		if (sex === "") {
 			sex = this.getRandomSex();
 			store.setSex(player, sex);
 		}
-		this.setSex(character, sex);
+		this.applySex(character, sex);
 
 		let firstName = data.firstName;
 		if (firstName === "") {
 			firstName = getRandomFirstName(raceName, sex);
+			store.setFirstName(player, firstName);
 		}
-		this.setFirstName(player, firstName);
+		this.applyFirstName(player, firstName);
 
 		let armorName = data.armorName;
 		if (armorName === "") {
@@ -116,25 +115,18 @@ export class IdentityService
 			}
 			store.setArmor(player, armorName);
 		}
-		this.setArmor(character, armorName);
+		this.applyArmor(character, armorName);
 
 		const serializedColor = data.manaColor;
-		const newColor =
+		const isBlank =
 			serializedColor.R === -1 &&
 			serializedColor.G === -1 &&
-			serializedColor.B === -1
-				? this.getRandomManaColor()
-				: deserializeColor3(serializedColor);
-		store.setManaColor(player, newColor);
+			serializedColor.B === -1;
+		if (isBlank) {
+			store.setManaColor(player, this.getRandomManaColor());
+		}
 
-		character.Humanoid.ApplyDescription(
-			this.playerDescriptions[player.UserId],
-		);
-
-		const components = Dependency<Components>();
-		components.waitForComponent<Character>(character).then((component) => {
-			component.giveForceField();
-		});
+		character.Humanoid.ApplyDescription(description);
 	}
 
 	public getPlayerAvatarDescription(playerId: number): HumanoidDescription {
@@ -149,7 +141,9 @@ export class IdentityService
 		return this.playerDescriptions[player.UserId];
 	}
 
-	public cleanPlayerDescription(description: HumanoidDescription) {
+	public cleanPlayerDescription(
+		description: HumanoidDescription,
+	): HumanoidDescription {
 		description.Shirt = 0;
 		description.Pants = 0;
 		description.GraphicTShirt = 0;
@@ -168,6 +162,8 @@ export class IdentityService
 		description.ShouldersAccessory = "";
 		description.WaistAccessory = "";
 		description.FaceAccessory = "";
+
+		return description;
 	}
 
 	private async cleanCharacterFace(model: Model) {
@@ -176,7 +172,7 @@ export class IdentityService
 		if (face) {
 			face.Destroy();
 		}
-		this.logger.Debug("Cleaned {@Character}'s face", character);
+		// this.logger.Debug("Cleaned {@Character}'s face", character);
 	}
 
 	public setCharacterSkinColor(character: Model, color: Color3) {
@@ -230,16 +226,16 @@ export class IdentityService
 		});
 	}
 
-	public async setEyeColor(model: Model, color: Color3) {
-		const character = await promiseR6(model);
+	public setEyeColor(model: Model, color: Color3) {
+		const character = promiseR6(model).expect();
 		const face = character.Head.FindFirstChild("face") as Decal;
 		if (!face) error(`Face not find in character ${character}`);
 
 		face.Color3 = color;
 	}
 
-	public async setFace(model: Model, raceName: string, personality: string) {
-		const character = await promiseR6(model);
+	public applyFace(model: Model, raceName: string, personality: string) {
+		const character = promiseR6(model).expect();
 		this.cleanCharacterFace(model);
 
 		const race = RACES[raceName];
@@ -275,7 +271,7 @@ export class IdentityService
 		lashes.Parent = head;
 	}
 
-	public setSex(character: Model, sex: Sex) {
+	public applySex(character: Model, sex: Sex) {
 		if (sex === "Female") {
 			this.addEyelashes(character);
 		} else {
@@ -285,7 +281,7 @@ export class IdentityService
 		}
 	}
 
-	public setArmor(character: Model, armorName: string) {
+	public applyArmor(character: Model, armorName: string) {
 		const player = Players.GetPlayerFromCharacter(character) as Player;
 		const identity = store.getState(selectPlayerIdentity(player));
 		if (identity === undefined) error("no data");
@@ -311,18 +307,14 @@ export class IdentityService
 			armor.Variations[identity.sex] ?? armor.Variations.Male;
 		variation.Shirt.Clone().Parent = character;
 		variation.Pants.Clone().Parent = character;
-
-		store.setArmor(player, armorName);
 	}
 
-	public setFirstName(player: Player, name: string) {
+	public applyFirstName(player: Player, name: string) {
 		if (player.Character) {
 			const humanoid =
 				player.Character.FindFirstChildWhichIsA("Humanoid");
 			if (humanoid) humanoid.DisplayName = name;
 		}
-
-		store.setFirstName(player, name);
 	}
 
 	public async addCustomHead(
@@ -375,7 +367,7 @@ export class IdentityService
 		humanoid.AddAccessory(customAccessory?.Clone() as Accessory);
 	}
 
-	public setPhenotype(
+	public applyPhenotype(
 		character: Model,
 		raceName: string,
 		phenotypeName: string,

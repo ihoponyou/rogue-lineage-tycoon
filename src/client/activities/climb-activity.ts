@@ -6,7 +6,7 @@ import {
 	Workspace,
 } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
-import { Character } from "client/components/character";
+import { LocalCharacter } from "client/components/local-character";
 import { AnimationController } from "client/controllers/animation-controller";
 import {
 	Direction,
@@ -36,7 +36,7 @@ export class ClimbActivity extends CharacterActivity {
 	private climbConstraint = this.newClimbConstraint();
 
 	public constructor(
-		character: Character,
+		character: LocalCharacter,
 		private animationController: AnimationController,
 		private inputController: InputController,
 		private keybindController: KeybindController,
@@ -232,11 +232,11 @@ export class ClimbActivity extends CharacterActivity {
 		if (combined.Magnitude > 1) combined = combined.Unit;
 		this.climbForce.VectorVelocity = combined.mul(
 			this.calculateClimbSpeed(100, 0, 0),
-		); // TODO: fix this
+		); // TODO: calculate climb speed based on mana, training, and passive boosts
 	}
 
 	private tryLedgeClimb(
-		humanoidRootPart: Part,
+		humanoidRootPart: BasePart,
 		lookVector: Vector3,
 		params: RaycastParams,
 	): void {
@@ -315,7 +315,6 @@ export class ClimbActivity extends CharacterActivity {
 		this.goalPart.CFrame = goal;
 
 		if (!this.character) return;
-		// TODO: make this frame independent
 		const humanoidRootPart = this.character.getHumanoidRootPart();
 		humanoidRootPart.CFrame = humanoidRootPart.CFrame.Lerp(
 			goal,

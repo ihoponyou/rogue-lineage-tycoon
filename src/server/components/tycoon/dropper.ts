@@ -1,12 +1,11 @@
-import { Component, Components } from "@flamework/components";
+import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Debris } from "@rbxts/services";
 import { Timer, TimerState } from "@rbxts/timer";
+import { Trove } from "@rbxts/trove";
 import { DROPPERS } from "server/configs/tycoon";
-import { DisposableComponent } from "shared/components/disposable-component";
-import { ModelComponent } from "shared/components/model";
 import { Toggleable } from "shared/components/toggleable";
-import { Inject } from "shared/inject";
+import { UsefulModel } from "shared/components/useful-model";
 
 type DropperInstance = Model & {
 	Faucet: BasePart & {
@@ -18,23 +17,29 @@ type DropperInstance = Model & {
 	tag: "Dropper",
 })
 export class Dropper
-	extends DisposableComponent<{}, DropperInstance>
+	extends BaseComponent<{}, DropperInstance>
 	implements OnStart
 {
 	private readonly config = DROPPERS[this.instance.Name];
 	private timer!: Timer;
+	private trove = new Trove();
 
-	@Inject
-	private components!: Components;
-
-	public constructor(private toggleable: Toggleable) {
+	constructor(
+		private components: Components,
+		private toggleable: Toggleable,
+	) {
 		super();
 		if (!this.config)
 			error(`dropper "${this.instance.Name}" does not exist`);
 		this.timer = new Timer(1 / this.config.dropsPerSecond);
 	}
 
-	public onStart(): void {
+	override destroy(): void {
+		this.trove.clean();
+		super.destroy();
+	}
+
+	onStart(): void {
 		this.trove.connect(this.timer.completed, () => this.onTimerCompleted());
 		this.trove.add(
 			this.toggleable.onToggled((bool) => {
@@ -51,29 +56,29 @@ export class Dropper
 		);
 	}
 
-	public setDropsPerSecond(newValue: number): void {
+	setDropsPerSecond(newValue: number): void {
 		this.timer.setLength(1 / newValue);
 	}
 
-	private onTimerCompleted(): void {
+	onTimerCompleted(): void {
 		this.drop();
 		if (this.toggleable.isEnabled()) this.timer.start();
 	}
 
-	private getRandomProduct(): Model {
+	getRandomProduct(): Model {
 		return this.config.productModels[
 			math.random(0, this.config.productModels.size() - 1)
 		];
 	}
 
-	private drop(): void {
+	drop(): void {
 		for (let _ = 0; _ < this.config.productsPerDrop; _++) {
 			// TODO: use a part cache, maybe move to client
 			const clone = this.trove.clone(this.getRandomProduct());
 			clone.Parent = this.instance;
 
 			this.components
-				.waitForComponent<ModelComponent>(clone)
+				.waitForComponent<UsefulModel>(clone)
 				.andThen((_model) => {
 					// model.setNetworkOwner(
 					// 	this.plotAsset.getPlot().getOwner()?.instance,

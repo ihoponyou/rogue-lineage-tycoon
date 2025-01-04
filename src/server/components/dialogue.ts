@@ -1,21 +1,29 @@
-import { Component } from "@flamework/components";
+import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { ReplicatedStorage } from "@rbxts/services";
+import Signal from "@rbxts/signal";
 import { DIALOGUE } from "server/configs/dialogue";
 import { Events } from "server/network";
-import { DisposableComponent } from "shared/components/disposable-component";
 import { Clickable } from "./interactable/clickable";
+import { PlayerServer } from "./player-server";
 
 const OPTION_TEMPLATE = ReplicatedStorage.Assets.UI.Dialogue.OptionTemplate;
+
+type SpokeCallback = (topic: string) => void;
 
 @Component({
 	tag: "Dialogue",
 })
-export class Dialogue extends DisposableComponent implements OnStart {
+export class Dialogue extends BaseComponent implements OnStart {
 	private static openDialogues = new Map<Player, Array<ImageLabel>>();
-	private config = DIALOGUE[this.instance.Name];
 
-	public constructor(private clickable: Clickable) {
+	private config = DIALOGUE[this.instance.Name];
+	private spoke = new Signal<SpokeCallback>();
+
+	public constructor(
+		private components: Components,
+		private clickable: Clickable,
+	) {
 		super();
 	}
 
@@ -25,7 +33,7 @@ export class Dialogue extends DisposableComponent implements OnStart {
 		if (this.config["Open"] === undefined)
 			error('missing "Open" dialogue cfg');
 
-		this.clickable.enable();
+		this.clickable.toggle(true);
 		this.clickable.onInteracted((player) => {
 			this.open(player);
 		});
@@ -34,13 +42,16 @@ export class Dialogue extends DisposableComponent implements OnStart {
 	private addOption(
 		player: Player,
 		text: string,
-		onClick: (component: Dialogue, player: Player) => void,
+		onClick: (component: Dialogue, player: PlayerServer) => void,
 	): ImageLabel {
 		const option = OPTION_TEMPLATE.Clone();
 		option.Parent = player.FindFirstChild("PlayerGui");
 		option.OptionText.Text = text;
 		option.OptionButton.MouseButton1Click.Connect(() =>
-			onClick(this, player),
+			onClick(
+				this,
+				this.components.waitForComponent<PlayerServer>(player).expect(),
+			),
 		);
 
 		Dialogue.openDialogues.get(player)?.push(option);
@@ -61,6 +72,13 @@ export class Dialogue extends DisposableComponent implements OnStart {
 		Dialogue.openDialogues.set(player, []);
 
 		this.speak(player, "Open");
+
+		if (this.instance.Name === "Alfric") {
+			this.instance
+				.FindFirstChild("HumanoidRootPart")
+				?.FindFirstChildOfClass("Sound")
+				?.Play();
+		}
 	}
 
 	public close(player: Player): void {
@@ -92,5 +110,11 @@ export class Dialogue extends DisposableComponent implements OnStart {
 			topicConfig.speech,
 			options,
 		);
+
+		this.spoke.Fire(topic);
+	}
+
+	public onSpoke(callback: SpokeCallback): RBXScriptConnection {
+		return this.spoke.Connect(callback);
 	}
 }

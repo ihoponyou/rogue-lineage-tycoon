@@ -1,21 +1,19 @@
 import { RunService } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
-import { Character } from "client/components/character";
+import { LocalCharacter } from "client/components/local-character";
 import { AnimationController } from "client/controllers/animation-controller";
 import { KeybindController } from "client/controllers/keybind-controller";
-import { Events } from "client/network";
-import { store } from "client/store";
-import { selectActiveTool } from "client/store/slices/gui/selectors";
-import { BLOCK_WALK_SPEED } from "shared/configs";
-import { WeaponConfig, getWeaponConfig } from "shared/configs/weapons";
+import { Events, Functions } from "client/network";
+import { getWeaponConfig, WeaponName } from "shared/configs/weapons";
 import { CharacterActivity } from "./character-activity";
 
 export class BlockActivity extends CharacterActivity {
 	private blockAnimationName = "";
+	private getEquippedWeaponPromise?: Promise<void>;
 	private trove = new Trove();
 
 	public constructor(
-		character: Character,
+		character: LocalCharacter,
 		private animationController: AnimationController,
 		private keybindController: KeybindController,
 	) {
@@ -25,23 +23,29 @@ export class BlockActivity extends CharacterActivity {
 	public override start(): void {
 		super.start();
 
-		const equippedTool = store.getState(selectActiveTool());
-		let config: WeaponConfig | undefined;
-		if (equippedTool !== undefined) {
-			try {
-				config = getWeaponConfig(equippedTool?.Name);
-			} catch (e) {
-				// oops!
-			}
-		}
-		this.blockAnimationName =
-			config?.blockAnimation?.Name ?? "DefaultBlock";
-		this.animationController.play(this.blockAnimationName);
-		this.character.setWalkSpeed(BLOCK_WALK_SPEED);
-
-		Events.combat.block(true);
+		this.getEquippedWeaponPromise =
+			Functions.item.getCurrentlyEquippedWeaponInstance
+				.invoke()
+				.then((instance) => {
+					let config = getWeaponConfig("Fists");
+					if (instance !== undefined) {
+						try {
+							config = getWeaponConfig(
+								instance?.Name as WeaponName,
+							);
+						} catch (e) {
+							// oops!
+						}
+					}
+					this.blockAnimationName =
+						config?.blockAnimation?.Name ?? "DefaultBlock";
+					this.animationController.play(this.blockAnimationName);
+				})
+				.catch(warn);
 
 		this.trove.add(Events.combat.unblock.connect(() => this.stop()));
+
+		Events.combat.block(true);
 
 		this.trove.add(
 			Events.combat.blockHit.connect(() => {
@@ -58,9 +62,9 @@ export class BlockActivity extends CharacterActivity {
 	public override stop(): void {
 		super.stop();
 
+		this.getEquippedWeaponPromise?.cancel();
 		Events.combat.block(false);
 		this.animationController.stop(this.blockAnimationName);
-		this.character.resetWalkSpeed();
 
 		this.trove.clean();
 	}

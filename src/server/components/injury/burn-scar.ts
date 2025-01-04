@@ -17,7 +17,7 @@ export class BurnScar extends BaseInjury implements OnStart, OnTick {
 	public onStart(): void {
 		this.inflict();
 
-		const player = this.character.getPlayer();
+		const player = this.playerCharacter.getPlayer().instance;
 		const data = store.getState(selectPlayer(player))?.resources;
 		if (!data) error("no data");
 
@@ -31,7 +31,7 @@ export class BurnScar extends BaseInjury implements OnStart, OnTick {
 
 	public onTick(_dt: number): void {
 		const characterTemperature = store.getState(
-			selectPlayer(this.character.getPlayer()),
+			selectPlayer(this.playerCharacter.getPlayer().instance),
 		)?.resources.temperature;
 		if (characterTemperature === undefined) return;
 		if (characterTemperature < LOWER_TEMPERATURE_THRESHOLD) return;

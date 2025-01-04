@@ -1,5 +1,4 @@
 export interface Toggleable {
 	isEnabled(): boolean;
-	enable(): void;
-	disable(): void;
+	toggle(bool: boolean): void;
 }

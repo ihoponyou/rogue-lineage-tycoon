@@ -1,23 +1,37 @@
 import { Component, Components } from "@flamework/components";
+import { OnStart } from "@flamework/core";
 import { Workspace } from "@rbxts/services";
 import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { selectPlayer } from "server/store/selectors";
 import { AbstractPlayer } from "shared/components/abstract-player";
-import { Inject } from "shared/inject";
 import { deserializeVector3 } from "shared/modules/serialized-vector3";
-import { Character } from "./character";
+import { PlayerCharacter } from "./player-character";
 
 const TYCOON_FOLDER = Workspace.Tycoons;
 
 @Component({
 	tag: "Player",
 })
-export class PlayerServer extends AbstractPlayer {
+export class PlayerServer extends AbstractPlayer implements OnStart {
 	private assets = new Array<string>();
 
-	@Inject
-	private components!: Components;
+	constructor(private components: Components) {
+		super();
+	}
+
+	public onStart(): void {
+		while (!this.instance.HasTag("DataLoaded")) {
+			task.wait();
+		}
+
+		if (this.instance.Character) {
+			this.onCharacterAdded(this.instance.Character);
+		}
+		this.instance.CharacterAdded.Connect((character) =>
+			this.onCharacterAdded(character),
+		);
+	}
 
 	public hasAsset(assetName: string): boolean {
 		getAssetConfig(assetName);
@@ -39,7 +53,7 @@ export class PlayerServer extends AbstractPlayer {
 
 	public async loadCharacter(
 		leavingPurgatory: boolean = false,
-	): Promise<Character> {
+	): Promise<PlayerCharacter> {
 		return new Promise((resolve, reject) => {
 			if (this.instance.Parent === undefined) {
 				reject("player has already left");
@@ -89,7 +103,7 @@ export class PlayerServer extends AbstractPlayer {
 			}
 
 			this.components
-				.waitForComponent<Character>(this.instance.Character)
+				.waitForComponent<PlayerCharacter>(this.instance.Character)
 				.andThen(
 					(component) => {
 						component.loadHealth();
@@ -102,16 +116,20 @@ export class PlayerServer extends AbstractPlayer {
 		});
 	}
 
-	public getCharacter(): Character {
+	public getPlayerCharacter(): PlayerCharacter {
 		const model = this.instance.Character;
 		if (model === undefined)
 			error(`${this.instance.Name}.Character is undefined`);
-		const character = this.components.getComponent<Character>(model);
+		const character = this.components.getComponent<PlayerCharacter>(model);
 		if (character === undefined)
 			error(
 				`${this.instance.Name}'s character missing character component`,
 			);
 		return character;
+	}
+
+	private onCharacterAdded(character: Model) {
+		character.AddTag(PlayerCharacter.TAG);
 	}
 
 	private isInsideTycoon(position: Vector3): boolean {

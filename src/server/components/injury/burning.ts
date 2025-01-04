@@ -1,9 +1,10 @@
-import { Component } from "@flamework/components";
+import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { Players, TweenService } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
-import { DisposableComponent } from "shared/components/disposable-component";
-import { Character } from "../character";
+import { Trove } from "@rbxts/trove";
+import { CharacterServer } from "../character-server";
+import { PlayerCharacter } from "../player-character";
 
 const HEAT_AMOUNT = 1.5;
 const BURN_DAMAGE = 6;
@@ -13,24 +14,33 @@ const TICKS_TO_DIE = 8;
 @Component({
 	tag: "Burning",
 })
-export class Burning extends DisposableComponent<{}, Model> implements OnStart {
+export class Burning extends BaseComponent<{}, Model> implements OnStart {
 	private killTicks = 0;
+	private trove = new Trove();
 
-	public constructor(private character: Character) {
+	constructor(
+		private playerCharacter: PlayerCharacter,
+		private character: CharacterServer,
+	) {
 		super();
 	}
 
-	public onStart(): void {
-		const torso = this.character.getTorso();
-		torso.OrangeFire.Enabled = true;
-		torso.Burning.Play();
-
-		this.trove.add(setInterval(() => this.burn(), BURN_INTERVAL));
+	override destroy(): void {
+		this.extinguish();
+		this.trove.clean();
+		super.destroy();
 	}
 
-	public override destroy(): void {
-		this.extinguish();
-		super.destroy();
+	onStart(): void {
+		const torso = this.character.getTorso();
+		const fireParticle = torso.FindFirstChild("OrangeFire") as
+			| ParticleEmitter
+			| undefined;
+		if (fireParticle !== undefined) fireParticle.Enabled = true;
+		const burnSound = torso.FindFirstChild("Burning") as Sound | undefined;
+		burnSound?.Play();
+
+		this.trove.add(setInterval(() => this.burn(), BURN_INTERVAL));
 	}
 
 	private burn(): void {
@@ -52,16 +62,26 @@ export class Burning extends DisposableComponent<{}, Model> implements OnStart {
 			const humanoid = this.character.getHumanoid();
 			humanoid.TakeDamage(math.min(BURN_DAMAGE, humanoid.Health));
 
-			this.character.adjustTemperature(HEAT_AMOUNT);
+			this.playerCharacter.adjustTemperature(HEAT_AMOUNT);
 		}
 	}
 
 	private extinguish(): void {
 		const torso = this.character.getTorso();
 		if (torso) {
-			torso.OrangeFire.Enabled = false;
-			torso.Burning.Stop();
-			torso.Extinguish.Play();
+			// TODO: create these onstart and delete on destroy
+			const fireParticle = torso.FindFirstChild("OrangeFire") as
+				| ParticleEmitter
+				| undefined;
+			if (fireParticle !== undefined) fireParticle.Enabled = false;
+			const burnSound = torso.FindFirstChild("Burning") as
+				| Sound
+				| undefined;
+			burnSound?.Stop();
+			const extinguishSound = torso.FindFirstChild("Extinguish") as
+				| Sound
+				| undefined;
+			extinguishSound?.Play();
 		}
 	}
 

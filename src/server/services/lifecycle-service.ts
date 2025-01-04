@@ -1,30 +1,15 @@
-import { Components } from "@flamework/components";
 import { Modding, OnStart, Service } from "@flamework/core";
-import { Players } from "@rbxts/services";
-import { Inject } from "shared/inject";
+import { Players, Workspace } from "@rbxts/services";
 import {
 	OnCharacterAdded,
 	OnCharacterRemoving,
 	OnPlayerAdded,
 	OnPlayerRemoving,
-	OnRemoved,
-} from "../../../types/lifecycles";
+} from "shared/modules/lifecycles";
 
 @Service()
 export class LifecycleService implements OnStart {
-	// this doesnt survive transpilation into lua
-	// private newLifecycleEvent<E>() {
-	// 	const listeners = new Set<E>();
-	// 	Modding.onListenerAdded<E>((obj) => listeners.add(obj));
-	// 	Modding.onListenerRemoved<E>((obj) => listeners.delete(obj));
-	// 	return listeners;
-	// }
-
-	@Inject
-	private components!: Components;
-
 	public onStart(): void {
-		// const playerAddedListeners = this.newLifecycleEvent<OnPlayerAdded>();
 		const playerAddedListeners = new Set<OnPlayerAdded>();
 		Modding.onListenerAdded<OnPlayerAdded>((obj) =>
 			playerAddedListeners.add(obj),
@@ -62,20 +47,17 @@ export class LifecycleService implements OnStart {
 				task.spawn(() => listener.onPlayerAdded(player));
 			}
 			player.CharacterAdded.Connect((character) => {
+				if (!character.IsDescendantOf(Workspace)) {
+					character.AncestryChanged.Wait();
+				}
 				for (const otherListener of characterAddedListeners) {
-					task.spawn(() =>
-						otherListener.onCharacterAdded(
-							character as StarterCharacter,
-						),
-					);
+					task.spawn(() => otherListener.onCharacterAdded(character));
 				}
 			});
 			player.CharacterRemoving.Connect((character) => {
 				for (const otherListener of characterRemovingListeners) {
 					task.spawn(() =>
-						otherListener.onCharacterRemoving(
-							character as StarterCharacter,
-						),
+						otherListener.onCharacterRemoving(character),
 					);
 				}
 			});
@@ -85,12 +67,10 @@ export class LifecycleService implements OnStart {
 			for (const listener of playerAddedListeners) {
 				task.spawn(() => listener.onPlayerAdded(player));
 			}
-			if (player.Character) {
+			if (player.Character !== undefined) {
 				for (const listener of characterAddedListeners) {
 					task.spawn(() =>
-						listener.onCharacterAdded(
-							player.Character as StarterCharacter,
-						),
+						listener.onCharacterAdded(player.Character!),
 					);
 				}
 			}
@@ -100,10 +80,6 @@ export class LifecycleService implements OnStart {
 			for (const listener of playerRemovingListeners) {
 				task.spawn(() => listener.onPlayerRemoving(player));
 			}
-		});
-
-		this.components.onComponentRemoved<OnRemoved>((value) => {
-			value.onRemoved();
 		});
 	}
 }

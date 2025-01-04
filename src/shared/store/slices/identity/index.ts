@@ -1,9 +1,9 @@
 import { createProducer } from "@rbxts/reflex";
+import { PlayerProfileData } from "shared/modules/player-data";
 import {
 	serializeColor3,
 	SerializedColor3,
 } from "shared/modules/serialized-color3";
-import { PlayerData } from "../player-data";
 
 export type Sex = "Male" | "Female";
 
@@ -32,7 +32,7 @@ export const DEFAULT_IDENTITY: Identity = {
 };
 
 export const identitySlice = createProducer(DEFAULT_IDENTITY, {
-	loadPlayerData: (_state, data: PlayerData) => data.identity,
+	loadPlayerData: (_state, data: PlayerProfileData) => data.identity,
 
 	resetLineageValues: (_state) => DEFAULT_IDENTITY,
 

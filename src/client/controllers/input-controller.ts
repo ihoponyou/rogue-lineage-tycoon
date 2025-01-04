@@ -1,15 +1,19 @@
 import { Components } from "@flamework/components";
 import { Controller, OnStart, OnTick } from "@flamework/core";
-import { UserInputService, Workspace } from "@rbxts/services";
-import Signal from "@rbxts/signal";
-import { store } from "client/store";
 import {
-	selectMana,
-	selectManaEnabled,
-} from "shared/store/slices/mana/selectors";
-import { OnLocalCharacterAdded } from "../../../types/lifecycles";
-import { Character } from "../components/character";
-import { InventoryController } from "./inventory-controller";
+	ContextActionService,
+	UserInputService,
+	Workspace,
+} from "@rbxts/services";
+import Signal from "@rbxts/signal";
+import { ProximityInteractableClient } from "client/components/proximity-interactable";
+import { Events } from "client/network";
+import { store } from "client/store";
+import { selectIsBackpackOpen } from "client/store/slices/ui/selectors";
+import { MAX_HOTBAR_SLOTS } from "shared/configs/constants";
+import { INTERACT_RADIUS } from "shared/constants";
+import { selectSkills } from "shared/store/slices/skills/selectors";
+import { CharacterController } from "./character-controller";
 import { KeybindController } from "./keybind-controller";
 
 const BEGIN = Enum.UserInputState.Begin;
@@ -26,8 +30,23 @@ export type Direction = "forward" | "backward" | "left" | "right";
 type ChargeManaCallback = (bool: boolean) => void;
 type ClimbCallback = (wallCastResult: RaycastResult) => void;
 
+const SLOT_KEYS: Array<Enum.KeyCode> = [
+	Enum.KeyCode.One,
+	Enum.KeyCode.Two,
+	Enum.KeyCode.Three,
+	Enum.KeyCode.Four,
+	Enum.KeyCode.Five,
+	Enum.KeyCode.Six,
+	Enum.KeyCode.Seven,
+	Enum.KeyCode.Eight,
+	Enum.KeyCode.Nine,
+	Enum.KeyCode.Zero,
+	Enum.KeyCode.Minus,
+	Enum.KeyCode.Equals,
+];
+
 @Controller()
-export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
+export class InputController implements OnStart, OnTick {
 	private inputVector = Vector2.zero;
 	private runTriggered = new Signal();
 	private dashTriggered = new Signal();
@@ -36,13 +55,13 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	private lightAttackTriggered = new Signal();
 	private heavyAttackTriggered = new Signal();
 	private blockTriggered = new Signal();
+
 	private lastForwardInputTick = 0;
-	private character?: Character;
 
 	public constructor(
 		private components: Components,
 		private keybindController: KeybindController,
-		private inventoryController: InventoryController,
+		private characterController: CharacterController,
 	) {}
 
 	public onStart(): void {
@@ -85,104 +104,84 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			"toggleBackpack",
 			this.keybindController.keybinds.toggleBackpack,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				store.toggleBackpack();
+				if (state !== BEGIN) return Enum.ContextActionResult.Pass;
+				const currentlyOpen = store.getState(selectIsBackpackOpen());
+				store.toggleBackpackOpen(!currentlyOpen);
+				return Enum.ContextActionResult.Pass;
+			},
+		);
+
+		this.keybindController.loadKeybind(
+			"drop",
+			Enum.KeyCode.Backspace,
+			(state) => {
+				if (state !== BEGIN) return;
+				error("fix me");
+				// this.inventoryController.dropSelectedItem();
+			},
+		);
+
+		for (let i = 0; i < MAX_HOTBAR_SLOTS; i++) {
+			ContextActionService.BindAction(
+				`switch_slot_${i}`,
+				(_, inputState) => {
+					if (inputState !== Enum.UserInputState.Begin)
+						return Enum.ContextActionResult.Pass;
+					const character = this.characterController.getCharacter();
+					if (character === undefined)
+						return Enum.ContextActionResult.Pass;
+
+					const state = store.getState();
+					const equippableIdAtSlot = state.hotbar[i];
+					if (equippableIdAtSlot === "")
+						return Enum.ContextActionResult.Pass;
+
+					const equippable =
+						state.equippables.get(equippableIdAtSlot);
+					if (equippable?.isEquipped()) {
+						equippable.unequip(character);
+					} else {
+						equippable?.equip(character);
+					}
+				},
+				false,
+				SLOT_KEYS[i],
+			);
+		}
+
+		this.keybindController.loadKeybind(
+			"carry",
+			this.keybindController.keybinds.carry,
+			(state) => {
+				if (state !== BEGIN) return;
+				Events.combat.carryInput();
 			},
 		);
 		this.keybindController.loadKeybind(
-			"slot1",
-			this.keybindController.keybinds.slot1,
+			"interact",
+			this.keybindController.keybinds.interact,
 			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(0);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot2",
-			this.keybindController.keybinds.slot2,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(1);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot3",
-			this.keybindController.keybinds.slot3,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(2);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot4",
-			this.keybindController.keybinds.slot4,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(3);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot5",
-			this.keybindController.keybinds.slot5,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(4);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot6",
-			this.keybindController.keybinds.slot6,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(5);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot7",
-			this.keybindController.keybinds.slot7,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(6);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot8",
-			this.keybindController.keybinds.slot8,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(7);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot9",
-			this.keybindController.keybinds.slot9,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(8);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot10",
-			this.keybindController.keybinds.slot10,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(9);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot11",
-			this.keybindController.keybinds.slot11,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(10);
-			},
-		);
-		this.keybindController.loadKeybind(
-			"slot12",
-			this.keybindController.keybinds.slot12,
-			(state) => {
-				if (state !== Enum.UserInputState.Begin) return;
-				this.inventoryController.switchSlot(11);
+				if (state !== BEGIN) return;
+				const character = this.characterController.getCharacter();
+				if (character === undefined) return;
+				const params = new OverlapParams();
+				params.AddToFilter(character.instance);
+				const partsWithinInteractRadius =
+					Workspace.GetPartBoundsInRadius(
+						character.getHumanoidRootPart().Position,
+						INTERACT_RADIUS,
+						params,
+					);
+				for (const part of partsWithinInteractRadius) {
+					const interactable =
+						this.components.getComponent<ProximityInteractableClient>(
+							part,
+						);
+					if (interactable === undefined) {
+						continue;
+					}
+					interactable.interact();
+				}
 			},
 		);
 	}
@@ -192,12 +191,6 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 			this.getAxis(InputAxis.Horizontal),
 			this.getAxis(InputAxis.Vertical),
 		);
-	}
-
-	public onLocalCharacterAdded(character: Model): void {
-		this.components
-			.waitForComponent<Character>(character)
-			.andThen((component) => (this.character = component));
 	}
 
 	// like the old unity one
@@ -263,8 +256,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	}
 
 	private handleForwardInput(state: Enum.UserInputState) {
-		if (state !== Enum.UserInputState.Begin)
-			return Enum.ContextActionResult.Pass;
+		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		if (tick() - this.lastForwardInputTick <= RUN_INTERVAL) {
 			this.runTriggered.Fire();
 		}
@@ -273,28 +265,34 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	}
 
 	private handleDashInput(state: Enum.UserInputState) {
-		if (state !== Enum.UserInputState.Begin)
-			return Enum.ContextActionResult.Pass;
+		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
 		this.dashTriggered.Fire();
 		return Enum.ContextActionResult.Pass;
 	}
 
 	private handleJumpInput(state: Enum.UserInputState) {
 		if (state !== BEGIN) return Enum.ContextActionResult.Pass;
-		if (!this.character) return Enum.ContextActionResult.Pass;
-		const manaData = store.getState(selectMana());
-		if ((manaData?.amount ?? 0) <= 0 || !manaData?.climbEnabled)
+		const character = this.characterController.getCharacter();
+		if (character === undefined) return Enum.ContextActionResult.Pass;
+		const playerState = store.getState();
+		if (
+			(playerState?.mana.amount ?? 0) <= 0 ||
+			!playerState.skills.has("Mana Climb")
+		)
 			return Enum.ContextActionResult.Pass;
 
-		const humanoidRootPart = this.character.getHumanoidRootPart();
+		const humanoidRootPart = character.getHumanoidRootPart();
 		const forwardCast = Workspace.Raycast(
 			humanoidRootPart.Position,
 			humanoidRootPart.CFrame.LookVector.mul(new Vector3(2, 0, 2)),
-			this.character.getRaycastParams(),
+			character.getRaycastParams(),
 		);
 
 		const inAir =
-			this.character.getHumanoid().FloorMaterial === Enum.Material.Air;
+			character.getHumanoid().FloorMaterial === Enum.Material.Air;
+
+		// TODO: double jump
+
 		if (!forwardCast || !inAir) {
 			return Enum.ContextActionResult.Pass;
 		}
@@ -310,7 +308,7 @@ export class InputController implements OnStart, OnTick, OnLocalCharacterAdded {
 	}
 
 	private handleManaInput(state: Enum.UserInputState) {
-		const manaEnabled = store.getState(selectManaEnabled());
+		const manaEnabled = store.getState(selectSkills()).has("Mana");
 		if (!manaEnabled) return Enum.ContextActionResult.Pass;
 		if (state === BEGIN || state === END) {
 			this.chargeManaTriggered.Fire(state === BEGIN);

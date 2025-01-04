@@ -5,9 +5,8 @@ import { TouchableModel } from "server/components/interactable/touchable/touchab
 import { getAssetConfig } from "server/configs/tycoon";
 import { store } from "server/store";
 import { selectPlayer } from "server/store/selectors";
-import { ModelComponent } from "shared/components/model";
+import { UsefulModel } from "shared/components/useful-model";
 import { Hideable } from "shared/hideable";
-import { Inject } from "shared/inject";
 import { PlayerServer } from "../player-server";
 import { Plot } from "./plot";
 
@@ -34,10 +33,10 @@ export class Pad
 	private assetConfig = getAssetConfig(this.attributes.assetName);
 	private purchased = new Signal<PurchaseCallback>();
 
-	@Inject
-	private components!: Components;
-
-	public constructor(private model: ModelComponent) {
+	public constructor(
+		private components: Components,
+		private model: UsefulModel,
+	) {
 		super();
 	}
 
@@ -51,19 +50,19 @@ export class Pad
 
 		this.setupBillboard();
 
-		this.enable();
+		this.toggle(true);
 	}
 
 	public onPurchased(callback: PurchaseCallback): void {
 		this.trove.connect(this.purchased, (player) => callback(player));
 	}
 
-	public hide(): void {
-		this.model.hide();
+	isHidden(): boolean {
+		return this.model.isHidden();
 	}
 
-	public show(): void {
-		this.model.show();
+	toggleHidden(bool?: boolean): void {
+		this.model.toggleHidden(bool);
 	}
 
 	public override isPlayerAllowed(player: Player): boolean {
@@ -97,8 +96,8 @@ export class Pad
 
 		print(`unlocked ${this.attributes.assetName}`);
 		playerServer.addAsset(this.attributes.assetName);
-		this.hide();
-		this.disable();
+		this.toggleHidden(true);
+		this.toggle(false);
 
 		this.purchased.Fire(playerServer);
 	}

@@ -1,10 +1,8 @@
-import { Component, Components } from "@flamework/components";
+import { BaseComponent, Component, Components } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { store } from "server/store";
-import { DisposableComponent } from "shared/components/disposable-component";
-import { ModelComponent } from "shared/components/model";
-import { Inject } from "shared/inject";
-import { Currency } from "../../../../types/currency";
+import { UsefulModel } from "shared/components/useful-model";
+import { Currency } from "shared/modules/currency";
 import { Clickable } from "../interactable/clickable";
 import { PlayerServer } from "../player-server";
 import { Pad } from "./pad";
@@ -18,10 +16,7 @@ type PlotInstance = Model & {
 @Component({
 	tag: "Plot",
 })
-export class Plot
-	extends DisposableComponent<{}, PlotInstance>
-	implements OnStart
-{
+export class Plot extends BaseComponent<{}, PlotInstance> implements OnStart {
 	private static plotOwners = new Map<Player, Plot>();
 
 	private bank: { [currency in Currency]: number } = {
@@ -32,10 +27,11 @@ export class Plot
 	};
 	private owner?: PlayerServer;
 	private teller!: Clickable;
-	private assets = new Map<string, ModelComponent>();
+	private assets = new Map<string, UsefulModel>();
 
-	@Inject
-	private components!: Components;
+	constructor(private components: Components) {
+		super();
+	}
 
 	public onStart(): void {
 		this.teller = this.components.getComponent<Clickable>(
@@ -45,8 +41,7 @@ export class Plot
 		this.teller.onInteracted((player) => this.onTellerInteracted(player));
 
 		this.instance.Assets.GetChildren().forEach((instance) => {
-			const model =
-				this.components.getComponent<ModelComponent>(instance);
+			const model = this.components.getComponent<UsefulModel>(instance);
 			if (model === undefined) return;
 			this.assets.set(instance.Name, model);
 			if (instance.HasTag("HideOnUnlock")) return;
@@ -56,8 +51,8 @@ export class Plot
 		this.instance.Pads.GetChildren().forEach((instance) => {
 			const pad = this.components.getComponent<Pad>(instance);
 			if (pad === undefined) return;
-			pad.hide();
-			pad.disable();
+			pad.toggleHidden(true);
+			pad.toggle(false);
 			pad.onPurchased(() => this.refreshPads());
 		});
 	}
@@ -94,8 +89,8 @@ export class Plot
 			if (this.owner.hasAsset(pad.attributes.assetName)) continue;
 			if (!this.owner.hasAssetPrerequisites(pad.attributes.assetName))
 				continue;
-			pad.show();
-			pad.enable();
+			pad.toggleHidden(false);
+			pad.toggle(true);
 		}
 	}
 

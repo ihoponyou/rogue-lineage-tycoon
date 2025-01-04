@@ -1,11 +1,12 @@
 import { UserInputService } from "@rbxts/services";
 import { Trove } from "@rbxts/trove";
-import { Character } from "client/components/character";
+import { LocalCharacter } from "client/components/local-character";
 import { AnimationController } from "client/controllers/animation-controller";
 import { Events } from "client/network";
 import { store } from "client/store";
 import { VFX } from "shared/constants";
 import { selectMana } from "shared/store/slices/mana/selectors";
+import { selectSkills } from "shared/store/slices/skills/selectors";
 import { CharacterActivity } from "./character-activity";
 
 export class RunActivity extends CharacterActivity {
@@ -13,7 +14,7 @@ export class RunActivity extends CharacterActivity {
 	private manaTrail = this.newManaTrail();
 
 	public constructor(
-		character: Character,
+		character: LocalCharacter,
 		private animationController: AnimationController,
 	) {
 		super(character);
@@ -22,9 +23,20 @@ export class RunActivity extends CharacterActivity {
 	public override start(): void {
 		super.start();
 
+		Events.character.startRun();
+
+		const hasManaRun = store.getState(selectSkills()).has("Mana Run");
 		const manaData = store.getState(selectMana());
-		const canManaRun = (manaData?.amount ?? 0) > 0 && manaData?.runEnabled;
-		canManaRun ? this.manaRun() : this.run();
+		const canManaRun = (manaData?.amount ?? 0) > 0 && hasManaRun;
+		if (canManaRun) {
+			this.trove.add(
+				Events.mana.emptied.connect(() => {
+					if (this.manaTrail) this.manaTrail.Enabled = false;
+				}),
+			);
+
+			this.manaTrail.Enabled = true;
+		}
 
 		this.trove.connect(UserInputService.InputEnded, (input, gpe) => {
 			if (gpe) return;
@@ -36,31 +48,10 @@ export class RunActivity extends CharacterActivity {
 	public override stop(): void {
 		super.stop();
 
-		this.character.resetWalkSpeed();
-		this.animationController.stop("Run");
-		this.animationController.stop("ManaRun");
+		Events.character.stopRun();
 		this.manaTrail.Enabled = false;
 
 		this.trove.clean();
-	}
-
-	private run(): void {
-		this.character.setWalkSpeed(this.character.getWalkSpeed() * 1.5);
-		this.animationController.play("Run");
-	}
-
-	private manaRun(): void {
-		this.trove.add(Events.mana.emptied.connect(() => this.onManaEmptied()));
-
-		this.character.setWalkSpeed(this.character.getWalkSpeed() * 2);
-		this.animationController.play("ManaRun");
-		this.manaTrail.Enabled = true;
-	}
-
-	private onManaEmptied(): void {
-		this.animationController.stop("ManaRun");
-		if (this.manaTrail) this.manaTrail.Enabled = false;
-		this.run();
 	}
 
 	private newManaTrail(): Trail {

@@ -1,12 +1,22 @@
-import { Component } from "@flamework/components";
-import { SKILLS } from "server/configs/tycoon";
+import { Component, Components } from "@flamework/components";
+import { SKILLS } from "server/configs/skills";
+import { store } from "server/store";
+import { SkillId } from "shared/configs/skills";
 import { UnlockEffect } from ".";
+import { Unlockable } from "../unlockable";
 
 @Component({
 	tag: "TeachOnUnlock",
 })
 export class TeachOnUnlock extends UnlockEffect {
-	private skillConfig = SKILLS[this.instance.Name];
+	private skillConfig = SKILLS[this.instance.Name as SkillId];
+
+	public constructor(
+		unlockable: Unlockable,
+		private components: Components,
+	) {
+		super(unlockable);
+	}
 
 	public override onStart(): void {
 		super.onStart();
@@ -15,6 +25,6 @@ export class TeachOnUnlock extends UnlockEffect {
 	}
 
 	public override onUnlocked(player: Player): void {
-		this.skillConfig.teach(player);
+		store.addSkill(player, this.instance.Name as SkillId);
 	}
 }

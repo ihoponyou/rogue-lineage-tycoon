@@ -1,6 +1,6 @@
 import { createProducer } from "@rbxts/reflex";
-import { Currency } from "../../../../../types/currency";
-import { PlayerData } from "../player-data";
+import { PlayerProfileData } from "shared/modules/player-data";
+import { Currency } from "../../../modules/currency";
 
 export interface CurrencyData {
 	readonly amount: number;
@@ -22,14 +22,13 @@ export const DEFAULT_CURRENCY_STATE: Currencies = {
 };
 
 export const currenciesSlice = createProducer(DEFAULT_CURRENCY_STATE, {
-	loadPlayerData: (_state, data: PlayerData) => {
+	loadPlayerData: (_state, data: PlayerProfileData) => {
 		return data.currencies;
 	},
 
 	resetLineageValues: (state) => {
-		// TODO: implement this
 		return {
-			...state,
+			...DEFAULT_CURRENCY_STATE,
 			Insight: state.Insight,
 		};
 	},

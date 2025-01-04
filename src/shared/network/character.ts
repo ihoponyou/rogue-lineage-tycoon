@@ -3,3 +3,9 @@ export interface CharacterClientEvents {
 	firstNameChanged(name: string): void;
 	stopRun(): void;
 }
+
+export interface CharacterServerEvents {
+	startRun(): void;
+	stopRun(): void;
+	dash(): void;
+}

@@ -1,2 +1,2 @@
-export const CONDITIONS = ["Frostbite", "BurnScar"] as const;
+export const CONDITIONS = ["Frostbite", "BurnScar", "Concussion"] as const;
 export type Condition = (typeof CONDITIONS)[number];

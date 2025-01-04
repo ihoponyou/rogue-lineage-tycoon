@@ -1,23 +1,32 @@
+import { Components } from "@flamework/components";
 import { Controller, OnStart } from "@flamework/core";
 import React, { StrictMode } from "@rbxts/react";
 import { ReflexProvider } from "@rbxts/react-reflex";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
-import { SoundService, StarterGui } from "@rbxts/services";
-import Signal from "@rbxts/signal";
-import { LOCAL_PLAYER_GUI } from "client/constants";
-import { App } from "client/gui/components/app";
-import { signalContext, ToolSelectedCallback } from "client/gui/context";
+import { Lighting, SoundService, StarterGui } from "@rbxts/services";
+import { LOCAL_PLAYER_GUI } from "client/configs/constants";
 import { Events } from "client/network";
 import { store } from "client/store";
+import { App } from "client/ui/components/app";
+import { singletonsContext } from "client/ui/context";
 import { selectCurrencies } from "shared/store/slices/currencies/selectors";
+import { CharacterController } from "./character-controller";
 
 @Controller()
 export class GuiController implements OnStart {
 	private root = createRoot(new Instance("Folder"));
+	private blurEffect = new Instance("BlurEffect");
 
-	private selectedTool = new Signal<ToolSelectedCallback>();
+	constructor(
+		private components: Components,
+		private characterController: CharacterController,
+	) {}
 
 	public onStart() {
+		this.blurEffect.Parent = Lighting;
+		this.blurEffect.Enabled = false;
+		this.blurEffect.Size = 50;
+
 		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Health, false);
 		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, false);
 		StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false);
@@ -38,18 +47,23 @@ export class GuiController implements OnStart {
 			store.setDialogueOptions([]);
 			store.setSpeakerName("");
 		});
+
+		Events.toggleBlur.connect((on) => {
+			this.blurEffect.Enabled = on;
+		});
+
 		this.root.render(
 			<StrictMode>
+				<singletonsContext.Provider
+					value={{
+						character: this.characterController,
+						components: this.components,
+					}}
+				></singletonsContext.Provider>
 				<ReflexProvider producer={store}>
-					<signalContext.Provider value={this.selectedTool}>
-						{createPortal(<App />, LOCAL_PLAYER_GUI)}
-					</signalContext.Provider>
+					{createPortal(<App />, LOCAL_PLAYER_GUI)}
 				</ReflexProvider>
 			</StrictMode>,
 		);
-	}
-
-	public onToolSelected(callback: ToolSelectedCallback): RBXScriptConnection {
-		return this.selectedTool.Connect(callback);
 	}
 }

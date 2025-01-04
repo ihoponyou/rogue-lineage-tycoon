@@ -1,120 +1,103 @@
-import { Component } from "@flamework/components";
+import { BaseComponent, Component } from "@flamework/components";
 import { OnStart } from "@flamework/core";
 import { promiseR6 } from "@rbxts/promise-character";
-import { Players } from "@rbxts/services";
-import { BASE_WALK_SPEED } from "shared/configs";
-import { DisposableComponent } from "./disposable-component";
+import { BASE_JUMP_POWER } from "shared/configs";
+import { Stat } from "shared/modules/stat";
 import { AbstractRagdoll } from "./ragdoll";
+import { UsefulModel } from "./useful-model";
 
 export interface CharacterAttributes {
 	isKnocked: boolean;
 	isAlive: boolean;
-	isStunned: boolean;
 	isBlocking: boolean;
 	isAttacking: boolean;
+	isCarried: boolean;
+	isDashing: boolean;
 	combo: number;
 	lightAttackDebounce: boolean;
 	heavyAttackDebounce: boolean;
+	stunTimer: number;
 }
-
-const DEFAULT_JUMP_POWER = 50;
 
 @Component()
 export abstract class AbstractCharacter
-	extends DisposableComponent<CharacterAttributes, Model>
+	extends BaseComponent<CharacterAttributes, Model>
 	implements OnStart
 {
+	static readonly TAG = "Character";
+
 	protected raycastParams = new RaycastParams();
 	protected humanoid!: Humanoid;
 	protected abstract ragdoll: AbstractRagdoll;
+	protected abstract readonly inventoryFolder: Folder;
+	protected abstract readonly skillsFolder: Folder;
 
-	public onStart(): void {
-		const character = promiseR6(this.instance).expect();
-		this.humanoid = character.Humanoid;
+	protected manaChargeRate = new Stat(-1);
 
+	constructor(readonly usefulModel: UsefulModel) {
+		super();
+	}
+
+	onStart(): void {
 		this.raycastParams.CollisionGroup = "Characters";
 		this.raycastParams.FilterType = Enum.RaycastFilterType.Exclude;
 		this.raycastParams.IgnoreWater = true;
+		this.raycastParams.RespectCanCollide = true;
 
 		this.raycastParams.AddToFilter(this.instance);
 
-		this.humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
-
-		this.onAttributeChanged("isStunned", (stunned, _wasStunned) => {
-			if (stunned) {
-				this.setWalkSpeed(0);
-				this.toggleJump(false);
-			} else {
-				this.resetWalkSpeed();
-				this.toggleJump(true);
-			}
-		});
+		const character = promiseR6(this.instance).expect();
+		character.Humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
+		this.humanoid = character.Humanoid;
 	}
 
-	public getHumanoid(): Humanoid {
-		return this.humanoid;
+	getHumanoid() {
+		const rig = promiseR6(this.instance)
+			.catch((reason) => debug.traceback(reason))
+			.expect();
+		if (typeIs(rig, "string")) {
+			error(`wtf`);
+		}
+		return rig.Humanoid;
 	}
 
-	public getAnimator(): Animator {
-		const animator = this.humanoid.FindFirstChild("Animator") as
-			| Animator
-			| undefined;
-		if (!animator)
-			error(`Animator not found in character ${this.instance.Name}`);
-		return animator;
+	getAnimator(): Animator {
+		return this.getHumanoid().Animator;
 	}
 
-	public getPlayer(): Player {
-		const player = Players.GetPlayerFromCharacter(this.instance);
-		if (!player)
-			error(`Player not found from character ${this.instance.Name}`);
-		return player;
+	getHead(): Part {
+		const head = this.instance.FindFirstChild("Head");
+		if (head === undefined) error(`nil head`);
+		return head as Part;
 	}
 
-	public getHead(): Head {
-		const head = this.instance.FindFirstChild("Head") as Head | undefined;
-		if (!head) error(`Head not found in character ${this.instance.Name}`);
-		return head;
+	getTorso() {
+		return promiseR6(this.instance).expect().Torso;
 	}
 
-	public getTorso(): Torso {
-		const torso = this.instance.FindFirstChild("Torso") as
-			| Torso
-			| undefined;
-		if (!torso) error(`Torso not found in character ${this.instance.Name}`);
-		return torso;
+	getHumanoidRootPart() {
+		const rig = promiseR6(this.instance)
+			.catch((reason) => debug.traceback(reason))
+			.expect();
+		if (typeIs(rig, "string")) {
+			error(`wtf`);
+		}
+		return rig.HumanoidRootPart;
 	}
 
-	public getHumanoidRootPart(): HumanoidRootPart {
-		const humanoidRootPart = this.instance.FindFirstChild(
-			"HumanoidRootPart",
-		) as HumanoidRootPart | undefined;
-		if (!humanoidRootPart)
-			error(`HRP not found in character ${this.instance.Name}`);
-		return humanoidRootPart;
-	}
-
-	public getRaycastParams(): RaycastParams {
+	getRaycastParams(): RaycastParams {
 		return this.raycastParams;
 	}
 
-	public getWalkSpeed(): number {
-		return BASE_WALK_SPEED; // plus bonuses
+	isStunned(): boolean {
+		return this.attributes.stunTimer > 0;
 	}
 
-	public resetWalkSpeed(): void {
-		this.humanoid.WalkSpeed = this.getWalkSpeed();
-	}
-
-	public setWalkSpeed(speed: number): void {
-		this.humanoid.WalkSpeed = speed;
-	}
-
-	public canAttack(): boolean {
+	canAttack(): boolean {
 		return (
 			this.attributes.isAlive &&
 			!(
-				this.attributes.isStunned ||
+				this.isStunned() ||
 				this.attributes.isBlocking ||
 				this.attributes.isAttacking ||
 				this.ragdoll.attributes.isRagdolled
@@ -122,27 +105,28 @@ export abstract class AbstractCharacter
 		);
 	}
 
-	public canLightAttack(): boolean {
+	canLightAttack(): boolean {
 		return this.canAttack() && !this.attributes.lightAttackDebounce;
 	}
 
-	public canHeavyAttack(): boolean {
+	canHeavyAttack(): boolean {
 		return this.canAttack() && !this.attributes.heavyAttackDebounce;
 	}
 
-	public canBlock(): boolean {
+	canBlock(): boolean {
 		return (
 			this.attributes.isAlive &&
 			!(
-				this.attributes.isStunned ||
+				this.isStunned() ||
 				this.attributes.isBlocking ||
 				this.attributes.isAttacking ||
+				this.attributes.isDashing ||
 				this.ragdoll.attributes.isRagdolled
 			)
 		);
 	}
 
-	public toggleJump(enable: boolean): void {
-		this.humanoid.JumpPower = enable ? DEFAULT_JUMP_POWER : 0;
+	toggleJump(enable: boolean): void {
+		this.getHumanoid().JumpPower = enable ? BASE_JUMP_POWER : 0;
 	}
 }

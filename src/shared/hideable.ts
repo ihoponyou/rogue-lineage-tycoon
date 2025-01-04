@@ -1,4 +1,4 @@
 export interface Hideable {
-	hide(): void;
-	show(): void;
+	isHidden(): boolean;
+	toggleHidden(bool?: boolean): void;
 }
