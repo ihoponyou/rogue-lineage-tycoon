@@ -1,4 +1,4 @@
-export interface Toggleable {
+export interface IToggleable {
 	isEnabled(): boolean;
 	toggle(bool: boolean): void;
 }
